@@ -6,8 +6,12 @@ const { app, BrowserWindow } = require('electron');
 app.on('ready', function() {
     //Pego a altura e largura do monitor principal
     const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
+    //defino o Menu
+    const menu = null;
     //Crio minha janela no monitor principal
     let win = new BrowserWindow({ x: 0, y: 0, width, height });
+    //seto o menu
+    win.setMenu(menu);
     //Abro a URL do monitor
     win.loadURL('file://' + __dirname + '/index.html');
     //Capturo os monitores disponiveis
@@ -26,7 +30,7 @@ app.on('ready', function() {
             frame: false
         });
         //Abro a url do monitor externo
-        win2.loadURL('https://github.com');
+        win2.loadURL('file://' + __dirname + '/projetor.html');
     }
     //Ação ao fechar o monitor principal
     win.on('closed', () => {
