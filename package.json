@@ -1,0 +1,9 @@
+{
+    "name": "dsw",
+    "version": "0.1.0",
+    "main": "main.js",
+    "author": "Thiago Lucena",
+    "scripts": {
+        "start": "electron main.js"
+    }
+}
