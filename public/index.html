@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>DSW - Projeção</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/all.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-dynamic-tabs.css">
+</head>
+
+<body>
+    <h1>Testando Electron!</h1>
+    <!-- Podemos pegar informações diretamente na página, mas na próxima etapa será mostrado como controlar sua interface -->
+    A versão do Electron é
+    <script>
+        document.write(process.versions.electron)
+    </script>, Node
+    <script>
+        document.write(process.versions.node)
+    </script>, e Chromium
+    <script>
+        document.write(process.versions.chrome)
+    </script>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <button id="btnHtml" class="btn btn-info">Aba com HTML</button>
+                <button id="btnAjax" class="btn btn-primary">Aba com AJAX</button>
+                <button id="btnIon" class="btn btn-danger">Aba com ícone <i class="fas fa-user"></i></button>
+            </div>
+        </div>
+        <div id="tabs">
+        </div>
+    </div>
+    <script>
+        window.$ = window.jQuery = require("jquery");
+    </script>
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/bootstrap-dynamic-tabs.js"></script>
+    <script>
+        // Pode usar o jQuery normalmente agora.
+        $(document).ready(
+            function() {
+                $("<h1>Test jQuery</h1>").appendTo('body');
+            }
+        );
+
+        var tabs = $('#tabs').bootstrapDynamicTabs().addTab({
+            title: 'Home',
+            text: 'Plugin jQuery para manipular tabs do bootstrap de forma dinâmica, excelente para aplicações multitelas na WEB ou em runtimes como node-webkit ou electron.',
+            closable: false
+        });
+        tabs.addTab({
+            title: 'Carregando via Ajax',
+            id: 'ajax1',
+            ajaxUrl: 'ajax/file2.html',
+            loadScripts: 'js/load.js',
+            loadStyles: ['css/test.css', 'css/test2.css']
+        });
+        $('#btnHtml').click(function() {
+            tabs.addTab({
+                title: 'Aba com HTML',
+                html: '<h2>Desenvolvido por <a href="//jayralencar.com.br">Jayr Alencar</a></h2>'
+            })
+        });
+        $('#btnAjax').click(function() {
+            tabs.addTab({
+                title: 'Carregando via Ajax',
+                id: 'ajax',
+                ajaxUrl: 'ajax/file.html',
+                loadScripts: 'js/load.js',
+                loadStyles: ['css/test.css', 'css/test2.css']
+            });
+        });
+        $('#btnIon').click(function() {
+            tabs.addTab({
+                title: 'Aba com ícone',
+                html: '<h2>Aba com ícone</h2>Um icone Font Awesome, exemplo: fa fa-user. O icone será mostrado na aba. Você também pode usar os glyphicon do Bootstrap </code>',
+                icon: 'fas fa-user'
+            })
+        })
+    </script>
+</body>
+
+</html>

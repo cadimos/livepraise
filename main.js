@@ -2,6 +2,8 @@
 const electron = require('electron');
 //Importo os modulos
 const { app, BrowserWindow } = require('electron');
+const server = require("./server");
+
 //Inicio a aplicação
 app.on('ready', function() {
     //Pego a altura e largura do monitor principal
@@ -27,14 +29,19 @@ app.on('ready', function() {
             y: externalDisplay.bounds.y,
             width: externalDisplay.bounds.width,
             height: externalDisplay.bounds.height,
-            frame: false
+            frame: false,
         });
         //Abro a url do monitor externo
-        win2.loadURL('file://' + __dirname + '/projetor.html');
+        //win2.loadURL('file://' + __dirname + '/projetor.html');
+        //win2.loadURL('http://localhost:8080/index.html');
+        win2.loadURL('http://localhost:8080/projetor.html');
+        win2.openDevTools();
     }
-    //Ação ao fechar o monitor principal
+    //Ação ao fechar
     win.on('closed', () => {
-        win = null,
-            win2.close()
+        app.quit()
+    });
+    win2.on('closed', () => {
+        app.quit()
     });
 });

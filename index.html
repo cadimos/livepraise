@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>DSW - Projeção</title>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="css/all.css">
-    <link rel="stylesheet" type="text/css" href="css/bootstrap-dynamic-tabs.css">
+    <link rel="stylesheet" type="text/css" href="public/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="public/css/all.css">
+    <link rel="stylesheet" type="text/css" href="public/css/bootstrap-dynamic-tabs.css">
 </head>
 
 <body>
@@ -33,10 +33,24 @@
         <div id="tabs">
         </div>
     </div>
-    <script src="js/jquery.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
-    <script src="js/bootstrap.js"></script>
-    <script src="js/bootstrap-dynamic-tabs.js"></script>
+    <script>
+        window.$ = window.jQuery = require("jquery");
+        //window.$.ui = window.jQuery.ui = require("jquery-ui");
+        /*
+                                require("jsdom").env("", function(err, window) {
+                                    if (err) {
+                                        console.error(err);
+                                        return;
+                                    }
+
+                                    var $ = require("jquery")(window);
+                                });
+                                */
+    </script>
+    <script src="public/js/jquery.js"></script>
+    <script src="public/js/jquery-ui.min.js"></script>
+    <script src="public/js/bootstrap.js"></script>
+    <script src="public/js/bootstrap-dynamic-tabs.js"></script>
     <script>
         var tabs = $('#tabs').bootstrapDynamicTabs().addTab({
             title: 'Home',
@@ -46,7 +60,7 @@
         tabs.addTab({
             title: 'Carregando via Ajax',
             id: 'ajax1',
-            ajaxUrl: 'ajax/file2.html',
+            ajaxUrl: 'public/ajax/file2.html',
             loadScripts: 'js/load.js',
             loadStyles: ['css/test.css', 'css/test2.css']
         });
@@ -60,7 +74,7 @@
             tabs.addTab({
                 title: 'Carregando via Ajax',
                 id: 'ajax',
-                ajaxUrl: 'ajax/file.html',
+                ajaxUrl: 'public/ajax/file.html',
                 loadScripts: 'js/load.js',
                 loadStyles: ['css/test.css', 'css/test2.css']
             });
