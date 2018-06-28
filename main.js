@@ -15,7 +15,7 @@ app.on('ready', function() {
     //seto o menu
     win.setMenu(menu);
     //Abro a URL do monitor
-    win.loadURL('file://' + __dirname + '/index.html');
+    win.loadURL('file://' + __dirname + '/public/index.html');
     //Capturo os monitores disponiveis
     let displays = electron.screen.getAllDisplays();
     //Verifico sem tem um monitor externo
@@ -32,10 +32,11 @@ app.on('ready', function() {
             frame: false,
         });
         //Abro a url do monitor externo
-        //win2.loadURL('file://' + __dirname + '/projetor.html');
+        win2.loadURL('file://' + __dirname + '/public/projetor.html');
         //win2.loadURL('http://localhost:8080/index.html');
-        win2.loadURL('http://localhost:8080/projetor.html');
-        win2.openDevTools();
+        //win2.loadURL('http://localhost:8080/projetor.html');
+        //win2.loadURL('http://localhost:8080/index.html');
+        //win2.openDevTools();
     }
     //Ação ao fechar
     win.on('closed', () => {
