@@ -11,11 +11,20 @@ app.on('ready', function() {
     //defino o Menu
     const menu = null;
     //Crio minha janela no monitor principal
-    let win = new BrowserWindow({ x: 0, y: 0, width, height });
+    let win = new BrowserWindow({
+        x: 0,
+        y: 0,
+        width,
+        height,
+        webPreferences: {
+            preload: './preload.js'
+        }
+    });
     //seto o menu
     win.setMenu(menu);
     //Abro a URL do monitor
     win.loadURL('file://' + __dirname + '/public/index.html');
+    //win.openDevTools();
     //Capturo os monitores disponiveis
     let displays = electron.screen.getAllDisplays();
     //Verifico sem tem um monitor externo

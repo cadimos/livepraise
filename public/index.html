@@ -36,10 +36,12 @@
     <script>
         window.$ = window.jQuery = require("jquery");
     </script>
-    <script src="js/jquery.js"></script>
+    <script crossorigin src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/socket.io-client/dist/socket.io.js"></script>
     <script src="js/jquery-ui.min.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="js/bootstrap-dynamic-tabs.js"></script>
+    <script src="js/monitor.js"></script>
     <script>
         var tabs = $('#tabs').bootstrapDynamicTabs().addTab({
             title: 'Home',
@@ -76,6 +78,11 @@
             })
         })
     </script>
+    <ul class="chat">
+    </ul>
+    <textarea id="textarea"></textarea>
+    <a href="javascript:void(0);" onclick="background('background/praia.jpg');"><img src="background/praia.jpg" width="100"></a>
+    <a href="javascript:void(0);" onclick="background('background/fundo.jpg');"><img src="background/fundo.jpg" width="100"></a>
 </body>
 
 </html>

@@ -1,26 +1,35 @@
-const express = require('express');
-const server = express();
+var express = require('express');
+var app = require('express')();
+var http = require('http').Server(app);
+const io = require('socket.io')(http);
 
-server.use(express.static('public'));
-server.get('/', (req, res) => res.send('Hello World!'));
+var clients = {};
+app.use(express.static('public'));
+app.get('/', function(req, res){
+    res.send('Bem Vindo ao Sistema de Projeção!');
+});
 
-server.listen(8080, () => console.log('Example app listening on port 3000!'));
-
-/*
-var http = require('http');
-var url = require('url');
-var fs = require('fs');
-
-http.createServer(function(req, res) {
-    var q = url.parse(req.url, true);
-    var filename = "." + q.pathname;
-    fs.readFile(filename, function(err, data) {
-        if (err) {
-            res.writeHead(404, { 'Content-Type': 'text/html' });
-            return res.end("404 Not Found");
-        }
-        res.write(data);
-        return res.end();
+//SocketIO vem aqui
+io.on("connection", function (client) {  
+    client.on("join", function(name){
+    	console.log("Joined: " + name);
+        clients[client.id] = name;
+        client.emit("update", "You have connected to the server.");
+        client.broadcast.emit("update", name + " has joined the server.")
     });
-}).listen(8080);
-*/
+
+    client.on("send", function(msg){
+    	console.log("Message: " + msg);
+        client.broadcast.emit("chat", clients[client.id], msg);
+    });
+
+    client.on("disconnect", function(){
+    	console.log("Disconnect");
+        io.emit("update", clients[client.id] + " has left the server.");
+        delete clients[client.id];
+    });
+});
+
+http.listen(3000, function(){
+    console.log('Iniciado servidor!');
+});
