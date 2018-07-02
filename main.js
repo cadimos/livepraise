@@ -46,12 +46,12 @@ app.on('ready', function() {
         //win2.loadURL('http://localhost:8080/projetor.html');
         //win2.loadURL('http://localhost:8080/index.html');
         //win2.openDevTools();
+        win2.on('closed', () => {
+            app.quit()
+        });
     }
     //Ação ao fechar
     win.on('closed', () => {
-        app.quit()
-    });
-    win2.on('closed', () => {
         app.quit()
     });
 });
