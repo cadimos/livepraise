@@ -13,13 +13,9 @@
         }, options);
 
         if (this.find('.nav-tabs').length == 0) {
-            this.append($('<ul/>', { class: 'nav nav-tabs' }).sortable({
-                connectWith: this
-            }));
+            this.append($('<ul/>', { class: 'nav nav-tabs' }).sortable());
         } else {
-            this.find('.nav-tabs').sortable({
-                connectWith: this
-            });
+            this.find('.nav-tabs').sortable();
         }
 
         if (this.find('.tab-content').length == 0) {
