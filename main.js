@@ -23,10 +23,10 @@ app.on('ready', function() {
     //seto o menu
     win.setMenu(menu);
     //Abro a URL do monitor
-    win.loadURL('file://' + __dirname + '/public/index.html');
+    win.loadURL('file://' + __dirname + '/app/index.html');
     //win.loadURL('file://' + __dirname + '/chrome-tabs/index.html');
     //win.loadURL('https://adamschwartz.co/chrome-tabs/');
-    win.openDevTools();
+    //win.openDevTools();
     //Capturo os monitores disponiveis
     let displays = electron.screen.getAllDisplays();
     //Verifico sem tem um monitor externo

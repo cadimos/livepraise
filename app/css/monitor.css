@@ -5,3 +5,39 @@
     width: 100%;
     height: 45px;
 }
+#preview{
+    width: 35vw;
+    height: 45vh;
+    padding: 0;
+    float: right;
+}
+#preview img{
+    width: 100%;
+    height: 45vh;
+}
+#navegacao-tab{
+    width: 65vw;
+    height: 45vh;
+    padding-left: 0;
+    padding-right: 0;
+}
+#navegacao-itens{
+    height: 45vh;
+    padding: 0;
+    float: left;
+    width: 100vw;
+}
+.container-fluid{
+    padding: 0 !important;
+}
+.chrome-tabs .chrome-tab {
+    width: 243px
+}
+
+.chrome-tabs .chrome-tab:nth-child(1) {
+    transform: translate3d(0px, 0, 0)
+}
+
+.chrome-tabs .chrome-tab:nth-child(2) {
+    transform: translate3d(229px, 0, 0)
+}

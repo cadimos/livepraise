@@ -11,12 +11,14 @@
         <link rel="stylesheet" type="text/css" href="css/all.css">
         <!-- Jquery UI -->
         <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css">
+        <!-- Chrome Tabs -->
+        <link rel="stylesheet" type="text/css" href="css/chrome-tabs.css">
         <!-- Monitor -->
         <link rel="stylesheet" type="text/css" href="css/monitor.css">
     </head>
     <body>
         <div class="container-fluid">
-            <div class="row">
+            <div class="row-fluid">
                 <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                 </div>
                 <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" id="background-rapido">
@@ -40,7 +42,112 @@
                     </a>
                 </div>
             </div>
-            <div class="row">
+            <div class="row-fluid" id="navegacao-itens">
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" id="navegacao-tab">
+                    <ul class="nav nav-tabs" id="navegacao">
+                        <li role="presentation" class="active"><a href="#imagens">Imagens</a></li>
+                        <li role="presentation"><a href="#videos">Videos</a></li>
+                        <li role="presentation"><a href="#musicas">Músicas</a></li>
+                        <li role="presentation"><a href="#biblias">Biblias</a></li>
+                        <li role="presentation"><a href="#outros">Outros</a></li>
+                    </ul>
+                    <div class="tab-content" id="navegacaoContent">
+                        <div class="tab-pane fade in active" role="tabpanel" id="imagens" aria-labelledby="home-tab">
+                            <p>Imagens</p>
+                        </div>
+                        <div class="tab-pane fade" role="tabpanel" id="videos" aria-labelledby="home-tab">
+                            <p>Videos</p>
+                        </div>
+                        <div class="tab-pane fade" role="tabpanel" id="musicas" aria-labelledby="home-tab">
+                            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                <div class="panel panel-default">
+                                  <div class="panel-heading" role="tab" id="headingOne">
+                                    <h4 class="panel-title">
+                                      <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        Collapsible Group Item #1
+                                      </a>
+                                    </h4>
+                                  </div>
+                                  <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                    <div class="panel-body">
+                                      Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="panel panel-default">
+                                  <div class="panel-heading" role="tab" id="headingTwo">
+                                    <h4 class="panel-title">
+                                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        Collapsible Group Item #2
+                                      </a>
+                                    </h4>
+                                  </div>
+                                  <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                    <div class="panel-body">
+                                      Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="panel panel-default">
+                                  <div class="panel-heading" role="tab" id="headingThree">
+                                    <h4 class="panel-title">
+                                      <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        Collapsible Group Item #3
+                                      </a>
+                                    </h4>
+                                  </div>
+                                  <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                                    <div class="panel-body">
+                                      Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" role="tabpanel" id="biblias" aria-labelledby="home-tab">
+                            <p>Biblias</p>
+                        </div>
+                        <div class="tab-pane fade" role="tabpanel" id="outros" aria-labelledby="home-tab">
+                            <p>Outros</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5" id="preview">
+                    <img src="Dados/imagens/praia.jpg" class="img-responsive" alt="Responsive image">
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="chrome-tabs">
+                    <div class="chrome-tabs-content">
+                        <div class="chrome-tab">
+                            <div class="chrome-tab-background">
+                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><symbol id="chrome-tab-geometry-left" viewBox="0 0 214 29" ><path d="M14.3 0.1L214 0.1 214 29 0 29C0 29 12.2 2.6 13.2 1.1 14.3-0.4 14.3 0.1 14.3 0.1Z"/></symbol><symbol id="chrome-tab-geometry-right" viewBox="0 0 214 29"><use xlink:href="#chrome-tab-geometry-left"/></symbol><clipPath id="crop"><rect class="mask" width="100%" height="100%" x="0"/></clipPath></defs><svg width="50%" height="100%"><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-shadow"/></svg><g transform="scale(-1, 1)"><svg width="50%" height="100%" x="-100%" y="0"><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-shadow"/></svg></g></svg>
+                            </div>
+                            <div class="chrome-tab-favicon" style="background-image: url('../chrome-tabs/demo/images/google-favicon.png')"></div>
+                            <div class="chrome-tab-title">Google</div>
+                            <div class="chrome-tab-close"></div>
+                            <input type="hidden" class="chrome-tab-id" value="0">
+                        </div>
+                        <div class="chrome-tab chrome-tab-current">
+                            <div class="chrome-tab-background">
+                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><symbol id="chrome-tab-geometry-left" viewBox="0 0 214 29" ><path d="M14.3 0.1L214 0.1 214 29 0 29C0 29 12.2 2.6 13.2 1.1 14.3-0.4 14.3 0.1 14.3 0.1Z"/></symbol><symbol id="chrome-tab-geometry-right" viewBox="0 0 214 29"><use xlink:href="#chrome-tab-geometry-left"/></symbol><clipPath id="crop"><rect class="mask" width="100%" height="100%" x="0"/></clipPath></defs><svg width="50%" height="100%"><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-shadow"/></svg><g transform="scale(-1, 1)"><svg width="50%" height="100%" x="-100%" y="0"><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-shadow"/></svg></g></svg>
+                            </div>
+                            <div class="chrome-tab-favicon" style="background-image: url('../chrome-tabs/demo/images/facebook-favicon.ico')"></div>
+                            <div class="chrome-tab-title">Facebook</div>
+                            <div class="chrome-tab-close"></div>
+                            <input type="hidden" class="chrome-tab-id" value="1">
+                        </div>
+                    </div>
+                    <div class="chrome-tabs-bottom-bar"></div>
+                    <div class="chrome-tabs-conteudo">
+                        <div class="chrome-conteudo chrome-conteudo-id-0">
+                        Conteúdo Google
+                        </div>
+                        <div class="chrome-conteudo chrome-conteudo-id-1 chrome-conteudo-show">
+                            Conteúdo Facebook
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Jquery -->
@@ -49,10 +156,16 @@
         </script>
         <!-- Jquery Hack -->
         <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap -->
+        <script src="js/bootstrap.min.js"></script>
         <!-- Jquery UI -->
         <script src="js/jquery-ui.min.js"></script>
         <!-- Soket IO -->
         <script src="../node_modules/socket.io-client/dist/socket.io.js"></script>
+        <!-- Draggabilly -->
+        <script src="js/draggabilly.pkgd.min.js"></script>
+        <!-- Chrome Tabs -->
+        <script src="js/chrome-tabs.js"></script>
         <!-- Comandos Monitor -->
         <script src="js/monitor.js"></script>
     </body>
