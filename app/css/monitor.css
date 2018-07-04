@@ -6,23 +6,23 @@
     height: 45px;
 }
 #preview{
-    width: 35vw;
-    height: 45vh;
+    width: 45vw;
+    height: 25vw;
     padding: 0;
     float: right;
 }
 #preview img{
     width: 100%;
-    height: 45vh;
+    height: 25vw;
 }
 #navegacao-tab{
-    width: 65vw;
-    height: 45vh;
+    width: 55vw;
+    height: 25vw;
     padding-left: 0;
     padding-right: 0;
 }
 #navegacao-itens{
-    height: 45vh;
+    height: 25vw;
     padding: 0;
     float: left;
     width: 100vw;

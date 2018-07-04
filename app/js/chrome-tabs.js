@@ -194,10 +194,11 @@
       this.emit('activeTabChange', { tabEl })
     }
 
-    soNumero(string)
-    {
-      var numsStr = string.replace(/[^0-9]/g,'');
+    soNumero(string){
+      if(string!=null && string!=''){
+        var numsStr = string.replace(/[^0-9]/g,'');
       return parseInt(numsStr);
+      }
     }
 
     removeConteudo(id){

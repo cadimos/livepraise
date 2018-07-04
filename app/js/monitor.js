@@ -35,6 +35,7 @@ $('#navegacao a').click(function (e) {
       el.classList.add('chrome-tabs-dark-theme')
     }
   })
+
 function backgroundRapido(url){
     removeConteudo();
 }
