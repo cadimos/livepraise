@@ -3,4 +3,7 @@ Largura: 35vw
 Altura: 45vh
 
 - Pesquisa de Música
-Ao pesquisar um louvor e não localizar no banco de dados local, pesquisa automaticamente na internet e retorna as opções, ao clicar em adicionar, ele salva a nova música no banco e adiciona na linha de execução.
+Ao pesquisar um louvor e não localizar no banco de dados local, pesquisa automaticamente na internet e retorna as opções, ao clicar em adicionar, ele salva a nova música no banco e adiciona na linha de execução
+
+- Tema
+ Ter opção de operação em tema claro e escuro
