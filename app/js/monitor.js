@@ -37,6 +37,13 @@ $('#navegacao a').click(function (e) {
   })
 
 function backgroundRapido(url){
+    $("#preview img").fadeOut(50, function() {
+        $("#preview img").attr('src',url);
+    }).fadeIn(300);
+    var socket = io.connect("http://localhost:3000");
+    var text = '{"funcao":[' +
+'{"nome":"background","valor":"'+url+'" }]}';
+    socket.emit("send", text);
     removeConteudo();
 }
 function removeConteudo(){

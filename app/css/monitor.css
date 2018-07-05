@@ -10,6 +10,7 @@
     height: 25vw;
     padding: 0;
     float: right;
+    background: #000000;
 }
 #preview img{
     width: 100%;
