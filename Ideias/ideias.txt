@@ -2,8 +2,62 @@
 Altura: 25vw
 Largura: 45vw
 
-- Pesquisa de Música
-Ao pesquisar um louvor e não localizar no banco de dados local, pesquisa automaticamente na internet e retorna as opções, ao clicar em adicionar, ele salva a nova música no banco e adiciona na linha de execução
-
 - Tema
  Ter opção de operação em tema claro e escuro
+
+- Alerta
+Sistema de alerta para mensagens urgentes
+
+- Biblias
+Sistema de Multiplas Biblias
+
+- Plano de Fundo
+Suporte a mudar o plano de fundo de exibição.
+Uso de imagens no plano de fundo
+Busca de Imagens no computador e na web
+Suporte a video como plano de fundo
+
+- Videos
+Opção de exibição de videos em mp4
+
+- Videos externos
+Suporte a exibição de videos do Youtube
+
+- Exibição dos textos
+Sobreamento no Texto a ser exibido
+
+- Execuçaõ de Audio
+
+- Historico de operações realizadas
+
+- Suporte a execução remota
+
+- Relatórios
+
+- Congelamento de Tela
+
+- Remover texto da Tela
+
+- Músicas
+Opção de Escrever uma nova música
+Opção de Pesquisa local e Online
+Pré-Visualização da música
+
+- Importar PowerPoint
+
+- captura de Camera
+
+- Salvamento do Ambiente
+
+- Bloco de Anotações
+
+- Pré-Visualização
+
+- Modulo Berçario
+
+- Logo
+opção de inserir logomarca na projeção
+
+- Acessar Site
+Opção de acessar um site.
+
