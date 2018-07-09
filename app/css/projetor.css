@@ -16,3 +16,10 @@ body {
     width: 100vw;
     display: none;
 }
+.texto{
+    position: absolute;
+    top: 0;
+    margin: 2vw;
+    height: 98vh;
+    width: 96vw;
+}

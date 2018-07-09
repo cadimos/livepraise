@@ -17,6 +17,21 @@ $(document).ready(function(){
 					$('#fundo img').css('display','block');
 				}).fadeIn(300);
 				break;
+				case 'texto':
+				vl=atob(vl);
+				var n = Number(vl.split('<br>').length);
+				font=Number(5);
+				if(n>font){
+					tamanho = (font-(font/n));
+					console.log(tamanho);
+					//tamanho = Math.floor(tamanho);
+				}else{
+					tamanho = font;
+				}
+				//Altura maxima 8vh = 8 br e 9 linhas
+				$('.texto').css('font-size',tamanho+'em');
+				$('.texto').html(vl);
+				break;
 			}
     	}
     });

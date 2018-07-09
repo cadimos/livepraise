@@ -58,3 +58,22 @@ function viewYoutube(url){
 function alerta(texto){
 
 }
+function texto(id){
+  txt=$('#'+id).val();
+  var n = Number(vl.split('<br>').length);
+  font=Number(1.7);
+  if(n>font){
+    tamanho = (font-(font/n));
+    console.log(tamanho);
+    //tamanho = Math.floor(tamanho);
+  }else{
+    tamanho = font;
+  }
+  //Altura maxima 8vh = 8 br e 9 linhas
+  $('.texto').css('font-size',tamanho+'em');
+  $('.texto').html(txt);
+  var socket = io.connect("http://localhost:3000");
+  var text = '{"funcao":[' +
+'{"nome":"texto","valor":"'+btoa(txt)+'" }]}';
+    socket.emit("send", text);
+}

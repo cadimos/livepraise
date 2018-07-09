@@ -42,3 +42,10 @@
 .chrome-tabs .chrome-tab:nth-child(2) {
     transform: translate3d(229px, 0, 0)
 }
+.texto{
+    position: absolute;
+    top: 0;
+    margin: 2vw;
+    height: 84%;
+    width: 91%;
+}
