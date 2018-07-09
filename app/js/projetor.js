@@ -24,12 +24,12 @@ $(document).ready(function(){
 				if(n>font){
 					tamanho = (font-(font/n));
 					console.log(tamanho);
-					//tamanho = Math.floor(tamanho);
 				}else{
 					tamanho = font;
 				}
 				//Altura maxima 8vh = 8 br e 9 linhas
 				$('.texto').css('font-size',tamanho+'em');
+				$('.texto').css('text-align','center');
 				$('.texto').html(vl);
 				break;
 			}

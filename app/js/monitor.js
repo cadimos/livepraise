@@ -60,7 +60,7 @@ function alerta(texto){
 }
 function texto(id){
   txt=$('#'+id).val();
-  var n = Number(vl.split('<br>').length);
+  var n = Number(txt.split('<br>').length);
   font=Number(1.7);
   if(n>font){
     tamanho = (font-(font/n));
@@ -71,6 +71,7 @@ function texto(id){
   }
   //Altura maxima 8vh = 8 br e 9 linhas
   $('.texto').css('font-size',tamanho+'em');
+  $('.texto').css('text-align','center');
   $('.texto').html(txt);
   var socket = io.connect("http://localhost:3000");
   var text = '{"funcao":[' +

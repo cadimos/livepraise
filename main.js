@@ -24,9 +24,7 @@ app.on('ready', function() {
     win.setMenu(menu);
     //Abro a URL do monitor
     win.loadURL('file://' + __dirname + '/app/index.html');
-    //win.loadURL('file://' + __dirname + '/chrome-tabs/index.html');
-    //win.loadURL('https://adamschwartz.co/chrome-tabs/');
-    win.openDevTools();
+    //win.openDevTools();
     //Capturo os monitores disponiveis
     let displays = electron.screen.getAllDisplays();
     //Verifico sem tem um monitor externo
@@ -47,7 +45,7 @@ app.on('ready', function() {
         //win2.loadURL('http://localhost:8080/index.html');
         //win2.loadURL('http://localhost:8080/projetor.html');
         //win2.loadURL('http://localhost:8080/index.html');
-        win2.openDevTools();
+        //win2.openDevTools();
         win2.on('closed', () => {
             app.quit()
         });
