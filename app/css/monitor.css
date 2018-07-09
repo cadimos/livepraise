@@ -54,3 +54,16 @@
     font-family: 'Roboto', sans-serif;
     font-weight: 900;
 }
+.chrome-conteudo ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.chrome-conteudo li{
+    border: solid 1px #cccccc;
+    padding: 1vw;
+    width: 10vw;
+    height: 35vh;
+    float: left;
+    overflow: hidden
+}

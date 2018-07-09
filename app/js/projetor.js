@@ -12,10 +12,10 @@ $(document).ready(function(){
 			vl=obj.funcao[0].valor;
 			switch(fn){
 				case 'background':
-				$("#fundo img").fadeOut(50, function() {
+				$("#fundo img").fadeOut(150, function() {
 					$("#fundo img").attr('src',vl);
 					$('#fundo img').css('display','block');
-				}).fadeIn(300);
+				}).fadeIn(200);
 				break;
 				case 'texto':
 				vl=atob(vl);
@@ -27,7 +27,6 @@ $(document).ready(function(){
 				}else{
 					tamanho = font;
 				}
-				//Altura maxima 8vh = 8 br e 9 linhas
 				$('.texto').css('font-size',tamanho+'em');
 				$('.texto').css('text-align','center');
 				$('.texto').html(vl);

@@ -37,9 +37,9 @@ $('#navegacao a').click(function (e) {
   })
 
 function backgroundRapido(url){
-    $("#preview img").fadeOut(50, function() {
+    $("#preview img").fadeOut(150, function() {
         $("#preview img").attr('src',url);
-    }).fadeIn(300);
+    }).fadeIn(200);
     var socket = io.connect("http://localhost:3000");
     var text = '{"funcao":[' +
 '{"nome":"background","valor":"'+url+'" }]}';
@@ -59,17 +59,15 @@ function alerta(texto){
 
 }
 function texto(id){
-  txt=$('#'+id).val();
+  txt=$('#'+id).html();
   var n = Number(txt.split('<br>').length);
   font=Number(1.7);
   if(n>font){
     tamanho = (font-(font/n));
     console.log(tamanho);
-    //tamanho = Math.floor(tamanho);
   }else{
     tamanho = font;
   }
-  //Altura maxima 8vh = 8 br e 9 linhas
   $('.texto').css('font-size',tamanho+'em');
   $('.texto').css('text-align','center');
   $('.texto').html(txt);
