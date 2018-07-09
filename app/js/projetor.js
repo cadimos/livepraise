@@ -31,6 +31,9 @@ $(document).ready(function(){
 				$('.texto').css('text-align','center');
 				$('.texto').html(vl);
 				break;
+				case 'removeConteudo':
+				$('.texto').html('');
+				break;
 			}
     	}
     });

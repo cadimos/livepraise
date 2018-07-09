@@ -44,10 +44,14 @@ function backgroundRapido(url){
     var text = '{"funcao":[' +
 '{"nome":"background","valor":"'+url+'" }]}';
     socket.emit("send", text);
-    removeConteudo();
+    setTimeout(() => removeConteudo(), 200)
 }
 function removeConteudo(){
-
+  $('.texto').html('');
+  var socket = io.connect("http://localhost:3000");
+  var text = '{"funcao":[' +
+'{"nome":"removeConteudo","valor":"remove" }]}';
+    socket.emit("send", text);
 }
 function viewVideo(url){
 
