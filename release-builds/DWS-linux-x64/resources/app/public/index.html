@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>DSW - Projeção</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/all.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-dynamic-tabs.css">
+    <!-- Chrome Tabs -->
+    <link rel="stylesheet" href="../chrome-tabs/demo/css/demo.css">
+    <link rel="stylesheet" href="../chrome-tabs/css/chrome-tabs.css">
+    <link rel="stylesheet" href="../chrome-tabs/css/chrome-tabs-dark-theme.css">
+</head>
+
+<body>
+    <h1>Testando Electron!</h1>
+    <!-- Podemos pegar informações diretamente na página, mas na próxima etapa será mostrado como controlar sua interface -->
+    A versão do Electron é
+    <script>
+        document.write(process.versions.electron)
+    </script>, Node
+    <script>
+        document.write(process.versions.node)
+    </script>, e Chromium
+    <script>
+        document.write(process.versions.chrome)
+    </script>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <button id="btnHtml" class="btn btn-info">Aba com HTML</button>
+                <button id="btnAjax" class="btn btn-primary">Aba com AJAX</button>
+                <button id="btnIon" class="btn btn-danger">Aba com ícone <i class="fas fa-user"></i></button>
+            </div>
+        </div>
+        <div id="tabs">
+        </div>
+    </div>
+    <script>
+        window.$ = window.jQuery = require("jquery");
+    </script>
+    <script crossorigin src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/socket.io-client/dist/socket.io.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/bootstrap-dynamic-tabs.js"></script>
+    <script src="js/monitor.js"></script>
+    <script>
+        var tabs = $('#tabs').bootstrapDynamicTabs().addTab({
+            title: 'Home',
+            text: 'Plugin jQuery para manipular tabs do bootstrap de forma dinâmica, excelente para aplicações multitelas na WEB ou em runtimes como node-webkit ou electron.',
+            closable: false
+        });
+        tabs.addTab({
+            title: 'Carregando via Ajax',
+            id: 'ajax1',
+            ajaxUrl: 'ajax/file2.html',
+            loadScripts: 'js/load.js',
+            loadStyles: ['css/test.css', 'css/test2.css']
+        });
+        $('#btnHtml').click(function() {
+            tabs.addTab({
+                title: 'Aba com HTML',
+                html: '<h2>Desenvolvido por <a href="//jayralencar.com.br">Jayr Alencar</a></h2>'
+            })
+        });
+        $('#btnAjax').click(function() {
+            tabs.addTab({
+                title: 'Carregando via Ajax',
+                id: 'ajax',
+                ajaxUrl: 'ajax/file.html',
+                loadScripts: 'js/load.js',
+                loadStyles: ['css/test.css', 'css/test2.css']
+            });
+        });
+        $('#btnIon').click(function() {
+            tabs.addTab({
+                title: 'Aba com ícone',
+                html: '<h2>Aba com ícone</h2>Um icone Font Awesome, exemplo: fa fa-user. O icone será mostrado na aba. Você também pode usar os glyphicon do Bootstrap </code>',
+                icon: 'fas fa-user'
+            })
+        })
+    </script>
+    <ul class="chat" style="display: none;">
+    </ul>
+    <textarea id="textarea"></textarea>
+    <a href="javascript:void(0);" onclick="background('background/praia.jpg');"><img src="background/praia.jpg" width="100"></a>
+    <a href="javascript:void(0);" onclick="background('background/fundo.jpg');"><img src="background/fundo.jpg" width="100"></a>
+    <div class="chrome-tabs">
+        <div class="chrome-tabs-content">
+            <div class="chrome-tab">
+                <div class="chrome-tab-background">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><symbol id="chrome-tab-geometry-left" viewBox="0 0 214 29" ><path d="M14.3 0.1L214 0.1 214 29 0 29C0 29 12.2 2.6 13.2 1.1 14.3-0.4 14.3 0.1 14.3 0.1Z"/></symbol><symbol id="chrome-tab-geometry-right" viewBox="0 0 214 29"><use xlink:href="#chrome-tab-geometry-left"/></symbol><clipPath id="crop"><rect class="mask" width="100%" height="100%" x="0"/></clipPath></defs><svg width="50%" height="100%"><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-shadow"/></svg><g transform="scale(-1, 1)"><svg width="50%" height="100%" x="-100%" y="0"><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-shadow"/></svg></g></svg>
+                </div>
+                <div class="chrome-tab-favicon" style="background-image: url('../chrome-tabs/demo/images/google-favicon.png')"></div>
+                <div class="chrome-tab-title">Google</div>
+                <div class="chrome-tab-close"></div>
+                <input type="hidden" class="chrome-tab-id" value="0">
+            </div>
+            <div class="chrome-tab chrome-tab-current">
+                <div class="chrome-tab-background">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><symbol id="chrome-tab-geometry-left" viewBox="0 0 214 29" ><path d="M14.3 0.1L214 0.1 214 29 0 29C0 29 12.2 2.6 13.2 1.1 14.3-0.4 14.3 0.1 14.3 0.1Z"/></symbol><symbol id="chrome-tab-geometry-right" viewBox="0 0 214 29"><use xlink:href="#chrome-tab-geometry-left"/></symbol><clipPath id="crop"><rect class="mask" width="100%" height="100%" x="0"/></clipPath></defs><svg width="50%" height="100%"><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-shadow"/></svg><g transform="scale(-1, 1)"><svg width="50%" height="100%" x="-100%" y="0"><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-shadow"/></svg></g></svg>
+                </div>
+                <div class="chrome-tab-favicon" style="background-image: url('../chrome-tabs/demo/images/facebook-favicon.ico')"></div>
+                <div class="chrome-tab-title">Facebook</div>
+                <div class="chrome-tab-close"></div>
+                <input type="hidden" class="chrome-tab-id" value="1">
+            </div>
+        </div>
+        <div class="chrome-tabs-bottom-bar"></div>
+        <div class="chrome-tabs-conteudo">
+            <div class="chrome-conteudo chrome-conteudo-id-0">
+            Conteúdo Google
+            </div>
+            <div class="chrome-conteudo chrome-conteudo-id-1 chrome-conteudo-show">
+                Conteúdo Facebook
+            </div>
+        </div>
+        <!-- Styles to prevent flash after JS initialization -->
+        <style>
+            .chrome-tabs .chrome-tab {
+            width: 243px
+            }
+
+            .chrome-tabs .chrome-tab:nth-child(1) {
+            transform: translate3d(0px, 0, 0)
+            }
+
+            .chrome-tabs .chrome-tab:nth-child(2) {
+            transform: translate3d(229px, 0, 0)
+            }
+        </style>
+    </div>
+
+    <br>
+
+    <p>
+    <button data-theme-toggle>Toggle dark theme</button> &nbsp;
+    <button data-add-tab>Add new tab</button> &nbsp;
+    <button data-remove-tab>Remove current tab</button>
+    </p>
+    <script src="../chrome-tabs/js/draggabilly.pkgd.min.js"></script>
+    <script src="../chrome-tabs/js/chrome-tabs.js"></script>
+    <script>
+      var el = document.querySelector('.chrome-tabs')
+      var chromeTabs = new ChromeTabs()
+
+      chromeTabs.init(el, {
+        tabOverlapDistance: 14,
+        minWidth: 45,
+        maxWidth: 243
+      })
+
+      el.addEventListener('activeTabChange', ({ detail }) => console.log('Active tab changed', detail.tabEl))
+      el.addEventListener('tabAdd', ({ detail }) => console.log('Tab added', detail.tabEl))
+      el.addEventListener('tabRemove', ({ detail }) => console.log('Tab removed', detail.tabEl))
+
+      document.querySelector('button[data-add-tab]').addEventListener('click', function(){
+        chromeTabs.addTab({
+          title: 'New Tab',
+          favicon: '../chrome-tabs/demo/images/default-favicon.png',
+        })
+      });
+
+      document.querySelector('button[data-remove-tab]').addEventListener('click', function(){
+        chromeTabs.removeTab(el.querySelector('.chrome-tab-current'))
+      });
+
+      document.querySelector('button[data-theme-toggle]').addEventListener('click', function(){
+        if (el.classList.contains('chrome-tabs-dark-theme')) {
+          document.documentElement.classList.remove('dark-theme')
+          el.classList.remove('chrome-tabs-dark-theme')
+        } else {
+          document.documentElement.classList.add('dark-theme')
+          el.classList.add('chrome-tabs-dark-theme')
+        }
+      })
+    </script>
+</body>
+
+</html>

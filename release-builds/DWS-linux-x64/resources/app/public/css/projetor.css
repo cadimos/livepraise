@@ -1,0 +1,15 @@
+body{
+    overflow: hidden;
+}
+#fundo{
+    width: 100%;
+    position: absolute;
+    margin: 0;
+    text-align: center;
+    top: 0;
+}
+#fundo img{
+    height: 100vh;
+    width: 100vw;
+    display: none;
+}

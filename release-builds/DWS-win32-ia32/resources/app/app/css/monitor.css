@@ -1,0 +1,51 @@
+#background-rapido{
+    padding: 0;
+}
+#background-rapido img{
+    width: 100%;
+    height: 45px;
+}
+#preview{
+    width: 45vw;
+    height: 25vw;
+    padding: 0;
+    float: right;
+    background: #000000;
+}
+#preview img{
+    width: 100%;
+    height: 25vw;
+}
+#navegacao-tab{
+    width: 55vw;
+    height: 25vw;
+    padding-left: 0;
+    padding-right: 0;
+}
+#navegacao-itens{
+    height: 25vw;
+    padding: 0;
+    float: left;
+    width: 100vw;
+}
+.container-fluid{
+    padding: 0 !important;
+}
+.chrome-tabs .chrome-tab {
+    width: 243px
+}
+
+.chrome-tabs .chrome-tab:nth-child(1) {
+    transform: translate3d(0px, 0, 0)
+}
+
+.chrome-tabs .chrome-tab:nth-child(2) {
+    transform: translate3d(229px, 0, 0)
+}
+.texto{
+    position: absolute;
+    top: 0;
+    margin: 2vw;
+    height: 84%;
+    width: 91%;
+}

@@ -22,4 +22,6 @@ body {
     margin: 2vw;
     height: 98vh;
     width: 96vw;
+    color: #ffffff;
+    text-shadow: 2px 2px 0px black;
 }

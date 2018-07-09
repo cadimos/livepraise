@@ -1,0 +1,25 @@
+body {
+    background-color: #000;
+    font-family: sans-serif;
+    color: white;
+    overflow: hidden;
+}
+#fundo{
+    width: 100%;
+    position: absolute;
+    margin: 0;
+    text-align: center;
+    top: 0;
+}
+#fundo img{
+    height: 100vh;
+    width: 100vw;
+    display: none;
+}
+.texto{
+    position: absolute;
+    top: 0;
+    margin: 2vw;
+    height: 98vh;
+    width: 96vw;
+}
