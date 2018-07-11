@@ -3,7 +3,23 @@ const electron = require('electron');
 //Importo os modulos
 const { app, BrowserWindow } = require('electron');
 const server = require("./server");
-
+const fs = require('fs');
+function getFiles (dir, files_){
+    if(dir==null && dir==''){
+        dir='app/Dados/imagens';
+    }
+    files_ = files_ || [];
+    var files = fs.readdirSync(dir);
+    for (var i in files){
+        var name = dir + '/' + files[i];
+        if (fs.statSync(name).isDirectory()){
+            getFiles(name, files_);
+        } else {
+            files_.push(name);
+        }
+    }
+    return files_;
+}
 //Inicio a aplicação
 app.on('ready', function() {
     //Pego a altura e largura do monitor principal
@@ -24,7 +40,7 @@ app.on('ready', function() {
     win.setMenu(menu);
     //Abro a URL do monitor
     win.loadURL('file://' + __dirname + '/app/index.html');
-    //win.openDevTools();
+    win.openDevTools();
     //Capturo os monitores disponiveis
     let displays = electron.screen.getAllDisplays();
     //Verifico sem tem um monitor externo
