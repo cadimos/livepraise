@@ -19,19 +19,7 @@ $(document).ready(function(){
 				break;
 				case 'texto':
 				vl=atob(vl);
-				/*
-				var n = Number(vl.split('<br>').length);
-				font=Number(5);
-				if(n>font){
-					tamanho = (font-(font/n));
-					console.log(tamanho);
-				}else{
-					tamanho = font;
-				}
-				$('.texto').css('font-size',tamanho+'em');
-				$('.texto').css('text-align','center');
-				*/
-				$('.texto').html(vl);
+				$('.texto span').html(vl);
 				$('.texto').textfill({
 					maxFontPixels: -1
 				  });

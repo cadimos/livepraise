@@ -69,19 +69,7 @@ function alerta(texto){
 }
 function texto(id){
   txt=$('#'+id).html();
-  /*
-  var n = Number(txt.split('<br>').length);
-  font=Number(1.7);
-  if(n>font){
-    tamanho = (font-(font/n));
-    console.log(tamanho);
-  }else{
-    tamanho = font;
-  }
-  $('.texto').css('font-size',tamanho+'em');
-  $('.texto').css('text-align','center');
-  */
-  $('.texto').html(txt);
+  $('.texto span').html(txt);
   $('.texto').textfill({
     maxFontPixels: 0
   });
