@@ -69,6 +69,7 @@ function alerta(texto){
 }
 function texto(id){
   txt=$('#'+id).html();
+  /*
   var n = Number(txt.split('<br>').length);
   font=Number(1.7);
   if(n>font){
@@ -79,7 +80,11 @@ function texto(id){
   }
   $('.texto').css('font-size',tamanho+'em');
   $('.texto').css('text-align','center');
+  */
   $('.texto').html(txt);
+  $('.texto').textfill({
+    maxFontPixels: 0
+  });
   var socket = io.connect("http://localhost:3000");
   var text = '{"funcao":[' +
 '{"nome":"texto","valor":"'+btoa(txt)+'" }]}';

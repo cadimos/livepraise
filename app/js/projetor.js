@@ -19,6 +19,7 @@ $(document).ready(function(){
 				break;
 				case 'texto':
 				vl=atob(vl);
+				/*
 				var n = Number(vl.split('<br>').length);
 				font=Number(5);
 				if(n>font){
@@ -29,7 +30,11 @@ $(document).ready(function(){
 				}
 				$('.texto').css('font-size',tamanho+'em');
 				$('.texto').css('text-align','center');
+				*/
 				$('.texto').html(vl);
+				$('.texto').textfill({
+					maxFontPixels: -1
+				  });
 				break;
 				case 'removeConteudo':
 				$('.texto').html('');
