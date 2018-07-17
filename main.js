@@ -24,7 +24,7 @@ app.on('ready', function() {
     win.setMenu(menu);
     //Abro a URL do monitor
     win.loadURL('file://' + __dirname + '/app/index.html');
-    win.openDevTools();
+    //win.openDevTools();
     //Capturo os monitores disponiveis
     let displays = electron.screen.getAllDisplays();
     //Verifico sem tem um monitor externo
