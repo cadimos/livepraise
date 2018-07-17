@@ -40,7 +40,15 @@ $('#navegacao a').click(function (e) {
     })
   }
 
-
+function background(url){
+  $("#preview img").fadeOut(150, function() {
+    $("#preview img").attr('src',url);
+}).fadeIn(200);
+  var socket = io.connect("http://localhost:3000");
+  var text = '{"funcao":[' +
+  '{"nome":"background","valor":"'+url+'" }]}';
+  socket.emit("send", text);
+}
 function backgroundRapido(url){
     $("#preview img").fadeOut(150, function() {
         $("#preview img").attr('src',url);
@@ -81,11 +89,42 @@ function texto(id){
 }
 
 const fs = require('fs');
+function catImagens(){
+  $('#cat_imagens').html();
+  dir='app/Dados/imagens';
+  var files = fs.readdirSync(dir);
+  for (var i in files){
+    var name = dir + '/' + files[i];
+    if (fs.statSync(name).isDirectory()){
+      vl=name;
+      option=name.replace(dir+'/','');
+      $('#cat_imagens').append('<option value="'+vl+'">'+option+'</option>');
+      if(i==0){
+        lista_imagem(vl);
+      }
+    }else{
+      //é um arquivo
+    }
+  }
+}
+catImagens();
+function lista_imagem(dir){
+  $('#preview-imagens').html('');
+  var files = fs.readdirSync(dir);
+  for (var i in files){
+    var name = dir + '/' + files[i];
+    if (fs.statSync(name).isDirectory()){
+      //É um diretorio
+    }else{
+      img=name.replace('app/','');
+      $('#preview-imagens').append('<li><img src="'+img+'" onclick="background(\''+img+'\')"></li>')
+    }
+  }
+}
 function getFiles (dir, files_){
     if(dir==null || dir=='' || dir=='undefined'){
         dir='app/Dados/imagens';
     }
-    console.log(dir);
     files_ = files_ || [];
     var files = fs.readdirSync(dir);
     for (var i in files){

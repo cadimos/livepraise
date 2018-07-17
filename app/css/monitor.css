@@ -67,3 +67,29 @@
     float: left;
     overflow: hidden
 }
+#preview-list{
+    overflow-y: scroll;
+    width: 100%;
+    height: 37vh;
+
+}
+#preview-imagens{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: scroll;
+    width: 100%;
+    display: table;
+}
+#preview-imagens li{
+    border: solid 1px #cccccc;
+    padding: 3px;
+    float: left;
+    width: 10.7vw;
+    height: 6vw;
+    list-style: none;
+}
+#preview-imagens img {
+    width: 100%;
+    max-height: 100%;
+}

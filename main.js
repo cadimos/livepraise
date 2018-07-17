@@ -33,6 +33,7 @@ app.on('ready', function() {
     });
     //Abro o Monitor externo
     if (externalDisplay) {
+
         win2 = new BrowserWindow({
             x: externalDisplay.bounds.x,
             y: externalDisplay.bounds.y,
@@ -49,6 +50,7 @@ app.on('ready', function() {
         win2.on('closed', () => {
             app.quit()
         });
+
     }
     //Ação ao fechar
     win.on('closed', () => {
