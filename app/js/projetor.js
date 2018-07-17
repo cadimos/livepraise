@@ -23,9 +23,10 @@ $(document).ready(function(){
 				$('.texto').textfill({
 					maxFontPixels: -1
 				  });
+				$('.texto').css('text-align','center');
 				break;
 				case 'removeConteudo':
-				$('.texto').html('');
+				$('.texto span').html('');
 				break;
 			}
     	}

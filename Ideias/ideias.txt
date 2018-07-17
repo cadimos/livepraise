@@ -61,3 +61,4 @@ opção de inserir logomarca na projeção
 - Acessar Site
 Opção de acessar um site.
 
+Opção de trocar a cor da letra rapidamente

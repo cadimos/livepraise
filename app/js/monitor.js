@@ -52,7 +52,7 @@ function backgroundRapido(url){
     setTimeout(() => removeConteudo(), 200)
 }
 function removeConteudo(){
-  $('.texto').html('');
+  $('.texto span').html('');
   var socket = io.connect("http://localhost:3000");
   var text = '{"funcao":[' +
 '{"nome":"removeConteudo","valor":"remove" }]}';
@@ -73,6 +73,7 @@ function texto(id){
   $('.texto').textfill({
     maxFontPixels: 0
   });
+  $('.texto').css('text-align','center');
   var socket = io.connect("http://localhost:3000");
   var text = '{"funcao":[' +
 '{"nome":"texto","valor":"'+btoa(txt)+'" }]}';
