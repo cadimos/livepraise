@@ -13,6 +13,7 @@
     "build": "electron-packager . --all"
   },
   "dependencies": {
+    "child-process-promise": "^2.2.1",
     "debug": "^3.1.0",
     "draggabilly": "^2.2.0",
     "express": "^4.16.3",

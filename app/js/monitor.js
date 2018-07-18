@@ -1,3 +1,6 @@
+const fs = require('fs');
+const exec = require('child-process-promise').exec;
+
 $('#navegacao a').click(function (e) {
     e.preventDefault()
     $(this).tab('show')
@@ -66,15 +69,6 @@ function removeConteudo(){
 '{"nome":"removeConteudo","valor":"remove" }]}';
     socket.emit("send", text);
 }
-function viewVideo(url){
-
-}
-function viewYoutube(url){
-
-}
-function alerta(texto){
-
-}
 function texto(id){
   txt=$('#'+id).html();
   $('.texto span').html(txt);
@@ -88,7 +82,7 @@ function texto(id){
     socket.emit("send", text);
 }
 
-const fs = require('fs');
+
 function catImagens(){
   $('#cat_imagens').html();
   dir='app/Dados/imagens';
@@ -121,22 +115,59 @@ function lista_imagem(dir){
     }
   }
 }
-function getFiles (dir, files_){
-    if(dir==null || dir=='' || dir=='undefined'){
-        dir='app/Dados/imagens';
+function catVideos(){
+  $('#cat_imagens').html();
+  dir='app/Dados/videos';
+  var files = fs.readdirSync(dir);
+  for (var i in files){
+    var name = dir + '/' + files[i];
+    if (fs.statSync(name).isDirectory()){
+      vl=name;
+      option=name.replace(dir+'/','');
+      $('#cat_videos').append('<option value="'+vl+'">'+option+'</option>');
+      if(i==0){
+        lista_video(vl);
+      }
+    }else{
+      //é um arquivo
     }
-    files_ = files_ || [];
-    var files = fs.readdirSync(dir);
-    for (var i in files){
-        var name = dir + '/' + files[i];
-        if (fs.statSync(name).isDirectory()){
-            getFiles(name, files_);
-        } else {
-            name=name.replace('app/','');
-            files_.push(name);
-        }
-    }
-    return files_;
+  }
 }
+catVideos();
+function lista_video(dir){
+  $('#preview-videos').html('');
+  var files = fs.readdirSync(dir);
+  for (var i in files){
+    var name = dir + '/' + files[i];
+    if (fs.statSync(name).isDirectory()){
+      //É um diretorio
+    }else{
+      img=name.replace(dir,dir+'/thumb');
+      img=img.replace('app/','');
+      img=img.replace('.mp4','.jpg');
+      video=name.replace('app/','');
+      list='<li><img src="'+img+'" onclick="viewVideo(\''+video+'\')"></li>';
+      if (fs.existsSync('app/'+img)) {
+        //Se o arquivo existir
+        $('#preview-videos').append(list);
+      }else{
+        //Se não existir
+        cmd = 'ffmpeg -ss 00:00:02 -i app/'+video+' -vf scale=400:-1 -vframes 1 app/'+img;
+        exec(cmd).then(function (result) {
+          $('#preview-videos').append(list);
+        }).catch(function (err) {
+            console.error('ERROR: ', err);
+        });
+      }
+    }
+  }
+}
+function viewVideo(url){
 
-  console.log(getFiles())
+}
+function viewYoutube(url){
+
+}
+function alerta(texto){
+
+}

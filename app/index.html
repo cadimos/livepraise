@@ -75,7 +75,15 @@
                             </div>
                         </div>
                         <div class="tab-pane fade" role="tabpanel" id="videos" aria-labelledby="home-tab">
-                            <p>Videos</p>
+                            <div class="row-fluid">
+                                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                                    <select id="cat_videos" class="form-control" onchange="lista_video(this.value)"></select>
+                                </div>
+                            </div>
+                            <div id="preview-list">
+                                <ul id="preview-videos">
+                                </ul>
+                            </div>
                         </div>
                         <div class="tab-pane fade" role="tabpanel" id="musicas" aria-labelledby="home-tab">
                             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">

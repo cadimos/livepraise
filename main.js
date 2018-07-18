@@ -24,7 +24,7 @@ app.on('ready', function() {
     win.setMenu(menu);
     //Abro a URL do monitor
     win.loadURL('file://' + __dirname + '/app/index.html');
-    //win.openDevTools();
+    win.openDevTools();
     //Capturo os monitores disponiveis
     let displays = electron.screen.getAllDisplays();
     //Verifico sem tem um monitor externo
@@ -33,7 +33,7 @@ app.on('ready', function() {
     });
     //Abro o Monitor externo
     if (externalDisplay) {
-
+/*
         win2 = new BrowserWindow({
             x: externalDisplay.bounds.x,
             y: externalDisplay.bounds.y,
@@ -50,7 +50,7 @@ app.on('ready', function() {
         win2.on('closed', () => {
             app.quit()
         });
-
+*/
     }
     //Ação ao fechar
     win.on('closed', () => {

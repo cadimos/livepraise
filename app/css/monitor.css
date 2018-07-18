@@ -93,3 +93,23 @@
     width: 100%;
     max-height: 100%;
 }
+#preview-videos{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: scroll;
+    width: 100%;
+    display: table;
+}
+#preview-videos li{
+    border: solid 1px #cccccc;
+    padding: 3px;
+    float: left;
+    width: 10.7vw;
+    height: 6vw;
+    list-style: none;
+}
+#preview-videos img {
+    width: 100%;
+    max-height: 100%;
+}
