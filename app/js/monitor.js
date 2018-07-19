@@ -44,6 +44,8 @@ $('#navegacao a').click(function (e) {
   }
 
 function background(url){
+  $('#video').css('display','none');
+  $('#preview img').css('display','block');
   $("#preview img").fadeOut(150, function() {
     $("#preview img").attr('src',url);
 }).fadeIn(200);
@@ -53,6 +55,8 @@ function background(url){
   socket.emit("send", text);
 }
 function backgroundRapido(url){
+    $('#video').css('display','none');
+    $('#preview img').css('display','block');
     $("#preview img").fadeOut(150, function() {
         $("#preview img").attr('src',url);
     }).fadeIn(200);
@@ -162,8 +166,26 @@ function lista_video(dir){
     }
   }
 }
+const player = new Plyr("#player");
 function viewVideo(url){
-
+  $('#preview img').css('display','none');
+  $('#video').css('display','block');
+  var socket = io.connect("http://localhost:3000");
+  var text = '{"funcao":[' +
+  '{"nome":"video","valor":"'+url+'" }]}';
+      socket.emit("send", text);
+  player.source = {
+    type: 'video',
+    autoplay: true,
+    sources: [
+        {
+            src: url,
+            type: 'video/mp4',
+            size: 720,
+        },
+    ],
+  };
+  $('#video video').attr('loop','true');
 }
 function viewYoutube(url){
 
