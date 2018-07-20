@@ -166,7 +166,6 @@ function lista_video(dir){
     }
   }
 }
-const player = new Plyr("#player");
 function viewVideo(url){
   $('#preview img').css('display','none');
   $('#video').css('display','block');
@@ -174,18 +173,9 @@ function viewVideo(url){
   var text = '{"funcao":[' +
   '{"nome":"video","valor":"'+url+'" }]}';
       socket.emit("send", text);
-  player.source = {
-    type: 'video',
-    autoplay: true,
-    sources: [
-        {
-            src: url,
-            type: 'video/mp4',
-            size: 720,
-        },
-    ],
-  };
-  $('#video video').attr('loop','true');
+  $('#player').append('<source src="'+url+'" type="video/mp4">');
+  player = document.getElementById("player");
+  player.play();
 }
 function viewYoutube(url){
 

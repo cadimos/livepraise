@@ -5,11 +5,6 @@ $(document).ready(function(){
     ready = true;
     socket.on("chat", function(client,msg) {
     	if (ready) {
-			const player = new Plyr("#player",{
-				muted:true,
-			});
-	    	//var time = new Date();
-			//$(".chat").append('<li class="other"><div class="msg"><span>' + client + ':</span><p>' + msg + '</p><time>' + time.getHours() + ':' + time.getMinutes() + '</time></div></li>');
 			obj = JSON.parse(msg);
 			fn=obj.funcao[0].nome;
 			vl=obj.funcao[0].valor;
@@ -33,18 +28,9 @@ $(document).ready(function(){
 				case 'video':
 				$('#fundo img').css('display','none');
 				$('#video').css('display','block');
-				player.source = {
-					type: 'video',
-					autoplay: true,
-					sources: [
-						{
-							src: vl,
-							type: 'video/mp4',
-							size: 720,
-						},
-					],
-				  };
-				$('#video video').attr('loop','true');
+				$('#player').append('<source src="'+vl+'" type="video/mp4">');
+				player = document.getElementById("player");
+				player.play();
 				break;
 				case 'removeConteudo':
 				$('.texto span').html('');

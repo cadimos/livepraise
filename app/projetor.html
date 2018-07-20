@@ -6,8 +6,6 @@
     <title>DSW - Projeção</title>
     <!-- Projetor -->
     <link rel="stylesheet" type="text/css" href="css/projetor.css">
-    <!-- Plyr Video -->
-    <link rel="stylesheet" type="text/css" href="css/plyr.css">
 </head>
 
 <body>
@@ -18,14 +16,12 @@
     <script src="../node_modules/socket.io-client/dist/socket.io.js"></script>
     <!-- Jquery TextFill -->
     <script src="js/jquery.textfill.min.js"></script>
-    <!-- Plyr Video -->
-    <script src="js/plyr.js"></script>
     <!-- Projetor -->
     <script src="js/projetor.js"></script>
     <div id="fundo">
         <img>
         <div id="video">
-            <video id="player"></video>
+            <video id="player" muted loop="true"></video>
         </div>
         <div class="texto"><span></span></div>
     </div>
