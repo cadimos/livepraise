@@ -3,6 +3,7 @@ $(document).ready(function(){
 	var socket = io.connect("http://localhost:3000");
 	//Habilito leitura
     ready = true;
+    player = document.getElementById("player");
     socket.on("chat", function(client,msg) {
     	if (ready) {
 			obj = JSON.parse(msg);
@@ -16,6 +17,7 @@ $(document).ready(function(){
 					$("#fundo img").attr('src',vl);
 					$('#fundo img').css('display','block');
 				}).fadeIn(200);
+				player.pause();
 				break;
 				case 'texto':
 				vl=atob(vl);
@@ -28,8 +30,8 @@ $(document).ready(function(){
 				case 'video':
 				$('#fundo img').css('display','none');
 				$('#video').css('display','block');
+				$('#player').html('');
 				$('#player').append('<source src="'+vl+'" type="video/mp4">');
-				player = document.getElementById("player");
 				player.play();
 				break;
 				case 'removeConteudo':

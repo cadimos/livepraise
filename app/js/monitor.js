@@ -1,47 +1,8 @@
+//Variaveis Globais
 const fs = require('fs');
 const exec = require('child-process-promise').exec;
-
-$('#navegacao a').click(function (e) {
-    e.preventDefault()
-    $(this).tab('show')
-  });
-  var el = document.querySelector('.chrome-tabs')
-  var chromeTabs = new ChromeTabs()
-
-  chromeTabs.init(el, {
-    tabOverlapDistance: 14,
-    minWidth: 45,
-    maxWidth: 243
-  })
-
-  el.addEventListener('activeTabChange', ({ detail }) => console.log('Active tab changed', detail.tabEl))
-  el.addEventListener('tabAdd', ({ detail }) => console.log('Tab added', detail.tabEl))
-  el.addEventListener('tabRemove', ({ detail }) => console.log('Tab removed', detail.tabEl))
-  if(document.querySelector('button[data-add-tab]')){
-    document.querySelector('button[data-add-tab]').addEventListener('click', function(){
-      chromeTabs.addTab({
-        title: 'New Tab',
-        favicon: '../chrome-tabs/demo/images/default-favicon.png',
-      })
-    });
-  }
-  if(document.querySelector('button[data-remove-tab]')){
-    document.querySelector('button[data-remove-tab]').addEventListener('click', function(){
-      chromeTabs.removeTab(el.querySelector('.chrome-tab-current'))
-    });
-  }
-
-  if(document.querySelector('button[data-theme-toggle]')){
-    document.querySelector('button[data-theme-toggle]').addEventListener('click', function(){
-      if (el.classList.contains('chrome-tabs-dark-theme')) {
-        document.documentElement.classList.remove('dark-theme')
-        el.classList.remove('chrome-tabs-dark-theme')
-      } else {
-        document.documentElement.classList.add('dark-theme')
-        el.classList.add('chrome-tabs-dark-theme')
-      }
-    })
-  }
+var player = document.getElementById("player");
+var socket = io.connect("http://localhost:3000");
 
 function background(url){
   $('#video').css('display','none');
@@ -49,10 +10,10 @@ function background(url){
   $("#preview img").fadeOut(150, function() {
     $("#preview img").attr('src',url);
 }).fadeIn(200);
-  var socket = io.connect("http://localhost:3000");
   var text = '{"funcao":[' +
   '{"nome":"background","valor":"'+url+'" }]}';
   socket.emit("send", text);
+  player.pause();
 }
 function backgroundRapido(url){
     $('#video').css('display','none');
@@ -60,15 +21,14 @@ function backgroundRapido(url){
     $("#preview img").fadeOut(150, function() {
         $("#preview img").attr('src',url);
     }).fadeIn(200);
-    var socket = io.connect("http://localhost:3000");
     var text = '{"funcao":[' +
 '{"nome":"background","valor":"'+url+'" }]}';
     socket.emit("send", text);
-    setTimeout(() => removeConteudo(), 200)
+    setTimeout(() => removeConteudo(), 200);
+    player.pause();
 }
 function removeConteudo(){
   $('.texto span').html('');
-  var socket = io.connect("http://localhost:3000");
   var text = '{"funcao":[' +
 '{"nome":"removeConteudo","valor":"remove" }]}';
     socket.emit("send", text);
@@ -80,7 +40,6 @@ function texto(id){
     maxFontPixels: 0
   });
   $('.texto').css('text-align','center');
-  var socket = io.connect("http://localhost:3000");
   var text = '{"funcao":[' +
 '{"nome":"texto","valor":"'+btoa(txt)+'" }]}';
     socket.emit("send", text);
@@ -169,12 +128,11 @@ function lista_video(dir){
 function viewVideo(url){
   $('#preview img').css('display','none');
   $('#video').css('display','block');
-  var socket = io.connect("http://localhost:3000");
   var text = '{"funcao":[' +
   '{"nome":"video","valor":"'+url+'" }]}';
       socket.emit("send", text);
+  $('#player').html('');
   $('#player').append('<source src="'+url+'" type="video/mp4">');
-  player = document.getElementById("player");
   player.play();
 }
 function viewYoutube(url){
@@ -182,4 +140,47 @@ function viewYoutube(url){
 }
 function alerta(texto){
 
+}
+
+//Tabs List
+$('#navegacao a').click(function (e) {
+  e.preventDefault()
+  $(this).tab('show')
+});
+var el = document.querySelector('.chrome-tabs')
+var chromeTabs = new ChromeTabs()
+
+chromeTabs.init(el, {
+  tabOverlapDistance: 14,
+  minWidth: 45,
+  maxWidth: 243
+})
+
+el.addEventListener('activeTabChange', ({ detail }) => console.log('Active tab changed', detail.tabEl))
+el.addEventListener('tabAdd', ({ detail }) => console.log('Tab added', detail.tabEl))
+el.addEventListener('tabRemove', ({ detail }) => console.log('Tab removed', detail.tabEl))
+if(document.querySelector('button[data-add-tab]')){
+  document.querySelector('button[data-add-tab]').addEventListener('click', function(){
+    chromeTabs.addTab({
+      title: 'New Tab',
+      favicon: '../chrome-tabs/demo/images/default-favicon.png',
+    })
+  });
+}
+if(document.querySelector('button[data-remove-tab]')){
+  document.querySelector('button[data-remove-tab]').addEventListener('click', function(){
+    chromeTabs.removeTab(el.querySelector('.chrome-tab-current'))
+  });
+}
+
+if(document.querySelector('button[data-theme-toggle]')){
+  document.querySelector('button[data-theme-toggle]').addEventListener('click', function(){
+    if (el.classList.contains('chrome-tabs-dark-theme')) {
+      document.documentElement.classList.remove('dark-theme')
+      el.classList.remove('chrome-tabs-dark-theme')
+    } else {
+      document.documentElement.classList.add('dark-theme')
+      el.classList.add('chrome-tabs-dark-theme')
+    }
+  })
 }
