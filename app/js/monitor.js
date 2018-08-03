@@ -3,13 +3,15 @@ const fs = require('fs');
 const exec = require('child-process-promise').exec;
 var player = document.getElementById("player");
 var socket = io.connect("http://localhost:3000");
+var sqlite3 = require('sqlite3').verbose();
+var db = new sqlite3.Database(__dirname+'/../dsw.db');
 
 function background(url){
   $('#video').css('display','none');
   $('#preview img').css('display','block');
   $("#preview img").fadeOut(150, function() {
     $("#preview img").attr('src',url);
-}).fadeIn(200);
+  }).fadeIn(200);
   var text = '{"funcao":[' +
   '{"nome":"background","valor":"'+url+'" }]}';
   socket.emit("send", text);
@@ -44,8 +46,6 @@ function texto(id){
 '{"nome":"texto","valor":"'+btoa(txt)+'" }]}';
     socket.emit("send", text);
 }
-
-
 function catImagens(){
   $('#cat_imagens').html();
   dir='app/Dados/imagens';
@@ -135,6 +135,15 @@ function viewVideo(url){
   $('#player').append('<source src="'+url+'" type="video/mp4">');
   player.play();
 }
+function catMusicas(){
+  db.serialize(function() {
+    db.each("SELECT id,nome FROM cat_musicas", function(err, row) {
+      $('#cat_musica').append('<option value="'+row.id+'">'+row.nome+'</option>');
+      console.log(row.id + ": " + row.nome);
+    });
+  });
+}
+catMusicas();
 function viewYoutube(url){
 
 }
@@ -184,3 +193,4 @@ if(document.querySelector('button[data-theme-toggle]')){
     }
   })
 }
+db.close();
