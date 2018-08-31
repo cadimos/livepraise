@@ -74,6 +74,7 @@ function lista_imagem(dir){
       //É um diretorio
     }else{
       img=name.replace('app/','');
+      img=img.replace('#','%23');
       $('#preview-imagens').append('<li><img src="'+img+'" onclick="background(\''+img+'\')"></li>')
     }
   }

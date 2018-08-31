@@ -9,7 +9,7 @@ app.on('ready', function() {
     var xcenter=(width/2)-200;
     var ycenter=(height/2)-100;
     //Crio a tela de Splash
-    splash = new BrowserWindow({
+    let splash = new BrowserWindow({
         width:400,
         height:200,
         x: xcenter,
@@ -17,7 +17,6 @@ app.on('ready', function() {
         frame: false,
     });
     splash.loadURL('file://' + __dirname + '/app/splash.html');
-
     const server = require("./server");
     //defino o Menu
     const menu = null;
