@@ -1,4 +1,4 @@
-//Inicio o Electon
+﻿//Inicio o Electon
 const electron = require('electron');
 //Importo os modulos
 const { app, BrowserWindow } = require('electron');
@@ -35,7 +35,7 @@ app.on('ready', function() {
     win.setMenu(menu);
     //Abro a URL do monitor
     win.loadURL('file://' + __dirname + '/app/index.html');
-    win.openDevTools();
+    //win.openDevTools();
     win.once('ready-to-show',()=>{
         win.show();
         splash.close();
@@ -47,7 +47,7 @@ app.on('ready', function() {
         return display.bounds.x !== 0 || display.bounds.y !== 0
     });
     //Abro o Monitor externo
-    /*
+    
     if (externalDisplay) {
 
         win2 = new BrowserWindow({
@@ -69,7 +69,7 @@ app.on('ready', function() {
         });
 
     }
-    */
+    
     //Ação ao fechar
     win.on('closed', () => {
         app.quit()
