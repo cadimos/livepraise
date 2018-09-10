@@ -19,6 +19,13 @@
     <body>
         <div class="container-fluid">
             <div class="row-fluid">
+                <button type="button" class="btn btn-primary" id="freeze" onclick="congelar('freeze')">Congelar</button>
+                <button type="button" class="btn btn-primary" id="remove" onclick="removeConteudo()">Limpar Tela</button>
+                <button type="button" class="btn btn-primary" id="new_music">Nova Música</button>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
                 <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                     <span>A versão do Electron é
                     <script>
@@ -159,7 +166,7 @@
                             <div class="chrome-tab-background">
                                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><symbol id="chrome-tab-geometry-left" viewBox="0 0 214 29" ><path d="M14.3 0.1L214 0.1 214 29 0 29C0 29 12.2 2.6 13.2 1.1 14.3-0.4 14.3 0.1 14.3 0.1Z"/></symbol><symbol id="chrome-tab-geometry-right" viewBox="0 0 214 29"><use xlink:href="#chrome-tab-geometry-left"/></symbol><clipPath id="crop"><rect class="mask" width="100%" height="100%" x="0"/></clipPath></defs><svg width="50%" height="100%"><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-shadow"/></svg><g transform="scale(-1, 1)"><svg width="50%" height="100%" x="-100%" y="0"><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-shadow"/></svg></g></svg>
                             </div>
-                            <div class="chrome-tab-favicon" style="background-image: url('../chrome-tabs/demo/images/google-favicon.png')"></div>
+                            <div class="chrome-tab-favicon"></div>
                             <div class="chrome-tab-title">Vitória No Deserto</div>
                             <div class="chrome-tab-close"></div>
                             <input type="hidden" class="chrome-tab-id" value="0">
@@ -168,7 +175,7 @@
                             <div class="chrome-tab-background">
                                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><symbol id="chrome-tab-geometry-left" viewBox="0 0 214 29" ><path d="M14.3 0.1L214 0.1 214 29 0 29C0 29 12.2 2.6 13.2 1.1 14.3-0.4 14.3 0.1 14.3 0.1Z"/></symbol><symbol id="chrome-tab-geometry-right" viewBox="0 0 214 29"><use xlink:href="#chrome-tab-geometry-left"/></symbol><clipPath id="crop"><rect class="mask" width="100%" height="100%" x="0"/></clipPath></defs><svg width="50%" height="100%"><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-left" width="214" height="29" class="chrome-tab-shadow"/></svg><g transform="scale(-1, 1)"><svg width="50%" height="100%" x="-100%" y="0"><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-background"/><use xlink:href="#chrome-tab-geometry-right" width="214" height="29" class="chrome-tab-shadow"/></svg></g></svg>
                             </div>
-                            <div class="chrome-tab-favicon" style="background-image: url('../chrome-tabs/demo/images/facebook-favicon.ico')"></div>
+                            <div class="chrome-tab-favicon"></div>
                             <div class="chrome-tab-title">Facebook</div>
                             <div class="chrome-tab-close"></div>
                             <input type="hidden" class="chrome-tab-id" value="1">
@@ -223,18 +230,18 @@
         <!-- Jquery Web -->
         <script src="../node_modules/jquery/dist/jquery.min.js"></script>
         <!-- Bootstrap -->
-        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootstrap.min.js" async></script>
         <!-- Jquery UI -->
-        <script src="js/jquery-ui.min.js"></script>
+        <script src="js/jquery-ui.min.js" async></script>
         <!-- Jquery TextFill -->
-        <script src="js/jquery.textfill.min.js"></script>
+        <script src="js/jquery.textfill.min.js" async></script>
         <!-- Soket IO -->
-        <script src="../node_modules/socket.io-client/dist/socket.io.js"></script>
+        <script src="../node_modules/socket.io-client/dist/socket.io.js" async></script>
         <!-- Draggabilly -->
-        <script src="js/draggabilly.pkgd.min.js"></script>
+        <script src="js/draggabilly.pkgd.min.js" async></script>
         <!-- Chrome Tabs -->
         <script src="js/chrome-tabs.js"></script>
         <!-- Comandos Monitor -->
-        <script src="js/monitor.js"></script>
+        <script src="js/monitor.js" async></script>
     </body>
 </html>

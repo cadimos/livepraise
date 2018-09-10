@@ -12,9 +12,11 @@ function background(url){
   $("#preview img").fadeOut(150, function() {
     $("#preview img").attr('src',url);
   }).fadeIn(200);
-  var text = '{"funcao":[' +
+  if(congelar('valida')==true){
+    var text = '{"funcao":[' +
   '{"nome":"background","valor":"'+url+'" }]}';
-  socket.emit("send", text);
+    socket.emit("send", text);
+  }
   player.pause();
 }
 function backgroundRapido(url){
@@ -23,17 +25,21 @@ function backgroundRapido(url){
     $("#preview img").fadeOut(150, function() {
         $("#preview img").attr('src',url);
     }).fadeIn(200);
-    var text = '{"funcao":[' +
-'{"nome":"background","valor":"'+url+'" }]}';
-    socket.emit("send", text);
+    if(congelar('valida')==true){
+      var text = '{"funcao":[' +
+  '{"nome":"background","valor":"'+url+'" }]}';
+      socket.emit("send", text);
+    }
     setTimeout(() => removeConteudo(), 200);
     player.pause();
 }
 function removeConteudo(){
   $('.texto span').html('');
-  var text = '{"funcao":[' +
-'{"nome":"removeConteudo","valor":"remove" }]}';
+  if(congelar('valida')==true){
+    var text = '{"funcao":[' +
+  '{"nome":"removeConteudo","valor":"remove" }]}';
     socket.emit("send", text);
+  }
 }
 function texto(id){
   txt=$('#'+id).html();
@@ -42,9 +48,11 @@ function texto(id){
     maxFontPixels: 0
   });
   $('.texto').css('text-align','center');
-  var text = '{"funcao":[' +
+  if(congelar('valida')==true){
+    var text = '{"funcao":[' +
 '{"nome":"texto","valor":"'+btoa(txt)+'" }]}';
     socket.emit("send", text);
+  }
 }
 function catImagens(){
   $('#cat_imagens').html();
@@ -129,9 +137,11 @@ function lista_video(dir){
 function viewVideo(url){
   $('#preview img').css('display','none');
   $('#video').css('display','block');
-  var text = '{"funcao":[' +
+  if(congelar('valida')==true){
+    var text = '{"funcao":[' +
   '{"nome":"video","valor":"'+url+'" }]}';
-      socket.emit("send", text);
+    socket.emit("send", text);
+  }
   $('#player').html('');
   $('#player').append('<source src="'+url+'" type="video/mp4">');
   player.play();
@@ -140,11 +150,26 @@ function catMusicas(){
   db.serialize(function() {
     db.each("SELECT id,nome FROM cat_musicas", function(err, row) {
       $('#cat_musica').append('<option value="'+row.id+'">'+row.nome+'</option>');
-      console.log(row.id + ": " + row.nome);
     });
   });
 }
 catMusicas();
+function congelar(acao){
+  s=$('#freeze').html();
+  if(acao=='freeze'){
+    if(s=='Congelar'){
+      $('#freeze').html('Descongelar');
+    }else{
+      $('#freeze').html('Congelar');
+    }
+  }else{
+    if(s=='Congelar'){
+      return true;
+    }else{
+      return false;
+    }
+  }
+}
 function viewYoutube(url){
 
 }
