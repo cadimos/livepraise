@@ -17,7 +17,6 @@ app.on('ready', function() {
         frame: false,
     });
     splash.loadURL('file://' + __dirname + '/app/splash.html');
-    const server = require("./server");
     //defino o Menu
     const menu = null;
     //Crio minha janela no monitor principal
@@ -33,6 +32,7 @@ app.on('ready', function() {
     });
     //seto o menu
     win.setMenu(menu);
+    const server = require("./server");
     //Abro a URL do monitor
     win.loadURL('file://' + __dirname + '/app/index.html');
     win.openDevTools();
