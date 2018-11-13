@@ -21,7 +21,59 @@
             <div class="row-fluid">
                 <button type="button" class="btn btn-primary" id="freeze" onclick="congelar('freeze')">Congelar</button>
                 <button type="button" class="btn btn-primary" id="remove" onclick="removeConteudo()">Limpar Tela</button>
-                <button type="button" class="btn btn-primary" id="new_music">Nova Música</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new_music">Nova Música</button>
+                <button type="button" class="btn btn-primary" id="atualizar" onclick="location.reload();">Atualizar</button>
+            </div>
+            <div class="modal fade" id="new_music" role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <h4 class="modal-title" id="myModalLabel">Nova Música</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal">
+                            <!-- Text input-->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="nome">Nome*:</label>
+                                <div class="col-md-9">
+                                <input id="nome" name="nome" type="text" placeholder="Música" class="form-control input-md" required="">
+
+                                </div>
+                            </div>
+
+                            <!-- Text input-->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="artista">Artista*:</label>
+                                <div class="col-md-9">
+                                <input id="artista" name="artista" type="text" placeholder="Cantor" class="form-control input-md" required="">
+
+                                </div>
+                            </div>
+
+                            <!-- Text input-->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="compositor">Compositor:</label>
+                                <div class="col-md-9">
+                                <input id="compositor" name="compositor" type="text" placeholder="Compositor" class="form-control input-md">
+
+                                </div>
+                            </div>
+
+                            <!-- Textarea -->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" for="letra">Letra*:</label>
+                                <div class="col-md-9">
+                                <textarea class="form-control" id="letra" name="letra" rows="10"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success">Salvar</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="container-fluid">
@@ -98,6 +150,7 @@
                                     <select id="cat_musica" class="form-control" onchange="lista_musica(this.value)"></select>
                                 </div>
                             </div>
+                            <div class="row"></div>
                             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                 <div class="panel panel-default">
                                   <div class="panel-heading" role="tab" id="headingOne">
