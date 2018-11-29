@@ -5,13 +5,47 @@ var player = document.getElementById("player");
 var socket = io.connect("http://localhost:3000");
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(__dirname+'/../dsw.db');
-alert(__dirname);
+
+function nl2br (str) {
+  var breakTag = '<br '+'/>';
+  return str.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/gm, breakTag);
+}
+
 function salvar_musica(){
   nome=$('#new_music #nome').val();
+  if(nome==''){
+    alert('O nome da Música é Obrigatória!');
+  }
   artista=$('#new_music #artista').val();
+  if(artista==''){
+    alert('O nome do Artista é Obrigatória!');
+  }
   compositor=$('#new_music #compositor').val();
-  letra=$('#new_music #letra').html();
-
+  cat=1;
+  letra=$('#new_music #letra').val();
+  if(letra==''){
+    alert('A letra da Música é Obrigatória!');
+  }
+  if(nome!='' && artista!='' && letra!=''){
+    letra=nl2br(letra);
+    versos=letra.split("<br /><br />");
+    t_versos=versos.length;
+    db.serialize(function() {
+      db.run("INSERT INTO `musica` (`cat`,`nome`,`nome2`,`artista`,`compositor`) VALUES ('"+cat+"','"+nome+"','"+nome+"','"+artista+"','"+compositor+"')");
+      db.each("SELECT id FROM musica ORDER BY  id  DESC LIMIT 1", function(err, row) {
+        id_musica=row.id;
+        for(i=0;i<t_versos;i++){
+          db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+versos[i]+"')")
+        }
+      });
+    });
+    $('#new_music').modal('hide');
+    $('#new_music #nome').val('');
+    $('#new_music #artista').val('');
+    $('#new_music #compositor').val('');
+    $('#new_music #letra').val('');
+    alert('Música salva com sucesso!');
+  }
 }
 function background(url){
   $('#video').css('display','none');
@@ -226,4 +260,4 @@ if(document.querySelector('button[data-theme-toggle]')){
     }
   })
 }
-db.close();
+//db.close();
