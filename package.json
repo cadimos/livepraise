@@ -8,7 +8,7 @@
     "win32": "electron-packager . DWS --platform=win32 --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar",
     "win64": "electron-packager . DWS --platform=win32 --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds",
     "linux32": "electron-packager . DWS --platform=linux --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar",
-    "linux64": "electron-packager . DWS --platform=linux --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds",
+    "linux64": "electron-packager . DWS --platform=linux --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --overwrite",
     "osx": "electron-packager . DWS --platform=darwin --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar",
     "build": "electron-packager . --all",
     "rebuild": "electron-rebuild -f -w sqlite3"

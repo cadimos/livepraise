@@ -5,7 +5,14 @@ var player = document.getElementById("player");
 var socket = io.connect("http://localhost:3000");
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(__dirname+'/../dsw.db');
+alert(__dirname);
+function salvar_musica(){
+  nome=$('#new_music #nome').val();
+  artista=$('#new_music #artista').val();
+  compositor=$('#new_music #compositor').val();
+  letra=$('#new_music #letra').html();
 
+}
 function background(url){
   $('#video').css('display','none');
   $('#preview img').css('display','block');
