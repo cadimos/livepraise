@@ -21,7 +21,9 @@
 
   const defaultTapProperties = {
     title: '',
-    favicon: ''
+    favicon: '',
+    conteudo:'',
+    debug: false
   }
 
   let instanceId = 0
@@ -46,8 +48,11 @@
       this.setupDraggabilly()
     }
 
-    emit(eventName, data) {
-      this.el.dispatchEvent(new CustomEvent(eventName, { detail: data }))
+    emit(eventName, data,tabProperties) {
+      tabProperties = Object.assign({}, defaultTapProperties, tabProperties)
+      if(tabProperties.debug==true){
+        this.el.dispatchEvent(new CustomEvent(eventName, { detail: data }))
+      }
     }
 
     setupStyleEl() {
@@ -163,12 +168,14 @@
       tabProperties = Object.assign({}, defaultTapProperties, tabProperties)
       this.tabContentEl.appendChild(tabEl)
       this.conteudoContentEl.appendChild(conteudoEl)
+      document.querySelector('.chrome-conteudo-id-'+lid).innerHTML = tabProperties.conteudo
       this.updateTab(tabEl, tabProperties)
-      this.emit('tabAdd', { tabEl })
-      this.setCurrentTab(tabEl)
+      this.emit('tabAdd', { tabEl },tabProperties)
+      setTimeout(() => this.setCurrentTab(tabEl),200);
       this.layoutTabs()
       this.fixZIndexes()
       this.setupDraggabilly()
+      setTimeout(() => this.setCurrentTab(tabEl),200);
 
     }
 

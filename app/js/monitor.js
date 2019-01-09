@@ -1,10 +1,11 @@
 //Variaveis Globais
+const dir_app = process.cwd();
 const fs = require('fs');
 const exec = require('child-process-promise').exec;
 var player = document.getElementById("player");
 var socket = io.connect("http://localhost:3000");
 var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database(__dirname+'/../dsw.db');
+var db = new sqlite3.Database(dir_app+'/dsw.db');
 
 function nl2br (str) {
   var breakTag = '<br '+'/>';
@@ -97,7 +98,7 @@ function texto(id){
 }
 function catImagens(){
   $('#cat_imagens').html();
-  dir='app/Dados/imagens';
+  dir=dir_app+'/Dados/imagens';
   var files = fs.readdirSync(dir);
   for (var i in files){
     var name = dir + '/' + files[i];
@@ -122,7 +123,7 @@ function lista_imagem(dir){
     if (fs.statSync(name).isDirectory()){
       //É um diretorio
     }else{
-      img=name.replace('app/','');
+      img=name;
       img=img.replace('#','%23');
       $('#preview-imagens').append('<li><img src="'+img+'" onclick="background(\''+img+'\')"></li>')
     }
@@ -130,7 +131,7 @@ function lista_imagem(dir){
 }
 function catVideos(){
   $('#cat_imagens').html();
-  dir='app/Dados/videos';
+  dir=dir_app+'/Dados/videos';
   var files = fs.readdirSync(dir);
   for (var i in files){
     var name = dir + '/' + files[i];
@@ -156,16 +157,15 @@ function lista_video(dir){
       //É um diretorio
     }else{
       img=name.replace(dir,dir+'/thumb');
-      img=img.replace('app/','');
       img=img.replace('.mp4','.jpg');
-      video=name.replace('app/','');
+      video=name;
       list='<li><img src="'+img+'" onclick="viewVideo(\''+video+'\')"></li>';
-      if (fs.existsSync('app/'+img)) {
+      if (fs.existsSync(img)) {
         //Se o arquivo existir
         $('#preview-videos').append(list);
       }else{
         //Se não existir
-        cmd = 'ffmpeg -ss 00:00:02 -i app/'+video+' -vf scale=400:-1 -vframes 1 app/'+img;
+        cmd = 'ffmpeg -ss 00:00:02 -i '+video+' -vf scale=400:-1 -vframes 1 '+img;
         exec(cmd).then(function (result) {
           $('#preview-videos').append(list);
         }).catch(function (err) {
@@ -195,6 +195,54 @@ function catMusicas(){
   });
 }
 catMusicas();
+function lista_musica(){
+  cat=$('#cat_musica').val();
+  modelo=`<div class="panel panel-default">
+  <div class="panel-heading" role="tab" id="head[id_musica]">
+  <h4 class="panel-title">
+  <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
+  [nome_musica] ([artista_musica])
+  </a>
+  <span class="acoes_item">
+    <a href="javascript:void(0);" onclick=""><i class="fas fa-edit"></i></a>
+    <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
+  </span>
+  </h4>
+  </div>
+  <div id="collapse[id_musica]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head[id_musica]">
+  <div class="panel-body">
+  <ul id="verso[id_musica]"></ul>
+  </div>
+  </div>
+  </div>`;
+
+  $('#list_music').html('');
+  db.serialize(function() {
+    db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"'", function(err, musica) {
+      item=modelo.replace('[id_musica]',musica.id);
+      item=item.replace('[id_musica]',musica.id);
+      item=item.replace('[id_musica]',musica.id);
+      item=item.replace('[id_musica]',musica.id);
+      item=item.replace('[id_musica]',musica.id);
+      item=item.replace('[id_musica]',musica.id);
+      item=item.replace('[nome_musica]',musica.nome);
+      item=item.replace('[artista_musica]',musica.artista);
+      $('#list_music').append(item);
+      db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
+        $('#verso'+musica.id).append('<li onclick="texto(\'verso_'+musica.id+'_'+row.id+'\');" id="verso_'+musica.id+'_'+row.id+'">'+row.verso+'</li>');
+      });
+    });
+  });
+}
+function adicionar_musica(id){
+  data='<ul id="item_verso'+id+'">'+$('#verso'+id).html()+'</ul>';
+  titulo=$('#head'+id+' a').html();
+  chromeTabs.addTab({
+    title: titulo,
+    conteudo: data
+  });
+}
+setTimeout(() => lista_musica(),200);
 function congelar(acao){
   s=$('#freeze').html();
   if(acao=='freeze'){

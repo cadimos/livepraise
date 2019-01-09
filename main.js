@@ -25,7 +25,7 @@ app.on('ready', function() {
         y: 0,
         width,
         height,
-        show: false,        
+        show: false,
         webPreferences: {
             preload: './preload.js'
         }

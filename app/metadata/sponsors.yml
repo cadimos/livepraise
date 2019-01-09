@@ -68,6 +68,11 @@ bity:
     - bity
   label: Bity
   url: 'http://bity.com'
+blackpulp-designs:
+  icons:
+    - pray
+  label: Blackpulp Designs
+  url: 'https://www.blackpulp.com'
 blissbook:
   icons:
     - pen-fancy
@@ -239,6 +244,7 @@ hire-a-helper:
     - couch
     - dolly
     - people-carry
+    - route
     - sign
     - suitcase
     - tape
@@ -267,6 +273,15 @@ in-site-systems:
     - toolbox
   label: InSite Systems
   url: 'https://www.insitesystems.com'
+inspira-bvba:
+  icons:
+    - chess-knight
+  label: Inspira bvba
+  url: 'https://www.inspira.be'
+joe-emison:
+  icons:
+    - blender-phone
+  label: Joe Emison
 joget:
   icons:
     - joget
@@ -334,6 +349,12 @@ nimblr:
     - nimblr
   label: Nimblr
   url: 'https://nimblr.ai'
+nompse:
+  icons:
+    - chalkboard
+    - chalkboard-teacher
+  label: Nomp.se
+  url: 'https://nomp.se'
 ns8:
   icons:
     - ns8
@@ -354,11 +375,26 @@ pal-fed:
     - palfed
   label: PalFed
   url: 'https://www.palfed.com'
+pcsg:
+  icons:
+    - horse-head
+  label: PCSG
+  url: 'https://www.pcsg.de'
 phabricator:
   icons:
     - phabricator
   label: Phabricator
   url: 'http://phacility.com'
+promo-wizard:
+  icons:
+    - hat-wizard
+  label: Promo Wizard
+  url: 'https://promowizard.co.uk'
+pulse-eight:
+  icons:
+    - volume-mute
+  label: Pulse-Eight
+  url: 'https://pulse-eight.com'
 purely-interactive:
   icons:
     - kiwi-bird
@@ -374,6 +410,11 @@ quin-scape:
     - quinscape
   label: QuinScape
   url: 'https://www.quinscape.de'
+reacteurope:
+  icons:
+    - reacteurope
+  label: ReactEurope
+  url: 'https://www.react-europe.org'
 readme-io:
   icons:
     - readme
@@ -384,11 +425,6 @@ red-river:
     - red-river
   label: red river
   url: 'https://river.red'
-rendact:
-  icons:
-    - rendact
-  label: Rendact
-  url: 'https://rendact.com'
 replyd:
   icons:
     - replyd
@@ -398,6 +434,11 @@ resolving:
     - resolving
   label: Resolving
   url: 'https://resolving.com'
+rev-io:
+  icons:
+    - rev
+  label: Rev.io
+  url: 'https://rev.io'
 rock-rms:
   icons:
     - rockrms
@@ -417,11 +458,17 @@ rocket-chat:
     - poo
     - quote-left
     - quote-right
+    - rocketchat
     - smile
     - video
     - video-slash
   label: Rocket.Chat
   url: 'https://rocket.chat'
+rodney-oliver:
+  icons:
+    - folder-minus
+    - folder-plus
+  label: Rodney Oliver
 schlix:
   icons:
     - schlix
@@ -437,6 +484,11 @@ service-stack:
     - servicestack
   label: ServiceStack
   url: 'https://servicestack.net'
+shawn-storie:
+  icons:
+    - teeth
+    - teeth-open
+  label: Shawn Storie
 shopware:
   icons:
     - shopware
@@ -493,9 +545,26 @@ studio-vinari:
   url: 'https://studiovinari.com'
 supple:
   icons:
+    - ad
+    - bullhorn
+    - bullseye
+    - comment-dollar
+    - comments-dollar
+    - envelope-open-text
+    - funnel-dollar
+    - mail-bulk
+    - poll
+    - poll-h
+    - search-dollar
+    - search-location
     - supple
   label: Supple
   url: 'https://supple.com.au'
+the-red-yeti:
+  icons:
+    - the-red-yeti
+  label: The Red Yeti
+  url: 'http://theredyeti.com'
 the-us-sunnah-foundation:
   icons:
     - dollar-sign
@@ -520,6 +589,11 @@ themeco:
     - themeco
   label: Themeco
   url: 'https://theme.co'
+think-peaks:
+  icons:
+    - think-peaks
+  label: Think Peaks
+  url: 'https://thinkpeaks.com/'
 typo3:
   icons:
     - typo3
@@ -540,6 +614,20 @@ vaadin:
     - vaadin
   label: Vaadin
   url: 'http://vaadin.com'
+via:
+  icons:
+    - car-crash
+    - draw-polygon
+    - house-damage
+    - layer-group
+    - skull-crossbones
+    - user-injured
+  label: VIA Traffic Software Solutions
+  url: 'https://www.via.software'
+victor-costan:
+  icons:
+    - otter
+  label: Staphany Park and Victor Costan
 vnv:
   icons:
     - vnv
@@ -549,6 +637,7 @@ weedable:
   icons:
     - bong
     - cannabis
+    - hippo
     - joint
     - mortar-pestle
     - prescription
@@ -559,3 +648,13 @@ whmcs:
     - whmcs
   label: WHMCS
   url: 'https://www.whmcs.com'
+workrails:
+  icons:
+    - briefcase
+  label: WorkRails
+  url: 'https://www.workrails.com'
+wpressr:
+  icons:
+    - wpressr
+  label: wpressr
+  url: 'https://wpressr.com'

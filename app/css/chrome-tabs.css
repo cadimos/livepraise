@@ -1,5 +1,5 @@
 .chrome-tabs {
-  
+
 }
 .chrome-tabs * {
   box-sizing: inherit;
@@ -41,6 +41,7 @@
 .chrome-tabs .chrome-tab {
   position: absolute;
   left: 0;
+  bottom: 0;
   height: 2.8em;
   width: 24em;
   border: 0;

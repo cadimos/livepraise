@@ -80,6 +80,7 @@
     overflow-y: scroll;
     width: 100%;
     height: 37vh;
+    padding-top: 5px;
 
 }
 #preview-imagens{
@@ -121,4 +122,46 @@
 #preview-videos img {
     width: 100%;
     max-height: 100%;
+}
+#list_music ul{
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+#list_music li{
+    border: solid 1px #cccccc;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+.panel-body{
+    padding-top: 5px;
+}
+.panel-title{
+    font-size: 14px;
+}
+.panel{
+    margin-top: 2px;
+}
+.nav-tabs>li>a{
+    color: #495057;
+}
+#navegacao{
+    margin-bottom: 5px;
+}
+.acoes_item{
+    float: right;
+    font-size: 16px;
+}
+.acoes_item a{
+    color: #333333;
+}
+.chrome-tabs-conteudo{
+    max-height: 30vh;
+}
+.chrome-conteudo ul{
+    max-height: 30vh;
+    overflow: hidden;
+}
+.panel-group{
+    margin-bottom: 0;
 }

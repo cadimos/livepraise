@@ -1,3 +1,4 @@
+const dir_app = process.cwd();
 $(document).ready(function(){
     //conecto no socket
 	var socket = io.connect("http://localhost:3000");
@@ -19,6 +20,7 @@ $(document).ready(function(){
 				}).fadeIn(200);
 				player.pause();
 				break;
+
 				case 'texto':
 				vl=atob(vl);
 				$('.texto span').html(vl);
@@ -27,6 +29,7 @@ $(document).ready(function(){
 				  });
 				$('.texto').css('text-align','center');
 				break;
+
 				case 'video':
 				$('#fundo img').css('display','none');
 				$('#video').css('display','block');
@@ -34,6 +37,7 @@ $(document).ready(function(){
 				$('#player').append('<source src="'+vl+'" type="video/mp4">');
 				player.play();
 				break;
+
 				case 'removeConteudo':
 				$('.texto span').html('');
 				break;
