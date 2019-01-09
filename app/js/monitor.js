@@ -46,6 +46,7 @@ function salvar_musica(){
     $('#new_music #compositor').val('');
     $('#new_music #letra').val('');
     alert('Música salva com sucesso!');
+    lista_musica();
   }
 }
 function background(url){
@@ -83,8 +84,11 @@ function removeConteudo(){
     socket.emit("send", text);
   }
 }
-function texto(id){
+function texto(id,br){
   txt=$('#'+id).html();
+  if(br=='BR'){
+    txt=nl2br(txt);
+  }
   $('.texto span').html(txt);
   $('.texto').textfill({
     maxFontPixels: 0
@@ -219,23 +223,24 @@ function lista_musica(){
   $('#list_music').html('');
   db.serialize(function() {
     db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"'", function(err, musica) {
-      item=modelo.replace('[id_musica]',musica.id);
-      item=item.replace('[id_musica]',musica.id);
-      item=item.replace('[id_musica]',musica.id);
-      item=item.replace('[id_musica]',musica.id);
-      item=item.replace('[id_musica]',musica.id);
-      item=item.replace('[id_musica]',musica.id);
+      item=modelo.replace(/\[id_musica\]/g,musica.id);
       item=item.replace('[nome_musica]',musica.nome);
       item=item.replace('[artista_musica]',musica.artista);
       $('#list_music').append(item);
       db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
-        $('#verso'+musica.id).append('<li onclick="texto(\'verso_'+musica.id+'_'+row.id+'\');" id="verso_'+musica.id+'_'+row.id+'">'+row.verso+'</li>');
+        verse=row.verso;
+        verse=verse.replace(/<br \/>/g,"\n");
+        $('#verso'+musica.id).append('<li onclick="texto(\'verso_'+musica.id+'_'+row.id+'\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
       });
     });
   });
 }
 function adicionar_musica(id){
-  data='<ul id="item_verso'+id+'">'+$('#verso'+id).html()+'</ul>';
+  verse=$('#verso'+id).html();
+  verse=verse.replace(/verso_/g,"item_verso_");
+  verse=verse.replace(/'BR'/g,"");
+  verse=nl2br(verse);
+  data='<ul id="item_verso'+id+'">'+verse+'</ul>';
   titulo=$('#head'+id+' a').html();
   chromeTabs.addTab({
     title: titulo,
