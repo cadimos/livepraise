@@ -25,7 +25,7 @@ app.on('ready', function() {
         height,
         show: false,
         title: '(DSW) Projeção',
-        icon: __dirname+'/app/icon/cadimos.ico',
+        icon: __dirname+'/app/icon/cadimos.png',
         webPreferences: {
             preload: './preload.js'
         }
