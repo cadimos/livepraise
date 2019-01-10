@@ -156,7 +156,7 @@
                         <div class="tab-pane fade" role="tabpanel" id="musicas" aria-labelledby="home-tab">
                             <div class="row-fluid">
                                 <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
-                                    <select id="cat_musica" class="form-control" onchange="lista_musica(this.value)"></select>
+                                    <select id="cat_musica" class="form-control" onchange="lista_musica()"></select>
                                 </div>
                             </div>
                             <div id="preview-list">
@@ -165,12 +165,24 @@
                             </div>
                         </div>
                         <!--/ Musicas -->
+                        <!-- Biblias -->
                         <div class="tab-pane fade" role="tabpanel" id="biblias" aria-labelledby="home-tab">
-                            <p>Biblias</p>
+                            <div class="row-fluid">
+                                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                                    <select id="cat_biblia" class="form-control" onchange="lista_biblia()"></select>
+                                </div>
+                            </div>
+                            <div id="preview-list">
+                                <div class="panel-group" id="list_biblia" role="tablist" aria-multiselectable="true">
+                                </div>
+                            </div>
                         </div>
+                        <!--/ Biblias -->
+                        <!--
                         <div class="tab-pane fade" role="tabpanel" id="outros" aria-labelledby="home-tab">
                             <p>Outros</p>
                         </div>
+                        -->
                     </div>
                 </div>
                 <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5" id="preview">
