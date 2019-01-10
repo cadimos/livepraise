@@ -26,56 +26,50 @@
             </div>
             <div class="modal fade" id="new_music" role="dialog">
                 <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                      <h4 class="modal-title" id="myModalLabel">Nova Música</h4>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form-horizontal">
-                            <!-- Text input-->
-                            <div class="form-group">
-                                <label class="col-md-3 control-label" for="nome">Nome*:</label>
-                                <div class="col-md-9">
-                                <input id="nome" name="nome" type="text" placeholder="Música" class="form-control input-md" required="">
-
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Nova Música</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal">
+                                <!-- Nome da Musica-->
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label" for="nome">Nome*:</label>
+                                    <div class="col-md-9">
+                                        <input id="nome" name="nome" type="text" placeholder="Música" class="form-control input-md" required="">
+                                    </div>
                                 </div>
-                            </div>
-
-                            <!-- Text input-->
-                            <div class="form-group">
-                                <label class="col-md-3 control-label" for="artista">Artista*:</label>
-                                <div class="col-md-9">
-                                <input id="artista" name="artista" type="text" placeholder="Cantor" class="form-control input-md" required="">
-
+                                <!-- Artista -->
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label" for="artista">Artista*:</label>
+                                    <div class="col-md-9">
+                                        <input id="artista" name="artista" type="text" placeholder="Cantor" class="form-control input-md" required="">
+                                    </div>
                                 </div>
-                            </div>
-
-                            <!-- Text input-->
-                            <div class="form-group">
-                                <label class="col-md-3 control-label" for="compositor">Compositor:</label>
-                                <div class="col-md-9">
-                                <input id="compositor" name="compositor" type="text" placeholder="Compositor" class="form-control input-md">
-
+                                <!-- Compositor-->
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label" for="compositor">Compositor:</label>
+                                    <div class="col-md-9">
+                                        <input id="compositor" name="compositor" type="text" placeholder="Compositor" class="form-control input-md">
+                                    </div>
                                 </div>
-                            </div>
-
-                            <!-- Textarea -->
-                            <div class="form-group">
-                                <label class="col-md-3 control-label" for="letra">Letra*:</label>
-                                <div class="col-md-9">
-                                <textarea class="form-control" id="letra" name="letra" rows="10"></textarea>
+                                <!-- Letra -->
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label" for="letra">Letra*:</label>
+                                    <div class="col-md-9">
+                                        <textarea class="form-control" id="letra" name="letra" rows="10"></textarea>
+                                    </div>
                                 </div>
+                            </form>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-success" onclick="salvar_musica();">Salvar</button>
                             </div>
-                        </form>
-                        <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-success" onclick="salvar_musica();">Salvar</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
         <div class="container-fluid">
             <div class="row-fluid">
                 <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
