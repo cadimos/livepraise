@@ -1,7 +1,7 @@
 ﻿//Inicio o Electon
 const electron = require('electron');
 //Importo os modulos
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 //Inicio a aplicação
 app.on('ready', function() {
     //Pego a altura e largura do monitor principal
@@ -17,8 +17,6 @@ app.on('ready', function() {
         frame: false,
     });
     splash.loadURL('file://' + __dirname + '/app/splash.html');
-    //defino o Menu
-    const menu = null;
     //Crio minha janela no monitor principal
     let win = new BrowserWindow({
         x: 0,
@@ -30,12 +28,11 @@ app.on('ready', function() {
             preload: './preload.js'
         }
     });
-    //seto o menu
-    win.setMenu(menu);
     const server = require("./server");
     //Abro a URL do monitor
+    win.setMenuBarVisibility(false);
     win.loadURL('file://' + __dirname + '/app/index.html');
-    win.openDevTools();
+    //win.openDevTools();
     win.once('ready-to-show',()=>{
         win.show();
         splash.close();
@@ -60,7 +57,7 @@ app.on('ready', function() {
         });
         //Abro a url do monitor externo
         win2.loadURL('file://' + __dirname + '/app/projetor.html');
-        win2.openDevTools();
+        //win2.openDevTools();
         win2.once('ready-to-show',()=>{
             win2.show();
         })
