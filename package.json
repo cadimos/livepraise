@@ -1,14 +1,13 @@
-
 {
   "name": "Live Praise",
   "version": "0.1.0",
   "main": "main.js",
   "author": {
-    "name":"Thiago de Lucena Sobrinho",
+    "name": "Thiago de Lucena Sobrinho",
     "email": "thiagolucenaelvis@gmail.com"
   },
-  "contributors":{},
-  "bugs":{
+  "contributors": {},
+  "bugs": {
     "url": "https://bitbucket.org/cadimos/livepraise/issues",
     "email": "livepraise@teraidc.com.br"
   },
