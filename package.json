@@ -1,15 +1,24 @@
+
 {
-  "name": "dsw",
+  "name": "Live Praise",
   "version": "0.1.0",
   "main": "main.js",
-  "author": "Thiago Lucena",
+  "author": {
+    "name":"Thiago de Lucena Sobrinho",
+    "email": "thiagolucenaelvis@gmail.com"
+  },
+  "contributors":{},
+  "bugs":{
+    "url": "https://bitbucket.org/cadimos/livepraise/issues",
+    "email": "livepraise@teraidc.com.br"
+  },
   "scripts": {
     "start": "electron main.js",
-    "win32": "electron-packager . DWS --platform=win32 --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar",
-    "win64": "electron-packager . DWS --platform=win32 --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds",
-    "linux32": "electron-packager . DWS --platform=linux --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar",
-    "linux64": "electron-packager . DWS --platform=linux --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --overwrite",
-    "osx": "electron-packager . DWS --platform=darwin --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar",
+    "win32": "electron-packager . DWS --platform=win32 --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "win64": "electron-packager . DWS --platform=win32 --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "linux32": "electron-packager . DWS --platform=linux --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "linux64": "electron-packager . DWS --platform=linux --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "osx": "electron-packager . DWS --platform=darwin --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
     "build": "electron-packager . --all",
     "rebuild": "electron-rebuild -f -w sqlite3"
   },
@@ -24,7 +33,7 @@
     "socket.io-client": "^2.2.0",
     "sqlite3": "^4.0.4"
   },
-  "description": "DSW (Data Show Web)",
+  "description": "Live Praise (Software de Projeção para Igrejas)",
   "devDependencies": {
     "debug": "^3.2.6",
     "electron": "^4.0.0-beta.11",
@@ -33,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/cadimos/dsw.git"
+    "url": "git+ssh://git@bitbucket.org/cadimos/livepraise.git"
   },
   "keywords": [
     "Projeção",
@@ -41,5 +50,5 @@
     "Igreja"
   ],
   "license": "ISC",
-  "homepage": "https://bitbucket.org/cadimos/dsw#readme"
+  "homepage": "https://bitbucket.org/cadimos/livepraise#readme"
 }
