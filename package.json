@@ -1,5 +1,5 @@
 {
-  "name": "Live Praise",
+  "name": "LivePraise",
   "version": "0.1.0",
   "main": "main.js",
   "author": {
@@ -7,10 +7,6 @@
     "email": "thiagolucenaelvis@gmail.com"
   },
   "contributors": {},
-  "bugs": {
-    "url": "https://bitbucket.org/cadimos/livepraise/issues",
-    "email": "livepraise@teraidc.com.br"
-  },
   "scripts": {
     "start": "electron main.js",
     "win32": "electron-packager . DWS --platform=win32 --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
@@ -48,6 +44,10 @@
     "DataShow",
     "Igreja"
   ],
+  "bugs": {
+    "url": "https://bitbucket.org/cadimos/livepraise/issues",
+    "email": "livepraise@teraidc.com.br"
+  },
   "license": "ISC",
   "homepage": "https://bitbucket.org/cadimos/livepraise#readme"
 }
