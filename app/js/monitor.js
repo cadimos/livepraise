@@ -351,9 +351,56 @@ function adicionar_musica(id){
     conteudo: data
   });
 }
-setTimeout(() => lista_musica(),200);
+setTimeout(() => lista_musica(),300);
 
+/* Funções de Biblia */
+//Lista as Biblias Disponiveis
+function catBiblias(){
+  db.serialize(function() {
+    db.each("SELECT id,nome FROM cat_biblia", function(err, row) {
+      $('#cat_biblia').append('<option value="'+row.id+'">'+row.nome+'</option>');
+    });
+  });
+}
+catBiblias();
 
+//Lista a Biblia Selecionada
+function lista_biblia(){
+  modelo=`<div class="panel panel-default">
+  <div class="panel-heading" role="tab" id="head[id_livro_biblia]">
+  <h4 class="panel-title">
+  <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_livro_biblia]" aria-expanded="true" aria-controls="collapseOne">
+  [nome_biblia]
+  </a>
+  <span class="acoes_item">
+    <a href="javascript:void(0);" onclick=""><i class="fas fa-edit"></i></a>
+    <a href="javascript:void(0);" onclick="adicionar_musica('[id_livro_biblia]')"><i class="fas fa-check-circle"></i></a>
+  </span>
+  </h4>
+  </div>
+  <div id="collapse[id_livro_biblia]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head[id_musica]">
+  <div class="panel-body">
+  <ul id="verso[id_livro_biblia]"></ul>
+  </div>
+  </div>
+  </div>`;
+
+  $('#list_biblia').html('');
+  db.serialize(function() {
+    db.each("SELECT id,nome FROM biblia_livros", function(err, biblia) {
+      item=modelo.replace(/\[id_livro_biblia\]/g,biblia.id);
+      item=item.replace(/\[nome_biblia\]/g,biblia.nome);
+      $('#list_biblia').append(item);
+      cat=$('#cat_biblia').val();
+      db.each("SELECT id,versiculo FROM biblia_versiculos WHERE `cat`='"+cat+"' AND `livro`='"+biblia.id+"'", function(err, row) {
+        verse=row.versiculo;
+        verse=verse.replace(/<br \/>/g,"\n");
+        $('#verso'+biblia.id).append('<li onclick="texto(\'verso_'+biblia.id+'_'+row.id+'\',\'BR\');" id="verso_'+biblia.id+'_'+row.id+'">'+verse+'</li>');
+      });
+    });
+  });
+}
+//setTimeout(() => lista_biblia(),200);
 
 function viewYoutube(url){
 
