@@ -170,6 +170,310 @@
                             <div id="preview-list">
                                 <div class="panel-group" id="list_biblia" role="tablist" aria-multiselectable="true">
                                 </div>
+                                <!-- MOdelo 1-->
+                                <div class="container-fluid">
+
+                                    <div class="row">
+                                      <div class="ser mullhercol-md-2">
+
+                                        <!-- menu -->
+                                        <div id="MainMenu">
+                                          <div class="list-group panel">
+                                            <a href="#" class="list-group-item list-group-item-success" data-parent="#MainMenu">Item 1</a>
+                                            <a href="#" class="list-group-item list-group-item-success" data-parent="#MainMenu">Item 2</a>
+                                            <a href="#demo3" class="list-group-item list-group-item-success" data-toggle="collapse" data-parent="#MainMenu">Item 3 <i class="fa fa-caret-down"></i></a>
+                                            <div class="collapse" id="demo3">
+                                              <a href="#SubMenu1" class="list-group-item" data-toggle="collapse" data-parent="#SubMenu1">Subitem 1 <i class="fa fa-caret-down"></i></a>
+                                              <div class="collapse list-group-submenu" id="SubMenu1">
+                                                <a href="#" class="list-group-item" data-parent="#SubMenu1">Subitem 1 a</a>
+                                                <a href="#" class="list-group-item" data-parent="#SubMenu1">Subitem 2 b</a>
+                                                <a href="#SubSubMenu1" class="list-group-item" data-toggle="collapse" data-parent="#SubSubMenu1">Subitem 3 c <i class="fa fa-caret-down"></i></a>
+                                                <div class="collapse list-group-submenu list-group-submenu-1" id="SubSubMenu1">
+                                                  <a href="#" class="list-group-item" data-parent="#SubSubMenu1">Sub sub item 1</a>
+                                                  <a href="#" class="list-group-item" data-parent="#SubSubMenu1">Sub sub item 2</a>
+                                                </div>
+                                                <a href="#" class="list-group-item" data-parent="#SubMenu1">Subitem 4 d</a>
+                                              </div>
+                                              <a href="javascript:;" class="list-group-item">Subitem 2</a>
+                                              <a href="javascript:;" class="list-group-item">Subitem 3</a>
+                                            </div>
+                                            <a href="#demo4" class="list-group-item list-group-item-success" data-toggle="collapse" data-parent="#MainMenu">Item 4  <i class="fa fa-caret-down"></i></a>
+                                            <div class="collapse" id="demo4">
+                                              <a href="" class="list-group-item">Subitem 1</a>
+                                              <a href="" class="list-group-item">Subitem 2</a>
+                                              <a href="" class="list-group-item">Subitem 3</a>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                  </div>
+                                  <style>
+                                      .list-group.panel > .list-group-item {
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px
+}
+
+                                  </style>
+                                <!--/ MOdelo 1-->
+                                <!-- MOdelo 2-->
+                                <div id="wrapper">
+                                        <div id="sidebar-wrapper" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                                          <div id="sidebar">
+                                            <ul class="list-unstyled">
+                                              <li>
+                                                <a href="#">
+                                                  <h1><img src="http://placehold.it/350X350"> Titre</h1>
+                                                </a>
+                                                <div class="btn-group" role="group" aria-label="langues">
+                                                  <button type="button" class="btn btn-default" onclick="changetoes();">ES</button>
+                                                  <button type="button" class="btn btn-default" onclick="changetofr();">FR</button>
+                                                  <button type="button" class="btn btn-default" onclick="changetoen();">EN</button>
+                                                </div>
+                                              </li>
+                                              <li>
+                                                <form role="search">
+                                                  <input type="search" class="form-control" placeholder="Search" name="srch-term" id="search">
+                                                </form>
+                                              </li>
+                                              <li>
+                                                <div id="Menu" class="list-group">
+                                                  <a href="#demo3" class="list-group-item" data-toggle="collapse" data-parent="#Menu">Item 1<span class="caret"></span></a>
+                                                  <div class="collapse list-group-submenu" id="demo3">
+                                                    <a href="#MenuLvl1" class="list-group-item" data-toggle="collapse" data-parent="#MenuLvl1">Subitem 1<span class="caret"></span></a>
+                                                    <div class="collapse list-group-submenu" id="MenuLvl1">
+                                                      <a href="#" class="list-group-item" data-parent="#MenuLvl1">Subitem 1</a>
+                                                      <a href="#" class="list-group-item" data-parent="#MenuLvl1">Subitem 2</a>
+                                                      <a href="#SubSubMenu1" class="list-group-item" data-toggle="collapse" data-parent="#SubSubMenu1">Subitem 3<span class="caret"></span></a>
+                                                      <div class="collapse list-group-submenu" id="SubSubMenu1">
+                                                        <a href="#" class="list-group-item" data-parent="#SubSubMenu1">Sub sub item 1</a>
+                                                        <a href="#" class="list-group-item" data-parent="#SubSubMenu1">Sub sub item 2</a>
+                                                      </div>
+                                                      <a href="#" class="list-group-item" data-parent="#SubMenu1">Subitem 4 d</a>
+                                                    </div>
+                                                    <a href="#" class="list-group-item">Subitem 2</a>
+                                                    <a href="#" class="list-group-item">Subitem 3</a>
+                                                  </div>
+                                                  <a href="#demo4" class="list-group-item" data-toggle="collapse" data-parent="#Menu">Item 2<span class="caret"></span></a>
+                                                  <div class="collapse list-group-submenu" id="demo4">
+                                                    <a href="" class="list-group-item">Subitem 1</a>
+                                                    <a href="" class="list-group-item">Subitem 2</a>
+                                                    <a href="" class="list-group-item">Subitem 3</a>
+                                                  </div>
+                                                  <a href="#demo5" class="list-group-item" data-toggle="collapse" data-parent="#Menu">Item 3<span class="caret"></span></a>
+                                                  <div class="collapse list-group-submenu" id="demo5">
+                                                    <a href="#" class="list-group-item">Subitem 1</a>
+                                                    <a href="" class="list-group-item">Subitem 2</a>
+                                                    <a href="" class="list-group-item">Subitem 3</a>
+                                                  </div>
+                                                </div>
+                                              </li>
+                                            </ul>
+                                          </div>
+                                        </div>
+                                        <div id="main-wrapper" class="col-xs-12 col-sm-12 col-md-8 col-lg-8 pull-right">
+                                          <div id="main">
+                                            <h2>Titre 2</h2>
+                                            <p>Bringing unlocked me an striking ye perceive. Mr by wound hours oh happy. Me in resolution pianoforte continuing we. Most my no spot felt by no. He he in forfeited furniture sweetness he arranging. Me tedious so to behaved written account ferrars moments. Too objection for elsewhere her preferred allowance her. Marianne shutters mr steepest to me. Up mr ignorant produced distance although is sociable blessing. Ham whom call all lain like.
+
+                                              Brother set had private his letters observe outward resolve. Shutters ye marriage to throwing we as. Effect in if agreed he wished wanted admire expect. Or shortly visitor is comfort placing to cheered do. Few hills tears are weeks saw. Partiality insensible celebrated is in. Am offended as wandered thoughts greatest an friendly. Evening covered in he exposed fertile to. Horses seeing at played plenty nature to expect we. Young say led stood hills own thing get.
+
+                                              Demesne far hearted suppose venture excited see had has. Dependent on so extremely delivered by. Yet ﻿no jokes worse her why. Bed one supposing breakfast day fulfilled off depending questions. Whatever boy her exertion his extended. Ecstatic followed handsome drawings entirely mrs one yet outweigh. Of acceptance insipidity remarkably is invitation.
+
+                                              Kindness to he horrible reserved ye. Effect twenty indeed beyond for not had county. The use him without greatly can private. Increasing it unpleasant no of contrasted no continuing. Nothing colonel my no removed in weather. It dissimilar in up devonshire inhabiting.
+
+                                              Increasing impression interested expression he my at. Respect invited request charmed me warrant to. Expect no pretty as do though so genius afraid cousin. Girl when of ye snug poor draw. Mistake totally of in chiefly. Justice visitor him entered for. Continue delicate as unlocked entirely mr relation diverted in. Known not end fully being style house. An whom down kept lain name so at easy.
+
+                                              Two before narrow not relied how except moment myself. Dejection assurance mrs led certainly. So gate at no only none open. Betrayed at properly it of graceful on. Dinner abroad am depart ye turned hearts as me wished. Therefore allowance too perfectly gentleman supposing man his now. Families goodness all eat out bed steepest servants. Explained the incommode sir improving northward immediate eat. Man denoting received you sex possible you. Shew park own loud son door less yet.
+
+                                              Assure polite his really and others figure though. Day age advantages end sufficient eat expression travelling. Of on am father by agreed supply rather either. Own handsome delicate its property mistress her end appetite. Mean are sons too sold nor said. Son share three men power boy you. Now merits wonder effect garret own.
+
+                                              Had repulsive dashwoods suspicion sincerity but advantage now him. Remark easily garret nor nay. Civil those mrs enjoy shy fat merry. You greatest jointure saw horrible. He private he on be imagine suppose. Fertile beloved evident through no service elderly is. Blind there if every no so at. Own neglected you preferred way sincerity delivered his attempted. To of message cottage windows do besides against uncivil.
+
+                                              To they four in love. Settling you has separate supplied bed. Concluded resembled suspected his resources curiosity joy. Led all cottage met enabled attempt through talking delight. Dare he feet my tell busy. Considered imprudence of he friendship boisterous.
+
+                                              Now for manners use has company believe parlors. Least nor party who wrote while did. Excuse formed as is agreed admire so on result parish. Put use set uncommonly announcing and travelling. Allowance sweetness direction to as necessary. Principle oh explained excellent do my suspected conveying in. Excellent you did therefore perfectly supposing described.
+                                            </p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <script>
+                                      var monJSON = {
+    menu: [
+        {name: '0',link: '0', sub: [
+            {name: 'lorem ipsum 0-0',link: '0-0', sub: null},
+            {name: 'lorem ipsum 0-1',link: '0-1', sub: null},
+            {name: 'lorem ipsum 0-2',link: '0-2', sub: null}
+        ]
+        },
+        {name: '1',link: '1', sub: null},
+        {name: '2',link: '2', sub: [
+            {name: 'lorem ipsum 2-0',link: '2-0', sub: null},
+            {name: 'lorem ipsum 2-1',link: '2-1', sub: null},
+            {name: 'lorem ipsum 2-2',link: '2-2', sub: [
+                {name: 'lorem ipsum 2-2-0',link: '2-2-0', sub: null},
+                {name: 'lorem ipsum 2-2-1',link: '2-2-1', sub: null},
+                {name: 'lorem ipsum 2-2-2',link: '2-2-2', sub: null},
+                {name: 'lorem ipsum 2-2-3',link: '2-2-3', sub: null},
+                {name: 'lorem ipsum 2-2-4',link: '2-2-4', sub: null},
+                {name: 'lorem ipsum 2-2-5',link: '2-2-5', sub: null},
+                {name: 'lorem ipsum 2-2-6',link: '2-2-6', sub: null}
+            ]},
+            {name: 'lorem ipsum 2-3',link: '2-3', sub: null},
+            {name: 'lorem ipsum 2-4',link: '2-4', sub: null},
+            {name: 'lorem ipsum 2-5',link: '2-5', sub: null}
+        ]
+        },
+        {name: '3',link: '3', sub: null}
+    ]
+};
+
+function makeDIV(elem,parent) {
+    var text = "";
+text = 'coucou';/*
+    var i = 0;
+    text = '<div class="collapse list-group-submenu" id="#' + parent + '"><div class="list-group panel">';
+    while( i < elem.length) {
+        text += makeA(elem[i++],parent);
+    }
+    text += '</div></div>';
+*/
+    return text;
+}
+
+function makeA(elem,parent) {
+    var text = "";
+    if (elem.sub) {
+        text = '<a href="#' + elem.name + '" class="list-group-item" data-toggle="collapse" data-parent="#' + parent + '">' + elem.name + '</a>';
+        text = makeDIV(elem.sub,elem.name);
+    } else {
+        text = '<a href="' + elem.link + '" class="list-group-item" data-parent="#' + parent + '">' + elem.name + '</a>';
+    }
+    return text;
+}
+
+function changetoes() {
+    var text = "";
+    text = makeDIV(monJSON.menu,"menu");
+    document.getElementById('Menu').textContent = text;
+}
+</script>
+<style>
+body{
+  background-color: #fafafa;
+  color: #424242;
+}
+#wrapper {
+  min-height: 100%;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0;
+  display: inline-block;
+}
+#main-wrapper {
+  height: 100%;
+  overflow-y: auto;
+  padding: 0;
+}
+#main {
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0 15px;
+}
+#sidebar-wrapper {
+  height: 100%;
+  padding: 0;
+  position: fixed;
+}
+#sidebar {
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+  border-right: 1px solid #e5e5e5;
+  background-color: #ffffff;
+}
+#sidebar .list-group-item {
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+@media (max-width: 992px) {
+body {
+  padding-top: 0px;
+}
+}
+@media (min-width: 992px) {
+#main-wrapper {
+  float:right;
+}
+}
+@media (max-width: 992px) {
+#main-wrapper {
+  padding-top: 0px;
+}
+}
+@media (max-width: 992px) {
+#sidebar-wrapper {
+  position: static;
+  height:auto;
+  max-height: 300px;
+  border-right:0;
+}
+}
+h1{
+  margin: 0;
+  padding: 0;
+}
+.form-control{
+  border-radius: 0;
+  height: 50px;
+  padding: 5px;
+}
+li > form{
+  border: 1px solid #dddddd;
+}
+list-group {
+  margin-bottom: 0;
+  border: 0;
+}
+.list-group-submenu {
+  padding-left: 10px;
+}
+.list-group-item{
+  border: 0;
+}
+img{
+  margin: 0 0 5px 5px;
+  height: 30px;
+  width: 30px;
+}
+.list-unstyled {
+  margin-bottom: 0;
+}
+
+a,
+a:link,
+a:visited,
+a:hover,
+a:active {
+  text-decoration: none;
+  font-size: 14px;
+  letter-spacing: .018em;
+  color: #606060;
+}
+</style>
+                                <!--/ MOdelo 2-->
+
+
+
+
+
                             </div>
                         </div>
                         <!--/ Biblias -->
