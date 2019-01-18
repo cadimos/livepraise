@@ -365,6 +365,7 @@ function catBiblias(){
 catBiblias();
 
 //Lista a Biblia Selecionada
+/*
 function lista_biblia(){
   modelo=`<div class="panel panel-default">
   <div class="panel-heading" role="tab" id="head[id_livro_biblia]">
@@ -400,6 +401,7 @@ function lista_biblia(){
     });
   });
 }
+*/
 //setTimeout(() => lista_biblia(),200);
 
 function viewYoutube(url){

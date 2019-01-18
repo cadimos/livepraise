@@ -134,7 +134,7 @@
     /*margin-bottom: 5px;*/
 }
 .panel-body{
-    padding-top: 5px;
+    padding-top: 0px;
 }
 .panel-title{
     font-size: 14px;
@@ -164,4 +164,8 @@
 }
 .panel-group{
     margin-bottom: 0;
+}
+#versiculo{
+    list-style: none;
+    padding: 0;
 }
