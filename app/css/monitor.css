@@ -166,6 +166,6 @@
     margin-bottom: 0;
 }
 #versiculo{
-    list-style: none;
-    padding: 0;
+    list-style: decimal-leading-zero;
+    padding-left: 15px;
 }

@@ -1,4 +1,5 @@
 //Variaveis Globais
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 const dir_app = process.cwd();
 const fs = require('fs');
 const exec = require('child-process-promise').exec;
@@ -365,34 +366,78 @@ function catBiblias(){
 catBiblias();
 
 //Lista a Biblia Selecionada
-/*
 function lista_biblia(){
-  modelo=`<div class="panel panel-default">
-  <div class="panel-heading" role="tab" id="head[id_livro_biblia]">
-  <h4 class="panel-title">
-  <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_livro_biblia]" aria-expanded="true" aria-controls="collapseOne">
-  [nome_biblia]
-  </a>
-  <span class="acoes_item">
-    <a href="javascript:void(0);" onclick=""><i class="fas fa-edit"></i></a>
-    <a href="javascript:void(0);" onclick="adicionar_musica('[id_livro_biblia]')"><i class="fas fa-check-circle"></i></a>
-  </span>
-  </h4>
+  modelo_biblia=`<div class="panel panel-default">
+  <div class="panel-heading" role="tab" id="head_biblia_[id_livro]">
+      <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#list_biblia" href="#collapse_biblia_[id_livro]" aria-expanded="true" aria-controls="collapse_biblia_[id_livro]">
+              [nome_livro]
+          </a>
+      </h4>
   </div>
-  <div id="collapse[id_livro_biblia]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head[id_musica]">
-  <div class="panel-body">
-  <ul id="verso[id_livro_biblia]"></ul>
+  <div id="collapse_biblia_[id_livro]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head_biblia_[id_livro]">
+      <div class="panel-body">
+          <div class="panel-group" id="list_biblia_[id_livro]" role="tablist" aria-multiselectable="true">
+          </div>
+      </div>
   </div>
+</div>`;
+  modelo_capitulos=`<div class="panel panel-success">
+  <div class="panel-heading" role="tab" id="head_[id_livro]_[id_capitulo]">
+      <h4 class="panel-title">
+          <a onclick="lista_versiculo([cat],[id_livro],[id_capitulo])" role="button" data-toggle="collapse" data-parent="#list_biblia_[id_livro]" href="#collapse_[id_livro]_[id_capitulo]" aria-expanded="true" aria-controls="collapse1">
+              [id_capitulo]
+          </a>
+          <span class="acoes_item">
+              <a href="javascript:void(0);" onclick="adicionar_biblia_capitulo('[id_livro]_[id_capitulo]')"><i class="fas fa-check-circle"></i></a>
+          </span>
+      </h4>
   </div>
-  </div>`;
-
+  <div id="collapse_[id_livro]_[id_capitulo]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head_[id_livro]_[id_capitulo]">
+      <div class="panel-body">
+          <ul id="versiculo"></ul>
+      </div>
+  </div>
+</div>`;
   $('#list_biblia').html('');
   db.serialize(function() {
     db.each("SELECT id,nome FROM biblia_livros", function(err, biblia) {
+      item=modelo_biblia.replace(/\[id_livro\]/g,biblia.id);
+      item=item.replace(/\[nome_livro\]/g,biblia.nome);
+      cat=$('#cat_biblia').val();
+      item=item.replace(/\[cat\]/g,biblia.nome);
+      $('#list_biblia').append(item);
+      db.each("SELECT DISTINCT capitulo FROM biblia_versiculos WHERE  cat ="+cat+" AND  livro ="+biblia.id+";", function(err, biblia_capitulos) {
+        capitulos=modelo_capitulos.replace(/\[id_livro\]/g,biblia.id);
+        capitulos=capitulos.replace(/\[id_capitulo\]/g,biblia_capitulos.capitulo);
+        $('#list_biblia_'+biblia.id).append(capitulos);
+      });
+    });
+  });
+}
+setTimeout(() => lista_biblia(),200);
+
+//Funçao de Listar os Versiculos por demanda
+function lista_versiculo(cat,livro,capitulo){
+  modelo_versiculo=`<li onclick="texto('versiculo_[id_capitulo]_[id_versiculo]','BR');" id="versiculo_[id_capitulo]_[id_versiculo]">[texto]</li>`;
+  modelo_versiculo=modelo_versiculo.replace(/\[id_livro\]/g,livro);
+  modelo_versiculo=modelo_versiculo.replace(/\[id_capitulo\]/g,capitulo);
+  db.serialize(function() {
+    db.each("SELECT id,texto FROM biblia_versiculos WHERE  cat ="+cat+" AND  livro ="+livro+" AND capitulo="+capitulo+";", function(err, biblia_versiculo) {
+      versiculo=modelo_versiculo.replace(/\[id_versiculo\]/g,biblia_versiculo.id);
+      versiculo=versiculo.replace(/\[texto\]/g,biblia_versiculo.texto);
+      $('#collapse_'+livro+'_'+capitulo+' #versiculo').append(versiculo);
+    });
+  });
+}
+/*
+function lista_biblia(){
+
+
       item=modelo.replace(/\[id_livro_biblia\]/g,biblia.id);
       item=item.replace(/\[nome_biblia\]/g,biblia.nome);
-      $('#list_biblia').append(item);
-      cat=$('#cat_biblia').val();
+
+
       db.each("SELECT id,versiculo FROM biblia_versiculos WHERE `cat`='"+cat+"' AND `livro`='"+biblia.id+"'", function(err, row) {
         verse=row.versiculo;
         verse=verse.replace(/<br \/>/g,"\n");
@@ -402,7 +447,7 @@ function lista_biblia(){
   });
 }
 */
-//setTimeout(() => lista_biblia(),200);
+
 
 function viewYoutube(url){
 
@@ -467,4 +512,3 @@ var pressedCtrl = false; //variável de controle
       alert('Tecla para esquerda pressionada')
     }
 	});
-//db.close();
