@@ -167,6 +167,7 @@ function catImagens(){
       //é um arquivo
     }
   }
+  return true;
 }
 catImagens();
 
@@ -386,7 +387,7 @@ function lista_biblia(){
   <div class="panel-heading" role="tab" id="head_[id_livro]_[id_capitulo]">
       <h4 class="panel-title">
           <a onclick="lista_versiculo([cat],[id_livro],[id_capitulo])" role="button" data-toggle="collapse" data-parent="#list_biblia_[id_livro]" href="#collapse_[id_livro]_[id_capitulo]" aria-expanded="true" aria-controls="collapse1">
-              [id_capitulo]
+            <i class="fas fa-bible"></i>  [id_capitulo]
           </a>
           <span class="acoes_item">
               <a href="javascript:void(0);" onclick="adicionar_biblia_capitulo('[id_livro]_[id_capitulo]')"><i class="fas fa-check-circle"></i></a>
@@ -430,24 +431,6 @@ function lista_versiculo(cat,livro,capitulo){
     });
   });
 }
-/*
-function lista_biblia(){
-
-
-      item=modelo.replace(/\[id_livro_biblia\]/g,biblia.id);
-      item=item.replace(/\[nome_biblia\]/g,biblia.nome);
-
-
-      db.each("SELECT id,versiculo FROM biblia_versiculos WHERE `cat`='"+cat+"' AND `livro`='"+biblia.id+"'", function(err, row) {
-        verse=row.versiculo;
-        verse=verse.replace(/<br \/>/g,"\n");
-        $('#verso'+biblia.id).append('<li onclick="texto(\'verso_'+biblia.id+'_'+row.id+'\',\'BR\');" id="verso_'+biblia.id+'_'+row.id+'">'+verse+'</li>');
-      });
-    });
-  });
-}
-*/
-
 
 function viewYoutube(url){
 
@@ -511,4 +494,4 @@ var pressedCtrl = false; //variável de controle
     if(e.which == KEY_LEFT || e.keyCode == KEY_LEFT){
       alert('Tecla para esquerda pressionada')
     }
-	});
+  });

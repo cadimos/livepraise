@@ -24,7 +24,7 @@ app.on('ready', function() {
         width,
         height,
         show: false,
-        title: '(DSW) Projeção',
+        title: 'Live Praise - Projeção',
         icon: __dirname+'/app/icon/cadimos.png',
         webPreferences: {
             nodeIntegration: true,
