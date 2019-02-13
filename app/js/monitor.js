@@ -65,6 +65,37 @@ const KEY_PF6 = 117;
 const KEY_PF7 = 118;
 const KEY_PF8 = 119;
 
+//Loanding
+function loanding(){
+ const carregar=[
+   'catImagens',
+   'parar_cor'
+ ];
+ $('#current_loading').html('Carregando itens');
+}
+//Muda a cor da arvore
+var stop_color=false;
+function color_animate(tempo){
+  let r=Math.floor(Math.random() * 256);
+  let g=Math.floor(Math.random() * 256);
+  let b=Math.floor(Math.random() * 256);
+  let r2=Math.floor(Math.random() * 256);
+  let g2=Math.floor(Math.random() * 256);
+  let b2=Math.floor(Math.random() * 256);
+  let r3=Math.floor(Math.random() * 256);
+  let g3=Math.floor(Math.random() * 256);
+  let b3=Math.floor(Math.random() * 256);
+  $('.tree').css('fill','url(#gradient)');
+  $('#inicio_gradiente').attr('stop-color','rgb('+r+','+g+','+b+')');
+  $('#meio_gradiente').attr('stop-color','rgb('+r2+','+g2+','+b2+')');
+  $('#fim_gradiente').attr('stop-color','rgb('+r3+','+g3+','+b3+')');
+  setTimeout(() => color_animate(tempo),tempo);
+}
+color_animate(5000);
+function parar_cor(){
+  stop_color = true;
+  return true;
+}
 //Remove Quebra de Linha Substituindo por <br />
 function nl2br (str) {
   var breakTag = '<br '+'/>';
