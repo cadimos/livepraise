@@ -170,14 +170,15 @@
     padding-left: 15px;
 }
 #loading{
-  position: fixed;
+  position: absolute;
   width: 100%;
   height: 100vh;
   background: #081d3e;
   top: 0;
+  z-index: 99999;
 }
 #loading_content {
-    width: 54%;
+    width: 70%;
     position: absolute;
     left: 15%;
     top: 15%;
@@ -189,13 +190,14 @@
 #loading_texto{
   float: left;
   color: #fff;
+  width: 60%;
 }
 #current_loading{
   margin-top: 15px;
 }
 svg {
   float: left;
-  max-width: 50%;
+  max-width: 40%;
 }
 
 .tree {
