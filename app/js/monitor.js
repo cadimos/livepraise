@@ -66,13 +66,7 @@ const KEY_PF7 = 118;
 const KEY_PF8 = 119;
 
 //Loanding
-function loanding(){
- const carregar=[
-   'catImagens',
-   'parar_cor'
- ];
- $('#current_loading').html('Carregando itens');
-}
+
 //Muda a cor da arvore
 var stop_color=false;
 function color_animate(tempo){
@@ -91,11 +85,34 @@ function color_animate(tempo){
   $('#fim_gradiente').attr('stop-color','rgb('+r3+','+g3+','+b3+')');
   setTimeout(() => color_animate(tempo),tempo);
 }
-color_animate(5000);
+
 function parar_cor(){
   stop_color = true;
   return true;
 }
+function loanding(){
+  $('#current_loading').html('Iniciando Animaçao');
+  color_animate(5000);
+  $('#current_loading').html('Carregando Imagens');
+  catImagens();
+  $('#current_loading').html('Carregando Vídeos');
+  catVideos();
+  $('#current_loading').html('Carregando Músicas');
+  catMusicas();
+  $('#current_loading').html('Listando Músicas');
+  setTimeout(() => lista_musica(),300);
+  $('#current_loading').html('Carregando Biblias');
+  catBiblias();
+  $('#current_loading').html('Listando livros da Biblias');
+  setTimeout(() => lista_biblia(),200);
+}
+function fechar_loandig(){
+  v=$('#current_loading').html();
+  if(v=='Listado Biblias'){
+    $('#loading').css('display','none');
+  }
+}
+setTimeout(() => loanding(), 200);
 //Remove Quebra de Linha Substituindo por <br />
 function nl2br (str) {
   var breakTag = '<br '+'/>';
@@ -155,8 +172,7 @@ function texto(id,br){
   });
   $('.texto').css('text-align','center');
   if(congelar('valida')==true){
-    var text = '{"funcao":[' +
-'{"nome":"texto","valor":"'+btoa(txt)+'" }]}';
+    var text = '{"funcao":[' +'{"nome":"texto","valor":"'+btoa(txt)+'" }]}';
     socket.emit("send", text);
   }
 }
@@ -198,9 +214,8 @@ function catImagens(){
       //é um arquivo
     }
   }
-  return true;
+  $('#current_loading').html('Carregado Imagens');
 }
-catImagens();
 
 //Lista Imagens
 function lista_imagem(dir){
@@ -216,6 +231,7 @@ function lista_imagem(dir){
       $('#preview-imagens').append('<li><img src="'+img+'" onclick="background(\''+img+'\')"></li>')
     }
   }
+  $('#current_loading').html('Carregado Preview de Imagens');
 }
 
 /* Funções de Videos */
@@ -238,8 +254,9 @@ function catVideos(){
       //é um arquivo
     }
   }
+  $('#current_loading').html('Carregado Vídeos');
 }
-catVideos();
+
 //Lista Videos
 function lista_video(dir){
   $('#preview-videos').html('');
@@ -267,6 +284,7 @@ function lista_video(dir){
       }
     }
   }
+  $('#current_loading').html('Carregado Preview de Vídeos');
 }
 //Visualiza o Video
 function viewVideo(url){
@@ -290,9 +308,9 @@ function catMusicas(){
     db.each("SELECT id,nome FROM cat_musicas", function(err, row) {
       $('#cat_musica').append('<option value="'+row.id+'">'+row.nome+'</option>');
     });
+    $('#current_loading').html('Carregado Músicas');
   });
 }
-catMusicas();
 
 //Lista as Musicas
 function lista_musica(){
@@ -329,6 +347,7 @@ function lista_musica(){
         $('#verso'+musica.id).append('<li onclick="texto(\'verso_'+musica.id+'_'+row.id+'\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
       });
     });
+    $('#current_loading').html('Listado Músicas');
   });
 }
 
@@ -384,7 +403,7 @@ function adicionar_musica(id){
     conteudo: data
   });
 }
-setTimeout(() => lista_musica(),300);
+
 
 /* Funções de Biblia */
 //Lista as Biblias Disponiveis
@@ -393,9 +412,9 @@ function catBiblias(){
     db.each("SELECT id,nome FROM cat_biblia", function(err, row) {
       $('#cat_biblia').append('<option value="'+row.id+'">'+row.nome+'</option>');
     });
+    $('#current_loading').html('Carregando Biblias');
   });
 }
-catBiblias();
 
 //Lista a Biblia Selecionada
 function lista_biblia(){
@@ -433,7 +452,9 @@ function lista_biblia(){
 </div>`;
   $('#list_biblia').html('');
   db.serialize(function() {
+    p='';
     db.each("SELECT id,nome FROM biblia_livros", function(err, biblia) {
+      $('#current_loading').html('Listando Livros da Biblias<br> Aguarde um instante, está quase acabando!');
       item=modelo_biblia.replace(/\[id_livro\]/g,biblia.id);
       item=item.replace(/\[nome_livro\]/g,biblia.nome);
       cat=$('#cat_biblia').val();
@@ -443,11 +464,14 @@ function lista_biblia(){
         capitulos=modelo_capitulos.replace(/\[id_livro\]/g,biblia.id);
         capitulos=capitulos.replace(/\[id_capitulo\]/g,biblia_capitulos.capitulo);
         $('#list_biblia_'+biblia.id).append(capitulos);
+        if(biblia.id==66 && biblia_capitulos.capitulo==22){
+          $('#current_loading').html('Listado Biblias');
+          setTimeout(() => fechar_loandig(),100);
+        }
       });
     });
   });
 }
-setTimeout(() => lista_biblia(),200);
 
 //Funçao de Listar os Versiculos por demanda
 function lista_versiculo(cat,livro,capitulo){
