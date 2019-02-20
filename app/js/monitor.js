@@ -514,15 +514,15 @@ if(document.querySelector('button[data-theme-toggle]')){
 }
 
 var pressedCtrl = false; //variável de controle
-	 $(document).keyup(function (e) {  //O evento Kyeup é acionado quando as teclas são soltas
-	 	if(e.which == KEY_CTRL) pressedCtrl=false; //Quando qualuer tecla for solta é preciso informar que Crtl não está pressionada
-	 })
-	$(document).keydown(function (e) { //Quando uma tecla é pressionada
-		if(e.which == KEY_CTRL) pressedCtrl = true; //Informando que Crtl está acionado
-		if((e.which == KEY_ENTER|| e.keyCode == KEY_ENTER) && pressedCtrl == true) { //Reconhecendo tecla Enter
-			alert('O comando Crtl+Enter foi acionado')
-     }
-    if(e.which == KEY_LEFT || e.keyCode == KEY_LEFT){
-      alert('Tecla para esquerda pressionada')
+$(document).keyup(function (e) {  //O evento Kyeup é acionado quando as teclas são soltas
+  if(e.which == KEY_CTRL) pressedCtrl=false; //Quando qualuer tecla for solta é preciso informar que Crtl não está pressionada
+  })
+$(document).keydown(function (e) { //Quando uma tecla é pressionada
+  if(e.which == KEY_CTRL) pressedCtrl = true; //Informando que Crtl está acionado
+  if((e.which == KEY_ENTER|| e.keyCode == KEY_ENTER) && pressedCtrl == true) { //Reconhecendo tecla Enter
+    alert('O comando Crtl+Enter foi acionado')
     }
-  });
+  if(e.which == KEY_LEFT || e.keyCode == KEY_LEFT){
+    alert('Tecla para esquerda pressionada')
+  }
+});
