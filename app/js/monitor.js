@@ -322,7 +322,7 @@ function lista_musica(){
   [nome_musica] ([artista_musica])
   </a>
   <span class="acoes_item">
-    <a href="javascript:void(0);" onclick=""><i class="fas fa-edit"></i></a>
+    <a href="javascript:void(0);" data-toggle="modal" data-target="#new_music" data-whatever="[id_musica]"><i class="fas fa-edit"></i></a>
     <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
   </span>
   </h4>
@@ -352,7 +352,7 @@ function lista_musica(){
 }
 
 //Salva as Musicas
-function salvar_musica(){
+function salvar_musica(id){
   nome=$('#new_music #nome').val();
   if(nome==''){
     alert('O nome da Música é Obrigatória!');
@@ -371,15 +371,28 @@ function salvar_musica(){
     letra=nl2br(letra);
     versos=letra.split("<br /><br />");
     t_versos=versos.length;
-    db.serialize(function() {
-      db.run("INSERT INTO `musica` (`cat`,`nome`,`nome2`,`artista`,`compositor`) VALUES ('"+cat+"','"+nome+"','"+nome+"','"+artista+"','"+compositor+"')");
-      db.each("SELECT id FROM musica ORDER BY  id  DESC LIMIT 1", function(err, row) {
-        id_musica=row.id;
-        for(i=0;i<t_versos;i++){
-          db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+versos[i]+"')")
-        }
+    if(id==0){
+      db.serialize(function() {
+        db.run("INSERT INTO `musica` (`cat`,`nome`,`nome2`,`artista`,`compositor`) VALUES ('"+cat+"','"+nome+"','"+nome+"','"+artista+"','"+compositor+"')");
+        db.each("SELECT id FROM musica ORDER BY  id  DESC LIMIT 1", function(err, row) {
+          id_musica=row.id;
+          for(i=0;i<t_versos;i++){
+            db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+versos[i]+"')")
+          }
+        });
       });
-    });
+    }else{
+      db.serialize(function() {
+        db.run("UPDATE `musica` SET `nome`='"+nome+"',`nome2`='"+nome+"',`artista`='"+artista+"',`compositor`='"+compositor+"' WHERE `id`='"+id+"'");
+        db.run("DELETE FROM `musica_versos` WHERE `id`='"+id+"'");
+        db.each("SELECT id FROM musica WHERE `id`='"+id+"' ORDER BY  id  DESC LIMIT 1", function(err, row) {
+          id_musica=row.id;
+          for(i=0;i<t_versos;i++){
+            db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+versos[i]+"')")
+          }
+        });
+      });
+    }
     $('#new_music').modal('hide');
     $('#new_music #nome').val('');
     $('#new_music #artista').val('');
@@ -403,7 +416,30 @@ function adicionar_musica(id){
     conteudo: data
   });
 }
-
+//Editar Musica
+$('#new_music').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var cod = button.data('whatever') // Extract info from data-* attributes
+  if(cod!='undefined' && cod!=null){
+    //Editar
+    db.serialize(function() {
+      db.each("SELECT id,nome,artista,compositor FROM musica WHERE id='"+cod+"'", function(err, musica) {
+        $('#nome').val(musica.nome);
+        $('#artista').val(musica.artista);
+        $('#compositor').val(musica.compositor);
+        $('#letra').html('');
+        $('#button_salvar_musica').attr('onclick','salvar_musica('+musica.id+');')
+        db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
+          verse=row.verso;
+          verse=verse.replace(/<br \/>/g,"\n");
+          $('#letra').append(verse+"\n\n");
+        });
+      });
+    });
+  }else{
+    $('#button_salvar_musica').attr('onclick','salvar_musica(0);')
+  }
+});
 
 /* Funções de Biblia */
 //Lista as Biblias Disponiveis

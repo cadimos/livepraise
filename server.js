@@ -3,14 +3,15 @@ var app = require('express')();
 var http = require('http').Server(app);
 const io = require('socket.io')(http);
 
-var clients = {};
 app.use(express.static('public'));
 app.get('/', function(req, res){
     res.send('Bem Vindo ao Sistema de Projeção!');
 });
-
+var clients = {};
 //SocketIO vem aqui
-io.on("connection", function (client) {  
+//Conexão
+io.on("connection", function (client) { 
+    console.log('Usuario Conectado'); 
     client.on("join", function(name){
     	console.log("Joined: " + name);
         clients[client.id] = name;
@@ -22,9 +23,9 @@ io.on("connection", function (client) {
     	console.log("Message: " + msg);
         client.broadcast.emit("chat", clients[client.id], msg);
     });
-
+    //Usuario Desconectado
     client.on("disconnect", function(){
-    	console.log("Disconnect");
+    	console.log("Disconnect "+client.id);
         io.emit("update", clients[client.id] + " has left the server.");
         delete clients[client.id];
     });
