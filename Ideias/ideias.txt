@@ -26,9 +26,9 @@ Suporte a exibição de videos do Youtube
 - Exibição dos textos
 Sobreamento no Texto a ser exibido
 
-- Execuçaõ de Audio
+- Execução de Audio
 
-- Historico de operações realizadas
+- Salvar Área de Trabalho
 
 - Suporte a execução remota
 
@@ -62,3 +62,5 @@ opção de inserir logomarca na projeção
 Opção de acessar um site.
 
 Opção de trocar a cor da letra rapidamente
+
+Mais itens e detalhes em: https://bitbucket.org/cadimos/livepraise/issues
