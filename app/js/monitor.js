@@ -107,10 +107,7 @@ function loanding(){
   setTimeout(() => lista_biblia(),200);
 }
 function fechar_loandig(){
-  v=$('#current_loading').html();
-  if(v=='Listado Biblias'){
-    $('#loading').css('display','none');
-  }
+  $('#loading').css('display','none');
 }
 setTimeout(() => loanding(), 200);
 //Remove Quebra de Linha Substituindo por <br />
@@ -488,7 +485,6 @@ function lista_biblia(){
 </div>`;
   $('#list_biblia').html('');
   db.serialize(function() {
-    p='';
     db.each("SELECT id,nome FROM biblia_livros", function(err, biblia) {
       $('#current_loading').html('Listando Livros da Biblias<br> Aguarde um instante, está quase acabando!');
       item=modelo_biblia.replace(/\[id_livro\]/g,biblia.id);
@@ -499,11 +495,12 @@ function lista_biblia(){
       db.each("SELECT DISTINCT capitulo FROM biblia_versiculos WHERE  cat ="+cat+" AND  livro ="+biblia.id+";", function(err, biblia_capitulos) {
         capitulos=modelo_capitulos.replace(/\[id_livro\]/g,biblia.id);
         capitulos=capitulos.replace(/\[id_capitulo\]/g,biblia_capitulos.capitulo);
-        $('#list_biblia_'+biblia.id).append(capitulos);
         if(biblia.id==66 && biblia_capitulos.capitulo==22){
           $('#current_loading').html('Listado Biblias');
           setTimeout(() => fechar_loandig(),100);
         }
+        $('#current_loading').html('Listando Livros da Biblias: '+biblia.nome+' '+biblia_capitulos.capitulo+'<br> Aguarde um instante, está quase acabando!');
+        $('#list_biblia_'+biblia.id).append(capitulos);
       });
     });
   });
