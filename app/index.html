@@ -197,26 +197,7 @@
                     </script>
                     </span>
                 </div>
-                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" id="background-rapido">
-                    <a href="javascript:void(0)" onclick="backgroundRapido('../Dados/imagens/Background/praia.jpg')">
-                        <img src="../Dados/imagens/Background/praia.jpg" class="img-responsive" alt="Responsive image">
-                    </a>
-                </div>
-                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" id="background-rapido">
-                    <a href="javascript:void(0)" onclick="backgroundRapido('../Dados/imagens/Background/Paisagem.jpg')">
-                        <img src="../Dados/imagens/Background/Paisagem.jpg" class="img-responsive" alt="Responsive image">
-                    </a>
-                </div>
-                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" id="background-rapido">
-                    <a href="javascript:void(0)" onclick="backgroundRapido('../Dados/imagens/Background/Mar.jpg')">
-                        <img src="../Dados/imagens/Background/Mar.jpg" class="img-responsive" alt="Responsive image">
-                    </a>
-                </div>
-                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1" id="background-rapido">
-                    <a href="javascript:void(0)" onclick="backgroundRapido('../Dados/imagens/Background/preto.jpg')">
-                        <img src="../Dados/imagens/Background/preto.jpg" class="img-responsive" alt="Responsive image">
-                    </a>
-                </div>
+                <div id="background-rapido"></div>
             </div>
             <div class="row-fluid" id="navegacao-itens">
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" id="navegacao-tab">
@@ -236,8 +217,7 @@
                                 </div>
                             </div>
                             <div id="preview-list">
-                                <ul id="preview-imagens">
-                                </ul>
+                                <ul id="preview-imagens"></ul>
                             </div>
                         </div>
                         <!--/ Imagens -->
@@ -249,8 +229,7 @@
                                 </div>
                             </div>
                             <div id="preview-list">
-                                <ul id="preview-videos">
-                                </ul>
+                                <ul id="preview-videos"></ul>
                             </div>
                         </div>
                         <!--/ Videos -->
@@ -275,42 +254,7 @@
                                 </div>
                             </div>
                             <div id="preview-list">
-                                <div class="panel-group" id="list_biblia" role="tablist" aria-multiselectable="true">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading" role="tab" id="head1">
-                                            <h4 class="panel-title">
-                                                <a role="button" data-toggle="collapse" data-parent="#list_biblia" href="#collapse1" aria-expanded="true" aria-controls="collapse1">
-                                                    Gênesis
-                                                </a>
-                                            </h4>
-                                        </div>
-                                        <div id="collapse1" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head1">
-                                            <div class="panel-body">
-                                                <div class="panel-group" id="list_biblia_1" role="tablist" aria-multiselectable="true">
-                                                    <div class="panel panel-success">
-                                                        <div class="panel-heading" role="tab" id="head_cap1">
-                                                            <h4 class="panel-title">
-                                                                <a role="button" data-toggle="collapse" data-parent="#list_biblia_1" href="#collapse_cap1" aria-expanded="true" aria-controls="collapse1">
-                                                                    01
-                                                                </a>
-                                                                <span class="acoes_item">
-                                                                    <a href="javascript:void(0);" onclick="adicionar_musica('[id_livro_biblia]')"><i class="fas fa-check-circle"></i></a>
-                                                                </span>
-                                                            </h4>
-                                                        </div>
-                                                        <div id="collapse_cap1" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head_cap1">
-                                                            <div class="panel-body">
-                                                                <ul id="versiculo">
-                                                                    <li onclick="texto('verso_xxx1','BR');" id="verso_xxx1">Teste1</li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div class="panel-group" id="list_biblia" role="tablist" aria-multiselectable="true"></div>
                             </div>
                         </div>
                         <!--/ Biblias -->
@@ -322,7 +266,7 @@
                     </div>
                 </div>
                 <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5" id="preview">
-                    <img src="../Dados/imagens/Background/preto.jpg" class="img-responsive" alt="Responsive image">
+                    <img src="" class="img-responsive" alt="Responsive image">
                     <div id="video">
                         <video id="player" controls loop="true"></video>
                     </div>

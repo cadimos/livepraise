@@ -105,6 +105,7 @@ function loanding(){
   catBiblias();
   $('#current_loading').html('Listando livros da Biblias');
   setTimeout(() => lista_biblia(),200);
+  lista_background_rapido();
 }
 function fechar_loandig(){
   $('#loading').css('display','none');
@@ -115,7 +116,31 @@ function nl2br (str) {
   var breakTag = '<br '+'/>';
   return str.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/gm, breakTag);
 }
-
+//Listagem Background Rápido
+function lista_background_rapido(){
+  modelo_back_rapido=`<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 background-rapido">
+  <a href="javascript:void(0)" onclick="backgroundRapido('[url64]')">
+      <img src="[url]" class="img-responsive" alt="Responsive image">
+  </a>
+</div>`;
+  $('#background-rapido').html('');
+  db.serialize(function() {
+    db.each("SELECT url,diretorio,inicial FROM background_rapido ORDER BY id ASC", function(err, res) {
+      if(res.diretorio=='/'){
+        dir=dir_app+'/';
+      }else{
+        dir=res.diretorio;
+      }
+      item_back=modelo_back_rapido.replace(/\[url\]/g,dir+res.url);
+      item_back=item_back.replace(/\[url64\]/g,btoa(dir+res.url));
+      $('#background-rapido').append(item_back);
+      if(res.inicial=='S'){
+        $('#preview img').attr('src',dir+res.url)
+      }
+    });
+    $('#current_loading').html('Background Rápido');
+  });
+}
 //Remove o Conteudo da Tela
 function removeConteudo(){
   $('.texto span').html('');
@@ -128,10 +153,11 @@ function removeConteudo(){
 
 //Troca o Fundo da Tela
 function background(url){
+  url=atob(url);
   $('#video').css('display','none');
   $('#preview img').css('display','block');
   $("#preview img").fadeOut(150, function() {
-    $("#preview img").attr('src',url);
+  $("#preview img").attr('src',url);
   }).fadeIn(200);
   if(congelar('valida')==true){
     var text = '{"funcao":[' +
@@ -143,6 +169,7 @@ function background(url){
 
 // Troca o Fundo Removendo o Texto
 function backgroundRapido(url){
+    url=atob(url);
     $('#video').css('display','none');
     $('#preview img').css('display','block');
     $("#preview img").fadeOut(150, function() {
@@ -225,7 +252,7 @@ function lista_imagem(dir){
     }else{
       img=name;
       img=img.replace('#','%23');
-      $('#preview-imagens').append('<li><img src="'+img+'" onclick="background(\''+img+'\')"></li>')
+      $('#preview-imagens').append('<li><img src="'+img+'" onclick="background(\''+btoa(img)+'\')"></li>')
     }
   }
   $('#current_loading').html('Carregado Preview de Imagens');
@@ -266,7 +293,7 @@ function lista_video(dir){
       img=name.replace(dir,dir+'/thumb');
       img=img.replace('.mp4','.jpg');
       video=name;
-      list='<li><img src="'+img+'" onclick="viewVideo(\''+video+'\')"></li>';
+      list='<li><img src="'+img+'" onclick="viewVideo(\''+btoa(video)+'\')"></li>';
       if (fs.existsSync(img)) {
         //Se o arquivo existir
         $('#preview-videos').append(list);
@@ -285,6 +312,7 @@ function lista_video(dir){
 }
 //Visualiza o Video
 function viewVideo(url){
+  url=atob(url);
   $('#preview img').css('display','none');
   $('#video').css('display','block');
   if(congelar('valida')==true){
