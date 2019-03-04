@@ -129,6 +129,7 @@
                 <button type="button" class="btn btn-primary" id="freeze" onclick="congelar('freeze')">Congelar</button>
                 <button type="button" class="btn btn-primary" id="remove" onclick="removeConteudo()">Limpar Tela</button>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new_music">Nova Música</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bloco_notas">Bloco de Notas</button>
                 <button type="button" class="btn btn-primary" id="atualizar" onclick="location.reload();">Atualizar</button>
             </div>
             <div class="modal fade" id="new_music" role="dialog">
@@ -172,6 +173,26 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
                                 <button type="button" class="btn btn-success" id="button_salvar_musica" onclick="salvar_musica();">Salvar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="bloco_notas" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Bloco de Notas</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal">
+                                <div class="col-md-12">
+                                    <textarea class="form-control" id="bl_note" name="bl_note" rows="10"></textarea>
+                                </div>
+                            </form>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
                             </div>
                         </div>
                     </div>
