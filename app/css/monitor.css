@@ -44,10 +44,6 @@
 .container-fluid{
     padding: 0 !important;
 }
-.chrome-tabs .chrome-tab {
-    /*width: 243px*/
-}
-
 .chrome-tabs .chrome-tab:nth-child(1) {
     transform: translate3d(0px, 0, 0)
 }

@@ -1,12 +1,11 @@
 {
-  "name": "LivePraise",
+  "name": "Live Praise",
   "version": "0.1.0",
   "main": "main.js",
   "author": {
     "name": "Thiago de Lucena Sobrinho",
     "email": "thiagolucenaelvis@gmail.com"
   },
-  "contributors": {},
   "scripts": {
     "start": "electron main.js",
     "win32": "electron-packager . 'Live Praise' --platform=win32 --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
