@@ -197,7 +197,7 @@
 #current_loading{
   margin-top: 15px;
 }
-svg {
+#loading svg {
   float: left;
   max-width: 40%;
 }
@@ -212,6 +212,11 @@ svg {
 }
 .modal-title{
     color: #333333;
+}
+.svg-inline--fa{
+    margin-right: 9px;
+    margin-top: 3px;
+    height: 1.16em;
 }
 @keyframes scale {
   0%, 100% {

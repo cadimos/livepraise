@@ -3,6 +3,8 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 const dir_app = process.cwd();
 const fs = require('fs');
 const exec = require('child-process-promise').exec;
+var Dialogs = require('dialogs');
+var dialogs = Dialogs(opts={});
 var player = document.getElementById("player");
 var socket = io.connect("http://localhost:3000");
 var sqlite3 = require('sqlite3').verbose();
@@ -286,27 +288,76 @@ function lista_video(dir){
   $('#preview-videos').html('');
   var files = fs.readdirSync(dir);
   for (var i in files){
-    var name = dir + '/' + files[i];
-    if (fs.statSync(name).isDirectory()){
-      //É um diretorio
-    }else{
-      img=name.replace(dir,dir+'/thumb');
-      img=img.replace('.mp4','.jpg');
-      video=name;
-      list='<li><img src="'+img+'" onclick="viewVideo(\''+btoa(video)+'\')"></li>';
-      if (fs.existsSync(img)) {
-        //Se o arquivo existir
-        $('#preview-videos').append(list);
-      }else{
-        //Se não existir
-        cmd = 'ffmpeg -ss 00:00:02 -i '+video+' -vf scale=400:-1 -vframes 1 '+img;
-        exec(cmd).then(function (result) {
-          $('#preview-videos').append(list);
-        }).catch(function (err) {
-            console.error('ERROR: ', err);
-        });
-      }
+    orgname=files[i];
+    rn=orgname.replace( /\s/g, '' );
+    var name = dir + '/' + rn;
+    if(orgname!=rn){
+      fs.rename(dir + '/'+orgname, name, function (err) {
+
+      });
     }
+    try{
+      if(fs.lstatSync(name).isDirectory()){
+        //É um diretorio
+      }else{
+        img=name.replace(dir,dir+'/thumb');
+        img=img.replace('.mp4','.jpg');
+        img=img.replace('.mpg','.jpg');
+        img=img.replace('.avi','.jpg');
+        video=name;
+        ext=name.substr(-4);
+        ext=ext.replace('.','');
+        newVideo=video.replace(ext,'mp4');
+        list='<li><img src="'+img+'" onclick="viewVideo(\''+btoa(newVideo)+'\')"></li>';
+        if (fs.existsSync(img)) {
+          //Se o arquivo existir
+          $('#preview-videos').append(list);
+        }else{
+          //Se não existir
+          cmd = 'ffmpeg -ss 00:00:02 -i '+video+' -vf scale=400:-1 -vframes 1 '+img;
+          exec(cmd).then(function (result) {
+
+          }).catch(function (err) {
+              console.error('ERROR: ', err);
+          });
+          if(ext!='mp4'){
+            cnv = 'ffmpeg -i '+video+' -f mp4 -vcodec libx264 -preset fast -profile:v main -acodec aac '+newVideo+' -hide_banner';
+            exec(cnv).then(function(result){
+              fs.unlink(video, (err) => {
+              });
+              $('#preview-videos').append(list);
+            }).catch(function (err) {
+              console.error('ERROR: ', err);
+            });
+          }else{
+            $('#preview-videos').append(list);
+          }
+        }
+      }
+    }catch(e){
+        // Handle error
+        if(e.code == 'ENOENT'){
+          //no such file or directory
+          //do something
+        }else {
+          //do something else
+        }
+    }
+    /*
+    fs.stat(name,function(err,data){
+      if(err){
+        lista_video(dir);
+      }else{
+        if(data.isDirectory()){
+
+        console.log('dir: '+files[i]);
+        }else{
+          console.log('file: '+files[i]);
+
+        }
+      }
+    });
+    */
   }
   $('#current_loading').html('Carregado Preview de Vídeos');
 }
@@ -350,6 +401,7 @@ function lista_musica(){
 	  <span class="acoes_item">
 	    <a href="javascript:void(0);" data-toggle="modal" data-target="#new_music" data-whatever="[id_musica]"><i class="fas fa-edit"></i></a>
 	    <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
+	    <a href="javascript:void(0);" onclick="remover_musica('[id_musica]')"><i class="fas fa-trash"></i></a>
 	  </span>
 	  </h4>
 	  </div>
@@ -445,6 +497,34 @@ function adicionar_musica(id){
     conteudo: data
   });
 }
+
+//Remover Musica
+function remover_musica(id,conf){
+  if(conf!=true){
+    r=confirm("Deseja realmente remover?");
+  }
+  rand=Math.floor(Math.random() * 1000000);
+  if(r){
+    if(conf==true){
+      msg="Código Incorreto por Favor \n";
+    }else{
+      msg='';
+    }
+    dialogs.prompt(msg+"Digite o Codigo a seguir: "+rand,function(cod){
+      if(cod==rand){
+        db.serialize(function() {
+          db.run("DELETE FROM `musica` WHERE `id`='"+id+"'");
+          lista_musica();
+        });
+      }else if(cod==null){
+      }else{
+        remover_musica(id,true);
+      }
+    });
+  }else{
+  }
+}
+
 //Editar Musica
 $('#new_music').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal

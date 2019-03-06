@@ -126,11 +126,13 @@
         </div>
         <div class="container-fluid">
             <div class="row-fluid">
-                <button type="button" class="btn btn-primary" id="freeze" onclick="congelar('freeze')">Congelar</button>
-                <button type="button" class="btn btn-primary" id="remove" onclick="removeConteudo()">Limpar Tela</button>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new_music">Nova Música</button>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bloco_notas">Bloco de Notas</button>
-                <button type="button" class="btn btn-primary" id="atualizar" onclick="location.reload();">Atualizar</button>
+                <div class="btn-group" role="group" >
+                    <button type="button" class="btn btn-primary" id="freeze" onclick="congelar('freeze')">Congelar</button>
+                    <button type="button" class="btn btn-primary" id="remove" onclick="removeConteudo()">Limpar Tela</button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new_music">Nova Música</button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bloco_notas">Bloco de Notas</button>
+                    <button type="button" class="btn btn-primary" id="atualizar" onclick="location.reload();">Atualizar</button>
+                </div>
             </div>
             <div class="modal fade" id="new_music" role="dialog">
                 <div class="modal-dialog" role="document">
@@ -237,6 +239,16 @@
                                     <select id="cat_imagens" class="form-control" onchange="lista_imagem(this.value)"></select>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Pesquisar">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"><i class="fas fa-search"></i></button>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
                             <div id="preview-list">
                                 <ul id="preview-imagens"></ul>
                             </div>
@@ -249,6 +261,16 @@
                                     <select id="cat_videos" class="form-control" onchange="lista_video(this.value)"></select>
                                 </div>
                             </div>
+                            <div class="row-fluid">
+                                <div class="col-md-12">
+                                    <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Pesquisar">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"><i class="fas fa-search"></i></button>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
                             <div id="preview-list">
                                 <ul id="preview-videos"></ul>
                             </div>
@@ -256,9 +278,19 @@
                         <!--/ Videos -->
                         <!-- Musicas -->
                         <div class="tab-pane fade" role="tabpanel" id="musicas" aria-labelledby="home-tab">
-                            <div class="row-fluid">
-                                <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                     <select id="cat_musica" class="form-control" onchange="lista_musica()"></select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Pesquisar">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"><i class="fas fa-search"></i></button>
+                                    </span>
+                                    </div>
                                 </div>
                             </div>
                             <div id="preview-list">

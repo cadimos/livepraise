@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "child-process-promise": "^2.2.1",
+    "dialogs": "^1.1.20",
     "draggabilly": "^2.2.0",
     "electron-prebuilt": "^1.4.13",
     "express": "^4.16.3",
