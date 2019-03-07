@@ -343,21 +343,6 @@ function lista_video(dir){
           //do something else
         }
     }
-    /*
-    fs.stat(name,function(err,data){
-      if(err){
-        lista_video(dir);
-      }else{
-        if(data.isDirectory()){
-
-        console.log('dir: '+files[i]);
-        }else{
-          console.log('file: '+files[i]);
-
-        }
-      }
-    });
-    */
   }
   $('#current_loading').html('Carregado Preview de Vídeos');
 }
@@ -371,9 +356,9 @@ function viewVideo(url){
   '{"nome":"video","valor":"'+url+'" }]}';
     socket.emit("send", text);
   }
-  $('#player').html('');
-  $('#player').append('<source src="'+url+'" type="video/mp4">');
-  player.play();
+  $('#video').html('');
+  $('#video').append('<video id="player" controls loop="true" autoplay><source src="'+url+'" type="video/mp4"></video>');
+  setTimeout(() => player.play(),200);
 }
 
 /* Funções de Música */

@@ -6,7 +6,9 @@ Com ele é possível realizar as tarefas essênciais para o bom andamento do cul
 ## Requisitos Mínimos ##
 
 Para o funcionamento do sistema é necessário que ele atenda os requisitos minimos.
+
 **Processador:** Intel Pentium 4 ou posterior compatível com SSE2
+
 **Sistema Operacional:** Windows 7 ou Superior, Mac OS X Yosemite 10.10 ou Superior, Debian 8+, openSUSE 13.3+, Fedora Linux 24+ ou Ubuntu 14.04+ de 64 bits
 
 ## Recursos do Sistema ##
