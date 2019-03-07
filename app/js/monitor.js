@@ -5,7 +5,6 @@ const fs = require('fs');
 const exec = require('child-process-promise').exec;
 var Dialogs = require('dialogs');
 var dialogs = Dialogs(opts={});
-var player = document.getElementById("player");
 var socket = io.connect("http://localhost:3000");
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(dir_app+'/dsw.db');
@@ -166,6 +165,7 @@ function background(url){
   '{"nome":"background","valor":"'+url+'" }]}';
     socket.emit("send", text);
   }
+  let player = document.getElementById("player");
   player.pause();
 }
 
@@ -183,6 +183,7 @@ function backgroundRapido(url){
       socket.emit("send", text);
     }
     setTimeout(() => removeConteudo(), 200);
+    let player = document.getElementById("player");
     player.pause();
 }
 
@@ -358,6 +359,7 @@ function viewVideo(url){
   }
   $('#video').html('');
   $('#video').append('<video id="player" controls loop="true" autoplay><source src="'+url+'" type="video/mp4"></video>');
+  let player = document.getElementById("player");
   setTimeout(() => player.play(),200);
 }
 
