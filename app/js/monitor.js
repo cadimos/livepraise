@@ -66,7 +66,13 @@ const KEY_PF6 = 117;
 const KEY_PF7 = 118;
 const KEY_PF8 = 119;
 
-//Loanding
+//Remove Quebra de Linha Substituindo por <br />
+function nl2br (str) {
+  var breakTag = '<br '+'/>';
+  return str.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/gm, breakTag);
+}
+
+//Inicio Loanding
 
 //Muda a cor da arvore
 var stop_color=false;
@@ -91,6 +97,7 @@ function parar_cor(){
   stop_color = true;
   return true;
 }
+
 function loanding(){
   $('#current_loading').html('Iniciando Animaçao');
   color_animate(5000);
@@ -108,15 +115,16 @@ function loanding(){
   setTimeout(() => lista_biblia(),200);
   lista_background_rapido();
 }
+
 function fechar_loandig(){
   $('#loading').css('display','none');
 }
+
 setTimeout(() => loanding(), 200);
-//Remove Quebra de Linha Substituindo por <br />
-function nl2br (str) {
-  var breakTag = '<br '+'/>';
-  return str.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/gm, breakTag);
-}
+
+//Fim Loanding
+
+
 //Listagem Background Rápido
 function lista_background_rapido(){
   modelo_back_rapido=`<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 background-rapido">
@@ -142,6 +150,7 @@ function lista_background_rapido(){
     $('#current_loading').html('Background Rápido');
   });
 }
+
 //Remove o Conteudo da Tela
 function removeConteudo(){
   $('.texto span').html('');
@@ -154,28 +163,28 @@ function removeConteudo(){
 
 //Troca o Fundo da Tela
 function background(url){
-  url=atob(url);
   $('#video').css('display','none');
   $('#preview img').css('display','block');
   $("#preview img").fadeOut(150, function() {
-  $("#preview img").attr('src',url);
+  $("#preview img").attr('src',atob(url));
   }).fadeIn(200);
   if(congelar('valida')==true){
     var text = '{"funcao":[' +
   '{"nome":"background","valor":"'+url+'" }]}';
     socket.emit("send", text);
   }
-  let player = document.getElementById("player");
-  player.pause();
+  if($('#player').length){
+		let player = document.getElementById("player");
+    player.pause();
+	}
 }
 
 // Troca o Fundo Removendo o Texto
 function backgroundRapido(url){
-    url=atob(url);
     $('#video').css('display','none');
     $('#preview img').css('display','block');
     $("#preview img").fadeOut(150, function() {
-        $("#preview img").attr('src',url);
+        $("#preview img").attr('src',atob(url));
     }).fadeIn(200);
     if(congelar('valida')==true){
       var text = '{"funcao":[' +
@@ -183,8 +192,10 @@ function backgroundRapido(url){
       socket.emit("send", text);
     }
     setTimeout(() => removeConteudo(), 200);
-    let player = document.getElementById("player");
-    player.pause();
+    if($('#player').length){
+      let player = document.getElementById("player");
+      player.pause();
+    }
 }
 
 //Exibe Texto na Tela
@@ -347,9 +358,9 @@ function lista_video(dir){
   }
   $('#current_loading').html('Carregado Preview de Vídeos');
 }
+
 //Visualiza o Video
 function viewVideo(url){
-  url=atob(url);
   $('#preview img').css('display','none');
   $('#video').css('display','block');
   if(congelar('valida')==true){
@@ -358,7 +369,7 @@ function viewVideo(url){
     socket.emit("send", text);
   }
   $('#video').html('');
-  $('#video').append('<video id="player" controls loop="true" autoplay><source src="'+url+'" type="video/mp4"></video>');
+  $('#video').append('<video id="player" controls loop="true" autoplay><source src="'+atob(url)+'" type="video/mp4"></video>');
   let player = document.getElementById("player");
   setTimeout(() => player.play(),200);
 }
@@ -419,6 +430,50 @@ function lista_musica(){
   	}
 }
 
+//Busca Musica
+/*
+
+
+*/
+$("#busca_musica").change(buscaMusica);
+function buscaMusica(){
+  busca=$("#busca_musica").val();
+  if(busca.length<3){
+    lista_musica();
+  }else{
+    $('#list_music').html('');
+	  db.serialize(function() {
+	    db.each("SELECT id,nome,artista FROM musica WHERE nome LIKE '%"+busca+"%'", function(err, musica) {
+	      item=modelo.replace(/\[id_musica\]/g,musica.id);
+	      item=item.replace(/\[nome_musica\]/g,musica.nome);
+	      item=item.replace(/\[artista_musica\]/g,musica.artista);
+	      $('#list_music').append(item);
+	      db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
+	        verse=row.verso;
+	        verse=verse.replace(/<br \/>/g,"\n");
+	        $('#verso'+musica.id).append('<li onclick="texto(\'verso_'+musica.id+'_'+row.id+'\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
+	      });
+	    });
+    });
+    $.ajax({
+      type: "GET",
+      url: "https://api.cadimos.tk/busca/musicas/"+encodeURI(busca),
+      dataType: "json",
+      success: function(data) {
+      	t_resultado=data.resultado.length;
+        for(i=0;i<t_resultado;i++){
+        	/*md=`<li>
+          Nome: ${data.resultado[i].nome}<br>
+          Artista: ${data.resultado[i].artista}<br>
+          Compositor: ${data.resultado[i].compositor}<br>
+          Versos:
+          </li>`;
+          $('#lista').append(md);*/
+        }
+      }
+    });
+  }
+}
 //Salva as Musicas
 function salvar_musica(id){
   nome=$('#new_music #nome').val();

@@ -57,6 +57,10 @@ app.on('ready', function() {
             height: externalDisplay.bounds.height,
             show: false,
             frame: false,
+            webPreferences: {
+                nodeIntegration: true,
+                preload: './preload.js'
+            }
         });
         //Abro a url do monitor externo
         win2.loadURL('file://' + __dirname + '/app/projetor.html');
