@@ -8,11 +8,11 @@
   },
   "scripts": {
     "start": "electron main.js",
-    "win32": "electron-packager . 'Live Praise' --platform=win32 --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
-    "win64": "electron-packager . 'Live Praise' --platform=win32 --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
-    "linux32": "electron-packager . 'Live Praise' --platform=linux --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
-    "linux64": "electron-packager . 'Live Praise' --platform=linux --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
-    "osx": "electron-packager . 'Live Praise' --platform=darwin --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "win32": "electron-packager . LivePraise --platform=win32 --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "win64": "electron-packager . LivePraise --platform=win32 --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "linux32": "electron-packager . LivePraise --platform=linux --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "linux64": "electron-packager . LivePraise --platform=linux --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
     "build": "electron-packager . --all",
     "rebuild": "electron-rebuild -f -w sqlite3"
   },
