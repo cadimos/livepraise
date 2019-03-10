@@ -391,6 +391,58 @@ function lista_musica(){
   cat=$('#cat_musica').val();
  	if(cat!=''){
 	  	modelo=`<div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="head[id_musica]">
+      <h4 class="panel-title">
+      <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
+      [nome_musica] ([artista_musica])
+      </a>
+      <span class="acoes_item">
+        <a href="javascript:void(0);" data-toggle="modal" data-target="#new_music" data-whatever="[id_musica]"><i class="fas fa-edit"></i></a>
+        <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
+        <a href="javascript:void(0);" onclick="remover_musica('[id_musica]')"><i class="fas fa-trash"></i></a>
+      </span>
+      </h4>
+      </div>
+      <div id="collapse[id_musica]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head[id_musica]">
+      <div class="panel-body">
+      <ul id="verso[id_musica]"></ul>
+      </div>
+      </div>
+      </div>`;
+
+      $('#list_music').html('');
+      db.serialize(function() {
+        db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"'", function(err, musica) {
+          item=modelo.replace(/\[id_musica\]/g,musica.id);
+          item=item.replace(/\[nome_musica\]/g,musica.nome);
+          item=item.replace(/\[artista_musica\]/g,musica.artista);
+          $('#list_music').append(item);
+          db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
+            verse=row.verso;
+            verse=verse.replace(/<br \/>/g,"\n");
+            $('#verso'+musica.id).append('<li onclick="texto(\'verso_'+musica.id+'_'+row.id+'\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
+          });
+        });
+        $('#current_loading').html('Listado Músicas');
+      });
+  	}else{
+  		setTimeout(() => lista_musica(),200);
+  	}
+}
+
+//Busca Musica
+/*
+
+
+*/
+$("#busca_musica").change(buscaMusica);
+function buscaMusica(){
+  busca=$("#busca_musica").val();
+  if(busca.length<3){
+    lista_musica();
+  }else{
+    $('#list_music').html('');
+    modelo=`<div class="panel panel-default">
 	  <div class="panel-heading" role="tab" id="head[id_musica]">
 	  <h4 class="panel-title">
 	  <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
@@ -409,39 +461,6 @@ function lista_musica(){
 	  </div>
 	  </div>
 	  </div>`;
-
-	  $('#list_music').html('');
-	  db.serialize(function() {
-	    db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"'", function(err, musica) {
-	      item=modelo.replace(/\[id_musica\]/g,musica.id);
-	      item=item.replace(/\[nome_musica\]/g,musica.nome);
-	      item=item.replace(/\[artista_musica\]/g,musica.artista);
-	      $('#list_music').append(item);
-	      db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
-	        verse=row.verso;
-	        verse=verse.replace(/<br \/>/g,"\n");
-	        $('#verso'+musica.id).append('<li onclick="texto(\'verso_'+musica.id+'_'+row.id+'\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
-	      });
-	    });
-	    $('#current_loading').html('Listado Músicas');
-	  });
-  	}else{
-  		setTimeout(() => lista_musica(),200);
-  	}
-}
-
-//Busca Musica
-/*
-
-
-*/
-$("#busca_musica").change(buscaMusica);
-function buscaMusica(){
-  busca=$("#busca_musica").val();
-  if(busca.length<3){
-    lista_musica();
-  }else{
-    $('#list_music').html('');
 	  db.serialize(function() {
 	    db.each("SELECT id,nome,artista FROM musica WHERE nome LIKE '%"+busca+"%'", function(err, musica) {
 	      item=modelo.replace(/\[id_musica\]/g,musica.id);
@@ -455,6 +474,23 @@ function buscaMusica(){
 	      });
 	    });
     });
+    modelo_web=`<div class="panel panel-default">
+	  <div class="panel-heading" role="tab" id="head[id_musica]">
+	  <h4 class="panel-title">
+	  <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
+	  [nome_musica] ([artista_musica])
+	  </a>
+	  <span class="acoes_item">
+	    <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
+	  </span>
+	  </h4>
+	  </div>
+	  <div id="collapse[id_musica]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head[id_musica]">
+	  <div class="panel-body">
+	  <ul id="verso[id_musica]"></ul>
+	  </div>
+	  </div>
+	  </div>`;
     $.ajax({
       type: "GET",
       url: "https://api.cadimos.tk/busca/musicas/"+encodeURI(busca),
@@ -462,13 +498,17 @@ function buscaMusica(){
       success: function(data) {
       	t_resultado=data.resultado.length;
         for(i=0;i<t_resultado;i++){
-        	/*md=`<li>
-          Nome: ${data.resultado[i].nome}<br>
-          Artista: ${data.resultado[i].artista}<br>
-          Compositor: ${data.resultado[i].compositor}<br>
-          Versos:
-          </li>`;
-          $('#lista').append(md);*/
+          result=data.resultado[i];
+          item=modelo_web.replace(/\[id_musica\]/g,'api'+result.id);
+          item=item.replace(/\[nome_musica\]/g,result.nome);
+          item=item.replace(/\[artista_musica\]/g,result.artista);
+          $('#list_music').append(item);
+          t_verso=result.versos.length;
+          for(v=0;v<t_verso;v++){
+            verse=result.versos[v];
+            verse=verse.replace(/<br \/>/g,"\n");
+	          $('#verso'+'api'+result.id).append('<li onclick="texto(\'verso_'+'api'+result.id+'_'+v+'\',\'BR\');" id="verso_'+'api'+result.id+'_'+v+'">'+verse+'</li>');
+          }
         }
       }
     });
