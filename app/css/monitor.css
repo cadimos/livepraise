@@ -9,25 +9,28 @@
 .background-rapido{
     padding: 0;
 }
+
 #preview{
     width: 45vw;
     height: 25vw;
     padding: 0;
     float: right;
     background: #000000;
+    border: solid 5px #404040;
+    border-radius: 5px;
 }
 #preview img{
     width: 100%;
-    height: 25vw;
+    height: 100%;
 }
 #preview video{
     width: 100%;
-    height: 25vw;
+    height: 100%;
     object-fit: fill;
 }
 #video{
     width: 100%;
-    height: 25vw;
+    height: 100%;
     display: none;
 }
 #navegacao-tab{

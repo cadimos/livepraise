@@ -285,12 +285,14 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Pesquisar" id="busca_musica">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button"><i class="fas fa-search"></i></button>
-                                    </span>
-                                    </div>
+                                    <form action="javascript:buscaMusica()">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Pesquisar" id="busca_musica">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button" onclick="buscaMusica()"><i class="fas fa-search"></i></button>
+                                            </span>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                             <div id="preview-list">

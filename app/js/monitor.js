@@ -5,6 +5,7 @@ const fs = require('fs');
 const exec = require('child-process-promise').exec;
 var Dialogs = require('dialogs');
 var dialogs = Dialogs(opts={});
+var request = require('request');//Teste
 var socket = io.connect("http://localhost:3000");
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(dir_app+'/dsw.db');
@@ -127,11 +128,11 @@ setTimeout(() => loanding(), 200);
 
 //Listagem Background Rápido
 function lista_background_rapido(){
-  modelo_back_rapido=`<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 background-rapido">
-  <a href="javascript:void(0)" onclick="backgroundRapido('[url64]')">
-      <img src="[url]" class="img-responsive" alt="Responsive image">
-  </a>
-</div>`;
+  let modelo=`<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 background-rapido">
+	  <a href="javascript:void(0)" onclick="backgroundRapido('[url64]')">
+	      <img src="[url]" class="img-responsive" alt="Responsive image">
+	  </a>
+	</div>`;
   $('#background-rapido').html('');
   db.serialize(function() {
     db.each("SELECT url,diretorio,inicial FROM background_rapido ORDER BY id ASC", function(err, res) {
@@ -140,7 +141,7 @@ function lista_background_rapido(){
       }else{
         dir=res.diretorio;
       }
-      item_back=modelo_back_rapido.replace(/\[url\]/g,dir+res.url);
+      item_back=modelo.replace(/\[url\]/g,dir+res.url);
       item_back=item_back.replace(/\[url64\]/g,btoa(dir+res.url));
       $('#background-rapido').append(item_back);
       if(res.inicial=='S'){
@@ -390,7 +391,7 @@ function catMusicas(){
 function lista_musica(){
   cat=$('#cat_musica').val();
  	if(cat!=''){
-	  	modelo=`<div class="panel panel-default">
+	  	let modelo=`<div class="panel panel-default">
       <div class="panel-heading" role="tab" id="head[id_musica]">
       <h4 class="panel-title">
       <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
@@ -431,18 +432,14 @@ function lista_musica(){
 }
 
 //Busca Musica
-/*
 
-
-*/
-$("#busca_musica").change(buscaMusica);
 function buscaMusica(){
   busca=$("#busca_musica").val();
   if(busca.length<3){
     lista_musica();
   }else{
     $('#list_music').html('');
-    modelo=`<div class="panel panel-default">
+    let modelo=`<div class="panel panel-default">
 	  <div class="panel-heading" role="tab" id="head[id_musica]">
 	  <h4 class="panel-title">
 	  <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
@@ -474,7 +471,7 @@ function buscaMusica(){
 	      });
 	    });
     });
-    modelo_web=`<div class="panel panel-default">
+    let modelo_web=`<div class="panel panel-default">
 	  <div class="panel-heading" role="tab" id="head[id_musica]">
 	  <h4 class="panel-title">
 	  <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
@@ -490,7 +487,7 @@ function buscaMusica(){
 	  <ul id="verso[id_musica]"></ul>
 	  </div>
 	  </div>
-	  </div>`;
+	  </div>`;		
     $.ajax({
       type: "GET",
       url: "https://api.cadimos.tk/busca/musicas/"+encodeURI(busca),
@@ -781,3 +778,26 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
     alert('Tecla para esquerda pressionada')
   }
 });
+/*
+request("https://api.cadimos.tk/busca/musicas/"+encodeURI(busca), function (error, response, body) {
+  console.log('error:', error); // Print the error if one occurred
+  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+  //console.log('body:', body); // Print the HTML for the Google homepage.
+  data = JSON.parse(body);
+  console.log(data);
+  	t_resultado=data.resultado.length;
+    for(i=0;i<t_resultado;i++){
+      result=data.resultado[i];
+      item=modelo_web.replace(/\[id_musica\]/g,'api'+result.id);
+      item=item.replace(/\[nome_musica\]/g,result.nome);
+      item=item.replace(/\[artista_musica\]/g,result.artista);
+      $('#list_music').append(item);
+      t_verso=result.versos.length;
+      for(v=0;v<t_verso;v++){
+        verse=result.versos[v];
+        verse=verse.replace(/<br \/>/g,"\n");
+          $('#verso'+'api'+result.id).append('<li onclick="texto(\'verso_'+'api'+result.id+'_'+v+'\',\'BR\');" id="verso_'+'api'+result.id+'_'+v+'">'+verse+'</li>');
+      }
+    }
+});
+*/
