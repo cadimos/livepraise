@@ -125,6 +125,13 @@ setTimeout(() => loanding(), 200);
 
 //Fim Loanding
 
+//Atualizar e Regarregar Janelas
+function atualizar(){
+  let txt='ok';
+  let text = '{"funcao":[' +'{"nome":"atualizar","valor":"'+btoa(txt)+'" }]}';
+  socket.emit("send", text);
+  setTimeout(() => location.reload(),100);
+}
 
 //Listagem Background Rápido
 function lista_background_rapido(){
@@ -487,7 +494,7 @@ function buscaMusica(){
 	  <ul id="verso[id_musica]"></ul>
 	  </div>
 	  </div>
-	  </div>`;		
+	  </div>`;
     $.ajax({
       type: "GET",
       url: "https://api.cadimos.tk/busca/musicas/"+encodeURI(busca),

@@ -64,7 +64,7 @@ app.on('ready', function() {
         });
         //Abro a url do monitor externo
         win2.loadURL('file://' + __dirname + '/app/projetor.html');
-        //win2.openDevTools();
+        win2.openDevTools();
         win2.once('ready-to-show',()=>{
             win2.show();
         })

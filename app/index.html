@@ -131,7 +131,7 @@
                     <button type="button" class="btn btn-primary" id="remove" onclick="removeConteudo()">Limpar Tela</button>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new_music">Nova Música</button>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bloco_notas">Bloco de Notas</button>
-                    <button type="button" class="btn btn-primary" id="atualizar" onclick="location.reload();">Atualizar</button>
+                    <button type="button" class="btn btn-primary" id="atualizar" onclick="atualizar();">Atualizar</button>
                 </div>
             </div>
             <div class="modal fade" id="new_music" role="dialog">
@@ -203,7 +203,7 @@
         </div>
         <div class="container-fluid">
             <div class="row-fluid">
-                <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                <div class="col-md-7">
                     <span style="display:none;">A versão do Electron é
                     <script>
                         document.write(process.versions.electron)
