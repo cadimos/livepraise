@@ -25,14 +25,18 @@ body {
     width: 100vw;
     display: none;
 }
-.texto{
+.conteudo{
     position: absolute;
     top: 0;
     margin: 2vw;
-    height: 94vh;
+    height: 90vh;
     width: 96vw;
     color: #ffffff;
     text-shadow: 2px 2px 0px black, 3px 3px 0 black, 5px 5px 0 black, 6px 6px 0 black;
     font-family: 'Roboto', sans-serif;
     font-weight: 900;
+}
+.titulo_musica{
+    position: absolute;
+    bottom: -5%;
 }

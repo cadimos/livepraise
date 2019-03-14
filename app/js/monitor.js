@@ -161,7 +161,7 @@ function lista_background_rapido(){
 
 //Remove o Conteudo da Tela
 function removeConteudo(){
-  $('.texto span').html('');
+  $('.conteudo').html('');
   if(congelar('valida')==true){
     var text = '{"funcao":[' +
   '{"nome":"removeConteudo","valor":"remove" }]}';
@@ -212,11 +212,11 @@ function texto(id,br){
   if(br=='BR'){
     txt=nl2br(txt);
   }
-  $('.texto span').html(txt);
-  $('.texto').textfill({
+  $('.conteudo').append('<span>'+txt+'</span>');
+  $('.conteudo').textfill({
     maxFontPixels: 0
   });
-  $('.texto').css('text-align','center');
+  $('.conteudo').css('text-align','center');
   if(congelar('valida')==true){
     var text = '{"funcao":[' +'{"nome":"texto","valor":"'+btoa(txt)+'" }]}';
     socket.emit("send", text);
@@ -428,7 +428,7 @@ function lista_musica(){
           db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
             verse=row.verso;
             verse=verse.replace(/<br \/>/g,"\n");
-            $('#verso'+musica.id).append('<li onclick="texto(\'verso_'+musica.id+'_'+row.id+'\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
+            $('#verso'+musica.id).append('<li onclick="viewMusica(\'verso_'+musica.id+'_'+row.id+'\',\''+musica.nome+' ('+musica.artista+')\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
           });
         });
         $('#current_loading').html('Listado Músicas');
@@ -474,7 +474,7 @@ function buscaMusica(){
 	      db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
 	        verse=row.verso;
 	        verse=verse.replace(/<br \/>/g,"\n");
-	        $('#verso'+musica.id).append('<li onclick="texto(\'verso_'+musica.id+'_'+row.id+'\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
+	        $('#verso'+musica.id).append('<li onclick="result.nome(\'verso_'+musica.id+'_'+row.id+'\',\''+musica.nome+' ('+musica.artista+')\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
 	      });
 	    });
     });
@@ -511,7 +511,7 @@ function buscaMusica(){
           for(v=0;v<t_verso;v++){
             verse=result.versos[v];
             verse=verse.replace(/<br \/>/g,"\n");
-	          $('#verso'+'api'+result.id).append('<li onclick="texto(\'verso_'+'api'+result.id+'_'+v+'\',\'BR\');" id="verso_'+'api'+result.id+'_'+v+'">'+verse+'</li>');
+	          $('#verso'+'api'+result.id).append('<li onclick="viewMusica(\'verso_'+'api'+result.id+'_'+v+'\',\''+result.nome+' ('+result.artista+')\',\'BR\');" id="verso_'+'api'+result.id+'_'+v+'">'+verse+'</li>');
           }
         }
       }
@@ -636,6 +636,27 @@ $('#new_music').on('show.bs.modal', function (event) {
   }
 });
 
+//Exibir Musica
+function viewMusica(id,nome,br){
+  $('.conteudo').html('');
+  txt=$('#'+id).html();
+  if(br=='BR'){
+    txt=nl2br(txt);
+  }
+  let modelo=`<span>${txt}</span>
+  <div class="titulo_musica">${nome}</div>`;
+  $('.conteudo').append(modelo);
+  $('.conteudo').textfill({
+    maxFontPixels: 0
+  });
+  $('.conteudo').css('text-align','center');
+  $('.conteudo .titulo_musica').css('font-size','20px');
+  if(congelar('valida')==true){
+    var text = '{"funcao":[' +'{"nome":"viewMusica","valor":"'+btoa(modelo)+'" }]}';
+    socket.emit("send", text);
+  }
+
+}
 /* Funções de Biblia */
 //Lista as Biblias Disponiveis
 function catBiblias(){
@@ -787,6 +808,10 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
     alert('Tecla para esquerda pressionada')
   }
 });
+/*
+Verificar se um item tem foco
+$(this).is(':focus');
+*/
 /*
 request("https://api.cadimos.tk/busca/musicas/"+encodeURI(busca), function (error, response, body) {
   console.log('error:', error); // Print the error if one occurred

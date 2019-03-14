@@ -57,6 +57,7 @@ app.on('ready', function() {
             height: externalDisplay.bounds.height,
             show: false,
             frame: false,
+            icon: __dirname+'/app/icon/cadimos.png',
             webPreferences: {
                 nodeIntegration: true,
                 preload: './preload.js'

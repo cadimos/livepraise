@@ -32,23 +32,34 @@ function background(vl){
 function video(vl){
 	$('#fundo img').css('display','none');
 	$('#video').css('display','block');
-	$('#player').html('');
-	$('#player').append('<source src="'+vl+'" type="video/mp4">');
+	$('#video').html('');
+  $('#video').append('<video id="player" controls loop="true" autoplay><source src="'+vl+'" type="video/mp4"></video>');
+  let player = document.getElementById("player");
+  setTimeout(() => player.play(),200);
 	if($('#player').length){
 		let player = document.getElementById("player");
     player.play();
 	}
 }
 function texto(vl){
-	$('.texto span').html(vl);
-	$('.texto').textfill({
+	$('.conteudo').append('<span>'+vl+'</span>');
+	$('.conteudo').textfill({
 		maxFontPixels: -1
 		});
-	$('.texto').css('text-align','center');
+	$('.conteudo').css('text-align','center');
+}
+function viewMusica(vl){
+	$('.conteudo').html('');
+	$('.conteudo').append(vl);
+	$('.conteudo').textfill({
+		maxFontPixels: -1
+		});
+	$('.conteudo').css('text-align','center');
+	$('.conteudo .titulo_musica').css('font-size','35px');
 }
 
 function removeConteudo(){
-	$('.texto span').html('');
+	$('.conteudo').html('');
 }
 function atualizar(){
 	location.reload();
@@ -66,6 +77,7 @@ $(document).ready(function(){
 		fn=obj.funcao[0].nome;
 		vl=obj.funcao[0].valor;
 		vl=atob(vl);
+		console.log('Função: '+fn+' e Valor: '+vl);
 		switch(fn){
 			case 'background':
 				background(vl);
@@ -85,6 +97,10 @@ $(document).ready(function(){
 
 			case 'atualizar':
 				atualizar();
+			break;
+
+			case 'viewMusica':
+			viewMusica(vl);
 			break;
 		}
 		}

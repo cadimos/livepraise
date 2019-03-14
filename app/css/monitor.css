@@ -58,16 +58,23 @@
 .chrome-tab-current .chrome-tab-background-effect {
     background: #606060;
 }
-.texto{
+.conteudo{
     position: absolute;
     top: 0;
     margin: 2vw;
-    height: 84%;
+    height: 80%;
     width: 91%;
     color: #ffffff;
     text-shadow: 2px 2px 0px black, 3px 3px 0 black;
     font-family: 'Roboto', sans-serif;
     font-weight: 900;
+}
+.titulo_musica {
+    position: absolute;
+    bottom: -7%;
+}
+form{
+    margin-block-end: 0;
 }
 .chrome-conteudo ul{
     margin: 0;
@@ -85,7 +92,7 @@
 #preview-list{
     overflow-y: scroll;
     width: 100%;
-    height: 37vh;
+    height: 32vh;
     padding-top: 5px;
 
 }
