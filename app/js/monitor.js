@@ -721,6 +721,8 @@ function lista_versiculo(cat,livro,capitulo){
     });
   });
 }
+// Busco na biblia
+function buscaBiblia(){}
 
 function viewYoutube(url){
 

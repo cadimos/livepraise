@@ -223,6 +223,7 @@
                                     <select id="cat_imagens" class="form-control" onchange="lista_imagem(this.value)"></select>
                                 </div>
                             </div>
+                            <!--
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="input-group">
@@ -233,6 +234,7 @@
                                     </div>
                                 </div>
                             </div>
+                            -->
                             <div id="preview-list">
                                 <ul id="preview-imagens"></ul>
                             </div>
@@ -245,6 +247,7 @@
                                     <select id="cat_videos" class="form-control" onchange="lista_video(this.value)"></select>
                                 </div>
                             </div>
+                            <!--
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="input-group">
@@ -255,6 +258,7 @@
                                     </div>
                                 </div>
                             </div>
+                            -->
                             <div id="preview-list">
                                 <ul id="preview-videos"></ul>
                             </div>
@@ -287,9 +291,21 @@
                         <!--/ Musicas -->
                         <!-- Biblias -->
                         <div class="tab-pane fade" role="tabpanel" id="biblias" aria-labelledby="home-tab">
-                            <div class="row-fluid">
+                            <div class="row">
                                 <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
                                     <select id="cat_biblia" class="form-control" onchange="lista_biblia()"></select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form action="javascript:buscaBiblia()">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Pesquisar" id="busca_biblia" onkeyup="buscaBiblia()">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button" onclick="buscaBiblia()"><i class="fas fa-search"></i></button>
+                                            </span>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                             <div id="preview-list">
