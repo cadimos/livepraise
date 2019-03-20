@@ -756,14 +756,16 @@ function lista_biblia(){
 }
 
 //Funçao de Listar os Versiculos por demanda
+
 function lista_versiculo(cat,livro,capitulo){
-  modelo_versiculo=`<li onclick="texto('versiculo_[id_capitulo]_[id_versiculo]','BR');" id="versiculo_[id_capitulo]_[id_versiculo]">[texto]</li>`;
+  modelo_versiculo=`<li onclick="viewBiblia('versiculo_[id_capitulo]_[id_versiculo]','[local_biblia]','BR');" id="versiculo_[id_capitulo]_[id_versiculo]">[texto]</li>`;
   modelo_versiculo=modelo_versiculo.replace(/\[id_livro\]/g,livro);
   modelo_versiculo=modelo_versiculo.replace(/\[id_capitulo\]/g,capitulo);
   db.serialize(function() {
     db.each("SELECT id,texto FROM biblia_versiculos WHERE  cat ="+cat+" AND  livro ="+livro+" AND capitulo="+capitulo+";", function(err, biblia_versiculo) {
       versiculo=modelo_versiculo.replace(/\[id_versiculo\]/g,biblia_versiculo.id);
       versiculo=versiculo.replace(/\[texto\]/g,biblia_versiculo.texto);
+      versiculo=versiculo.replace(/\[local_biblia\]/g,livro+'-'+capitulo+'-'+biblia_versiculo.id);
       $('#collapse_'+livro+'_'+capitulo+' #versiculo').append(versiculo);
     });
   });
@@ -772,7 +774,7 @@ function lista_versiculo(cat,livro,capitulo){
 //Exibir Musica
 function viewBiblia(id,nome,br){
   $('.content').html('');
-  $('.rodape').html('');
+  $('.titulo').html('');
   txt=$('#'+id).html();
   if(br=='BR'){
     txt=nl2br(txt);
@@ -783,10 +785,15 @@ function viewBiblia(id,nome,br){
     maxFontPixels: 0
   });
   $('.content').css('text-align','center');
-  $('.rodape').css('font-size','20px');
-  $('.rodape').html(nome);
+  $('.titulo').css('font-size','20px');
+  nome=nome.split('-');
+  db.serialize(function() {
+    db.each("SELECT id,nome FROM biblia_livros WHERE `id`='"+nome[0]+"'", function(err, biblia) {
+      $('.titulo').html(biblia.nome+' '+nome[1]+':'+nome[2]);
+    });
+  });
   if(congelar('valida')==true){
-    var text = '{"funcao":[' +'{"nome":"viewMusica","valor":"'+btoa(modelo)+'" }]}';
+    var text = '{"funcao":[' +'{"nome":"viewBiblia","valor":"'+btoa(modelo)+'" }]}';
     socket.emit("send", text);
   }
 
