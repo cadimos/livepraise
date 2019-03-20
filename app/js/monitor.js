@@ -762,10 +762,10 @@ function lista_versiculo(cat,livro,capitulo){
   modelo_versiculo=modelo_versiculo.replace(/\[id_livro\]/g,livro);
   modelo_versiculo=modelo_versiculo.replace(/\[id_capitulo\]/g,capitulo);
   db.serialize(function() {
-    db.each("SELECT id,texto FROM biblia_versiculos WHERE  cat ="+cat+" AND  livro ="+livro+" AND capitulo="+capitulo+";", function(err, biblia_versiculo) {
-      versiculo=modelo_versiculo.replace(/\[id_versiculo\]/g,biblia_versiculo.id);
+    db.each("SELECT id,texto,versiculo FROM biblia_versiculos WHERE  cat ="+cat+" AND  livro ="+livro+" AND capitulo="+capitulo+";", function(err, biblia_versiculo) {
+      versiculo=modelo_versiculo.replace(/\[id_versiculo\]/g,biblia_versiculo.versiculo);
       versiculo=versiculo.replace(/\[texto\]/g,biblia_versiculo.texto);
-      versiculo=versiculo.replace(/\[local_biblia\]/g,livro+'-'+capitulo+'-'+biblia_versiculo.id);
+      versiculo=versiculo.replace(/\[local_biblia\]/g,livro+'-'+capitulo+'-'+biblia_versiculo.versiculo);
       $('#collapse_'+livro+'_'+capitulo+' #versiculo').append(versiculo);
     });
   });
