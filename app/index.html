@@ -127,20 +127,20 @@
         <div class="container-fluid">
             <div class="row-fluid">
                 <div class="btn-group" role="group" >
-                    <button type="button" class="btn btn-primary" id="freeze" onclick="congelar('freeze')">Congelar</button>
-                    <button type="button" class="btn btn-primary" id="remove" onclick="removeConteudo()">Limpar Tela</button>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new_music">Nova Música</button>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bloco_notas">Bloco de Notas</button>
-                    <button type="button" class="btn btn-primary" id="atualizar" onclick="atualizar();">Atualizar</button>
+                    <button type="button" class="btn btn-primary" id="freeze" onclick="congelar('freeze')"><i class="fas fa-snowflake"></i> Congelar</button>
+                    <button type="button" class="btn btn-primary" id="remove" onclick="removeConteudo()"><i class="fas fa-desktop"></i> Limpar Tela</button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new_music"><i class="fas fa-file-alt"></i> Nova Música</button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bloco_notas"><i class="fas fa-sticky-note"></i> Bloco de Notas</button>
+                    <button type="button" class="btn btn-primary" id="atualizar" onclick="atualizar();"><i class="fas fa-redo-alt"></i> Recarregar</button>
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Configurações
-                          <span class="caret"></span>
+                            <i class="fas fa-cogs"></i> Configurações
+                            <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
                           <li><a href="#">Tela Projetor</a></li>
                         </ul>
-                      </div>
+                    </div>
                 </div>
             </div>
             <div class="modal fade" id="new_music" role="dialog">
@@ -211,12 +211,14 @@
             </div>
         </div>
         <div class="container-fluid">
+            <!--
             <div class="row-fluid">
                 <div class="col-md-7"></div>
                 <div id="background-rapido"></div>
             </div>
+            -->
             <div class="row-fluid" id="navegacao-itens">
-                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" id="navegacao-tab">
+                <div class="col-md-7" id="navegacao-tab">
                     <ul class="nav nav-tabs" id="navegacao">
                         <li role="presentation" class="active"><a href="#imagens"><i class="fas fa-image"></i> Imagens</a></li>
                         <li role="presentation"><a href="#videos"><i class="fas fa-video"></i> Videos</a></li>
@@ -329,6 +331,7 @@
                         -->
                     </div>
                 </div>
+                <div id="background-rapido"></div>
                 <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5" id="preview">
                     <!--You can change the dimensions of the camera with height and weight, (text align and margin is just for center the image)-->
                     <!--
