@@ -61,9 +61,8 @@
 .conteudo{
     position: absolute;
     top: 0;
-    margin: 2vw;
-    height: 80%;
-    width: 91%;
+    height: 100%;
+    width: 100%;
     color: #ffffff;
     text-shadow: 2px 2px 0px black, 3px 3px 0 black;
     font-family: 'Roboto', sans-serif;
@@ -142,9 +141,10 @@ form{
     margin: 0;
 }
 #list_music li{
-    /*border: solid 1px #cccccc;*/
     padding-left: 5px;
-    /*margin-bottom: 5px;*/
+}
+li.ativo{
+    border: solid 2px #845cff;
 }
 .panel-body{
     padding-top: 0px;
@@ -228,6 +228,23 @@ form{
     margin-right: 9px;
     margin-top: 3px;
     height: 1.16em;
+}
+.titulo{
+    height: 5vh;
+}
+.content{
+    padding: 1vh;
+    height: 37vh;
+}
+.rodape{
+    height: 5vh;
+}
+.alerta{
+    position: absolute;
+    bottom: 0px;
+    font-size: 25px;
+    background: black;
+    width: 100%;
 }
 @keyframes scale {
   0%, 100% {

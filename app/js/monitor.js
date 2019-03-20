@@ -1,5 +1,7 @@
+
+
 //Variaveis Globais
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
+//process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 const dir_app = process.cwd();
 const fs = require('fs');
 const exec = require('child-process-promise').exec;
@@ -161,7 +163,10 @@ function lista_background_rapido(){
 
 //Remove o Conteudo da Tela
 function removeConteudo(){
-  $('.conteudo').html('');
+  $('.titulo').html('');
+  $('.content').html('');
+  $('.rodape').html('');
+  $('.alert').html('');
   if(congelar('valida')==true){
     var text = '{"funcao":[' +
   '{"nome":"removeConteudo","valor":"remove" }]}';
@@ -212,11 +217,11 @@ function texto(id,br){
   if(br=='BR'){
     txt=nl2br(txt);
   }
-  $('.conteudo').append('<span>'+txt+'</span>');
-  $('.conteudo').textfill({
+  $('.content').append('<span>'+txt+'</span>');
+  $('.content').textfill({
     maxFontPixels: 0
   });
-  $('.conteudo').css('text-align','center');
+  $('.content').css('text-align','center');
   if(congelar('valida')==true){
     var text = '{"funcao":[' +'{"nome":"texto","valor":"'+btoa(txt)+'" }]}';
     socket.emit("send", text);
@@ -240,7 +245,7 @@ function congelar(acao){
     }
   }
 }
-/* Funções de Imagens */
+// Funções de Imagens
 
 //Lista a Categoria das Imagens
 function catImagens(){
@@ -280,7 +285,7 @@ function lista_imagem(dir){
   $('#current_loading').html('Carregado Preview de Imagens');
 }
 
-/* Funções de Videos */
+// Funções de Videos
 
 //Lista as Categorias de Videos
 function catVideos(){
@@ -382,7 +387,7 @@ function viewVideo(url){
   setTimeout(() => player.play(),200);
 }
 
-/* Funções de Música */
+// Funções de Música
 
 //Lista as Categorias de Musicas
 function catMusicas(){
@@ -428,7 +433,7 @@ function lista_musica(){
           db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
             verse=row.verso;
             verse=verse.replace(/<br \/>/g,"\n");
-            $('#verso'+musica.id).append('<li onclick="viewMusica(\'verso_'+musica.id+'_'+row.id+'\',\''+musica.nome+' ('+musica.artista+')\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
+            $('#verso'+musica.id).append('<li class="verso_musica" onclick="viewMusica(\'verso_'+musica.id+'_'+row.id+'\',\''+musica.nome+' ('+musica.artista+')\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
           });
         });
         $('#current_loading').html('Listado Músicas');
@@ -436,6 +441,26 @@ function lista_musica(){
   	}else{
   		setTimeout(() => lista_musica(),200);
   	}
+}
+
+//setTimeout(() => teste(),500);
+function teste(){
+  var btnContainer = document.getElementById("verso13");
+  var btns = btnContainer.getElementsByClassName("verso_musica");
+  // Loop through the buttons and add the active class to the current/clicked button
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener("click", function() {
+      var current = document.getElementsByClassName("ativo");
+
+      // If there's no active class
+      if (current.length > 0) {
+        current[0].className = current[0].className.replace(" ativo", "");
+      }
+
+      // Add the active class to the current/clicked button
+      this.className += " ativo";
+    });
+  }
 }
 
 //Busca Musica
@@ -638,26 +663,27 @@ $('#new_music').on('show.bs.modal', function (event) {
 
 //Exibir Musica
 function viewMusica(id,nome,br){
-  $('.conteudo').html('');
+  $('.content').html('');
+  $('.rodape').html('');
   txt=$('#'+id).html();
   if(br=='BR'){
     txt=nl2br(txt);
   }
-  let modelo=`<span>${txt}</span>
-  <div class="titulo_musica">${nome}</div>`;
-  $('.conteudo').append(modelo);
-  $('.conteudo').textfill({
+  let modelo=`<span>${txt}</span>`;
+  $('.content').append(modelo);
+  $('.content').textfill({
     maxFontPixels: 0
   });
-  $('.conteudo').css('text-align','center');
-  $('.conteudo .titulo_musica').css('font-size','20px');
+  $('.content').css('text-align','center');
+  $('.rodape').css('font-size','20px');
+  $('.rodape').html(nome);
   if(congelar('valida')==true){
     var text = '{"funcao":[' +'{"nome":"viewMusica","valor":"'+btoa(modelo)+'" }]}';
     socket.emit("send", text);
   }
 
 }
-/* Funções de Biblia */
+// Funções de Biblia
 //Lista as Biblias Disponiveis
 function catBiblias(){
   db.serialize(function() {
@@ -742,6 +768,29 @@ function lista_versiculo(cat,livro,capitulo){
     });
   });
 }
+
+//Exibir Musica
+function viewBiblia(id,nome,br){
+  $('.content').html('');
+  $('.rodape').html('');
+  txt=$('#'+id).html();
+  if(br=='BR'){
+    txt=nl2br(txt);
+  }
+  let modelo=`<span>${txt}</span>`;
+  $('.content').append(modelo);
+  $('.content').textfill({
+    maxFontPixels: 0
+  });
+  $('.content').css('text-align','center');
+  $('.rodape').css('font-size','20px');
+  $('.rodape').html(nome);
+  if(congelar('valida')==true){
+    var text = '{"funcao":[' +'{"nome":"viewMusica","valor":"'+btoa(modelo)+'" }]}';
+    socket.emit("send", text);
+  }
+
+}
 // Busco na biblia
 function buscaBiblia(){}
 
@@ -808,6 +857,44 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
     alert('Tecla para esquerda pressionada')
   }
 });
+// A flag to know when start or stop the camera
+var enabled = false;
+// Use require to add webcamjs
+var WebCamera = require("webcamjs");
+function start_cam(){
+  console.log('acao start cam: '+enabled);
+  if(!enabled){ // Start the camera !
+    enabled = true;
+    WebCamera.attach('#camdemo');
+    console.log("The camera has been started");
+  }else{ // Disable the camera !
+    enabled = false;
+    WebCamera.reset();
+   console.log("The camera has been disabled");
+  }
+}
+
+
+/*
+$(document).ready(function(){
+  $('#verso13 li').click(function(){
+    $('#verso13 li').removeClass("ativo");
+    $(this).addClass("ativo");
+});
+});
+//Musica Ativa
+$('#list_music li').click(function() {
+  $('li').removeClass();
+  $(this).parent().addClass('ativo');
+});
+*/
+/*
+
+*/
+/*
+div editavel
+<p contenteditable="true">This is an editable paragraph.</p>
+*/
 /*
 Verificar se um item tem foco
 $(this).is(':focus');
