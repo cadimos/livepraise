@@ -35,7 +35,7 @@
   "description": "Live Praise (Software de Projeção para Igrejas)",
   "devDependencies": {
     "debug": "^3.2.6",
-    "electron": "^5.0.0-beta.5",
+    "electron": "^5.0.0-beta.6",
     "electron-packager": "^12.1.1",
     "electron-rebuild": "^1.8.2"
   },
