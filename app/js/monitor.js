@@ -9,6 +9,7 @@ var Dialogs = require('dialogs');
 var dialogs = Dialogs(opts={});
 var request = require('request');//Teste
 var socket = io.connect("http://localhost:3000");
+socket.emit("join", 'Monitor');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(dir_app+'/dsw.db');
 
@@ -79,6 +80,7 @@ function nl2br (str) {
 
 //Muda a cor da arvore
 var stop_color=false;
+
 function color_animate(tempo){
   let r=Math.floor(Math.random() * 256);
   let g=Math.floor(Math.random() * 256);
@@ -117,6 +119,7 @@ function loanding(){
   $('#current_loading').html('Listando livros da Biblias');
   setTimeout(() => lista_biblia(),200);
   lista_background_rapido();
+  lista_tela();
 }
 
 function fechar_loandig(){
@@ -126,7 +129,7 @@ function fechar_loandig(){
 setTimeout(() => loanding(), 200);
 
 //Fim Loanding
-socket.emit("join", 'Monitor');
+
 //Atualizar e Regarregar Janelas
 function atualizar(){
   let txt='ok';
@@ -161,6 +164,36 @@ function lista_background_rapido(){
   });
 }
 
+//Marca o tipo de tela de projecao atual
+function lista_tela(){
+  db.serialize(function() {
+    db.each("SELECT tipo,largura,altura FROM tela", function(err, res) {
+      $('#tamanho_tela').val(res.tipo);
+    });
+  });
+}
+
+//Ajustar tela
+function ajustarTela(hide){
+  tm=$('#conf_tela #tamanho_tela').val();
+  lg=$('#conf_tela #largura').val();
+  at=$('#conf_tela #altura').val();
+  db.serialize(function() {
+    db.run("INSERT INTO `tela` (`tipo`,`largura`,`altura`) VALUES ('"+tm+"','"+lg+"','"+at+"')");
+  });
+  if(tm=='personalizado'){
+    vl=btoa(lg+'x'+at)
+    var text = '{"funcao":[' +
+  '{"nome":"ajustarTela","valor":"'+vl+'" }]}';
+  }else{
+    var text = '{"funcao":[' +
+  '{"nome":"ajustarTela","valor":"'+btoa(tm)+'" }]}';
+  }
+  socket.emit("send", text);
+  if(hide){
+    $('#conf_tela').modal('hide');
+  }
+}
 //Remove o Conteudo da Tela
 function removeConteudo(){
   $('.titulo').html('');

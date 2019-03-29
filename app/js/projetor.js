@@ -14,9 +14,12 @@ function loanding(){
 			background(dir+res.url);
     });
     $('#current_loading').html('Background Rápido');
-  });
+	});
+	ajustarTela();
 }
+
 loanding();
+
 function background(vl){
 	$('#video').css('display','none');
 	$('#fundo img').css('display','block');
@@ -29,6 +32,7 @@ function background(vl){
     player.pause();
 	}
 }
+
 function video(vl){
 	$('#fundo img').css('display','none');
 	$('#video').css('display','block');
@@ -41,6 +45,7 @@ function video(vl){
     player.play();
 	}
 }
+
 function texto(vl){
 	$('.conteudo').append('<span>'+vl+'</span>');
 	$('.conteudo').textfill({
@@ -61,8 +66,60 @@ function viewMusica(vl){
 function removeConteudo(){
 	$('.conteudo').html('');
 }
+
 function atualizar(){
 	location.reload();
+}
+
+function ajustarTela(largura,altura){
+	screenWidth = screen.width;
+  screenHeight = screen.height;
+	if(!altura){
+		if(!largura){
+			db.serialize(function() {
+				db.each("SELECT tipo,largura,altura FROM tela", function(err, res) {
+					if(res.tipo=='16:9' || res.tipo=='4:3' || res.tipo=='padrao'){
+						ajustarTela(res.tipo);
+					}else{
+						ajustarTela(res.largura,res.altura);
+					}
+				});
+			});
+			console.log('Recarrega Ajustar Tela');
+		}else if(largura.indexOf(':')<0){
+			new_altura=screenHeight;
+			$('#fundo').css('height',new_altura+'px');
+			$('#fundo img').css('height',new_altura+'px');
+			$('#video').css('height',new_altura+'px');
+			$('#fundo video').css('height',new_altura+'px');
+			$('.conteudo').css('height',new_altura+'px');
+			console.log('Padrão');
+		}else{
+			dimensao=largura.split(':');
+			frm_inicio=dimensao[0];
+			frm_fim=dimensao[1];
+			new_altura=(screenWidth*frm_fim)/frm_inicio;
+			$('#fundo').css('height',new_altura+'px');
+			$('#fundo img').css('height',new_altura+'px');
+			$('#video').css('height',new_altura+'px');
+			$('#fundo video').css('height',new_altura+'px');
+			$('.conteudo').css('height',new_altura+'px');
+			console.log(frm_inicio+':'+frm_fim);
+		}
+	}else{
+			$('#fundo').css('height',altura+'px');
+			$('#fundo img').css('height',altura+'px');
+			$('#video').css('height',altura+'px');
+			$('#fundo video').css('height',altura+'px');
+			$('.conteudo').css('height',altura+'px');
+
+			$('#fundo').css('width',largura+'px');
+			$('#fundo img').css('width',largura+'px');
+			$('#video').css('width',largura+'px');
+			$('#fundo video').css('width',largura+'px');
+			$('.conteudo').css('width',largura+'px');
+			console.log('Definido pelo Usuario');
+	}
 }
 
 $(document).ready(function(){
@@ -84,7 +141,7 @@ $(document).ready(function(){
 			break;
 
 			case 'texto':
-			texto(vl);
+				texto(vl);
 			break;
 
 			case 'video':
@@ -100,7 +157,19 @@ $(document).ready(function(){
 			break;
 
 			case 'viewMusica':
-			viewMusica(vl);
+				viewMusica(vl);
+			break;
+
+			case 'ajustarTela':
+				v=vl.indexOf('x');
+				if(vl<0){
+					ajustarTela(vl);
+				}else{
+					medidas=vl.split('x');
+					w=medidas[0];
+					h=medidas[1];
+					ajustarTela(w,h);
+				}
 			break;
 		}
 		}
