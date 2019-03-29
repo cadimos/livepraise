@@ -10,9 +10,9 @@
     "start": "electron main.js",
     "win32": "electron-packager . LivePraise --platform=win32 --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
     "win64": "electron-packager . LivePraise --platform=win32 --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
-    "linux32": "electron-packager . LivePraise --platform=linux --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
-    "linux64": "electron-packager . LivePraise --platform=linux --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
-    "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "linux32": "electron-packager . LivePraise --platform=linux --arch=ia32 --icon=app/icon/livepraise.png --prune=true --out=release-builds --asar --overwrite",
+    "linux64": "electron-packager . LivePraise --platform=linux --arch=x64 --icon=app/icon/livepraise.png --prune=true --out=release-builds --asar --overwrite",
+    "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/livepraise.icns --prune=true --out=release-builds --asar --overwrite",
     "build": "electron-packager . --all",
     "rebuild": "electron-rebuild -f -w sqlite3"
   },
@@ -35,7 +35,7 @@
   "description": "Live Praise (Software de Projeção para Igrejas)",
   "devDependencies": {
     "debug": "^3.2.6",
-    "electron": "^5.0.0-beta.6",
+    "electron": "^5.0.0-beta.7",
     "electron-packager": "^12.1.1",
     "electron-rebuild": "^1.8.2"
   },
@@ -44,6 +44,7 @@
     "url": "git+ssh://git@bitbucket.org/cadimos/livepraise.git"
   },
   "keywords": [
+    "Live Praise",
     "Projeção",
     "DataShow",
     "Igreja"

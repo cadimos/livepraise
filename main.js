@@ -15,6 +15,8 @@ app.on('ready', function() {
         x: xcenter,
         y: ycenter,
         frame: false,
+        title: 'Live Praise - Iniciando',
+        icon: __dirname+'/app/icon/livepraise.png',
     });
     splash.loadURL('file://' + __dirname + '/app/splash.html');
     //Crio minha janela no monitor principal
@@ -25,7 +27,7 @@ app.on('ready', function() {
         height,
         show: false,
         title: 'Live Praise - Projeção',
-        icon: __dirname+'/app/icon/cadimos.png',
+        icon: __dirname+'/app/icon/livepraise.png',
         webPreferences: {
             nodeIntegration: true,
             preload: './preload.js'
@@ -57,7 +59,8 @@ app.on('ready', function() {
             height: externalDisplay.bounds.height,
             show: false,
             frame: false,
-            icon: __dirname+'/app/icon/cadimos.png',
+            title: 'Live Praise - Projetor',
+            icon: __dirname+'/app/icon/livepraise.png',
             webPreferences: {
                 nodeIntegration: true,
                 preload: './preload.js'

@@ -10,8 +10,8 @@ app.get('/', function(req, res){
 var clients = {};
 //SocketIO vem aqui
 //Conexão
-io.on("connection", function (client) { 
-    console.log('Usuario Conectado'); 
+io.on("connection", function (client) {
+    console.log('Usuario Conectado');
     client.on("join", function(name){
     	console.log("Joined: " + name);
         clients[client.id] = name;

@@ -45,7 +45,7 @@
     padding-right: 0;
 }
 #navegacao-itens{
-    height: 25vw;
+    height: 28.4vw;
     padding: 0;
     float: left;
     width: 100vw;
@@ -237,6 +237,7 @@ li.ativo{
 }
 .titulo{
     height: 5vh;
+    padding-left: 1vh;
 }
 .content{
     padding: 1vh;
@@ -244,6 +245,7 @@ li.ativo{
 }
 .rodape{
     height: 5vh;
+    padding-left: 1vh;
 }
 .alerta{
     position: absolute;

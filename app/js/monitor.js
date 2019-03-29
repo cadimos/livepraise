@@ -1,7 +1,7 @@
 
 
 //Variaveis Globais
-//process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 const dir_app = process.cwd();
 const fs = require('fs');
 const exec = require('child-process-promise').exec;
@@ -126,7 +126,7 @@ function fechar_loandig(){
 setTimeout(() => loanding(), 200);
 
 //Fim Loanding
-
+socket.emit("join", 'Monitor');
 //Atualizar e Regarregar Janelas
 function atualizar(){
   let txt='ok';
@@ -231,19 +231,22 @@ function texto(id,br){
 //Congela a tela, permitindo alterações apenas na do operador
 function congelar(acao){
   s=$('#freeze').html();
+  return true;
+  /*
   if(acao=='freeze'){
-    if(s=='Congelar'){
-      $('#freeze').html('Descongelar');
+    if(s=='<i class="fas fa-snowflake"></i> Congelar'){
+      $('#freeze').html('<i class="fas fa-snowflake"></i> Descongelar');
     }else{
-      $('#freeze').html('Congelar');
+      $('#freeze').html('<i class="fas fa-snowflake"></i> Congelar');
     }
   }else{
-    if(s=='Congelar'){
+    if(s=='<i class="fas fa-snowflake"></i> Congelar'){
       return true;
     }else{
       return false;
     }
   }
+  */
 }
 // Funções de Imagens
 
