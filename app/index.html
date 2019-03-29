@@ -128,11 +128,12 @@
         <div class="container-fluid">
             <div class="row-fluid">
                 <div class="btn-group" role="group" >
-                    <button type="button" class="btn btn-primary" id="freeze" onclick="congelar('freeze')"><i class="fas fa-snowflake"></i> Congelar</button>
+                    <button type="button" class="btn btn-primary" id="button_freeze" onclick="congelar('freeze')"><i class="fas fa-snowflake"></i> Congelar</button>
                     <button type="button" class="btn btn-primary" id="remove" onclick="removeConteudo()"><i class="fas fa-desktop"></i> Limpar Tela</button>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#new_music"><i class="fas fa-file-alt"></i> Nova Música</button>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bloco_notas"><i class="fas fa-sticky-note"></i> Bloco de Notas</button>
                     <button type="button" class="btn btn-primary" id="atualizar" onclick="atualizar();"><i class="fas fa-redo-alt"></i> Recarregar</button>
+                    <input type="hidden" id="freeze" value="congelar">
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-cogs"></i> Configurações

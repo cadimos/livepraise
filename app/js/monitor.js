@@ -230,23 +230,22 @@ function texto(id,br){
 
 //Congela a tela, permitindo alterações apenas na do operador
 function congelar(acao){
-  s=$('#freeze').html();
-  return true;
-  /*
+  s=$('#freeze').val();
   if(acao=='freeze'){
-    if(s=='<i class="fas fa-snowflake"></i> Congelar'){
-      $('#freeze').html('<i class="fas fa-snowflake"></i> Descongelar');
+    if(s=='congelar'){
+      $('#button_freeze').html('<i class="fas fa-snowflake"></i> Descongelar');
+      $('#freeze').val('descongelar');
     }else{
-      $('#freeze').html('<i class="fas fa-snowflake"></i> Congelar');
+      $('#button_freeze').html('<i class="fas fa-snowflake"></i> Congelar');
+      $('#freeze').val('congelar');
     }
   }else{
-    if(s=='<i class="fas fa-snowflake"></i> Congelar'){
+    if(s=='congelar'){
       return true;
     }else{
       return false;
     }
   }
-  */
 }
 // Funções de Imagens
 
