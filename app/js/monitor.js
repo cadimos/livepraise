@@ -477,8 +477,37 @@ function lista_musica(){
   		setTimeout(() => lista_musica(),200);
   	}
 }
+function slideAtivo(){
+  currenteId=document.querySelector(".chrome-conteudo-show ul").id;
+  header = document.getElementById(currenteId);
+  btns = header.getElementsByClassName("item_verso_musica");
+  for (i = 0; i < btns.length; i++) {
+    current = document.getElementsByClassName("ativo");
+    btns[i].addEventListener("click", function() {
 
-//setTimeout(() => teste(),500);
+      if (current.length > 0) {
+        current[0].className = current[0].className.replace(" ativo", "");
+      }
+      this.className += " ativo";
+    });
+  }
+}
+function activeCurrentSlide(id){
+  if(!id){
+    id=document.querySelector('.chrome-tab-current .chrome-tab-id').value
+  }
+  console.log('id: '+id);
+  const currentCont = document.querySelector(".chrome-conteudo-show li .ativo");
+  if(currentCont){
+    currentCont.classList.remove('ativo');
+  }
+  console.log(currentCont);
+  document.querySelector(".chrome-conteudo-id-"+id+" li").classList.add('ativo')
+}
+
+
+
+//
 function teste(){
   var btnContainer = document.getElementById("verso13");
   var btns = btnContainer.getElementsByClassName("verso_musica");
@@ -642,6 +671,7 @@ function adicionar_musica(id){
     title: titulo,
     conteudo: data
   });
+  setTimeout(() => slideAtivo(),500);
 }
 
 //Remover Musica
