@@ -179,7 +179,7 @@ function ajustarTela(hide){
   lg=$('#conf_tela #largura').val();
   at=$('#conf_tela #altura').val();
   db.serialize(function() {
-    db.run("INSERT INTO `tela` (`tipo`,`largura`,`altura`) VALUES ('"+tm+"','"+lg+"','"+at+"')");
+    db.run("UPDATE `tela` SET `tipo`='"+tm+"',`largura`='"+lg+"',`altura`='"+at+"'");
   });
   if(tm=='personalizado'){
     vl=btoa(lg+'x'+at)

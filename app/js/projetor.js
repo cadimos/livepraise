@@ -125,6 +125,7 @@ function ajustarTela(largura,altura){
 $(document).ready(function(){
     //conecto no socket
 	var socket = io.connect("http://localhost:3000");
+	socket.emit("join", 'Projetor');
 	//Habilito leitura
   ready = true;
 
@@ -162,7 +163,7 @@ $(document).ready(function(){
 
 			case 'ajustarTela':
 				v=vl.indexOf('x');
-				if(vl<0){
+				if(v<0){
 					ajustarTela(vl);
 				}else{
 					medidas=vl.split('x');
