@@ -478,55 +478,24 @@ function lista_musica(){
   	}
 }
 function slideAtivo(){
-  currenteId=document.querySelector(".chrome-conteudo-show ul").id;
-  header = document.getElementById(currenteId);
-  btns = header.getElementsByClassName("item_verso_musica");
-  for (i = 0; i < btns.length; i++) {
-    current = document.getElementsByClassName("ativo");
-    btns[i].addEventListener("click", function() {
+  if(!$('.chrome-conteudo-show ul').length){
+    setTimeout(() => slideAtivo(),200);
+  }else{
+    currenteId=document.querySelector(".chrome-conteudo-show ul").id;
+    header = document.getElementById(currenteId);
+    btns = header.getElementsByClassName("item_verso_musica");
+    for (i = 0; i < btns.length; i++) {
+      current = document.getElementsByClassName("ativo");
+      btns[i].addEventListener("click", function() {
 
-      if (current.length > 0) {
-        current[0].className = current[0].className.replace(" ativo", "");
-      }
-      this.className += " ativo";
-    });
+        if (current.length > 0) {
+          current[0].className = current[0].className.replace(" ativo", "");
+        }
+        this.className += " ativo";
+      });
+    }
   }
 }
-function activeCurrentSlide(id){
-  if(!id){
-    id=document.querySelector('.chrome-tab-current .chrome-tab-id').value
-  }
-  console.log('id: '+id);
-  const currentCont = document.querySelector(".chrome-conteudo-show li .ativo");
-  if(currentCont){
-    currentCont.classList.remove('ativo');
-  }
-  console.log(currentCont);
-  document.querySelector(".chrome-conteudo-id-"+id+" li").classList.add('ativo')
-}
-
-
-
-//
-function teste(){
-  var btnContainer = document.getElementById("verso13");
-  var btns = btnContainer.getElementsByClassName("verso_musica");
-  // Loop through the buttons and add the active class to the current/clicked button
-  for (var i = 0; i < btns.length; i++) {
-    btns[i].addEventListener("click", function() {
-      var current = document.getElementsByClassName("ativo");
-
-      // If there's no active class
-      if (current.length > 0) {
-        current[0].className = current[0].className.replace(" ativo", "");
-      }
-
-      // Add the active class to the current/clicked button
-      this.className += " ativo";
-    });
-  }
-}
-
 //Busca Musica
 
 function buscaMusica(){
@@ -925,10 +894,45 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
   if((e.which == KEY_ENTER|| e.keyCode == KEY_ENTER) && pressedCtrl == true) { //Reconhecendo tecla Enter
     alert('O comando Crtl+Enter foi acionado')
     }
-  if(e.which == KEY_LEFT || e.keyCode == KEY_LEFT){
-    alert('Tecla para esquerda pressionada')
+  if(e.which == KEY_LEFT || e.keyCode == KEY_LEFT || e.which == KEY_RIGHT || e.keyCode == KEY_RIGHT){
+    if(!$('#busca_musica').is(':focus') || $('#busca_musica').val()==''){
+      //percorre todo sequencia atual
+      let proximo = 1;
+      let index = 1;
+      $.each($('.chrome-conteudo-show .item_verso_musica'), function () {
+        if($(this).hasClass('ativo')) {
+          switch (e.keyCode) {
+            case KEY_RIGHT:
+              proximo += index;
+              break;
+            case KEY_LEFT:
+              proximo = index - 1;
+              break;
+          }
+        }
+        index++;
+      });
+      index = 1;
+      // VERIFICA SE O RETORNO É MAIOR QUE O NUMERO TOTAL DE DIVS E RETORNA FALSO PARA A NAVEGACAO NÃO SAIR DE DAS DIVS
+      if(proximo > $('.chrome-conteudo-show .item_verso_musica').length) {
+          return false;
+      // VERIFICA SE O RETORNO É MENOR QUE 1 E RETORNA FALSO PARA A NAVEGAÇÃO NÃO SAIR DAS DIVS
+      }else if(proximo < 1 ) {
+          return false;
+      }
+      // PERCORRE TODAS AS DIVS ITEMS PARA ATRIBUIR A CLASSE SELECTED NA DIV QUE O CURSOR DEVE IR SETADO NA VARIAVEL PROXIMO
+      $.each($('.chrome-conteudo-show .item_verso_musica'), function () {
+          $(this).removeClass('ativo');
+          if (index === proximo) {
+              $(this).addClass('ativo');
+              $(this).trigger('click');
+          }
+          index++;
+      })
+    }
   }
 });
+/*
 // A flag to know when start or stop the camera
 var enabled = false;
 // Use require to add webcamjs
@@ -945,15 +949,9 @@ function start_cam(){
    console.log("The camera has been disabled");
   }
 }
-
+*/
 
 /*
-$(document).ready(function(){
-  $('#verso13 li').click(function(){
-    $('#verso13 li').removeClass("ativo");
-    $(this).addClass("ativo");
-});
-});
 //Musica Ativa
 $('#list_music li').click(function() {
   $('li').removeClass();
@@ -970,27 +968,4 @@ div editavel
 /*
 Verificar se um item tem foco
 $(this).is(':focus');
-*/
-/*
-request("https://api.cadimos.tk/busca/musicas/"+encodeURI(busca), function (error, response, body) {
-  console.log('error:', error); // Print the error if one occurred
-  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-  //console.log('body:', body); // Print the HTML for the Google homepage.
-  data = JSON.parse(body);
-  console.log(data);
-  	t_resultado=data.resultado.length;
-    for(i=0;i<t_resultado;i++){
-      result=data.resultado[i];
-      item=modelo_web.replace(/\[id_musica\]/g,'api'+result.id);
-      item=item.replace(/\[nome_musica\]/g,result.nome);
-      item=item.replace(/\[artista_musica\]/g,result.artista);
-      $('#list_music').append(item);
-      t_verso=result.versos.length;
-      for(v=0;v<t_verso;v++){
-        verse=result.versos[v];
-        verse=verse.replace(/<br \/>/g,"\n");
-          $('#verso'+'api'+result.id).append('<li onclick="texto(\'verso_'+'api'+result.id+'_'+v+'\',\'BR\');" id="verso_'+'api'+result.id+'_'+v+'">'+verse+'</li>');
-      }
-    }
-});
 */
