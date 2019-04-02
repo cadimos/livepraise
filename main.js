@@ -77,6 +77,7 @@ app.on('ready', function() {
         });
 
     }else{
+        /*
         win2 = new BrowserWindow({
             x: 0,
             y: 0,
@@ -100,6 +101,7 @@ app.on('ready', function() {
         win2.on('closed', () => {
             app.quit()
         });
+        */
     }
 
     //Ação ao fechar

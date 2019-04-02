@@ -44,7 +44,7 @@
 			explicitHeight   : null,
 			changeLineHeight : false,
 			truncateOnFail   : false,
-			allowOverflow    : false // If true, text will stay at minFontPixels but overflow container w/out failing 
+			allowOverflow    : false // If true, text will stay at minFontPixels but overflow container w/out failing
 		};
 
 		var Opts = $.extend(defaults, options);
@@ -148,7 +148,7 @@
 			//
 			//     http://stackoverflow.com/a/17433451/1094964
 			//
-			
+
 			while (minFontPixels < (Math.floor(maxFontPixels) - 1)) {
 
 				var fontSize = Math.floor((minFontPixels + maxFontPixels) / 2);
@@ -305,10 +305,10 @@
 			);
 
 			// Oops, something wrong happened!
-			// If font-size increasing, we weren't supposed to exceed the original size 
-			// If font-size decreasing, we hit minFontPixels, and still won't fit 
+			// If font-size increasing, we weren't supposed to exceed the original size
+			// If font-size decreasing, we hit minFontPixels, and still won't fit
 			if ((ourText.width()  > maxWidth && !Opts.allowOverflow) ||
-				(ourText.height() > maxHeight && !Opts.widthOnly && !Opts.allowOverflow)) { 
+				(ourText.height() > maxHeight && !Opts.widthOnly && !Opts.allowOverflow)) {
 
 				ourText.css('font-size', oldFontSize);
 

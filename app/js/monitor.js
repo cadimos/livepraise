@@ -792,13 +792,13 @@ function lista_biblia(){
 //Funçao de Listar os Versiculos por demanda
 
 function lista_versiculo(cat,livro,capitulo){
-  modelo_versiculo=`<li onclick="viewBiblia('versiculo_[id_capitulo]_[id_versiculo]','[local_biblia]','BR');" id="versiculo_[id_capitulo]_[id_versiculo]">[texto]</li>`;
+  modelo_versiculo=`<li onclick="viewBiblia('versiculo_[id_capitulo]_[id_versiculo]','[local_biblia]','BR');" id="versiculo_[id_capitulo]_[id_versiculo]" class="versiculo">[texto]</li>`;
   modelo_versiculo=modelo_versiculo.replace(/\[id_livro\]/g,livro);
   modelo_versiculo=modelo_versiculo.replace(/\[id_capitulo\]/g,capitulo);
   db.serialize(function() {
     db.each("SELECT id,texto,versiculo FROM biblia_versiculos WHERE  cat ="+cat+" AND  livro ="+livro+" AND capitulo="+capitulo+";", function(err, biblia_versiculo) {
       versiculo=modelo_versiculo.replace(/\[id_versiculo\]/g,biblia_versiculo.versiculo);
-      versiculo=versiculo.replace(/\[texto\]/g,biblia_versiculo.texto);
+      versiculo=versiculo.replace(/\[texto\]/g,iso_encode(biblia_versiculo.texto));
       versiculo=versiculo.replace(/\[local_biblia\]/g,livro+'-'+capitulo+'-'+biblia_versiculo.versiculo);
       $('#collapse_'+livro+'_'+capitulo+' #versiculo').append(versiculo);
     });
@@ -809,15 +809,13 @@ function lista_versiculo(cat,livro,capitulo){
 function viewBiblia(id,nome,br){
   $('.content').html('');
   $('.titulo').html('');
-  txt=$('#'+id).html();
+  txt=iso_encode($('#'+id).html());
   if(br=='BR'){
     txt=nl2br(txt);
   }
   let modelo=`<span>${txt}</span>`;
   $('.content').append(modelo);
-  $('.content').textfill({
-    maxFontPixels: 0
-  });
+  $('.content').textfill({maxFontPixels: 0,debug: true  });
   $('.content').css('text-align','center');
   $('.titulo').css('font-size','20px');
   nome=nome.split('-');
@@ -826,6 +824,8 @@ function viewBiblia(id,nome,br){
       $('.titulo').html(biblia.nome+' '+nome[1]+':'+nome[2]);
     });
   });
+  $('.versiculo').removeClass('ativo');
+  $('#'+id).addClass('ativo');
   if(congelar('valida')==true){
     var text = '{"funcao":[' +'{"nome":"viewBiblia","valor":"'+btoa(modelo)+'" }]}';
     socket.emit("send", text);
@@ -842,6 +842,100 @@ function alerta(texto){
 
 }
 
+//Converte caracteres UTF-8 para o formato ISO-8859-1
+function iso_encode(str){
+  /*
+	str=str.replace(/º/g,"&ordm;");
+	str=str.replace(/ª/g,"&ordf;");
+	str=str.replace(/°/g,"&deg;");
+
+	str=str.replace(/â/g,"&acirc;");
+	str=str.replace(/ê/g,"&ecirc;");
+	str=str.replace(/î/g,"&icirc;");
+	str=str.replace(/ô/g,"&ocirc;");
+	str=str.replace(/û/g,"&ucirc;");
+	str=str.replace(/Â/g,"&Acirc;");
+	str=str.replace(/Ê/g,"&Ecirc;");
+	str=str.replace(/Î/g,"&Icirc;");
+	str=str.replace(/Ô/g,"&Ocirc;");
+	str=str.replace(/Û/g,"&Ucirc;");
+
+	str=str.replace(/ç/g,"&ccedil;");
+	str=str.replace(/Ç/g,"&Ccedil;");
+
+	str=str.replace(/\"/g,"&quot;");
+
+	str=str.replace(/®/g,"&reg;");
+	str=str.replace(/™/g,"&#8482;");
+	str=str.replace(/©/g,"&copy;");
+	str=str.replace(/'/g,"&#39;");
+	str=str.replace(/´/g,"&acute;");
+	str=str.replace(/¡/g,"&iexcl;");
+	str=str.replace(/—/g,"&#8212;");
+	str=str.replace(/–/g,"&#8211;");
+	str=str.replace(/£/g,"&pound;");
+	str=str.replace(/€/g,"&#8364;");
+	str=str.replace(/¥/g,"&yen;");
+	str=str.replace(/Ø/g,"&Oslash;");
+	str=str.replace(/¶/g,"&para;");
+	str=str.replace(/§/g,"&sect;");
+	str=str.replace(/ß/g,"&szlig;");
+	str=str.replace(/ñ/g,"&ntilde;");
+	str=str.replace(/÷/g,"&divide;");
+
+	str=str.replace(/ã/g,"&atilde;");
+	str=str.replace(/õ/g,"&otilde;");
+	str=str.replace(/Ã/g,"&Atilde;");
+	str=str.replace(/Õ/g,"&Otilde;");
+
+	str=str.replace(/á/g,"&aacute;");
+	str=str.replace(/é/g,"&eacute;");
+	str=str.replace(/í/g,"&iacute;");
+	str=str.replace(/ó/g,"&oacute;");
+	str=str.replace(/ú/g,"&uacute;");
+	str=str.replace(/Á/g,"&Aacute;");
+	str=str.replace(/É/g,"&Eacute;");
+	str=str.replace(/Í/g,"&Iacute;");
+	str=str.replace(/Ó/g,"&Oacute;");
+	str=str.replace(/Ú/g,"&Uacute;");
+
+	str=str.replace(/à/g,"&agrave;");
+	str=str.replace(/è/g,"&egrave;");
+	str=str.replace(/ì/g,"&igrave;");
+	str=str.replace(/ò/g,"&ograve;");
+	str=str.replace(/ù/g,"&ugrave;");
+	str=str.replace(/À/g,"&agrave;");
+	str=str.replace(/È/g,"&egrave;");
+	str=str.replace(/Ì/g,"&igrave;");
+	str=str.replace(/Ò/g,"&ograve;");
+	str=str.replace(/Ù/g,"&ugrave;");
+
+	str=str.replace(/ä/g,"&auml;");
+	str=str.replace(/ë/g,"&euml;");
+	str=str.replace(/ï/g,"&iuml;");
+	str=str.replace(/ö/g,"&ouml;");
+	str=str.replace(/ü/g,"&uuml;");
+	str=str.replace(/Ä/g,"&Auml;");
+	str=str.replace(/Ë/g,"&Euml;");
+	str=str.replace(/Ï/g,"&Iuml;");
+	str=str.replace(/Ö/g,"&Ouml;");
+	str=str.replace(/Ü/g,"&Uuml;");
+
+	str=str.replace(/¢/g,"&cent;");
+
+	str=str.replace(/¹/g,"&sup1;");
+	str=str.replace(/²/g,"&sup2;");
+	str=str.replace(/³/g,"&sup3;");
+
+	str=str.replace(/£/g,"&pound;");
+  str=str.replace(/¬/g,"&not;");
+
+  */
+  str=str.replace(/;/g,"&semi;");
+  str=str.replace(/:/g,"&colon;");
+
+	return str;
+}
 //Tabs List
 $('#navegacao a').click(function (e) {
   e.preventDefault()
@@ -922,6 +1016,43 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
       }
       // PERCORRE TODAS AS DIVS ITEMS PARA ATRIBUIR A CLASSE SELECTED NA DIV QUE O CURSOR DEVE IR SETADO NA VARIAVEL PROXIMO
       $.each($('.chrome-conteudo-show .item_verso_musica'), function () {
+          $(this).removeClass('ativo');
+          if (index === proximo) {
+              $(this).addClass('ativo');
+              $(this).trigger('click');
+          }
+          index++;
+      })
+    }
+  }
+  if(e.which == KEY_UP || e.keyCode == KEY_UP || e.which == KEY_DOWN || e.keyCode == KEY_DOWN){
+    if(!$('#busca_musica').is(':focus') || $('#busca_musica').val()==''){
+      //percorre todo sequencia atual
+      let proximo = 1;
+      let index = 1;
+      $.each($('.versiculo'), function () {
+        if($(this).hasClass('ativo')) {
+          switch (e.keyCode) {
+            case KEY_DOWN:
+              proximo += index;
+              break;
+            case KEY_UP:
+              proximo = index - 1;
+              break;
+          }
+        }
+        index++;
+      });
+      index = 1;
+      // VERIFICA SE O RETORNO É MAIOR QUE O NUMERO TOTAL DE DIVS E RETORNA FALSO PARA A NAVEGACAO NÃO SAIR DE DAS DIVS
+      if(proximo > $('.versiculo').length) {
+          return false;
+      // VERIFICA SE O RETORNO É MENOR QUE 1 E RETORNA FALSO PARA A NAVEGAÇÃO NÃO SAIR DAS DIVS
+      }else if(proximo < 1 ) {
+          return false;
+      }
+      // PERCORRE TODAS AS DIVS ITEMS PARA ATRIBUIR A CLASSE SELECTED NA DIV QUE O CURSOR DEVE IR SETADO NA VARIAVEL PROXIMO
+      $.each($('.versiculo'), function () {
           $(this).removeClass('ativo');
           if (index === proximo) {
               $(this).addClass('ativo');

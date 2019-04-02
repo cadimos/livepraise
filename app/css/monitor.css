@@ -243,6 +243,9 @@ li.ativo{
     padding: 1vh;
     height: 37vh;
 }
+.content span{
+    display: table;
+}
 .rodape{
     height: 5vh;
     padding-left: 1vh;
