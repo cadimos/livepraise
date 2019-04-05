@@ -12,6 +12,8 @@ var socket = io.connect("http://localhost:3000");
 socket.emit("join", 'Monitor');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(dir_app+'/dsw.db');
+const si = require('systeminformation');
+var md5 = require("blueimp-md5");
 
 //Teclado
 const KEY_DOWN = 40;
@@ -128,6 +130,71 @@ function fechar_loandig(){
 
 setTimeout(() => loanding(), 200);
 
+function systemItens(){
+  idOS='';
+  idHD='';
+  idRede='';
+  si.osInfo().then(os => {
+    console.log('OS serial: '+os.serial);
+    idOS=os.serial;
+  }).catch(error => console.error(error));
+  si.diskLayout().then(disco => {
+    console.log('Disco serial: '+disco[0].serialNum);
+    idHD=disco[0].serialNum;
+  }).catch(error => console.error(error));
+  si.networkInterfaces().then(rede => {
+    for(r=0;r<rede.length;r++){
+      if(rede[r].mac){
+        console.log('Rede Mac: '+rede[r].mac);
+        idRede=rede[r].mac;
+      }
+    }
+  }).catch(error => console.error(error));
+  setTimeout(() => chaveSystem(idOS,idHD,idRede),1000);
+}
+systemItens();
+function chaveSystem(os,hd,rede){
+  let chave=md5(os+hd+rede);
+  db.serialize(function() {
+    db.each("SELECT * FROM system", function(err, res) {
+      if(os!=res.os){
+        if(res.os==0){
+          db.run("UPDATE `system` SET `os`='"+os+"'");
+        }else{
+          console.log('OS Alterado');
+        }
+      }
+      if(hd!=res.hd){
+        if(res.hd==0){
+          db.run("UPDATE `system` SET `hd`='"+hd+"'");
+        }else{
+          console.log('HD Alterado');
+        }
+      }
+      if(rede!=res.mac){
+        if(res.mac==0){
+          db.run("UPDATE `system` SET `mac`='"+rede+"'");
+        }else{
+          console.log('Rede Alterado');
+        }
+      }
+      if(chave!=res.chave){
+        if(res.chave==0){
+          db.run("UPDATE `system` SET `chave`='"+chave+"'");
+        }else{
+          console.log('Chave Alterado');
+        }
+      }
+    });
+  });
+  msg=`
+  OS: ${os}
+  HD: ${hd}
+  Rede: ${rede}
+  Chave: ${chave}
+  `;
+  console.log(msg);
+}
 //Fim Loanding
 
 //Atualizar e Regarregar Janelas
@@ -697,20 +764,22 @@ $('#new_music').on('show.bs.modal', function (event) {
 
 //Exibir Musica
 function viewMusica(id,nome,br){
-  $('.content').html('');
-  $('.rodape').html('');
+
+  $('.conteudo').html('');
   txt=$('#'+id).html();
   if(br=='BR'){
     txt=nl2br(txt);
   }
-  let modelo=`<span>${txt}</span>`;
-  $('.content').append(modelo);
+  let modelo=`
+  <div class="titulo"></div>
+  <div class="content"><span>${txt}</span></div>
+  <div class="rodape">${nome}</div>`;
+  $('.conteudo').append(modelo);
   $('.content').textfill({
     maxFontPixels: 0
   });
   $('.content').css('text-align','center');
   $('.rodape').css('font-size','20px');
-  $('.rodape').html(nome);
   if(congelar('valida')==true){
     var text = '{"funcao":[' +'{"nome":"viewMusica","valor":"'+btoa(modelo)+'" }]}';
     socket.emit("send", text);
@@ -804,14 +873,16 @@ function lista_versiculo(cat,livro,capitulo){
 
 //Exibir Musica
 function viewBiblia(id,nome,br){
-  $('.content').html('');
-  $('.titulo').html('');
+  $('.conteudo').html('');
   txt=$('#'+id).html();
   if(br=='BR'){
     txt=nl2br(txt);
   }
-  let modelo=`<span>${txt}</span>`;
-  $('.content').append(modelo);
+  let modelo=`
+  <div class="titulo"></div>
+  <div class="content"><span>${txt}</span></div>
+  <div class="rodape"></div>`;
+  $('.conteudo').append(modelo);
   $('.content').textfill({maxFontPixels: 0,debug: true  });
   $('.content').css('text-align','center');
   $('.titulo').css('font-size','20px');
@@ -884,7 +955,6 @@ function buscaBiblia(){
       $('#versiculo_'+capitulo+'_'+versiculo).trigger('focus');
     }
   }
-  console.log('Livro: '+livro+' Referencia: '+ref+' ID: '+IDLivro(livro));
 }
 var idLivro='';
 function SetIDLivro(id){
