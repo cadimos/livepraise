@@ -56,11 +56,9 @@ function texto(vl){
 function viewMusica(vl){
 	$('.conteudo').html('');
 	$('.conteudo').append(vl);
-	$('.conteudo').textfill({
-		maxFontPixels: -1
-		});
-	$('.conteudo').css('text-align','center');
-	$('.conteudo .titulo_musica').css('font-size','35px');
+	$('.content').textfill({maxFontPixels: -1});
+	$('.content').css('text-align','center');
+	$('.rodape').css('font-size','35px');
 }
 
 function removeConteudo(){
@@ -120,6 +118,7 @@ function ajustarTela(largura,altura){
 			$('.conteudo').css('width',largura+'px');
 			console.log('Definido pelo Usuario');
 	}
+	$('.content').textfill({maxFontPixels: -1});
 }
 
 $(document).ready(function(){

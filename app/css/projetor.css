@@ -28,15 +28,32 @@ body {
 .conteudo{
     position: absolute;
     top: 0;
-    margin: 2vw;
     height: 90vh;
-    width: 96vw;
+    width: 100vw;
     color: #ffffff;
     text-shadow: 2px 2px 0px black, 3px 3px 0 black, 5px 5px 0 black, 6px 6px 0 black;
     font-family: 'Roboto', sans-serif;
     font-weight: 900;
 }
-.titulo_musica{
+.titulo{
+    height: 5vh;
+    padding-left: 1vh;
+}
+.content{
+    padding: 1vh;
+    height: 80%;
+}
+.content span{
+    display: table;
+}
+.rodape{
+    height: 5vh;
+    padding-left: 1vh;
+}
+.alerta{
     position: absolute;
-    bottom: -5%;
+    bottom: 0px;
+    font-size: 25px;
+    background: black;
+    width: 100%;
 }
