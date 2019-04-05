@@ -61,6 +61,14 @@ function viewMusica(vl){
 	$('.rodape').css('font-size','35px');
 }
 
+function viewBiblia(vl){
+	$('.conteudo').html('');
+	$('.conteudo').append(vl);
+	$('.content').textfill({maxFontPixels: -1});
+	$('.content').css('text-align','left');
+	$('.titulo').css('font-size','35px');
+}
+
 function removeConteudo(){
 	$('.conteudo').html('');
 }
@@ -158,6 +166,10 @@ $(document).ready(function(){
 
 			case 'viewMusica':
 				viewMusica(vl);
+			break;
+
+			case 'viewBiblia':
+				viewBiblia(vl);
 			break;
 
 			case 'ajustarTela':

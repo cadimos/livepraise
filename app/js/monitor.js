@@ -884,7 +884,7 @@ function viewBiblia(id,nome,br){
   <div class="rodape"></div>`;
   $('.conteudo').append(modelo);
   $('.content').textfill({maxFontPixels: 0,debug: true  });
-  $('.content').css('text-align','center');
+  $('.content').css('text-align','left');
   $('.titulo').css('font-size','20px');
   nome=nome.split('-');
   db.serialize(function() {
@@ -895,8 +895,15 @@ function viewBiblia(id,nome,br){
   $('.versiculo').removeClass('ativo');
   $('#'+id).addClass('ativo');
   if(congelar('valida')==true){
-    var text = '{"funcao":[' +'{"nome":"viewBiblia","valor":"'+btoa(modelo)+'" }]}';
-    socket.emit("send", text);
+    setTimeout(function(){
+      tit=$('.titulo').html();
+      let modelo_send=`
+      <div class="titulo">${tit}</div>
+      <div class="content"><span>${txt}</span></div>
+      <div class="rodape"></div>`;
+      var text = '{"funcao":[' +'{"nome":"viewBiblia","valor":"'+btoa(modelo_send)+'" }]}';
+      socket.emit("send", text);
+    },200);
   }
 
 }
@@ -931,7 +938,6 @@ function buscaBiblia(){
   if(ref!=''){
     if(ref.indexOf(":")>0){
       i=ref.split(':');
-      console.log(i);
       capitulo=i[0];
       if(i.length>1){
         versiculo=i[1];
@@ -942,7 +948,6 @@ function buscaBiblia(){
       capitulo=ref;
       versiculo='';
     }
-    console.log("teste REF");
     att_cap=$('#collapse_'+IDLivro(livro)+'_'+capitulo).attr('aria-expanded');
     if(!att_cap){
       att_cap='false';
@@ -1032,7 +1037,7 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
     alert('O comando Crtl+Enter foi acionado')
     }
   if(e.which == KEY_LEFT || e.keyCode == KEY_LEFT || e.which == KEY_RIGHT || e.keyCode == KEY_RIGHT){
-    if(!$('#busca_musica').is(':focus') || $('#busca_musica').val()=='' || !$('#busca_biblia').is(':focus') || $('#busca_biblia').val()==''){
+    if(!$('#busca_musica').is(':focus') || $('#busca_musica').val()==''){
       //percorre todo sequencia atual
       let proximo = 1;
       let index = 1;
