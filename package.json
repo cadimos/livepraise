@@ -1,21 +1,43 @@
 {
-  "name": "Live_Praise",
+  "name": "live_praise",
   "version": "0.1.0",
   "main": "main.js",
   "author": {
     "name": "Thiago de Lucena Sobrinho",
     "email": "thiagolucenaelvis@gmail.com"
   },
+  "contributors": [
+    { "name": "Kerolen Lucena", "email": "kerolen@teraidc.com.br" },
+    { "name": "Sabrina Santos", "email": "sabrina@teraidc.com.br"}
+  ],
+  "description": "Live Praise (Software de Projeção para Igrejas)",
+  "keywords": [
+    "Live Praise",
+    "Projeção",
+    "DataShow",
+    "Igreja"
+  ],
+  "license": "UNLICENSED",
+  "homepage": "https://bitbucket.org/cadimos/livepraise#readme",
+  "bugs": {
+    "url": "https://bitbucket.org/cadimos/livepraise/issues",
+    "email": "livepraise@teraidc.com.br"
+  },
   "scripts": {
     "start": "electron main.js",
-    "win32": "electron-packager . LivePraise --platform=win32 --arch=ia32 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
-    "win64": "electron-packager . LivePraise --platform=win32 --arch=x64 --icon=app/icon/cadimos.ico --prune=true --out=release-builds --asar --overwrite",
+    "win32": "electron-packager . LivePraise --platform=win32 --arch=ia32 --icon=app/icon/livepraise.ico --prune=true --out=release-builds --asar --overwrite",
+    "win64": "electron-packager . LivePraise --platform=win32 --arch=x64 --icon=app/icon/livepraise.ico --prune=true --out=release-builds --asar --overwrite",
     "linux32": "electron-packager . LivePraise --platform=linux --arch=ia32 --icon=app/icon/livepraise.png --prune=true --out=release-builds --asar --overwrite",
     "linux64": "electron-packager . LivePraise --platform=linux --arch=x64 --icon=app/icon/livepraise.png --prune=true --out=release-builds --asar --overwrite",
     "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/livepraise.icns --prune=true --out=release-builds --asar --overwrite",
     "build": "electron-packager . --all",
     "rebuild": "electron-rebuild -f -w sqlite3"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/cadimos/livepraise.git"
+  },
+  "private": true,
   "dependencies": {
     "child-process-promise": "^2.2.1",
     "dialogs": "^1.1.20",
@@ -32,27 +54,10 @@
     "sqlite3": "^4.0.6",
     "webcamjs": "^1.0.25"
   },
-  "description": "Live Praise (Software de Projeção para Igrejas)",
   "devDependencies": {
     "debug": "^3.2.6",
-    "electron": "^5.0.0-beta.7",
+    "electron": "^5.0.0-beta.8",
     "electron-packager": "^12.1.1",
     "electron-rebuild": "^1.8.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@bitbucket.org/cadimos/livepraise.git"
-  },
-  "keywords": [
-    "Live Praise",
-    "Projeção",
-    "DataShow",
-    "Igreja"
-  ],
-  "bugs": {
-    "url": "https://bitbucket.org/cadimos/livepraise/issues",
-    "email": "livepraise@teraidc.com.br"
-  },
-  "license": "Private",
-  "homepage": "https://bitbucket.org/cadimos/livepraise#readme"
+  }
 }
