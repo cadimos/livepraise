@@ -619,12 +619,25 @@ function buscaMusica(){
 	  <ul id="verso[id_musica]"></ul>
 	  </div>
 	  </div>
-	  </div>`;
+    </div>`;
+    $('#list_music').append('<div class="alert alert-info" role="alert" id="alerta_pesquisa_musica">Procurando Música na Internet</div>');
     $.ajax({
       type: "GET",
       url: "https://api.cadimos.tk/busca/musicas/"+encodeURI(busca),
       dataType: "json",
+      error: function(erro){
+        $('#alerta_pesquisa_musica').remove();
+        $('#list_music').append('<div class="alert alert-danger" role="alert" id="alerta_erro_musica">Houve um erro ao Buscar a música na internet. Verifique sua conexão e tente novamente!</div>');
+        $('#alerta_erro_musica').fadeOut(10000,function(){
+          $(this).remove();
+        });
+      },
       success: function(data) {
+        $('#alerta_pesquisa_musica').remove();
+        $('#list_music').append('<div class="alert alert-success" role="alert" id="alerta_sucesso_musica">Localizado Músicas na Internet</div>');
+        $('#alerta_sucesso_musica').fadeOut(2000,function(){
+          $(this).remove();
+        });
       	t_resultado=data.resultado.length;
         for(i=0;i<t_resultado;i++){
           result=data.resultado[i];
