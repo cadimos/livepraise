@@ -45,6 +45,7 @@ body {
 }
 .content span{
     display: table;
+    width: 100%;
 }
 .rodape{
     height: 5vh;

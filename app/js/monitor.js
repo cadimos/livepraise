@@ -610,7 +610,7 @@ function buscaMusica(){
 	  [nome_musica] ([artista_musica])
 	  </a>
 	  <span class="acoes_item">
-	    <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
+	    <a href="javascript:void(0);" onclick="adicionar_musica_salvar('[id_musica]','[nome_musica]','[artista_musica]','[compositor_musica]')"><i class="fas fa-check-circle"></i></a>
 	  </span>
 	  </h4>
 	  </div>
@@ -643,13 +643,14 @@ function buscaMusica(){
           result=data.resultado[i];
           item=modelo_web.replace(/\[id_musica\]/g,'api'+result.id);
           item=item.replace(/\[nome_musica\]/g,result.nome);
-          item=item.replace(/\[artista_musica\]/g,result.artista);
+          item=item.replace(/\[artista_musica\]/g,result.artista.trim());
+          item=item.replace(/\[compositor_musica\]/g,result.compositor.trim());
           $('#list_music').append(item);
           t_verso=result.versos.length;
           for(v=0;v<t_verso;v++){
             verse=result.versos[v];
             verse=verse.replace(/<br \/>/g,"\n");
-	          $('#verso'+'api'+result.id).append('<li onclick="viewMusica(\'verso_'+'api'+result.id+'_'+v+'\',\''+result.nome+' ('+result.artista+')\',\'BR\');" id="verso_'+'api'+result.id+'_'+v+'">'+verse+'</li>');
+	          $('#verso'+'api'+result.id).append('<li class="verso_musica" onclick="viewMusica(\'verso_'+'api'+result.id+'_'+v+'\',\''+result.nome+' ('+result.artista+')\',\'BR\');" id="verso_'+'api'+result.id+'_'+v+'">'+verse+'</li>');
           }
         }
       }
@@ -720,7 +721,23 @@ function adicionar_musica(id){
     title: titulo,
     conteudo: data
   });
-  setTimeout(() => slideAtivo(),500);
+  setTimeout(() => slideAtivo(),700);
+}
+function adicionar_musica_salvar(id,nome,artista,compositor){
+  cat=1;
+  versos=$('#verso'+id+' li');
+  t_versos=versos.length;
+  db.serialize(function() {
+    db.run("INSERT INTO `musica` (`cat`,`nome`,`nome2`,`artista`,`compositor`) VALUES ('"+cat+"','"+nome+"','"+nome+"','"+artista+"','"+compositor+"')");
+    db.each("SELECT id FROM musica ORDER BY  id  DESC LIMIT 1", function(err, row) {
+      id_musica=row.id;
+      for(i=0;i<t_versos;i++){
+        v=$(versos[i]).html();
+        db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+v+"')");
+      }
+    });
+  });
+  adicionar_musica(id);
 }
 
 //Remover Musica
