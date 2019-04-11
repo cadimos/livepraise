@@ -85,6 +85,10 @@ form{
     margin: 0;
     padding: 0;
     list-style: none;
+    max-height: 30vh;
+    overflow: hidden;
+    /*white-space:nowrap;*/
+    display: inline-flex;
 }
 .chrome-conteudo li{
     border: solid 1px #cccccc;
@@ -176,10 +180,6 @@ li.ativo{
 }
 .chrome-tabs-conteudo{
     max-height: 30vh;
-}
-.chrome-conteudo ul{
-    max-height: 30vh;
-    overflow: hidden;
 }
 .panel-group{
     margin-bottom: 0;

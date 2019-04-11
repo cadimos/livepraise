@@ -11,7 +11,8 @@
       </div>
       <div class="chrome-tab-favicon"></div>
       <div class="chrome-tab-title"></div>
-      <div class="chrome-tab-close"></div>
+      <div class="chrome-tab-close">
+      </div>
       <input type="hidden" class="chrome-tab-id" value="">
     </div>
   `

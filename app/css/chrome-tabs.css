@@ -19,7 +19,10 @@
   display: none;
 }
 .chrome-conteudo-show{
-  display: table !important;
+  display: block !important;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  width: 100vw;
 }
 .chrome-tabs .chrome-tabs-content {
   /*position: relative;*/
@@ -30,9 +33,9 @@
   box-sizing: border-box;
   position: relative;
   font-size: 10px;
-  height: 4.2em;
+  height: 3.2em;
   background: linear-gradient(#dad9da, #d9d8d9);
-  padding: 1em 1.2em 0.45em 1.2em;
+  /*padding: 1em 1.2em 0.45em 1.2em;*/
   border-radius: 0.5em 0.5em 0 0;
   box-shadow: 0 0.05em #b7b7b7;
   overflow: hidden;
@@ -42,7 +45,7 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  height: 2.8em;
+  height: 3em;
   width: 24em;
   border: 0;
   margin: 0;
@@ -122,7 +125,7 @@
 }
 .chrome-tabs .chrome-tab-favicon {
   position: relative;
-  margin-left: 1.6em;
+  /*margin-left: 1.6em;*/
   height: 1.6em;
   width: 1.6em;
   background-size: 1.6em;
@@ -156,6 +159,7 @@
   right: 1.8em;
   background: #ea7a7a;
 }
+/*
 .chrome-tabs .chrome-tab-close::before {
   content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'><path stroke='#5a5a5a' stroke-linecap='round' stroke-width='1.125' d='M4 4 L10 10 M10 4 L4 10'></path></svg>");
   position: absolute;
@@ -169,6 +173,7 @@
 .chrome-tabs .chrome-tab-close:hover:active::before {
   content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'><path stroke='#fff' stroke-linecap='round' stroke-width='1.2' d='M4 4 L10 10 M10 4 L4 10'></path></svg>");
 }
+*/
 .chrome-tabs .chrome-tab-close:hover {
   background: #e25c4b;
 }
