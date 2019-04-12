@@ -922,7 +922,9 @@ function viewBiblia(id,nome,br){
       $('.titulo').html(biblia.nome+' '+nome[1]+':'+nome[2]);
     });
   });
-  $('.versiculo').removeClass('ativo');
+  $.each($('.versiculo'), function () {
+    $(this).removeClass('ativo');
+  });
   $('#'+id).addClass('ativo');
   if(congelar('valida')==true){
     setTimeout(function(){
@@ -1172,16 +1174,6 @@ function start_cam(){
 }
 */
 
-/*
-//Musica Ativa
-$('#list_music li').click(function() {
-  $('li').removeClass();
-  $(this).parent().addClass('ativo');
-});
-*/
-/*
-
-*/
 /*
 div editavel
 <p contenteditable="true">This is an editable paragraph.</p>
