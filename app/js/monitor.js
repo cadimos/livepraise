@@ -837,7 +837,7 @@ function lista_biblia(){
           </a>
       </h4>
   </div>
-  <div id="collapse_biblia_[id_livro]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head_biblia_[id_livro]">
+  <div id="collapse_biblia_[id_livro]" class="biblia_livro panel-collapse collapse" role="tabpanel" aria-labelledby="head_biblia_[id_livro]">
       <div class="panel-body">
           <div class="panel-group" id="list_biblia_[id_livro]" role="tablist" aria-multiselectable="true">
           </div>
@@ -853,7 +853,7 @@ function lista_biblia(){
           <span class="acoes_item"></span>
       </h4>
   </div>
-  <div id="collapse_[id_livro]_[id_capitulo]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head_[id_livro]_[id_capitulo]">
+  <div id="collapse_[id_livro]_[id_capitulo]" class="biblia_capitulo panel-collapse collapse" role="tabpanel" aria-labelledby="head_[id_livro]_[id_capitulo]">
       <div class="panel-body">
           <ul id="versiculo"></ul>
       </div>
@@ -937,6 +937,32 @@ function viewBiblia(id,nome,br){
   }
 
 }
+//Scroll da Biblia
+let pos_ini=$('#biblias #preview-list').offset().top;
+function scrollBiblia(){
+  let vLivro=$('.biblia_livro.in').length;
+  let vCapitulo=$('.biblia_capitulo.in').length;
+  let vVersiculo=$('.versiculo.ativo').length;
+  let pos=0;
+  if(vLivro){
+    pos_livro=$('.biblia_livro.in').offset().top;
+    pos=pos_livro;
+    if(vCapitulo){
+      pos_capitulo=$('.biblia_capitulo.in').offset().top;
+      pos=pos_capitulo;
+      if(vVersiculo){
+        pos_versiculo=$('.versiculo.ativo').offset().top;
+        pos=pos_versiculo;
+      }
+    }
+  }
+  if(pos>pos_ini){
+    pos=pos-pos_ini;
+  }
+  if(pos>0){
+    $('#biblias #preview-list').animate({scrollTop: pos}, 500);
+  }
+}
 // Busco na biblia
 function buscaBiblia(){
   texto=$('#busca_biblia').val();
@@ -958,12 +984,13 @@ function buscaBiblia(){
       ref='';
     }
   }
-  att_livro=$('#collapse_biblia_'+IDLivro(livro)).attr('aria-expanded');
+  att_livro=$('#collapse_biblia_'+IDLivro(livro)+'.in').length;
   if(!att_livro){
     att_livro='false';
   }
   if(att_livro=='false'){
     $('#head_biblia_'+IDLivro(livro)+' a').trigger('click');
+    scrollBiblia();
   }
   if(ref!=''){
     if(ref.indexOf(":")>0){
@@ -978,16 +1005,18 @@ function buscaBiblia(){
       capitulo=ref;
       versiculo='';
     }
-    att_cap=$('#collapse_'+IDLivro(livro)+'_'+capitulo).attr('aria-expanded');
+    att_cap=$('#collapse_'+IDLivro(livro)+'_'+capitulo+'.in').length;
     if(!att_cap){
       att_cap='false';
     }
     if(att_cap=='false'){
       $('#head_'+IDLivro(livro)+'_'+capitulo+' a').trigger('click');
+      scrollBiblia()
     }
     if(versiculo){
       $('#versiculo_'+capitulo+'_'+versiculo).trigger('click');
       $('#versiculo_'+capitulo+'_'+versiculo).trigger('focus');
+      scrollBiblia()
     }
   }
 }
@@ -1117,6 +1146,7 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
           if (index === proximo) {
               $(this).addClass('ativo');
               $(this).trigger('click');
+              scrollBiblia();
           }
           index++;
       })
