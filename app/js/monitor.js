@@ -977,7 +977,7 @@ function viewBiblia(id,nome,br){
 
 }
 //Scroll da Biblia
-let pos_ini=$('#biblias #preview-list').offset().top;
+const pos_ini=$('#biblias #preview-list').offset().top;
 function scrollBiblia(){
   let vLivro=$('.biblia_livro.in').length;
   let vCapitulo=$('.biblia_capitulo.in').length;
@@ -995,10 +995,7 @@ function scrollBiblia(){
       }
     }
   }
-  if(pos>pos_ini){
-    pos=pos-pos_ini;
-  }
-  if(pos>0){
+  if(pos!=0){
     $('#biblias #preview-list').animate({scrollTop: pos}, 500);
   }
 }

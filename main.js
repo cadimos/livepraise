@@ -51,7 +51,6 @@ app.on('ready', function() {
     //Abro o Monitor externo
 
     if (externalDisplay) {
-
         win2 = new BrowserWindow({
             x: externalDisplay.bounds.x,
             y: externalDisplay.bounds.y,
@@ -76,32 +75,6 @@ app.on('ready', function() {
             app.quit()
         });
 
-    }else{
-        /*
-        win2 = new BrowserWindow({
-            x: 0,
-            y: 0,
-            width,
-            height,
-            show: false,
-            frame: false,
-            title: 'Live Praise - Projetor',
-            icon: __dirname+'/app/icon/livepraise.png',
-            webPreferences: {
-                nodeIntegration: true,
-                preload: './preload.js'
-            }
-        });
-        //Abro a url do monitor externo
-        win2.loadURL('file://' + __dirname + '/app/projetor.html');
-        win2.openDevTools();
-        win2.once('ready-to-show',()=>{
-            win2.show();
-        })
-        win2.on('closed', () => {
-            app.quit()
-        });
-        */
     }
 
     //Ação ao fechar
