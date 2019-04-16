@@ -78,6 +78,27 @@ function nl2br (str) {
   return str.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/gm, breakTag);
 }
 
+function addslashes(str) {
+  str = str.replace(/\\/g, '\\\\');
+  str = str.replace(/\'/g, '\\\'');
+  str = str.replace(/\"/g, '\\"');
+  str = str.replace(/\0/g, '\\0');
+  return str;
+}
+
+function stripslashes(str) {
+  str = str.replace(/\\'/g, '\'');
+  str = str.replace(/\\"/g, '"');
+  str = str.replace(/\\0/g, '\0');
+  str = str.replace(/\\\\/g, '\\');
+  return str;
+}
+
+function iso_encode(str){
+  str = str.replace(/\'/g, '&apos;');
+  str = str.replace(/\"/g, '&quot;');
+  return str;
+}
 //Inicio Loanding
 
 //Muda a cor da arvore
@@ -152,7 +173,8 @@ function systemItens(){
   }).catch(error => console.error(error));
   setTimeout(() => chaveSystem(idOS,idHD,idRede),1000);
 }
-systemItens();
+setTimeout(() => systemItens(),1000);
+
 function chaveSystem(os,hd,rede){
   let chave=md5(os+hd+rede);
   db.serialize(function() {
@@ -535,7 +557,8 @@ function lista_musica(){
           db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
             verse=row.verso;
             verse=verse.replace(/<br \/>/g,"\n");
-            $('#verso'+musica.id).append('<li class="verso_musica" onclick="viewMusica(\'verso_'+musica.id+'_'+row.id+'\',\''+musica.nome+' ('+musica.artista+')\',\'BR\');" id="verso_'+musica.id+'_'+row.id+'">'+verse+'</li>');
+            modelo_item=`<li class="verso_musica" onclick='viewMusica("verso_${musica.id}_${row.id}","${musica.nome} (${musica.artista})","BR");' id="verso_${musica.id}_${row.id}">${verse}</li>`;
+            $('#verso'+musica.id).append(modelo_item);
           });
         });
         $('#current_loading').html('Listado Músicas');
@@ -544,6 +567,7 @@ function lista_musica(){
   		setTimeout(() => lista_musica(),200);
   	}
 }
+
 function slideAtivo(){
   if(!$('.chrome-conteudo-show ul').length){
     setTimeout(() => slideAtivo(),200);
@@ -563,6 +587,7 @@ function slideAtivo(){
     }
   }
 }
+
 //Busca Musica
 
 function buscaMusica(){
@@ -610,7 +635,7 @@ function buscaMusica(){
 	  [nome_musica] ([artista_musica])
 	  </a>
 	  <span class="acoes_item">
-	    <a href="javascript:void(0);" onclick="adicionar_musica_salvar('[id_musica]','[nome_musica]','[artista_musica]','[compositor_musica]')"><i class="fas fa-check-circle"></i></a>
+	    <a href="javascript:void(0);" onclick='adicionar_musica_salvar("[id_musica]","[nome_musica]","[artista_musica]","[compositor_musica]")'><i class="fas fa-check-circle"></i></a>
 	  </span>
 	  </h4>
 	  </div>
@@ -650,7 +675,8 @@ function buscaMusica(){
           for(v=0;v<t_verso;v++){
             verse=result.versos[v];
             verse=verse.replace(/<br \/>/g,"\n");
-	          $('#verso'+'api'+result.id).append('<li class="verso_musica" onclick="viewMusica(\'verso_'+'api'+result.id+'_'+v+'\',\''+result.nome+' ('+result.artista+')\',\'BR\');" id="verso_'+'api'+result.id+'_'+v+'">'+verse+'</li>');
+            let modelo_item=`<li class="verso_musica" onclick='viewMusica("verso_api${result.id}_${v}","${result.nome} (${result.artista})","BR");' id="verso_api${result.id}_${v}">${verse}</li>`;
+	          $('#verso'+'api'+result.id).append(modelo_item);
           }
         }
       }
@@ -663,16 +689,20 @@ function salvar_musica(id){
   if(nome==''){
     alert('O nome da Música é Obrigatória!');
   }
+  nome=iso_encode(nome);
   artista=$('#new_music #artista').val();
   if(artista==''){
     alert('O nome do Artista é Obrigatória!');
   }
+  artista=iso_encode(artista);
   compositor=$('#new_music #compositor').val();
+  compositor=iso_encode(compositor);
   cat=1;
   letra=$('#new_music #letra').val();
   if(letra==''){
     alert('A letra da Música é Obrigatória!');
   }
+  letra=iso_encode(letra);
   if(nome!='' && artista!='' && letra!=''){
     letra=nl2br(letra);
     versos=letra.split("<br /><br />");
@@ -723,16 +753,21 @@ function adicionar_musica(id){
   });
   setTimeout(() => slideAtivo(),700);
 }
+
 function adicionar_musica_salvar(id,nome,artista,compositor){
   cat=1;
   versos=$('#verso'+id+' li');
   t_versos=versos.length;
+  nome=iso_encode(nome);
+  artista=iso_encode(artista);
+  compositor=iso_encode(compositor);
   db.serialize(function() {
     db.run("INSERT INTO `musica` (`cat`,`nome`,`nome2`,`artista`,`compositor`) VALUES ('"+cat+"','"+nome+"','"+nome+"','"+artista+"','"+compositor+"')");
     db.each("SELECT id FROM musica ORDER BY  id  DESC LIMIT 1", function(err, row) {
       id_musica=row.id;
       for(i=0;i<t_versos;i++){
         v=$(versos[i]).html();
+        v=iso_encode(v);
         db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+v+"')");
       }
     });
@@ -797,6 +832,7 @@ function viewMusica(id,nome,br){
 
   $('.conteudo').html('');
   txt=$('#'+id).html();
+  txt=iso_encode(txt);
   if(br=='BR'){
     txt=nl2br(txt);
   }
