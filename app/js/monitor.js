@@ -549,7 +549,7 @@ function lista_musica(){
 
       $('#list_music').html('');
       db.serialize(function() {
-        db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"'", function(err, musica) {
+        db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"' ORDER BY nome ASC", function(err, musica) {
           item=modelo.replace(/\[id_musica\]/g,musica.id);
           item=item.replace(/\[nome_musica\]/g,musica.nome);
           item=item.replace(/\[artista_musica\]/g,musica.artista);
@@ -589,7 +589,6 @@ function slideAtivo(){
 }
 
 //Busca Musica
-
 function buscaMusica(){
   busca=$("#busca_musica").val();
   if(busca.length<3){
@@ -683,6 +682,7 @@ function buscaMusica(){
     });
   }
 }
+
 //Salva as Musicas
 function salvar_musica(id){
   nome=$('#new_music #nome').val();
@@ -853,6 +853,7 @@ function viewMusica(id,nome,br){
 
 }
 // Funções de Biblia
+
 //Lista as Biblias Disponiveis
 function catBiblias(){
   db.serialize(function() {
