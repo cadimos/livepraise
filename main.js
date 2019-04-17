@@ -42,14 +42,26 @@ app.on('ready', function() {
         win.show();
         splash.close();
     })
+    win.webContents.on('new-window', (event, url) => {
+        event.preventDefault()
+        const win_link = new BrowserWindow({
+            title: 'Live Praise',
+            icon: __dirname+'/app/icon/livepraise.png',
+            show: false
+            })
+        win_link.once('ready-to-show', () => win_link.show())
+        win_link.loadURL(url)
+        win_link.setMenuBarVisibility(false);
+        event.newGuest = win_link
+    })
     //Capturo os monitores disponiveis
     let displays = electron.screen.getAllDisplays();
     //Verifico sem tem um monitor externo
     let externalDisplay = displays.find((display) => {
         return display.bounds.x !== 0 || display.bounds.y !== 0
     });
-    //Abro o Monitor externo
 
+    //Abro o Monitor externo
     if (externalDisplay) {
         win2 = new BrowserWindow({
             x: externalDisplay.bounds.x,
