@@ -1,8 +1,10 @@
+var compression = require('compression');
 var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
 const io = require('socket.io')(http);
 
+app.use(compression());
 app.use(express.static('public'));
 app.get('/', function(req, res){
     res.send('Bem Vindo ao Sistema de Projeção!');
