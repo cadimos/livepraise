@@ -3,8 +3,6 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 const dir_app = process.cwd();
 const fs = require('fs');
 const exec = require('child-process-promise').exec;
-var Dialogs = require('dialogs');
-var dialogs = Dialogs(opts={});
 var request = require('request');//Teste
 var socket = io.connect("http://localhost:3000");
 socket.emit("join", 'Monitor');
@@ -158,7 +156,6 @@ function systemItens(){
     idOS=os.serial;
   }).catch(error => console.error(error));
   si.diskLayout().then(disco => {
-    console.log(disco);
     console.log('Disco serial: '+disco[0].serialNum);
     idHD=disco[0].serialNum;
   }).catch(error => console.error(error));
