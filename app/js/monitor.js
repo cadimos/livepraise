@@ -591,7 +591,9 @@ function slideAtivo(){
 function buscaMusicaLocal(){
   cat=$('#cat_musica').val();
   busca=$("#busca_musica").val();
- 	if(cat!=''){
+  if(busca.length<3){
+    lista_musica();
+  }else	if(cat!=''){
     let modelo=`<div class="panel panel-default">
     <div class="panel-heading" role="tab" id="head[id_musica]">
     <h4 class="panel-title">
