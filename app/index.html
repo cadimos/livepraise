@@ -337,11 +337,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <form action="javascript:buscaMusica()">
+                                    <form action="javascript:buscaMusica(true)">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Pesquisar" id="busca_musica">
+                                            <input type="text" class="form-control" placeholder="Pesquisar" id="busca_musica" onkeyup="buscaMusica()">
                                             <span class="input-group-btn">
-                                                <button class="btn btn-default" type="button" onclick="buscaMusica()"><i class="fas fa-search"></i></button>
+                                                <button class="btn btn-default" type="button" onclick="buscaMusica(true)"><i class="fas fa-search"></i></button>
                                             </span>
                                         </div>
                                     </form>
