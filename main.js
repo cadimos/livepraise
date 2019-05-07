@@ -1,7 +1,8 @@
 ﻿//Inicio o Electon
 const electron = require('electron');
 //Importo os modulos
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, powerSaveBlocker, Menu } = require('electron');
+const id_power_monitor = powerSaveBlocker.start('prevent-display-sleep')
 //Inicio a aplicação
 app.on('ready', function() {
     //Pego a altura e largura do monitor principal

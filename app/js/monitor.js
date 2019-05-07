@@ -1,5 +1,3 @@
-
-
 //Variaveis Globais
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 const dir_app = process.cwd();
