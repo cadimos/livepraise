@@ -70,8 +70,11 @@ const KEY_PF8 = 119;
 
 //Remove Quebra de Linha Substituindo por <br />
 function nl2br (str) {
-  var breakTag = '<br '+'/>';
-  return str.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/gm, breakTag);
+  if (typeof str === 'undefined' || str === null) {
+    return ''
+  }
+  var breakTag = `<br />`;
+  return (str + '').replace(/(\r\n|\n\r|\r|\n)/g, breakTag + '$1')
 }
 
 function addslashes(str) {
@@ -716,21 +719,23 @@ function salvar_musica(id){
     }else{
       db.serialize(function() {
         db.run("UPDATE `musica` SET `nome`='"+nome+"',`nome2`='"+nome+"',`artista`='"+artista+"',`compositor`='"+compositor+"' WHERE `id`='"+id+"'");
-        db.run("DELETE FROM `musica_versos` WHERE `id`='"+id+"'");
-        db.each("SELECT id FROM musica WHERE `id`='"+id+"' ORDER BY  id  DESC LIMIT 1", function(err, row) {
-          id_musica=row.id;
-          for(i=0;i<t_versos;i++){
-            db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+versos[i]+"')")
-          }
-        });
+        db.run("DELETE FROM `musica_versos` WHERE `musica`='"+id+"'");
+        id_musica=id;
+        for(i=0;i<t_versos;i++){
+          db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+versos[i]+"')")
+        }
       });
     }
-    $('#new_music').modal('hide');
     $('#new_music #nome').val('');
     $('#new_music #artista').val('');
     $('#new_music #compositor').val('');
     $('#new_music #letra').val('');
-    alert('Música salva com sucesso!');
+    $.alert({
+      title: 'Sucesso!',
+      content: 'Música salva com sucesso!',
+    });
+    $('#new_music').modal('hide');
+    $('.modal-backdrop').remove();
     lista_musica();
   }
 }
