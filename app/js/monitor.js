@@ -630,6 +630,7 @@ function buscaMusicaLocal(){
     });
   }
 }
+
 function buscaMusicaOnline(){
   busca=$("#busca_musica").val();
   if(busca.length<3){
@@ -691,6 +692,7 @@ function buscaMusicaOnline(){
     });
   }
 }
+
 function buscaMusica(submit){
   if(!submit){
     buscaMusicaLocal();
@@ -1016,8 +1018,8 @@ function viewBiblia(id,nome,br){
 
 }
 //Scroll da Biblia
-const pos_ini=$('#biblias #preview-list').offset().top;
 function scrollBiblia(){
+  let pos_ini=$('#biblias #preview-list').offset().top;
   let vLivro=$('.biblia_livro.in').length;
   let vCapitulo=$('.biblia_capitulo.in').length;
   let vVersiculo=$('.versiculo.ativo').length;
@@ -1034,7 +1036,9 @@ function scrollBiblia(){
       }
     }
   }
-  if(pos!=0){
+  pos=pos-pos_ini;
+  console.log('Biblia Real: '+pos+' = '+pos_ini);
+  if(pos!=pos_ini){
     $('#biblias #preview-list').animate({scrollTop: pos}, 500);
   }
 }
