@@ -1,8 +1,0 @@
-{
-    "productName": "LivePraise",
-    "dest": "release-builds/installers/",
-    "icon": "app/icon/livepraise.ico",
-    "tags": [
-        "Utility"
-    ]
-}
