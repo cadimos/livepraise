@@ -18,6 +18,7 @@ app.on('ready', function() {
         frame: false,
         title: 'Live Praise - Iniciando',
         icon: __dirname+'/app/icon/livepraise.png',
+        backgroundColor: '#000',
     });
     splash.loadURL('file://' + __dirname + '/app/splash.html');
     //Crio minha janela no monitor principal

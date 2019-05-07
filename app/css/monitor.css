@@ -261,6 +261,9 @@ li.ativo{
 .modal-body label{
     color: #404040;
 }
+.jconfirm {
+    color: #333;
+}
 @keyframes scale {
   0%, 100% {
     transform: scale(0.0);

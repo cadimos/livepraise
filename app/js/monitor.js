@@ -158,6 +158,7 @@ function systemItens(){
     idOS=os.serial;
   }).catch(error => console.error(error));
   si.diskLayout().then(disco => {
+    console.log(disco);
     console.log('Disco serial: '+disco[0].serialNum);
     idHD=disco[0].serialNum;
   }).catch(error => console.error(error));
@@ -775,28 +776,49 @@ function adicionar_musica_salvar(id,nome,artista,compositor){
 
 //Remover Musica
 function remover_musica(id,conf){
-  if(conf!=true){
-    r=confirm("Deseja realmente remover?");
-  }
   rand=Math.floor(Math.random() * 1000000);
-  if(r){
-    if(conf==true){
-      msg="Código Incorreto por Favor \n";
-    }else{
-      msg='';
-    }
-    dialogs.prompt(msg+"Digite o Codigo a seguir: "+rand,function(cod){
-      if(cod==rand){
-        db.serialize(function() {
-          db.run("DELETE FROM `musica` WHERE `id`='"+id+"'");
-          lista_musica();
-        });
-      }else if(cod==null){
-      }else{
-        remover_musica(id,true);
+  if(conf!=true){
+    $.confirm({
+      title: 'Deseja Realmente Remover?',
+      content: `<form action="" class="formName">
+      <div class="form-group">
+      <label>Digite o Código a seguir para Excluir: ${rand}</label>
+      <input type="text" placeholder="Código" class="codigo form-control" required />
+      </div>
+      </form>
+      `,
+      buttons: {
+          formSubmit: {
+              text: 'Excluir',
+              btnClass: 'btn-red',
+              action: function () {
+                  var cod = this.$content.find('.codigo').val();
+                  if(!cod || cod!=rand){
+                      $.alert('Código incorreto! Tente novamente');
+                      return false;
+                  }else{
+                    db.serialize(function() {
+                      db.run("DELETE FROM `musica` WHERE `id`='"+id+"'");
+                      lista_musica();
+                    });
+                  }
+              }
+          },
+          cancel: {
+            text: 'Cancelar',
+            action: function () {}
+          }
+      },
+      onContentReady: function () {
+          // bind to events
+          var jc = this;
+          this.$content.find('form').on('submit', function (e) {
+              // if the user submits the form by pressing enter in the field.
+              e.preventDefault();
+              jc.$$formSubmit.trigger('click'); // reference the button and click it
+          });
       }
     });
-  }else{
   }
 }
 
