@@ -74,7 +74,7 @@ function nl2br (str) {
     return ''
   }
   var breakTag = `<br />`;
-  return (str + '').replace(/(\r\n|\n\r|\r|\n)/g, breakTag + '$1')
+  return (str + '').replace(/(\r\n|\n\r|\r|\n)/g, breakTag)
 }
 
 function addslashes(str) {
@@ -731,7 +731,9 @@ function salvar_musica(id){
         db.each("SELECT id FROM musica ORDER BY  id  DESC LIMIT 1", function(err, row) {
           id_musica=row.id;
           for(i=0;i<t_versos;i++){
-            db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+versos[i]+"')")
+            if(versos[i]!=''){
+              db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+versos[i]+"')")
+            }
           }
         });
       });
@@ -741,7 +743,9 @@ function salvar_musica(id){
         db.run("DELETE FROM `musica_versos` WHERE `musica`='"+id+"'");
         id_musica=id;
         for(i=0;i<t_versos;i++){
-          db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+versos[i]+"')")
+          if(versos[i]!=''){
+            db.run("INSERT INTO `musica_versos` (`musica`,`verso`) VALUES ('"+id_musica+"','"+versos[i]+"')")
+          }
         }
       });
     }
@@ -854,12 +858,13 @@ $('#new_music').on('show.bs.modal', function (event) {
         $('#nome').val(musica.nome);
         $('#artista').val(musica.artista);
         $('#compositor').val(musica.compositor);
-        $('#letra').html('');
-        $('#button_salvar_musica').attr('onclick','salvar_musica('+musica.id+');')
-        db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
+        $('#letra').val('');
+        $('#button_salvar_musica').attr('onclick','salvar_musica('+cod+');')
+        db.each("SELECT `id`,`verso` FROM `musica_versos` WHERE `musica`='"+cod+"'", function(err, row) {
           verse=row.verso;
           verse=verse.replace(/<br \/>/g,"\n");
-          $('#letra').append(verse+"\n\n");
+          verse=$('#letra').val()+verse+"\n\n";
+          $('#letra').val(verse);
         });
       });
     });
@@ -1037,7 +1042,6 @@ function scrollBiblia(){
     }
   }
   pos=pos-pos_ini;
-  console.log('Biblia Real: '+pos+' = '+pos_ini);
   if(pos!=pos_ini){
     $('#biblias #preview-list').animate({scrollTop: pos}, 500);
   }
