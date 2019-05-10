@@ -943,9 +943,11 @@ function lista_biblia(){
   </div>
 </div>`;
   $('#list_biblia').html('');
+  $('#biblias #preview-list').append('<div id="loading_biblia"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span>Carregando Biblia</span></div>');
   db.serialize(function() {
     db.each("SELECT id,nome FROM biblia_livros", function(err, biblia) {
       $('#current_loading').html('Listando Livros da Biblias');
+      $('#loading_biblia span').html('Listando Livros da Biblias');
       item=modelo_biblia.replace(/\[id_livro\]/g,biblia.id);
       item=item.replace(/\[nome_livro\]/g,biblia.nome);
       cat=$('#cat_biblia').val();
@@ -956,9 +958,14 @@ function lista_biblia(){
         capitulos=capitulos.replace(/\[id_capitulo\]/g,biblia_capitulos.capitulo);
         if(biblia.id==66 && biblia_capitulos.capitulo==22){
           $('#current_loading').html('Listado Biblias');
+          $('#loading_biblia span').html('Listado Capitulos da Biblia');
           setTimeout(() => fechar_loandig(),100);
+          setTimeout(function(){
+            $('#loading_biblia').remove();
+          },200);
         }
         $('#current_loading').html('Listando Livros da Biblias: '+biblia.nome+' '+biblia_capitulos.capitulo);
+        $('#loading_biblia span').html('Listando Livros da Biblias: '+biblia.nome+' '+biblia_capitulos.capitulo);
         $('#list_biblia_'+biblia.id).append(capitulos);
       },function (err,b){
         if(err){

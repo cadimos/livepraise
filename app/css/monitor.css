@@ -188,6 +188,13 @@ li.ativo{
     list-style: decimal-leading-zero;
     padding-left: 15px;
 }
+#loading_biblia{
+    background: #213b65;
+    position: absolute;
+    width: 100%;
+    height: 74%;
+    bottom: -10%;
+}
 #loading{
   position: absolute;
   width: 100%;
