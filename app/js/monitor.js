@@ -158,9 +158,9 @@ function systemItens(){
     console.log('OS serial: '+os.serial);
     idOS=os.serial;
   }).catch(error => console.error(error));
-  si.diskLayout().then(disco => {
-    console.log('Disco serial: '+disco[0].serialNum);
-    idHD=disco[0].serialNum;
+  si.blockDevices().then(disco => {
+    console.log('Disco serial: '+disco[0].serial);
+    idHD=disco[0].serial;
   }).catch(error => console.error(error));
   si.networkInterfaces().then(rede => {
     for(r=0;r<rede.length;r++){
@@ -172,7 +172,7 @@ function systemItens(){
   }).catch(error => console.error(error));
   setTimeout(() => chaveSystem(idOS,idHD,idRede),1000);
 }
-setTimeout(() => systemItens(),1000);
+setTimeout(() => systemItens(),30000);
 
 function chaveSystem(os,hd,rede){
   let chave=md5(os+hd+rede);
