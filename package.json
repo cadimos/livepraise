@@ -47,7 +47,7 @@
     "blueimp-md5": "^2.10.0",
     "child-process-promise": "^2.2.1",
     "draggabilly": "^2.2.0",
-    "express": "^4.16.4",
+    "express": "^4.17.0",
     "graceful-fs": "^4.1.15",
     "jquery": "^3.4.1",
     "jquery-confirm": "^3.3.2",
@@ -56,8 +56,8 @@
     "request": "^2.88.0",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
-    "sqlite3": "^4.0.6",
-    "systeminformation": "^4.3.0",
+    "sqlite3": "^4.0.8",
+    "systeminformation": "^4.5.1",
     "webcamjs": "^1.0.25"
   },
   "devDependencies": {

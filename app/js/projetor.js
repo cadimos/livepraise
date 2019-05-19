@@ -64,7 +64,7 @@ function viewMusica(vl){
 function viewBiblia(vl){
 	$('.conteudo').html('');
 	$('.conteudo').append(vl);
-	$('.content').textfill({maxFontPixels: -1});
+	$('.content').textfill({maxFontPixels: CalculaLinhas(5,'.content')});
 	$('.content').css('text-align','left');
 	$('.titulo').css('font-size','35px');
 }
@@ -76,7 +76,13 @@ function removeConteudo(){
 function atualizar(){
 	location.reload();
 }
-
+function CalculaLinhas(quant,div){
+  let largura=$(div).innerWidth();
+  let altura=$(div).innerHeight();
+  carcteres_linha=50;
+  font=((altura/quant)-(largura/carcteres_linha))-quant;
+  return font;
+}
 function ajustarTela(largura,altura){
 	screenWidth = screen.width;
   screenHeight = screen.height;

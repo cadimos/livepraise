@@ -1003,7 +1003,7 @@ function viewBiblia(id,nome,br){
   <div class="content"><span>${txt}</span></div>
   <div class="rodape"></div>`;
   $('.conteudo').append(modelo);
-  $('.content').textfill({maxFontPixels: 0,debug: true  });
+  $('.content').textfill({maxFontPixels: CalculaLinhas(5,'.content'),debug: true  });
   $('.content').css('text-align','left');
   $('.titulo').css('font-size','20px');
   nome=nome.split('-');
@@ -1030,6 +1030,8 @@ function viewBiblia(id,nome,br){
 
 }
 //Scroll da Biblia
+var biblia_scroll=0;
+var biblia_scroll_qtd=0;
 function scrollBiblia(){
   let pos_ini=$('#biblias #preview-list').offset().top;
   let vLivro=$('.biblia_livro.in').length;
@@ -1048,13 +1050,19 @@ function scrollBiblia(){
       }
     }
   }
-  pos=pos-pos_ini;
-  if(pos!=pos_ini){
+  if(pos!=0){
+    pos=pos-pos_ini;
+  }
+  if(pos!=pos_ini || pos!=biblia_scroll){
+    biblia_scroll=pos;
+    console.log(pos);
+    console.log(biblia_scroll_qtd);
+    biblia_scroll_qtd++;
     $('#biblias #preview-list').animate({scrollTop: pos}, 500);
   }
 }
 // Busco na biblia
-function buscaBiblia(){
+function buscaBiblia(){biblia_scroll
   texto=$('#busca_biblia').val();
   n=texto.substr(0,1);
   n=n.match(/\d/g);
@@ -1104,9 +1112,12 @@ function buscaBiblia(){
       scrollBiblia()
     }
     if(versiculo){
-      $('#versiculo_'+capitulo+'_'+versiculo).trigger('click');
-      $('#versiculo_'+capitulo+'_'+versiculo).trigger('focus');
-      scrollBiblia()
+      LimpaBiblia();
+      if($('#versiculo_'+capitulo+'_'+versiculo).length){
+        $('#versiculo_'+capitulo+'_'+versiculo).trigger('click');
+        $('#versiculo_'+capitulo+'_'+versiculo).trigger('focus');
+        scrollBiblia()
+      }
     }
   }
 }
@@ -1120,11 +1131,23 @@ function SetIDLivro(id){
 }
 function IDLivro(str){
   db.serialize(function() {
-    db.each("SELECT id FROM biblia_livros WHERE `nome` LIKE '"+str+"%' OR `nome2` LIKE '"+str+"%' LIMIT 1", function(err, biblia) {
-      SetIDLivro(biblia.id);
+    db.each("SELECT COUNT() as total,id FROM biblia_livros WHERE `nome` LIKE '"+str+"%' OR `nome2` LIKE '"+str+"%' LIMIT 1", function(err, result) {
+      SetIDLivro(result.id);
     });
   });
   return SetIDLivro();
+}
+function LimpaBiblia(){
+  $.each($('.versiculo'), function () {
+    $(this).removeClass('ativo');
+  })
+}
+function CalculaLinhas(quant,div){
+  let largura=$(div).innerWidth();
+  let altura=$(div).innerHeight();
+  carcteres_linha=50;
+  font=((altura/quant)-(largura/carcteres_linha))-quant;
+  return font;
 }
 function viewYoutube(url){
 
