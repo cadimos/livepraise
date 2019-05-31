@@ -913,6 +913,7 @@ function catBiblias(){
 //Lista a Biblia Selecionada
 function lista_biblia(){
   modelo_biblia=`<div class="panel panel-default">
+  <a name="collapse_biblia_[id_livro]"></a>
   <div class="panel-heading" role="tab" id="head_biblia_[id_livro]">
       <h4 class="panel-title">
           <a role="button" data-toggle="collapse" data-parent="#list_biblia" href="#collapse_biblia_[id_livro]" aria-expanded="true" aria-controls="collapse_biblia_[id_livro]">
@@ -928,6 +929,7 @@ function lista_biblia(){
   </div>
 </div>`;
   modelo_capitulos=`<div class="panel panel-success">
+  <a name="collapse_[id_livro]_[id_capitulo]"></a>
   <div class="panel-heading" role="tab" id="head_[id_livro]_[id_capitulo]">
       <h4 class="panel-title">
           <a onclick="lista_versiculo([cat],[id_livro],[id_capitulo])" role="button" data-toggle="collapse" data-parent="#list_biblia_[id_livro]" href="#collapse_[id_livro]_[id_capitulo]" aria-expanded="true" aria-controls="collapse1">
@@ -978,7 +980,7 @@ function lista_biblia(){
 
 //Funçao de Listar os Versiculos por demanda
 function lista_versiculo(cat,livro,capitulo){
-  modelo_versiculo=`<li onclick="viewBiblia('versiculo_[id_capitulo]_[id_versiculo]','[local_biblia]','BR');" id="versiculo_[id_capitulo]_[id_versiculo]" class="versiculo">[texto]</li>`;
+  modelo_versiculo=`<a name="versiculo_[id_capitulo]_[id_versiculo]"></a><li onclick="viewBiblia('versiculo_[id_capitulo]_[id_versiculo]','[local_biblia]','BR');" id="versiculo_[id_capitulo]_[id_versiculo]" class="versiculo">[texto]</li>`;
   modelo_versiculo=modelo_versiculo.replace(/\[id_livro\]/g,livro);
   modelo_versiculo=modelo_versiculo.replace(/\[id_capitulo\]/g,capitulo);
   db.serialize(function() {
@@ -1029,40 +1031,8 @@ function viewBiblia(id,nome,br){
   }
 
 }
-//Scroll da Biblia
-var biblia_scroll=0;
-var biblia_scroll_qtd=0;
-function scrollBiblia(){
-  let pos_ini=$('#biblias #preview-list').offset().top;
-  let vLivro=$('.biblia_livro.in').length;
-  let vCapitulo=$('.biblia_capitulo.in').length;
-  let vVersiculo=$('.versiculo.ativo').length;
-  let pos=0;
-  if(vLivro){
-    pos_livro=$('.biblia_livro.in').offset().top;
-    pos=pos_livro;
-    if(vCapitulo){
-      pos_capitulo=$('.biblia_capitulo.in').offset().top;
-      pos=pos_capitulo;
-      if(vVersiculo){
-        pos_versiculo=$('.versiculo.ativo').offset().top;
-        pos=pos_versiculo;
-      }
-    }
-  }
-  if(pos!=0){
-    pos=pos-pos_ini;
-  }
-  if(pos!=pos_ini || pos!=biblia_scroll){
-    biblia_scroll=pos;
-    console.log(pos);
-    console.log(biblia_scroll_qtd);
-    biblia_scroll_qtd++;
-    $('#biblias #preview-list').animate({scrollTop: pos}, 500);
-  }
-}
 // Busco na biblia
-function buscaBiblia(){biblia_scroll
+function buscaBiblia(){
   texto=$('#busca_biblia').val();
   n=texto.substr(0,1);
   n=n.match(/\d/g);
@@ -1088,7 +1058,9 @@ function buscaBiblia(){biblia_scroll
   }
   if(att_livro=='false'){
     $('#head_biblia_'+IDLivro(livro)+' a').trigger('click');
-    scrollBiblia();
+    let ancora="#collapse_biblia_"+IDLivro(livro);
+    location.href=ancora;
+    $('#busca_biblia').focus();
   }
   if(ref!=''){
     if(ref.indexOf(":")>0){
@@ -1109,14 +1081,18 @@ function buscaBiblia(){biblia_scroll
     }
     if(att_cap=='false'){
       $('#head_'+IDLivro(livro)+'_'+capitulo+' a').trigger('click');
-      scrollBiblia()
+      let ancora="#collapse_biblia_"+IDLivro(livro)+'_'+capitulo;
+      location.href=ancora;
+      $('#busca_biblia').focus();
     }
     if(versiculo){
       LimpaBiblia();
       if($('#versiculo_'+capitulo+'_'+versiculo).length){
         $('#versiculo_'+capitulo+'_'+versiculo).trigger('click');
         $('#versiculo_'+capitulo+'_'+versiculo).trigger('focus');
-        scrollBiblia()
+        let ancora='#versiculo_'+capitulo+'_'+versiculo;
+        location.href=ancora;
+        $('#busca_biblia').focus();
       }
     }
   }
@@ -1259,7 +1235,6 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
           if (index === proximo) {
               $(this).addClass('ativo');
               $(this).trigger('click');
-              scrollBiblia();
           }
           index++;
       })
