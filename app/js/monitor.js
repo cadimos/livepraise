@@ -515,7 +515,7 @@ function viewVideo(url){
 //Lista as Categorias de Musicas
 function catMusicas(){
   db.serialize(function() {
-    db.each("SELECT id,nome FROM cat_musicas", function(err, row) {
+    db.each("SELECT `id`,`nome` FROM cat_musicas", function(err, row) {
       $('#cat_musica').append('<option value="'+row.id+'">'+row.nome+'</option>');
     });
     $('#current_loading').html('Carregado Músicas');
