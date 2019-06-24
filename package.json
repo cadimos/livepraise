@@ -47,22 +47,21 @@
     "blueimp-md5": "^2.10.0",
     "child-process-promise": "^2.2.1",
     "draggabilly": "^2.2.0",
-    "express": "^4.17.0",
+    "express": "^4.17.1",
     "graceful-fs": "^4.1.15",
     "jquery": "^3.4.1",
-    "jquery-confirm": "^3.3.2",
-    "node-abi": "^2.8.0",
+    "node-abi": "^2.9.0",
     "node-pre-gyp": "^0.13.0",
     "request": "^2.88.0",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
-    "sqlite3": "^4.0.8",
-    "systeminformation": "^4.5.1",
+    "sqlite3": "^4.0.9",
+    "systeminformation": "^4.12.2",
     "webcamjs": "^1.0.25"
   },
   "devDependencies": {
     "debug": "^4.1.1",
-    "electron": "^5.0.3",
+    "electron": "^6.0.0-beta.10",
     "electron-packager": "^13.1.1",
     "electron-rebuild": "^1.8.5"
   }
