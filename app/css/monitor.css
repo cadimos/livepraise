@@ -277,6 +277,9 @@ li.ativo{
 .capitulo.active {
     background: #adde98;
 }
+#versiculo li {
+    margin-bottom: 2px;
+}
 @keyframes scale {
   0%, 100% {
     transform: scale(0.0);
