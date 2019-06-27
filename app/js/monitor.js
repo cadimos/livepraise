@@ -10,6 +10,7 @@ var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(dir_app+'/dsw.db');
 const si = require('systeminformation');
 var md5 = require("blueimp-md5");
+var ffmpeg = require('ffmpeg-static');
 
 //Teclado
 const KEY_DOWN = 40;
@@ -432,6 +433,20 @@ function catVideos(){
 }
 
 //Lista Videos
+function gera_thumb(video,img,i){
+  cmd = ffmpeg.path+' -ss 00:00:02 -i '+video+' -vf scale=400:-1 -vframes 1 '+img;
+  exec(cmd).then(function (result) {
+    setTimeout(function(){
+      action=result.childProcess.spawnargs[2];
+      nv_img=action.split('vframes 1 ');
+      nv_img=nv_img[1];
+      $('#video'+i).attr('src',nv_img);
+      console.log(i+' - '+nv_img);
+    },1000);
+  }).catch(function (err) {
+      console.error('ERROR: ', err);
+  });
+}
 function lista_video(dir){
   $('#preview-videos').html('');
   var files = fs.readdirSync(dir);
@@ -456,20 +471,16 @@ function lista_video(dir){
         ext=name.substr(-4);
         ext=ext.replace('.','');
         newVideo=video.replace(ext,'mp4');
-        list='<li><img src="'+img+'" onclick="viewVideo(\''+btoa(newVideo)+'\')"></li>';
+        list='<li><img id="video'+i+'" src="'+img+'" onclick="viewVideo(\''+btoa(newVideo)+'\')"></li>';
         if (fs.existsSync(img)) {
           //Se o arquivo existir
           $('#preview-videos').append(list);
         }else{
           //Se não existir
-          cmd = 'ffmpeg -ss 00:00:02 -i '+video+' -vf scale=400:-1 -vframes 1 '+img;
-          exec(cmd).then(function (result) {
-
-          }).catch(function (err) {
-              console.error('ERROR: ', err);
-          });
+          gera_thumb(video,img,i);
+          
           if(ext!='mp4'){
-            cnv = 'ffmpeg -i '+video+' -f mp4 -vcodec libx264 -preset fast -profile:v main -acodec aac '+newVideo+' -hide_banner';
+            cnv = ffmpeg.path+' -i '+video+' -f mp4 -vcodec libx264 -preset fast -profile:v main -acodec aac '+newVideo+' -hide_banner';
             exec(cnv).then(function(result){
               fs.unlink(video, (err) => {
               });
