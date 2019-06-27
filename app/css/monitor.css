@@ -271,6 +271,12 @@ li.ativo{
 .jconfirm {
     color: #333;
 }
+.livro.active {
+    background: #ccc;
+}
+.capitulo.active {
+    background: #adde98;
+}
 @keyframes scale {
   0%, 100% {
     transform: scale(0.0);

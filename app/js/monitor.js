@@ -914,7 +914,7 @@ function catBiblias(){
 function lista_biblia(){
   modelo_biblia=`<div class="panel panel-default">
   <a name="collapse_biblia_[id_livro]"></a>
-  <div class="panel-heading" role="tab" id="head_biblia_[id_livro]">
+  <div class="panel-heading livro" role="tab" id="head_biblia_[id_livro]">
       <h4 class="panel-title">
           <a role="button" data-toggle="collapse" data-parent="#list_biblia" href="#collapse_biblia_[id_livro]" aria-expanded="true" aria-controls="collapse_biblia_[id_livro]">
               [nome_livro]
@@ -930,7 +930,7 @@ function lista_biblia(){
 </div>`;
   modelo_capitulos=`<div class="panel panel-success">
   <a name="collapse_[id_livro]_[id_capitulo]"></a>
-  <div class="panel-heading" role="tab" id="head_[id_livro]_[id_capitulo]">
+  <div class="panel-heading capitulo" role="tab" id="head_[id_livro]_[id_capitulo]">
       <h4 class="panel-title">
           <a onclick="lista_versiculo([cat],[id_livro],[id_capitulo])" role="button" data-toggle="collapse" data-parent="#list_biblia_[id_livro]" href="#collapse_[id_livro]_[id_capitulo]" aria-expanded="true" aria-controls="collapse1">
             <i class="fas fa-bible"></i>  [id_capitulo]
@@ -964,6 +964,7 @@ function lista_biblia(){
           setTimeout(() => fechar_loandig(),100);
           setTimeout(function(){
             $('#loading_biblia').remove();
+            active_biblies();
           },200);
         }
         $('#current_loading').html('Listando Livros da Biblias: '+biblia.nome+' '+biblia_capitulos.capitulo);
@@ -975,6 +976,16 @@ function lista_biblia(){
         }
       });
     });
+  });
+}
+// Muda cor nos livros
+function active_biblies(){
+  $('#list_biblia .panel-collapse').on('show.bs.collapse', function () {
+    $(this).siblings('.panel-heading').addClass('active');
+  });
+
+  $('#list_biblia .panel-collapse').on('hide.bs.collapse', function () {
+    $(this).siblings('.panel-heading').removeClass('active');
   });
 }
 
