@@ -85,7 +85,7 @@ function CalculaLinhas(quant,div){
 }
 function ajustarTela(largura,altura){
 	screenWidth = screen.width;
-  screenHeight = screen.height;
+  	screenHeight = screen.height;
 	if(!altura){
 		if(!largura){
 			db.serialize(function() {

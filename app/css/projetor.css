@@ -11,18 +11,18 @@ body {
     top: 0;
 }
 #fundo img{
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     display: none;
 }
 #fundo video{
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     object-fit: fill;
 }
 #video{
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     display: none;
 }
 .conteudo{
