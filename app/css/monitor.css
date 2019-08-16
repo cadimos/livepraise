@@ -257,6 +257,9 @@ li.ativo{
 .rodape{
     height: 5vh;
     padding-left: 1vh;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .alerta{
     position: absolute;

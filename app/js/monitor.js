@@ -1,7 +1,8 @@
 //Variaveis Globais
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 const dir_app = process.cwd();
-const fs = require('fs');
+//const fs = require('fs');
+const fs = require('graceful-fs');
 const exec = require('child-process-promise').exec;
 var request = require('request');//Teste
 var socket = io.connect("http://localhost:3000");

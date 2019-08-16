@@ -51,6 +51,9 @@ body {
 .rodape{
     height: 5vh;
     margin-left: 5vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .alerta{
     position: absolute;

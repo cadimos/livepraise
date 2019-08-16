@@ -19,6 +19,22 @@
         <link rel="shortcut icon" type="image/png" href="icon/livepraise.png" />
     </head>
     <body>
+        <script src="js/notication.js" async></script>
+    	<script>
+    		window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
+                msg='Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber+ ' Column: ' + column + ' StackTrace: ' +  errorObj;
+                dataString = 'erro='+msg;
+                $.ajax({
+                    type: "POST",
+                    url: "https://api.cadimos.tk/erro",
+                    data: dataString,
+                    dataType: "html",
+                    success: function(data) {
+                        Notify('Erro Identificado!','Foi encontrado um erro! Já estamos trabalhando para resolver o problema');
+                    }
+                });
+    		}
+    	</script>
         <!-- Loading -->
         <div id="loading">
             <div id="loading_content">
