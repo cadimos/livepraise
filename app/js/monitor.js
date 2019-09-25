@@ -299,19 +299,19 @@ function removeConteudo(){
 
 //Troca o Fundo da Tela
 function background(url){
-  $('#video').css('display','none');
-  $('#preview img').css('display','block');
-  $("#preview img").fadeOut(150, function() {
-  $("#preview img").attr('src',atob(url));
-  }).fadeIn(200);
-  if(congelar('valida')==true){
-    var text = '{"funcao":[' +
-  '{"nome":"background","valor":"'+url+'" }]}';
-    socket.emit("send", text);
-  }
-  if($('#player').length){
+ 	$('#video').css('display','none');
+	$('#preview img').css('display','block');
+	$("#preview img").fadeOut(150, function() {
+	$("#preview img").attr('src',atob(url));
+	}).fadeIn(200);
+	if(congelar('valida')==true){
+	var text = '{"funcao":[' +
+	'{"nome":"background","valor":"'+url+'" }]}';
+	socket.emit("send", text);
+	}
+  	if($('#player').length){
 		let player = document.getElementById("player");
-    player.pause();
+    	player.pause();
 	}
 }
 
@@ -436,8 +436,8 @@ function catVideos(){
 //Lista Videos
 function gera_thumb(video,img,i){
   cmd = ffmpeg.path+' -ss 00:00:02 -i '+video+' -vf scale=400:-1 -vframes 1 '+img;
-  exec(cmd).then(function (result) {
-    setTimeout(function(){
+  exec(cmd).then((result) => {
+    setTimeout(() =>{
       action=result.childProcess.spawnargs[2];
       nv_img=action.split('vframes 1 ');
       nv_img=nv_img[1];
@@ -470,7 +470,7 @@ function lista_video(dir){
         img=img.replace('.avi','.jpg');
         video=name;
         ext=name.substr(-4);
-        ext=ext.replace('.','');
+        ext=ext.replace(/\./g,'');
         newVideo=video.replace(ext,'mp4');
         list='<li><img id="video'+i+'" src="'+img+'" onclick="viewVideo(\''+btoa(newVideo)+'\')"></li>';
         if (fs.existsSync(img)) {
@@ -495,18 +495,14 @@ function lista_video(dir){
         }
       }
     }catch(e){
-        // Handle error
-        if(e.code == 'ENOENT'){
-          //no such file or directory
-          //do something
-        }else {
-          //do something else
-        }
     }
   }
   $('#current_loading').html('Carregado Preview de Vídeos');
 }
-
+function play_video(){
+	player.play();
+	player.volume=0;
+}
 //Visualiza o Video
 function viewVideo(url){
   $('#preview img').css('display','none');
@@ -519,7 +515,7 @@ function viewVideo(url){
   $('#video').html('');
   $('#video').append('<video id="player" controls loop="true" autoplay><source src="'+atob(url)+'" type="video/mp4"></video>');
   let player = document.getElementById("player");
-  setTimeout(() => player.play(),200);
+  setTimeout(() => play_video(),200);
 }
 
 // Funções de Música

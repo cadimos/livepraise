@@ -2,6 +2,7 @@ var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
 const io = require('socket.io')(http);
+const porta = 3000;
 
 app.use(express.static('public'));
 app.get('/', function(req, res){
@@ -31,6 +32,6 @@ io.on("connection", function (client) {
     });
 });
 
-http.listen(3000, function(){
+http.listen(porta, function(){
     console.log('Iniciado servidor!');
 });
