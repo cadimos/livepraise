@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>DSW - Projeção</title>
+    <!-- Projetor -->
+    <link rel="stylesheet" type="text/css" href="css/projetor.css">
+</head>
+
+<body>
+    <script>
+        window.$ = window.jQuery = require("jquery");
+    </script>
+    <script crossorigin src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/socket.io-client/dist/socket.io.js"></script>
+    <!-- Jquery TextFill -->
+    <script src="js/jquery.textfill.min.js"></script>
+    <!-- Projetor -->
+    <script src="js/projetor.js"></script>
+    <div id="fundo">
+        <img>
+        <div id="video">
+            <video id="player" muted loop="true"></video>
+        </div>
+        <div class="conteudo"></div>
+    </div>
+    <ul class="chat">
+    </ul>
+</body>
+
+</html>
