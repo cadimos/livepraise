@@ -1053,65 +1053,68 @@ function viewBiblia(id,nome,br){
 // Busco na biblia
 function buscaBiblia(){
   texto=$('#busca_biblia').val();
-  n=texto.substr(0,1);
-  n=n.match(/\d/g);
-  str=texto.split(' ');
-  if(n && str.length>1){
-    livro=str[0]+' '+str[1];
-    if(str.length>2){
-      ref=str[2];
-    }else{
-      ref='';
-    }
-  }else{
-    livro=str[0];
-    if(str.length>1){
-      ref=str[1];
-    }else{
-      ref='';
-    }
-  }
-  att_livro=$('#collapse_biblia_'+IDLivro(livro)+'.in').length;
-  if(!att_livro){
-    att_livro='false';
-  }
-  if(att_livro=='false'){
-    $('#head_biblia_'+IDLivro(livro)+' a').trigger('click');
-    let ancora="#collapse_biblia_"+IDLivro(livro);
-    location.href=ancora;
-    $('#busca_biblia').focus();
-  }
-  if(ref!=''){
-    if(ref.indexOf(":")>0){
-      i=ref.split(':');
-      capitulo=i[0];
-      if(i.length>1){
-        versiculo=i[1];
+  if(texto.length>1){
+    n=texto.substr(0,1);
+    n=n.match(/\d/g);
+    str=texto.split(' ');
+    if(n && str.length>1){
+      livro=str[0]+' '+str[1];
+      if(str.length>2){
+        ref=str[2];
       }else{
-        versiculo='';
+        ref='';
       }
     }else{
-      capitulo=ref;
-      versiculo='';
+      livro=str[0];
+      console.log(livro)
+      if(str.length>1){
+        ref=str[1];
+      }else{
+        ref='';
+      }
     }
-    att_cap=$('#collapse_'+IDLivro(livro)+'_'+capitulo+'.in').length;
-    if(!att_cap){
-      att_cap='false';
+    att_livro=$('#collapse_biblia_'+IDLivro(livro)+'.in').length;
+    if(!att_livro){
+      att_livro='false';
     }
-    if(att_cap=='false'){
-      $('#head_'+IDLivro(livro)+'_'+capitulo+' a').trigger('click');
-      let ancora="#collapse_biblia_"+IDLivro(livro)+'_'+capitulo;
+    if(att_livro=='false'){
+      $('#head_biblia_'+IDLivro(livro)+' a').trigger('click');
+      let ancora="#collapse_biblia_"+IDLivro(livro);
       location.href=ancora;
       $('#busca_biblia').focus();
     }
-    if(versiculo){
-      LimpaBiblia();
-      if($('#versiculo_'+capitulo+'_'+versiculo).length){
-        $('#versiculo_'+capitulo+'_'+versiculo).trigger('click');
-        $('#versiculo_'+capitulo+'_'+versiculo).trigger('focus');
-        let ancora='#versiculo_'+capitulo+'_'+versiculo;
+    if(ref!=''){
+      if(ref.indexOf(":")>0){
+        i=ref.split(':');
+        capitulo=i[0];
+        if(i.length>1){
+          versiculo=i[1];
+        }else{
+          versiculo='';
+        }
+      }else{
+        capitulo=ref;
+        versiculo='';
+      }
+      att_cap=$('#collapse_'+IDLivro(livro)+'_'+capitulo+'.in').length;
+      if(!att_cap){
+        att_cap='false';
+      }
+      if(att_cap=='false'){
+        $('#head_'+IDLivro(livro)+'_'+capitulo+' a').trigger('click');
+        let ancora="#collapse_biblia_"+IDLivro(livro)+'_'+capitulo;
         location.href=ancora;
         $('#busca_biblia').focus();
+      }
+      if(versiculo){
+        LimpaBiblia();
+        if($('#versiculo_'+capitulo+'_'+versiculo).length){
+          $('#versiculo_'+capitulo+'_'+versiculo).trigger('click');
+          $('#versiculo_'+capitulo+'_'+versiculo).trigger('focus');
+          let ancora='#versiculo_'+capitulo+'_'+versiculo;
+          location.href=ancora;
+          $('#busca_biblia').focus();
+        }
       }
     }
   }
@@ -1125,8 +1128,9 @@ function SetIDLivro(id){
   }
 }
 function IDLivro(str){
+  SetIDLivro(0);
   db.serialize(function() {
-    db.each("SELECT COUNT() as total,id FROM biblia_livros WHERE `nome` LIKE '"+str+"%' OR `nome2` LIKE '"+str+"%' LIMIT 1", function(err, result) {
+    db.each("SELECT id FROM biblia_livros WHERE `nome` LIKE '"+str+"%' OR `nome2` LIKE '"+str+"%' LIMIT 1", function(err, result) {
       SetIDLivro(result.id);
     });
   });

@@ -1,5 +1,5 @@
 var socket = io.connect("http://localhost:3000");
-socket.emit("join", 'Monitor');
+socket.emit("join", 'Remoto');
 
 //Teclado
 const KEY_DOWN = 40;
@@ -224,6 +224,7 @@ function lista_background_rapido(){
 	  </a>
 	</div>`;
   $('#background-rapido').html('');
+  /*
   db.serialize(function() {
     db.each("SELECT url,diretorio,inicial FROM background_rapido ORDER BY id ASC", function(err, res) {
       if(res.diretorio=='/'){
@@ -240,15 +241,18 @@ function lista_background_rapido(){
     });
     $('#current_loading').html('Background Rápido');
   });
+  */
 }
 
 //Marca o tipo de tela de projecao atual
 function lista_tela(){
+  /*
   db.serialize(function() {
     db.each("SELECT tipo,largura,altura FROM tela", function(err, res) {
       $('#tamanho_tela').val(res.tipo);
     });
   });
+  */
 }
 
 //Ajustar tela
@@ -363,6 +367,7 @@ function congelar(acao){
 //Lista a Categoria das Imagens
 function catImagens(){
   $('#cat_imagens').html();
+  /*
   dir=dir_app+'/Dados/imagens';
   var files = fs.readdirSync(dir);
   for (var i in files){
@@ -379,6 +384,7 @@ function catImagens(){
     }
   }
   $('#current_loading').html('Carregado Imagens');
+  */
 }
 
 //Lista Imagens
@@ -403,6 +409,7 @@ function lista_imagem(dir){
 //Lista as Categorias de Videos
 function catVideos(){
   $('#cat_imagens').html();
+  /*
   dir=dir_app+'/Dados/videos';
   var files = fs.readdirSync(dir);
   for (var i in files){
@@ -419,6 +426,7 @@ function catVideos(){
     }
   }
   $('#current_loading').html('Carregado Vídeos');
+  */
 }
 
 //Lista Videos
@@ -510,12 +518,14 @@ function viewVideo(url){
 
 //Lista as Categorias de Musicas
 function catMusicas(){
+  /*
   db.serialize(function() {
     db.each("SELECT `id`,`nome` FROM cat_musicas", function(err, row) {
       $('#cat_musica').append('<option value="'+row.id+'">'+row.nome+'</option>');
     });
     $('#current_loading').html('Carregado Músicas');
   });
+  */
 }
 
 //Lista as Musicas
@@ -543,6 +553,7 @@ function lista_musica(){
       </div>`;
 
       $('#list_music').html('');
+      /*
       db.serialize(function() {
         db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"' ORDER BY nome ASC", function(err, musica) {
           item=modelo.replace(/\[id_musica\]/g,musica.id);
@@ -558,6 +569,7 @@ function lista_musica(){
         });
         $('#current_loading').html('Listado Músicas');
       });
+      */
   	}else{
   		setTimeout(() => lista_musica(),200);
   	}
@@ -898,12 +910,14 @@ function viewMusica(id,nome,br){
 
 //Lista as Biblias Disponiveis
 function catBiblias(){
+  /*
   db.serialize(function() {
     db.each("SELECT id,nome FROM cat_biblia", function(err, row) {
       $('#cat_biblia').append('<option value="'+row.id+'">'+row.nome+'</option>');
     });
     $('#current_loading').html('Carregando Biblias');
-  });
+  }); 
+  */
 }
 
 //Lista a Biblia Selecionada
@@ -942,6 +956,7 @@ function lista_biblia(){
 </div>`;
   $('#list_biblia').html('');
   $('#biblias #preview-list').append('<div id="loading_biblia"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span>Carregando Biblia</span></div>');
+  /*
   db.serialize(function() {
     db.each("SELECT id,nome FROM biblia_livros", function(err, biblia) {
       $('#current_loading').html('Listando Livros da Biblias');
@@ -957,11 +972,13 @@ function lista_biblia(){
         if(biblia.id==66 && biblia_capitulos.capitulo==22){
           $('#current_loading').html('Listado Biblias');
           $('#loading_biblia span').html('Listado Capitulos da Biblia');
+          */
           setTimeout(() => fechar_loandig(),100);
           setTimeout(function(){
             $('#loading_biblia').remove();
             active_biblies();
           },200);
+          /*
         }
         $('#current_loading').html('Listando Livros da Biblias: '+biblia.nome+' '+biblia_capitulos.capitulo);
         $('#loading_biblia span').html('Listando Livros da Biblias: '+biblia.nome+' '+biblia_capitulos.capitulo);
@@ -973,6 +990,7 @@ function lista_biblia(){
       });
     });
   });
+  */
 }
 // Muda cor nos livros
 function active_biblies(){
