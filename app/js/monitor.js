@@ -12,6 +12,56 @@ var db = new sqlite3.Database(dir_app+'/dsw.db');
 const si = require('systeminformation');
 var md5 = require("blueimp-md5");
 var ffmpeg = require('ffmpeg-static');
+socket.on("chat", function(client,msg) {
+  if(client=='Remoto'){
+    obj = JSON.parse(msg);
+		fn=obj.funcao[0].nome;
+		vl=obj.funcao[0].valor;
+		vl=atob(vl);
+		console.log('Função: '+fn+' e Valor: '+vl);
+		switch(fn){
+			case 'background':
+				background(vl);
+			break;
+
+			case 'texto':
+				texto(vl);
+			break;
+
+			case 'video':
+				video(vl);
+			break;
+
+			case 'removeConteudo':
+				removeConteudo();
+			break;
+
+			case 'atualizar':
+				atualizar();
+			break;
+
+			case 'viewMusica':
+				viewMusica(vl);
+			break;
+
+			case 'viewBiblia':
+				viewBiblia(vl);
+			break;
+
+			case 'ajustarTela':
+				v=vl.indexOf('x');
+				if(v<0){
+					ajustarTela(vl);
+				}else{
+					medidas=vl.split('x');
+					w=medidas[0];
+					h=medidas[1];
+					ajustarTela(w,h);
+				}
+			break;
+		}
+  }
+});
 
 //Teclado
 const KEY_DOWN = 40;
@@ -221,10 +271,12 @@ function chaveSystem(os,hd,rede){
 //Fim Loanding
 
 //Atualizar e Regarregar Janelas
-function atualizar(){
+function atualizar(vl){
   let txt='ok';
-  let text = '{"funcao":[' +'{"nome":"atualizar","valor":"'+btoa(txt)+'" }]}';
-  socket.emit("send", text);
+  if(vl!=txt){
+    let text = '{"funcao":[' +'{"nome":"atualizar","valor":"'+btoa(txt)+'" }]}';
+    socket.emit("send", text);
+  }
   setTimeout(() => location.reload(),100);
 }
 

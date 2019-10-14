@@ -1,5 +1,55 @@
 var socket = io.connect("http://localhost:3000");
 socket.emit("join", 'Remoto');
+socket.on("chat", function(client,msg) {
+  if(client=='Monitor'){
+    obj = JSON.parse(msg);
+		fn=obj.funcao[0].nome;
+		vl=obj.funcao[0].valor;
+		vl=atob(vl);
+		console.log('Função: '+fn+' e Valor: '+vl);
+		switch(fn){
+			case 'background':
+				background(vl);
+			break;
+
+			case 'texto':
+				texto(vl);
+			break;
+
+			case 'video':
+				video(vl);
+			break;
+
+			case 'removeConteudo':
+				removeConteudo();
+			break;
+
+			case 'atualizar':
+				atualizar(vl);
+			break;
+
+			case 'viewMusica':
+				viewMusica(vl);
+			break;
+
+			case 'viewBiblia':
+				viewBiblia(vl);
+			break;
+
+			case 'ajustarTela':
+				v=vl.indexOf('x');
+				if(v<0){
+					ajustarTela(vl);
+				}else{
+					medidas=vl.split('x');
+					w=medidas[0];
+					h=medidas[1];
+					ajustarTela(w,h);
+				}
+			break;
+		}
+  }
+});
 
 //Teclado
 const KEY_DOWN = 40;
@@ -116,8 +166,8 @@ function parar_cor(){
 }
 
 function loanding(){
-  $('#current_loading').html('Iniciando Animaçao');
-  color_animate(5000);
+  $('#current_loading').html('Iniciando...');
+  color_animate(4000);
   $('#current_loading').html('Carregando Imagens');
   catImagens();
   $('#current_loading').html('Carregando Vídeos');
@@ -138,81 +188,16 @@ function fechar_loandig(){
   $('#loading').css('display','none');
 }
 
-setTimeout(() => loanding(), 200);
-
-function systemItens(){
-  idOS='';
-  idHD='';
-  idRede='';
-  si.osInfo().then(os => {
-    console.log('OS serial: '+os.serial);
-    idOS=os.serial;
-  }).catch(error => console.error(error));
-  si.blockDevices().then(disco => {
-    console.log('Disco serial: '+disco[0].serial);
-    idHD=disco[0].serial;
-  }).catch(error => console.error(error));
-  si.networkInterfaces().then(rede => {
-    for(r=0;r<rede.length;r++){
-      if(rede[r].mac){
-        console.log('Rede Mac: '+rede[r].mac);
-        idRede=rede[r].mac;
-      }
-    }
-  }).catch(error => console.error(error));
-  setTimeout(() => chaveSystem(idOS,idHD,idRede),1000);
-}
-setTimeout(() => systemItens(),30000);
-
-function chaveSystem(os,hd,rede){
-  let chave=md5(os+hd+rede);
-  db.serialize(function() {
-    db.each("SELECT * FROM system", function(err, res) {
-      if(os!=res.os){
-        if(res.os==0){
-          db.run("UPDATE `system` SET `os`='"+os+"'");
-        }else{
-          console.log('OS Alterado');
-        }
-      }
-      if(hd!=res.hd){
-        if(res.hd==0){
-          db.run("UPDATE `system` SET `hd`='"+hd+"'");
-        }else{
-          console.log('HD Alterado');
-        }
-      }
-      if(rede!=res.mac){
-        if(res.mac==0){
-          db.run("UPDATE `system` SET `mac`='"+rede+"'");
-        }else{
-          console.log('Rede Alterado');
-        }
-      }
-      if(chave!=res.chave){
-        if(res.chave==0){
-          db.run("UPDATE `system` SET `chave`='"+chave+"'");
-        }else{
-          console.log('Chave Alterado');
-        }
-      }
-    });
-  });
-  msg=`
-  OS: ${os}
-  HD: ${hd}
-  Rede: ${rede}
-  Chave: ${chave}
-  `;
-  console.log(msg);
-}
+loanding();
 //Fim Loanding
 
 //Atualizar e Regarregar Janelas
-function atualizar(){
+function atualizar(vl){
   let txt='ok';
-  let text = '{"funcao":[' +'{"nome":"atualizar","valor":"'+btoa(txt)+'" }]}';
-  socket.emit("send", text);
+  if(vl!=txt){
+    let text = '{"funcao":[' +'{"nome":"atualizar","valor":"'+btoa(txt)+'" }]}';
+    socket.emit("send", text);
+  }
   setTimeout(() => location.reload(),100);
 }
 
