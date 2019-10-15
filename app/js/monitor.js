@@ -1148,6 +1148,7 @@ function buscaBiblia(){
         capitulo=ref;
         versiculo='';
       }
+      capitulo=capitulo.replace(';','');
       att_cap=$('#collapse_'+IDLivro(livro)+'_'+capitulo+'.in').length;
       if(!att_cap){
         att_cap='false';
