@@ -392,7 +392,8 @@ function texto(id,br){
   if(br=='BR'){
     txt=nl2br(txt);
   }
-  $('.content').append('<span>'+txt+'</span>');
+  txt=`<span>${txt}</span>`
+  $('.content').append(txt);
   $('.content').textfill({
     maxFontPixels: 0
   });
