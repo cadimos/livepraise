@@ -90,7 +90,7 @@ function ajustarTela(largura,altura){
 		if(!largura){
 			db.serialize(function() {
 				db.each("SELECT tipo,largura,altura FROM tela", function(err, res) {
-					if(res.tipo=='16:9' || res.tipo=='4:3' || res.tipo=='padrao'){
+					if(res.tipo=='16:9' || res.tipo=='4:3' || res.tipo=='7:3'|| res.tipo=='5:3'|| res.tipo=='13:7' || res.tipo=='padrao'){
 						ajustarTela(res.tipo);
 					}else{
 						ajustarTela(res.largura,res.altura);

@@ -392,7 +392,8 @@ function texto(id,br){
   if(br=='BR'){
     txt=nl2br(txt);
   }
-  $('.content').append('<span>'+txt+'</span>');
+  txt=`<span>${txt}</span>`
+  $('.content').append(txt);
   $('.content').textfill({
     maxFontPixels: 0
   });
@@ -717,7 +718,7 @@ function buscaMusicaOnline(){
     $('#list_music').append('<div class="alert alert-info" role="alert" id="alerta_pesquisa_musica">Procurando Música na Internet</div>');
     $.ajax({
       type: "GET",
-      url: "https://api.cadimos.tk/busca/musicas/"+encodeURI(busca),
+      url: "https://api.livepraise.tk/busca/musicas/"+encodeURI(busca),
       dataType: "json",
       error: function(erro){
         $('#alerta_pesquisa_musica').remove();
