@@ -40,12 +40,21 @@ function CalculaLinhas(quant,div){
 function background(vl){
 	vl=vl.split("Dados");
 	vl='Dados'+vl[1];
-	console.log(vl);
+	$('#video').css('display','none');
+	$('#fundo img').css('display','block');
+	$("#fundo img").fadeOut(150, function() {
+		$("#fundo img").attr('src',vl);
+		$('#fundo img').css('display','block');
+	}).fadeIn(200);
+	if($('#player').length){
+		let player = document.getElementById("player");
+    player.pause();
+	}
 }
 
 $(document).ready(function(){
     //conecto no socket
-    var url=document.URL.replace('/projetor.html','');
+    var url=document.URL.replace('/projetor_all.html','');
 	var socket = io.connect(url);
 	socket.emit("join", 'Projetor');
 	//Habilito leitura

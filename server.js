@@ -3,12 +3,17 @@ var app = require('express')();
 var http = require('http').Server(app);
 const io = require('socket.io')(http);
 const porta = 3000;
-
-app.use(express.static('public'));
-app.use('/app',express.static('app'));
-app.use('/node_modules',express.static('node_modules'));
-app.get('/', function(req, res){
-    res.send('Bem Vindo ao Sistema de Projeção!');
+if(__dirname.indexOf('resources')<0){
+    var base=__dirname;
+}else{
+    var base = '../../'+__dirname;
+}
+app.use(express.static(__dirname+'/public'));
+app.use('/app',express.static(__dirname+'/app'));
+app.use('/node_modules',express.static(__dirname+'/node_modules'));
+app.use('/Dados',express.static(base+'/Dados'));
+app.get('/teste', function(req, res){
+    res.send('Bem Vindo ao Sistema de Projeção!'+__dirname );
 });
 var clients = {};
 //SocketIO vem aqui
