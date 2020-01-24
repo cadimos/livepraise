@@ -1160,8 +1160,12 @@ function buscaBiblia(){
         $('#busca_biblia').focus();
       }
       versiculo=versiculo.replace(/[^\d]+/g,'');
-      if(versiculo){
+      if(versiculo.length>0){
         LimpaBiblia();
+        att_ver=$('#versiculo_'+capitulo+'_'+versiculo).length;
+        if(!att_ver){
+          att_ver='false';
+        }
         if($('#versiculo_'+capitulo+'_'+versiculo).length){
           $('#versiculo_'+capitulo+'_'+versiculo).trigger('click');
           $('#versiculo_'+capitulo+'_'+versiculo).trigger('focus');
