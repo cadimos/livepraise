@@ -3,7 +3,7 @@ const electron = require('electron');
 //Importo os modulos
 const { app, BrowserWindow, powerSaveBlocker, Menu } = require('electron');
 const id_power_monitor = powerSaveBlocker.start('prevent-display-sleep');
-app.commandLine.hasSwitch('disable-gpu');
+//app.commandLine.hasSwitch('disable-gpu');
 //Inicio a aplicação
 app.on('ready', function() {
     //Pego a altura e largura do monitor principal
@@ -32,8 +32,7 @@ app.on('ready', function() {
         title: 'Live Praise - Projeção',
         icon: __dirname+'/app/icon/livepraise.png',
         webPreferences: {
-            nodeIntegration: true,
-            preload: './preload.js'
+            nodeIntegration: true
         }
     });
     const server = require("./server");
@@ -76,8 +75,7 @@ app.on('ready', function() {
             title: 'Live Praise - Projetor',
             icon: __dirname+'/app/icon/livepraise.png',
             webPreferences: {
-                nodeIntegration: true,
-                preload: './preload.js'
+                nodeIntegration: true
             }
         });
         //Abro a url do monitor externo
