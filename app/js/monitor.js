@@ -1119,7 +1119,6 @@ function buscaBiblia(){
       }
     }else{
       livro=str[0];
-      console.log(livro)
       if(str.length>1){
         ref=str[1];
       }else{
@@ -1149,7 +1148,7 @@ function buscaBiblia(){
         capitulo=ref;
         versiculo='';
       }
-      capitulo=capitulo.replace(';','');
+      capitulo=capitulo.replace(/[^\d]+/g,'');
       att_cap=$('#collapse_'+IDLivro(livro)+'_'+capitulo+'.in').length;
       if(!att_cap){
         att_cap='false';
@@ -1160,8 +1159,13 @@ function buscaBiblia(){
         location.href=ancora;
         $('#busca_biblia').focus();
       }
-      if(versiculo){
+      versiculo=versiculo.replace(/[^\d]+/g,'');
+      if(versiculo.length>0){
         LimpaBiblia();
+        att_ver=$('#versiculo_'+capitulo+'_'+versiculo).length;
+        if(!att_ver){
+          att_ver='false';
+        }
         if($('#versiculo_'+capitulo+'_'+versiculo).length){
           $('#versiculo_'+capitulo+'_'+versiculo).trigger('click');
           $('#versiculo_'+capitulo+'_'+versiculo).trigger('focus');
