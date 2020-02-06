@@ -2,6 +2,7 @@
 const electron = require('electron');
 //Importo os modulos
 const { app, BrowserWindow, powerSaveBlocker, Menu } = require('electron');
+app.allowRendererProcessReuse=false;
 const id_power_monitor = powerSaveBlocker.start('prevent-display-sleep');
 //app.commandLine.hasSwitch('disable-gpu');
 //Inicio a aplicação
