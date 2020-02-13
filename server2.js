@@ -3,8 +3,8 @@ var consign = require('consign');
 var bodyParser = require('body-parser');
 var app = require('express')();
 var http = require('http').Server(app);
-const io = require('socket.io')(http);
-const port = 3000;
+const io = require('socket.io')(http,{cookie: false});
+const config = require('./config');
 if(__dirname.indexOf('resources')<0){
   var base=__dirname;
 }else{
@@ -44,6 +44,6 @@ io.on("connection", function (client) {
 consign()
   .include('modulos')
   .into(app)
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta: ${port}`)
+http.listen(config.port,function(){
+  console.log('Sistema usando porta '+config.port);
 })
