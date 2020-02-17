@@ -1,9 +1,9 @@
 module.exports = app => {
   var sqlite3 = require('sqlite3').verbose();
   const config = require('../config');
-  var db = new sqlite3.Database(config.dir_app+'/dsw.db');
   app.get('/categoria/biblia', (req, res) => {
-      sql="SELECT id,nome FROM cat_biblia";
+      var db = new sqlite3.Database(config.dir_app+'/dsw.db');
+      sql="SELECT * FROM cat_biblia";
       db.all(sql, [], (err, rows) => {
           if (err) {
             res.status(400).json({
@@ -18,8 +18,10 @@ module.exports = app => {
           })
       });
   })
-  app.get('/livros/biblia', (req, res) => {
-    sql="SELECT id,nome FROM biblia_livros";
+  app.get('/livros/biblia/:biblia', (req, res) => {
+    biblia= req.params.biblia;
+    var db = new sqlite3.Database(config.dir_app+'/Dados/biblias/'+biblia);
+    sql="SELECT id,nome FROM livros";
     db.all(sql, [], (err, rows) => {
         if (err) {
           res.status(400).json({
@@ -37,7 +39,8 @@ module.exports = app => {
   app.get('/capitulo/biblia/:biblia/:livro', (req, res) => {
     biblia= req.params.biblia;
     livro= req.params.livro;
-    sql="SELECT DISTINCT capitulo FROM biblia_versiculos WHERE  cat ="+biblia+" AND  livro ="+livro+";"
+    var db = new sqlite3.Database(config.dir_app+'/Dados/biblias/'+biblia);
+    sql="SELECT * FROM livros WHERE  id ="+livro+";"
     db.all(sql, [], (err, rows) => {
         if (err) {
           res.status(400).json({
@@ -56,7 +59,8 @@ module.exports = app => {
     biblia= req.params.biblia;
     livro= req.params.livro;
     capitulo= req.params.capitulo;
-    sql="SELECT id,texto,versiculo FROM biblia_versiculos WHERE  cat ="+biblia+" AND  livro ="+livro+" AND capitulo="+capitulo+";"
+    var db = new sqlite3.Database(config.dir_app+'/Dados/biblias/'+biblia);
+    sql="SELECT id,texto,versiculo FROM versiculos WHERE  livro ="+livro+" AND capitulo="+capitulo+";"
     db.all(sql, [], (err, rows) => {
         if (err) {
           res.status(400).json({
@@ -70,6 +74,16 @@ module.exports = app => {
             "data":rows
         })
     });
+  })
+  app.get('/busca/biblia/:biblia/:busca',(req,res) => {
+    busca= req.params.busca;
+    res.json({
+      "status":"successo",
+      "busca" : busca,
+      "livro" : 1,
+      "capitulo": 2,
+      "versiculo": 3
+    })
   })
 }
 /*
@@ -153,14 +167,6 @@ function buscaBiblia(){
         }
       }
     }
-  }
-}
-var idLivro='';
-function SetIDLivro(id){
-  if(id){
-    idLivro=id;
-  }else{
-    return idLivro;
   }
 }
 function IDLivro(str){
