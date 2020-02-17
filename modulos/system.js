@@ -7,10 +7,10 @@ const exec = require('child-process-promise').exec;
 var request = require('request');//Teste
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(dir_app+'/dsw.db');
-const si = require('systeminformation');
 var md5 = require("blueimp-md5");
 var ffmpeg = require('ffmpeg-static');
 */
+const si = require('systeminformation');
 
 function systemItens(){
   idOS='';
