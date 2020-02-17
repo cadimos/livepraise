@@ -18,3 +18,20 @@ module.exports = app => {
         })
     })
 }
+
+//Lista Imagens
+function lista_imagem(dir){
+  $('#preview-imagens').html('');
+  var files = fs.readdirSync(dir);
+  for (var i in files){
+    var name = dir + '/' + files[i];
+    if (fs.statSync(name).isDirectory()){
+      //É um diretorio
+    }else{
+      img=name;
+      img=img.replace('#','%23');
+      $('#preview-imagens').append('<li><img src="'+img+'" onclick="background(\''+btoa(img)+'\')"></li>')
+    }
+  }
+  $('#current_loading').html('Carregado Preview de Imagens');
+}
