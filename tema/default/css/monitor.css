@@ -1,0 +1,297 @@
+@import url('roboto.css');
+#background-rapido{
+    padding: 0;
+    width: 45vw;
+    height: 45px;
+    float: left;
+    padding-left: 5px;
+}
+#background-rapido img{
+    width: 113px;
+    height: 45px;
+}
+.background-rapido{
+    padding: 0;
+    width: auto;
+}
+
+#preview{
+    width: 45vw;
+    height: 25vw;
+    padding: 0;
+    float: right;
+    background: #000000;
+    border: solid 5px #404040;
+    border-radius: 5px;
+}
+#preview img{
+    width: 100%;
+    height: 100%;
+}
+#preview video{
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+#video{
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+#navegacao-tab{
+    width: 55vw;
+    height: 25vw;
+    padding-left: 0;
+    padding-right: 0;
+    float: left;
+}
+#navegacao-itens{
+    height: 28.4vw;
+    padding: 0;
+    float: left;
+    width: 100vw;
+    margin-top: 10px;
+}
+.container-fluid{
+    padding: 0 !important;
+}
+.chrome-tabs .chrome-tab:nth-child(1) {
+    transform: translate3d(0px, 0, 0)
+}
+
+.chrome-tabs .chrome-tab:nth-child(2) {
+    transform: translate3d(229px, 0, 0)
+}
+.chrome-tab-current .chrome-tab-background-effect {
+    background: #606060;
+}
+.conteudo{
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    color: #ffffff;
+    text-shadow: 2px 2px 0px black, 3px 3px 0 black;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 900;
+}
+.titulo_musica {
+    position: absolute;
+    bottom: -7%;
+}
+form{
+    margin-block-end: 0;
+}
+.chrome-conteudo ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-height: 30vh;
+    overflow: hidden;
+    /*white-space:nowrap;*/
+    display: inline-flex;
+}
+.chrome-conteudo li{
+    border: solid 1px #cccccc;
+    padding: 1vw;
+    width: 10vw;
+    height: 35vh;
+    float: left;
+    overflow: hidden
+}
+#preview-list{
+    overflow-y: scroll;
+    width: 100%;
+    height: 37vh;
+    padding-top: 5px;
+
+}
+#preview-imagens{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: scroll;
+    width: 100%;
+    display: table;
+}
+#preview-imagens li{
+    border: solid 1px #cccccc;
+    padding: 3px;
+    float: left;
+    width: 10.7vw;
+    height: 6vw;
+    list-style: none;
+}
+#preview-imagens img {
+    width: 100%;
+    max-height: 100%;
+}
+#preview-videos{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: scroll;
+    width: 100%;
+    display: table;
+}
+#preview-videos li{
+    border: solid 1px #cccccc;
+    padding: 3px;
+    float: left;
+    width: 10.7vw;
+    height: 6vw;
+    list-style: none;
+}
+#preview-videos img {
+    width: 100%;
+    max-height: 100%;
+}
+#list_music ul{
+    list-style-type: decimal;
+    padding: 0;
+    margin: 0;
+}
+#list_music li{
+    padding-left: 5px;
+}
+li.ativo{
+    border: solid 2px #3000fc;
+}
+.panel-body{
+    padding-top: 0px;
+}
+.panel-title{
+    font-size: 14px;
+}
+.panel{
+    margin-top: 2px;
+}
+.nav-tabs>li>a{
+    color: #495057;
+}
+#navegacao{
+    margin-bottom: 5px;
+}
+.acoes_item{
+    float: right;
+    font-size: 16px;
+}
+.acoes_item a{
+    color: #333333;
+}
+.chrome-tabs-conteudo{
+    max-height: 30vh;
+}
+.panel-group{
+    margin-bottom: 0;
+}
+#versiculo{
+    list-style: decimal-leading-zero;
+    padding-left: 15px;
+}
+#loading_biblia{
+    background: #213b65;
+    position: absolute;
+    width: 100%;
+    height: 74%;
+    bottom: -10%;
+}
+#loading{
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  background: #081d3e;
+  top: 0;
+  z-index: 99999;
+}
+#loading_content {
+    width: 70%;
+    position: absolute;
+    left: 15%;
+    top: 15%;
+    height: 40%;
+    background: #213b65;
+    padding: 30px;
+    border: inset #1b74ff 5px;
+}
+#loading_texto{
+  float: left;
+  color: #fff;
+  width: 60%;
+}
+#current_loading{
+  margin-top: 15px;
+}
+#loading svg {
+  float: left;
+  max-width: 40%;
+}
+
+.tree {
+  fill: #efc321;
+}
+
+.circle-mask {
+  transform-origin: 50% 90%;
+  animation: scale 5s infinite ease-out;
+}
+.modal-title{
+    color: #333333;
+}
+.svg-inline--fa{
+    margin-right: 9px;
+    margin-top: 3px;
+    height: 1.16em;
+}
+.titulo{
+    height: 5vh;
+    padding-left: 1vh;
+}
+.content{
+    padding: 1vh;
+    height: 37vh;
+}
+.content span{
+    display: table;
+    width: 100%;
+}
+.rodape{
+    height: 5vh;
+    padding-left: 1vh;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.alerta{
+    position: absolute;
+    bottom: 0px;
+    font-size: 25px;
+    background: black;
+    width: 100%;
+}
+.modal-body label{
+    color: #404040;
+}
+.jconfirm {
+    color: #333;
+}
+.livro.active {
+    background: #ccc;
+}
+.capitulo.active {
+    background: #adde98;
+}
+#versiculo li {
+    margin-bottom: 2px;
+}
+@keyframes scale {
+  0%, 100% {
+    transform: scale(0.0);
+  }
+  7%, 90% {
+    transform: scale(0.4);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
