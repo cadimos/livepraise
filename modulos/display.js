@@ -1,44 +1,40 @@
 module.exports = app => {
-}
-/*
-const dir_app = process.cwd();
-const fs = require('graceful-fs');
-const exec = require('child-process-promise').exec;
-var request = require('request');//Teste
-var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database(dir_app+'/dsw.db');
-const si = require('systeminformation');
-var md5 = require("blueimp-md5");
-var ffmpeg = require('ffmpeg-static');
-*/
-
-//Marca o tipo de tela de projecao atual
-function lista_tela(){
-  db.serialize(function() {
-    db.each("SELECT tipo,largura,altura FROM tela", function(err, res) {
-      $('#tamanho_tela').val(res.tipo);
+  var sqlite3 = require('sqlite3').verbose();
+  const config = require('../config');
+  var db = new sqlite3.Database(config.dir_app+'/dsw.db');
+  app.get('/display', (req, res) => {
+    sql="SELECT * FROM tela";
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+          res.status(400).json({
+              "status":"erro",
+              "erro":err.message
+            });
+          return;
+        }
+        res.json({
+            "status":"successo",
+            "data":rows
+        })
     });
-  });
-}
-
-//Ajustar tela
-function ajustarTela(hide){
-  tm=$('#conf_tela #tamanho_tela').val();
-  lg=$('#conf_tela #largura').val();
-  at=$('#conf_tela #altura').val();
-  db.serialize(function() {
-    db.run("UPDATE `tela` SET `tipo`='"+tm+"',`largura`='"+lg+"',`altura`='"+at+"'");
-  });
-  if(tm=='personalizado'){
-    vl=btoa(lg+'x'+at)
-    var text = '{"funcao":[' +
-  '{"nome":"ajustarTela","valor":"'+vl+'" }]}';
-  }else{
-    var text = '{"funcao":[' +
-  '{"nome":"ajustarTela","valor":"'+btoa(tm)+'" }]}';
-  }
-  socket.emit("send", text);
-  if(hide){
-    $('#conf_tela').modal('hide');
-  }
+  })
+  app.get('/display/:tipo/:largura/:altura', (req, res) => {
+    tipo= req.params.tipo;
+    largura= req.params.largura;
+    altura= req.params.altura;
+    sql="UPDATE `tela` SET `tipo`='"+tipo+"',`largura`='"+largura+"',`altura`='"+altura+"'";
+    db.run(sql, [], (err, rows) => {
+        if (err) {
+          res.status(400).json({
+              "status":"erro",
+              "erro":err.message
+            });
+          return;
+        }
+        res.json({
+            "status":"successo",
+            "data":rows
+        })
+    });
+  })
 }
