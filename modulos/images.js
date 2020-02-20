@@ -3,6 +3,7 @@ module.exports = app => {
     const config = require('../config');
     var sqlite3 = require('sqlite3').verbose();
     app.get('/categoria/imagem', (req, res) => {
+        res.setHeader('Access-Control-Allow-Origin', '*');
         dir=config.dir_app+'/Dados/imagens';
         var files = fs.readdirSync(dir);
         cat=[];
@@ -18,6 +19,7 @@ module.exports = app => {
         })
   })
   app.get('/categoria/imagem/:dir', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     cat= req.params.dir;
     dir=config.dir_app+'/Dados/imagens/'+cat;
     var files = fs.readdirSync(dir);

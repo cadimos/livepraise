@@ -13,6 +13,7 @@ if(__dirname.indexOf('resources')<0){
 app.use(bodyParser.json())
 app.use(express.static(__dirname+'/public'));
 app.use('/app',express.static(__dirname+'/app'));
+app.use('/tema',express.static(__dirname+'/tema/default'));
 app.use('/node_modules',express.static(__dirname+'/node_modules'));
 app.use('/Dados',express.static(base+'/Dados'));
 app.get('/teste', function(req, res){
