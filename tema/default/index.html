@@ -8,7 +8,7 @@
         <!-- Bootstrap Css -->
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <!-- Fonts Icones -->
-        <!--<link rel="stylesheet" type="text/css" href="css/all.css">-->
+        <link rel="stylesheet" type="text/css" href="css/all.min.css">
         <!-- Jquery UI -->
         <!--<link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css">-->
         <!-- Chrome Tabs -->
@@ -288,16 +288,26 @@
         <div class="container-fluid">
             <div class="row-fluid" id="navegacao-itens">
                 <div class="col-md-7" id="navegacao-tab">
-                    <ul class="nav nav-tabs" id="navegacao">
-                        <li role="presentation" class="active"><a href="#imagens"><i class="fas fa-image"></i> Imagens</a></li>
-                        <li role="presentation"><a href="#videos"><i class="fas fa-video"></i> Videos</a></li>
-                        <li role="presentation"><a href="#musicas"><i class="fas fa-book-open"></i> Músicas</a></li>
-                        <li role="presentation"><a href="#biblias"><i class="fas fa-bible"></i> Biblias</a></li>
-                        <!--<li role="presentation"><a href="#outros"><i class="fas fa-asterisk"></i> Outros</a></li>-->
+                    <ul class="nav nav-tabs" id="navegacao" role="tablist">
+                        <li class="nav-item">
+                            <a href="#imagens" class="nav-link active" data-toggle="tab" role="tab"><i class="fas fa-image"></i> Imagens</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#videos" class="nav-link" data-toggle="tab" role="tab"><i class="fas fa-video"></i> Videos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#musicas" class="nav-link" data-toggle="tab" role="tab"><i class="fas fa-book-open"></i> Músicas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#biblias" class="nav-link" data-toggle="tab" role="tab"><i class="fas fa-bible"></i> Biblias</a>
+                        </li>
+                        <!--<li class="nav-item">
+                            <a href="#outros" class="nav-link" data-toggle="tab" role="tab"><i class="fas fa-asterisk"></i> Outros</a>
+                        </li>-->
                     </ul>
                     <div class="tab-content" id="navegacaoContent">
                         <!-- Imagens -->
-                        <div class="tab-pane fade in active" role="tabpanel" id="imagens" aria-labelledby="home-tab">
+                        <div class="tab-pane fade in show active" role="tabpanel" id="imagens" aria-labelledby="home-tab">
                             <div class="row">
                                 <div class="col-md-12">
                                     <select id="cat_imagens" class="form-control" onchange="lista_imagem(this.value)"></select>
@@ -428,7 +438,8 @@
         <!-- Jquery Web -->
         <script src="js/jquery.min.js"></script>
         <!-- Bootstrap -->
-        <script src="js/bootstrap.min.js" async></script>
+        <script src="js/popper.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
         <!-- Jquery UI -->
         <!--<script src="js/jquery-ui.min.js" async></script>-->
         <!-- Jquery Debounce -->
@@ -448,6 +459,6 @@
         <script src="js/jquery-confirm.min.js"></script>
         <!--<link rel="stylesheet" type="text/css" href="css/jquery-confirm.min.css">-->
         <!-- Comandos Monitor -->
-        <!--<script src="js/monitor.js" async></script>-->
+        <script src="js/monitor.js" async></script>
     </body>
 </html>
