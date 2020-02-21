@@ -1,7 +1,6 @@
 module.exports = app => {
     const fs = require('graceful-fs');
     const config = require('../config');
-    var sqlite3 = require('sqlite3').verbose();
     app.get('/categoria/imagem', (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', '*');
         dir=config.dir_app+'/Dados/imagens';

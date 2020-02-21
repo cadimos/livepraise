@@ -126,3 +126,18 @@ function lista_imagem(dir){
     });
     $('#current_loading').html('Carregado Preview de Imagens');
 }
+
+/*
+Validar se thumb já foi gerada
+function checkImgOnline(imageUrl, error, ok){
+     var img = new Image();
+     img.src = imageUrl;
+     console.log(img.height);
+     if(img.height>0){
+       ok();
+     } else {
+       error();
+     }
+}
+checkImgOnline('https://www.thiagovespa.com.br/blog/wp-content/uploads/2013/11/back.jpg', function() {alert('Fora do ar!')}, function(){alert('Online')});
+*/
