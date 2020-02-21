@@ -263,25 +263,27 @@ function lista_musica(){
     cat=$('#cat_musica').val();
     if(cat!='' && cat!=null){
         $('#list_music').html('');
-        let modelo=`<div class="panel panel-default">
-        <div class="panel-heading" role="tab" id="head[id_musica]">
-        <h4 class="panel-title">
-        <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
-        [nome_musica] ([artista_musica])
-        </a>
+       let modelo=`
+       <div class="card">
+    <div class="card-header" id="head[id_musica]">
+      <h4 class="mb-0">
+        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse[id_musica]" aria-expanded="true" aria-controls="collapse[id_musica]">
+            [nome_musica] ([artista_musica])
+        </button>
         <span class="acoes_item">
           <a href="javascript:void(0);" data-toggle="modal" data-target="#new_music" data-whatever="[id_musica]"><i class="fas fa-edit"></i></a>
           <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
           <a href="javascript:void(0);" onclick="remover_musica('[id_musica]')"><i class="fas fa-trash"></i></a>
         </span>
-        </h4>
-        </div>
-        <div id="collapse[id_musica]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head[id_musica]">
-        <div class="panel-body">
+      </h4>
+    </div>
+
+    <div id="collapse[id_musica]" class="collapse" aria-labelledby="collapse[id_musica]" data-parent="#list_music">
+      <div class="card-body">
         <ul id="verso[id_musica]"></ul>
-        </div>
-        </div>
-        </div>`;
+      </div>
+    </div>
+  </div>`;
         $.ajax({
             type: "GET",
             url: urlSocket+'/categoria/musica/'+cat,
