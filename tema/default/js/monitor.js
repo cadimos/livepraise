@@ -108,28 +108,30 @@ function loanding(){
     $('#current_loading').html('Iniciando Animaçao');
     color_animate(2000);
     $('#current_loading').html('Carregando Imagens');
+    let mus=catMusicas();
     let img=catImagens();
     let vid=catVideos();
+    //let listMus=lista_musica();
 
     if(img){
         $('#current_loading').html('Carregando Vídeos');
     }
     if(vid){
-        $('#current_loading').html('Carregado Vídeos');
+        $('#current_loading').html('Carregando Músicas');
+    }
+    if(mus){
+        $('#current_loading').html('Listando Músicas');
     }
     if(
         img==true &&
-        vid==true
+        vid==true &&
+        mus==true 
     ){
         parar_cor();
         fechar_loandig();
     }
     /*
     
-    $('#current_loading').html('Carregando Músicas');
-    catMusicas();
-    $('#current_loading').html('Listando Músicas');
-    setTimeout(() => lista_musica(),300);
     $('#current_loading').html('Carregando Biblias');
     catBiblias();
     $('#current_loading').html('Listando livros da Biblias');
@@ -211,18 +213,113 @@ function catVideos(){
         }
     });
     return true;
-  }
-/*
-Validar se thumb já foi gerada
-function checkImgOnline(imageUrl, error, ok){
-     var img = new Image();
-     img.src = imageUrl;
-     console.log(img.height);
-     if(img.height>0){
-       ok();
-     } else {
-       error();
-     }
 }
-checkImgOnline('https://www.thiagovespa.com.br/blog/wp-content/uploads/2013/11/back.jpg', function() {alert('Fora do ar!')}, function(){alert('Online')});
-*/
+function lista_video(dir){
+    $('#preview-videos').html('');
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/categoria/video/'+dir,
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.video.length;
+                vid=data.video;
+                preview=data.thumb;
+                erro=false;
+                for(i=0;i<t_rows;i++){                    
+                    video=vid[i];
+                    thumb=preview[i];
+                    $('#preview-videos').append('<li><img id="video'+i+'" src="'+urlSocket+'/'+thumb+'" onclick="viewVideo(\''+btoa(urlSocket+'/'+video)+'\')"></li>');
+                }
+            }
+        }
+    });
+   return true;
+}
+//Lista as Categorias de Musicas
+function catMusicas(){
+    $('#cat_musica').html('');
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/categoria/musica',
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                for(i=0;i<t_rows;i++){
+                    option=result[i].nome;
+                    id=result[i].id
+                    $('#cat_musica').append('<option value="'+id+'">'+option+'</option>');
+                }
+                lista_musica();
+            }
+        }
+    });
+    return true;
+}
+//Lista as Musicas
+function lista_musica(){
+    cat=$('#cat_musica').val();
+    if(cat!='' && cat!=null){
+        $('#list_music').html('');
+        let modelo=`<div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="head[id_musica]">
+        <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
+        [nome_musica] ([artista_musica])
+        </a>
+        <span class="acoes_item">
+          <a href="javascript:void(0);" data-toggle="modal" data-target="#new_music" data-whatever="[id_musica]"><i class="fas fa-edit"></i></a>
+          <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
+          <a href="javascript:void(0);" onclick="remover_musica('[id_musica]')"><i class="fas fa-trash"></i></a>
+        </span>
+        </h4>
+        </div>
+        <div id="collapse[id_musica]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head[id_musica]">
+        <div class="panel-body">
+        <ul id="verso[id_musica]"></ul>
+        </div>
+        </div>
+        </div>`;
+        $.ajax({
+            type: "GET",
+            url: urlSocket+'/categoria/musica/'+cat,
+            dataType: "json",
+            success: function(data) {
+                if(data.status=='successo'){
+                    t_rows=data.data.length;
+                    result=data.data;
+                    for(i=0;i<t_rows;i++){
+                        musica=result[i];
+                        item=modelo.replace(/\[id_musica\]/g,musica.id);
+                        item=item.replace(/\[nome_musica\]/g,musica.nome);
+                        item=item.replace(/\[artista_musica\]/g,musica.artista);
+                        $('#list_music').append(item);
+                    }
+                }
+            }
+        });
+        return true;
+    }else{
+        setTimeout(() => lista_musica(),200);
+    }
+  
+        /*
+        db.serialize(function() {
+          db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"' ORDER BY nome ASC", function(err, musica) {
+            
+            db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
+              verse=row.verso;
+              verse=verse.replace(/<br \/>/g,"\n");
+              modelo_item=`<li class="verso_musica" onclick='viewMusica("verso_${musica.id}_${row.id}","${musica.nome} (${musica.artista})","BR");' id="verso_${musica.id}_${row.id}">${verse}</li>`;
+              $('#verso'+musica.id).append(modelo_item);
+            });
+          });
+          $('#current_loading').html('Listado Músicas');
+        });
+        }else{
+            
+        }
+        */
+  }

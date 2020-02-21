@@ -1,71 +1,45 @@
 module.exports = app => {
-}
-/*
-const dir_app = process.cwd();
-const fs = require('graceful-fs');
-const exec = require('child-process-promise').exec;
-var request = require('request');//Teste
-var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database(dir_app+'/dsw.db');
-const si = require('systeminformation');
-var md5 = require("blueimp-md5");
-var ffmpeg = require('ffmpeg-static');
-*/
-
-//Lista as Categorias de Musicas
-function catMusicas(){
-  db.serialize(function() {
-    db.each("SELECT `id`,`nome` FROM cat_musicas", function(err, row) {
-      $('#cat_musica').append('<option value="'+row.id+'">'+row.nome+'</option>');
-    });
-    $('#current_loading').html('Carregado Músicas');
-  });
-}
-
-//Lista as Musicas
-function lista_musica(){
-  cat=$('#cat_musica').val();
- 	if(cat!=''){
-	  	let modelo=`<div class="panel panel-default">
-      <div class="panel-heading" role="tab" id="head[id_musica]">
-      <h4 class="panel-title">
-      <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
-      [nome_musica] ([artista_musica])
-      </a>
-      <span class="acoes_item">
-        <a href="javascript:void(0);" data-toggle="modal" data-target="#new_music" data-whatever="[id_musica]"><i class="fas fa-edit"></i></a>
-        <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
-        <a href="javascript:void(0);" onclick="remover_musica('[id_musica]')"><i class="fas fa-trash"></i></a>
-      </span>
-      </h4>
-      </div>
-      <div id="collapse[id_musica]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head[id_musica]">
-      <div class="panel-body">
-      <ul id="verso[id_musica]"></ul>
-      </div>
-      </div>
-      </div>`;
-
-      $('#list_music').html('');
-      db.serialize(function() {
-        db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"' ORDER BY nome ASC", function(err, musica) {
-          item=modelo.replace(/\[id_musica\]/g,musica.id);
-          item=item.replace(/\[nome_musica\]/g,musica.nome);
-          item=item.replace(/\[artista_musica\]/g,musica.artista);
-          $('#list_music').append(item);
-          db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
-            verse=row.verso;
-            verse=verse.replace(/<br \/>/g,"\n");
-            modelo_item=`<li class="verso_musica" onclick='viewMusica("verso_${musica.id}_${row.id}","${musica.nome} (${musica.artista})","BR");' id="verso_${musica.id}_${row.id}">${verse}</li>`;
-            $('#verso'+musica.id).append(modelo_item);
+  var sqlite3 = require('sqlite3').verbose();
+  const config = require('../config');  
+  var db = new sqlite3.Database(config.dir_app+'/dsw.db');
+  app.get('/categoria/musica', (req, res) => {
+    sql="SELECT * FROM cat_musicas";
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        res.status(400).json({
+            "status":"erro",
+            "erro":err.message
           });
-        });
-        $('#current_loading').html('Listado Músicas');
-      });
-  	}else{
-  		setTimeout(() => lista_musica(),200);
-  	}
+        return;
+      }
+      res.json({
+          "status":"successo",
+          "data":rows
+      })
+    });
+  })
+  app.get('/categoria/musica/:id', (req, res) => {
+    id= req.params.id;
+    sql="SELECT * FROM musica WHERE cat='"+id+"'";
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        res.status(400).json({
+            "status":"erro",
+            "erro":err.message
+          });
+        return;
+      }
+      res.json({
+          "status":"successo",
+          "data":rows
+      })
+    });
+  })
 }
+
+
+/*
+
 
 //Busca Musica
 function buscaMusicaLocal(){
@@ -315,3 +289,4 @@ function viewMusica(id,nome,br){
   }
 
 }
+*/
