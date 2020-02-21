@@ -35,6 +35,23 @@ module.exports = app => {
       })
     });
   })
+  app.get('/musica/verso/:id', (req, res) => {
+    id= req.params.id;
+    sql="SELECT * FROM musica_versos WHERE musica='"+id+"'";
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        res.status(400).json({
+            "status":"erro",
+            "erro":err.message
+          });
+        return;
+      }
+      res.json({
+          "status":"successo",
+          "data":rows
+      })
+    });
+  })
 }
 
 

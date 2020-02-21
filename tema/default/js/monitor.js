@@ -298,6 +298,7 @@ function lista_musica(){
                         item=item.replace(/\[nome_musica\]/g,musica.nome);
                         item=item.replace(/\[artista_musica\]/g,musica.artista);
                         $('#list_music').append(item);
+                        lista_musica_verso(musica.id,musica.nome,musica.artista);
                     }
                 }
             }
@@ -306,22 +307,25 @@ function lista_musica(){
     }else{
         setTimeout(() => lista_musica(),200);
     }
-  
-        /*
-        db.serialize(function() {
-          db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"' ORDER BY nome ASC", function(err, musica) {
-            
-            db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
-              verse=row.verso;
-              verse=verse.replace(/<br \/>/g,"\n");
-              modelo_item=`<li class="verso_musica" onclick='viewMusica("verso_${musica.id}_${row.id}","${musica.nome} (${musica.artista})","BR");' id="verso_${musica.id}_${row.id}">${verse}</li>`;
-              $('#verso'+musica.id).append(modelo_item);
-            });
-          });
-          $('#current_loading').html('Listado Músicas');
-        });
-        }else{
-            
+}
+function lista_musica_verso(id,nome,artista){
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/musica/verso/'+id,
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                for(i=0;i<t_rows;i++){
+                    row=result[i];
+                    verse=row.verso;
+                    verse=verse.replace(/<br \/>/g,"\n");
+                    modelo_item=`<li class="verso_musica" onclick='viewMusica("verso_${row.musica}_${row.id}","${nome} (${artista})","BR");' id="verso_${row.musica}_${row.id}">${verse}</li>`;
+                    $('#verso'+row.musica).append(modelo_item);
+                }
+            }
         }
-        */
-  }
+    });
+    return true;
+}
