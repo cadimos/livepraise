@@ -81,9 +81,72 @@ function atualizar(vl){
     }
     setTimeout(() => location.reload(),100);
 }
+var stop_color=false;
+function color_animate(tempo){
+    if(stop_color==false){
+        let r=Math.floor(Math.random() * 256);
+        let g=Math.floor(Math.random() * 256);
+        let b=Math.floor(Math.random() * 256);
+        let r2=Math.floor(Math.random() * 256);
+        let g2=Math.floor(Math.random() * 256);
+        let b2=Math.floor(Math.random() * 256);
+        let r3=Math.floor(Math.random() * 256);
+        let g3=Math.floor(Math.random() * 256);
+        let b3=Math.floor(Math.random() * 256);
+        $('.tree').css('fill','url(#gradient)');
+        $('#inicio_gradiente').attr('stop-color','rgb('+r+','+g+','+b+')');
+        $('#meio_gradiente').attr('stop-color','rgb('+r2+','+g2+','+b2+')');
+        $('#fim_gradiente').attr('stop-color','rgb('+r3+','+g3+','+b3+')');
+        setTimeout(() => color_animate(tempo),tempo);
+    }
+}
+function parar_cor(){
+    stop_color = true;
+    return true;
+}
+function loanding(){
+    $('#current_loading').html('Iniciando Animaçao');
+    color_animate(2000);
+    $('#current_loading').html('Carregando Imagens');
+    let img=catImagens();
+    let vid=catVideos();
+
+    if(img){
+        $('#current_loading').html('Carregando Vídeos');
+    }
+    if(vid){
+        $('#current_loading').html('Carregado Vídeos');
+    }
+    if(
+        img==true &&
+        vid==true
+    ){
+        parar_cor();
+        fechar_loandig();
+    }
+    /*
+    
+    $('#current_loading').html('Carregando Músicas');
+    catMusicas();
+    $('#current_loading').html('Listando Músicas');
+    setTimeout(() => lista_musica(),300);
+    $('#current_loading').html('Carregando Biblias');
+    catBiblias();
+    $('#current_loading').html('Listando livros da Biblias');
+    setTimeout(() => lista_biblia(),200);
+    lista_background_rapido();
+    lista_tela();
+    */
+}
+  
+function fechar_loandig(){
+    $('#loading').css('display','none');
+}
+  
+setTimeout(() => loanding(), 200);
 //Lista a Categoria das Imagens
 function catImagens(){
-    $('#cat_imagens').html();
+    $('#cat_imagens').html('');
     $.ajax({
         type: "GET",
         url: urlSocket+'/categoria/imagem',
@@ -102,7 +165,7 @@ function catImagens(){
             }
         }
     });
-    $('#current_loading').html('Carregado Imagens');
+    return true;
 }
 catImagens();
 //Lista Imagens
@@ -124,9 +187,31 @@ function lista_imagem(dir){
             }
         }
     });
-    $('#current_loading').html('Carregado Preview de Imagens');
+    return true;
 }
-
+//Lista as Categorias de Videos
+function catVideos(){
+    $('#cat_videos').html('');
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/categoria/video',
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                for(i=0;i<t_rows;i++){
+                    option=result[i].replace('Dados/videos/','');
+                    $('#cat_videos').append('<option value="'+option+'">'+option+'</option>');
+                    if(i==0){
+                        lista_video(option);
+                    }
+                }
+            }
+        }
+    });
+    return true;
+  }
 /*
 Validar se thumb já foi gerada
 function checkImgOnline(imageUrl, error, ok){
