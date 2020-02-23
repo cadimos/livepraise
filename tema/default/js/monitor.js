@@ -111,7 +111,7 @@ function loanding(){
     let mus=catMusicas();
     let img=catImagens();
     let vid=catVideos();
-    //let listMus=lista_musica();
+    let bib=catBiblias();
 
     if(img){
         $('#current_loading').html('Carregando Vídeos');
@@ -120,19 +120,22 @@ function loanding(){
         $('#current_loading').html('Carregando Músicas');
     }
     if(mus){
-        $('#current_loading').html('Listando Músicas');
+        $('#current_loading').html('Carregando Biblias');
+    }
+    if(bib){
+        $('#current_loading').html('Carregando Background Rápido');
     }
     if(
         img==true &&
         vid==true &&
-        mus==true 
+        mus==true &&
+        bib==true
     ){
         parar_cor();
         fechar_loandig();
     }
     /*
     
-    $('#current_loading').html('Carregando Biblias');
     catBiblias();
     $('#current_loading').html('Listando livros da Biblias');
     setTimeout(() => lista_biblia(),200);
@@ -328,4 +331,113 @@ function lista_musica_verso(id,nome,artista){
         }
     });
     return true;
+}
+//Lista as Biblias Disponiveis
+function catBiblias(){
+    $('#cat_biblia').html('');
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/categoria/biblia',
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                for(i=0;i<t_rows;i++){
+                    option=result[i].nome;
+                    id=result[i].url
+                    $('#cat_biblia').append('<option value="'+id+'">'+option+'</option>');
+                    lista_biblia();
+                }
+            }
+        }
+    });
+    return true;
+}
+//Lista a Biblia Selecionada
+function lista_biblia(){
+    cat=$('#cat_biblia').val();
+    let modelo=`
+    <div class="card">
+        <div class="card-header" id="head_biblia_[id_livro]">
+            <h4 class="mb-0">
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse_biblia_[id_livro]" aria-expanded="true" aria-controls="collapse_biblia_[id_livro]">
+                [nome_livro]
+            </button>
+            </h4>
+        </div>
+    
+        <div id="collapse_biblia_[id_livro]" class="biblia_livro collapse" aria-labelledby="collapse_biblia_[id_livro]" data-parent="#list_biblia">
+            <div class="card-body" id="list_biblia_[id_livro]"></div>
+        </div>
+    </div>`;
+    $('#list_biblia').html('');
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/livros/biblia/'+cat,
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                for(i=0;i<t_rows;i++){
+                   item=modelo.replace(/\[id_livro\]/g,result[i].id);
+                   item=item.replace(/\[nome_livro\]/g,result[i].nome);
+                   $('#list_biblia').append(item);
+                   lista_capitulos(result[i].id);
+                }
+            }
+        }
+    });
+    return true;
+    /*
+    modelo_capitulos=`<div class="panel panel-success">
+    <a name="collapse_[id_livro]_[id_capitulo]"></a>
+    <div class="panel-heading capitulo" role="tab" id="head_[id_livro]_[id_capitulo]">
+        <h4 class="panel-title">
+            <a onclick="lista_versiculo([cat],[id_livro],[id_capitulo])" role="button" data-toggle="collapse" data-parent="#list_biblia_[id_livro]" href="#collapse_[id_livro]_[id_capitulo]" aria-expanded="true" aria-controls="collapse1">
+              <i class="fas fa-bible"></i>  [id_capitulo]
+            </a>
+            <span class="acoes_item"></span>
+        </h4>
+    </div>
+    <div id="collapse_[id_livro]_[id_capitulo]" class="biblia_capitulo panel-collapse collapse" role="tabpanel" aria-labelledby="head_[id_livro]_[id_capitulo]">
+        <div class="panel-body">
+            <ul id="versiculo"></ul>
+        </div>
+    </div>
+  </div>`;
+    
+    $('#biblias #preview-list').append('<div id="loading_biblia"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span>Carregando Biblia</span></div>');
+    db.serialize(function() {
+      db.each("SELECT id,nome FROM biblia_livros", function(err, biblia) {
+        $('#current_loading').html('Listando Livros da Biblias');
+        $('#loading_biblia span').html('Listando Livros da Biblias');
+        
+        db.each("SELECT DISTINCT capitulo FROM biblia_versiculos WHERE  cat ="+cat+" AND  livro ="+biblia.id+";", function(err, biblia_capitulos) {
+          capitulos=modelo_capitulos.replace(/\[id_livro\]/g,biblia.id);
+          capitulos=capitulos.replace(/\[id_capitulo\]/g,biblia_capitulos.capitulo);
+          if(biblia.id==66 && biblia_capitulos.capitulo==22){
+            $('#current_loading').html('Listado Biblias');
+            $('#loading_biblia span').html('Listado Capitulos da Biblia');
+            setTimeout(() => fechar_loandig(),100);
+            setTimeout(function(){
+              $('#loading_biblia').remove();
+              active_biblies();
+            },200);
+          }
+          $('#current_loading').html('Listando Livros da Biblias: '+biblia.nome+' '+biblia_capitulos.capitulo);
+          $('#loading_biblia span').html('Listando Livros da Biblias: '+biblia.nome+' '+biblia_capitulos.capitulo);
+          $('#list_biblia_'+biblia.id).append(capitulos);
+        },function (err,b){
+          if(err){
+            console.error(err);
+          }
+        });
+      });
+    });
+    */
+}
+function lista_capitulos(id){
+    
 }
