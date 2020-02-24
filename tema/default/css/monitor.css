@@ -12,7 +12,9 @@
 }
 .background-rapido{
     padding: 0;
-    width: auto;
+    width: auto !important;
+    max-width: 100%;
+    float: left;
 }
 
 #preview{

@@ -111,6 +111,7 @@ function loanding(){
     let mus=catMusicas();
     let img=catImagens();
     let vid=catVideos();
+    let bg=lista_background_rapido();
     let bib=catBiblias();
 
     if(img){
@@ -129,14 +130,15 @@ function loanding(){
         img==true &&
         vid==true &&
         mus==true &&
+        bg ==true &&
         bib==true
     ){
-        //parar_cor();
+        parar_cor();
         //fechar_loandig();
     }
     /*
     
-    lista_background_rapido();
+    
     lista_tela();
     */
 }
@@ -437,3 +439,60 @@ function lista_capitulos(id){
     });
     return true;
 }
+
+//Listagem Background Rápido
+function lista_background_rapido(){
+    let modelo=`<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 background-rapido">
+        <a href="javascript:void(0)" onclick="backgroundRapido('[url64]')">
+            <img src="[url]" class="img-responsive" alt="Responsive image">
+        </a>
+      </div>`;
+    $('#background-rapido').html('');
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/background-rapido',
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                for(i=0;i<t_rows;i++){
+                    inicial=result[i].inicial;
+                    url_img=urlSocket+'/'+result[i].url;
+                    if(inicial=='S'){
+                        $('#preview img').attr('src',url_img);
+                    }
+                    item_back=modelo.replace(/\[url\]/g,url_img);
+                    item_back=item_back.replace(/\[url64\]/g,btoa(url_img));
+                    $('#background-rapido').append(item_back);
+                    /*
+                    option=result[i].replace('Dados/imagens/','');
+                    $('#cat_imagens').append('<option value="'+option+'">'+option+'</option>');
+                    if(i==0){
+                        lista_imagem(option);
+                    }
+                    */
+                }
+            }
+        }
+    });
+    /*
+    db.serialize(function() {
+      db.each("SELECT url,diretorio,inicial FROM background_rapido ORDER BY id ASC", function(err, res) {
+        if(res.diretorio=='/'){
+          dir=dir_app+'/';
+        }else{
+          dir=res.diretorio;
+        }
+        item_back=modelo.replace(/\[url\]/g,dir+res.url);
+        item_back=item_back.replace(/\[url64\]/g,btoa(dir+res.url));
+        $('#background-rapido').append(item_back);
+        if(res.inicial=='S'){
+          $('#preview img').attr('src',dir+res.url)
+        }
+      });
+      $('#current_loading').html('Background Rápido');
+    });
+    */
+   return true;
+  }
