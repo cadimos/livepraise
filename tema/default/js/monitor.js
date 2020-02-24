@@ -439,5 +439,21 @@ function lista_biblia(){
     */
 }
 function lista_capitulos(id){
-    
+    cat=$('#cat_biblia').val();
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/capitulo/biblia/'+cat+'/'+id,
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                for(i=0;i<t_rows;i++){
+                  capitulos=result[i].capitulos;
+                  //console.log(capitulos);
+                }
+            }
+        }
+    });
+    return true;
 }
