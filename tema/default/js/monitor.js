@@ -488,3 +488,20 @@ function background(url){
         player.pause();
     }
 }
+//Visualiza o Video
+function viewVideo(url){
+    $('#preview img').css('display','none');
+    $('#video').css('display','block');
+    if(congelar('valida')==true){
+      var text = `{"funcao":[{"nome":"video","valor":"${url}" }]}`;
+      socket.emit("send", text);
+    }
+    $('#video').html('');
+    $('#video').append('<video id="player" controls loop="true" autoplay><source src="'+atob(url)+'" type="video/mp4"></video>');
+    let player = document.getElementById("player");
+    setTimeout(() => play_video(),200);
+}
+function play_video(){
+	player.play();
+	player.volume=0;
+}

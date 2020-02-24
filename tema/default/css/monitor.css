@@ -25,6 +25,7 @@
     background: #000000;
     border: solid 5px #404040;
     border-radius: 5px;
+    position: relative;
 }
 #preview img{
     width: 100%;
