@@ -186,7 +186,8 @@ function lista_imagem(dir){
                 for(i=0;i<t_rows;i++){                    
                     img=result[i];
                     img=img.replace('#','%23');
-                    $('#preview-imagens').append('<li><img src="'+urlSocket+'/'+img+'" onclick="background(\''+btoa(img)+'\')"></li>')
+                    url_img=urlSocket+'/'+img
+                    $('#preview-imagens').append('<li><img src="'+url_img+'" onclick="background(\''+btoa(url_img)+'\')"></li>')
                 }
             }
         }
@@ -465,34 +466,25 @@ function lista_background_rapido(){
                     item_back=modelo.replace(/\[url\]/g,url_img);
                     item_back=item_back.replace(/\[url64\]/g,btoa(url_img));
                     $('#background-rapido').append(item_back);
-                    /*
-                    option=result[i].replace('Dados/imagens/','');
-                    $('#cat_imagens').append('<option value="'+option+'">'+option+'</option>');
-                    if(i==0){
-                        lista_imagem(option);
-                    }
-                    */
                 }
             }
         }
     });
-    /*
-    db.serialize(function() {
-      db.each("SELECT url,diretorio,inicial FROM background_rapido ORDER BY id ASC", function(err, res) {
-        if(res.diretorio=='/'){
-          dir=dir_app+'/';
-        }else{
-          dir=res.diretorio;
-        }
-        item_back=modelo.replace(/\[url\]/g,dir+res.url);
-        item_back=item_back.replace(/\[url64\]/g,btoa(dir+res.url));
-        $('#background-rapido').append(item_back);
-        if(res.inicial=='S'){
-          $('#preview img').attr('src',dir+res.url)
-        }
-      });
-      $('#current_loading').html('Background Rápido');
-    });
-    */
    return true;
-  }
+}
+//Troca o Fundo da Tela
+function background(url){
+    $('#video').css('display','none');
+    $('#preview img').css('display','block');
+    $("#preview img").fadeOut(150, function() {
+        $("#preview img").attr('src',atob(url));
+    }).fadeIn(200);
+    if(congelar('valida')==true){
+        var text = `{"funcao":[{"nome":"background","valor":"${url}" }]}`;
+        socket.emit("send", text);
+    }
+    if($('#player').length){
+        let player = document.getElementById("player");
+        player.pause();
+    }
+}
