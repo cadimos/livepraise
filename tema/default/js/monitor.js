@@ -41,6 +41,20 @@ socket.on("chat", function(client,msg) {
     */
     }
 });
+//Converte em ISO-8859-1
+function iso_encode(str){
+    str = str.replace(/\'/g, '&apos;');
+    str = str.replace(/\"/g, '&quot;');
+    return str;
+}
+//Remove Quebra de Linha Substituindo por <br />
+function nl2br (str) {
+    if (typeof str === 'undefined' || str === null) {
+      return ''
+    }
+    var breakTag = `<br />`;
+    return (str + '').replace(/(\r\n|\n\r|\r|\n)/g, breakTag)
+  }
 //Congela a tela, permitindo alterações apenas na do operador
 function congelar(acao){
     s=$('#freeze').val();
@@ -171,7 +185,6 @@ function catImagens(){
     });
     return true;
 }
-catImagens();
 //Lista Imagens
 function lista_imagem(dir){
     $('#preview-imagens').html('');
@@ -268,7 +281,7 @@ function lista_musica(){
         $('#list_music').html('');
        let modelo=`
        <div class="card">
-      <div class="card-header">
+      <div class="card-header" id="head[id_musica]">
         <a class="card-link" data-toggle="collapse" href="#musica[id_musica]">
             [nome_musica] ([artista_musica])
         </a>
@@ -329,6 +342,43 @@ function lista_musica_verso(id,nome,artista){
         }
     });
     return true;
+}
+//Exibir Musica
+function viewMusica(id,nome,br){
+    $('.conteudo').html('');
+    txt=$('#'+id).html();
+    txt=iso_encode(txt);
+    if(br=='BR'){
+      txt=nl2br(txt);
+    }
+    let modelo=`
+    <div class="titulo"></div>
+    <div class="content"><span>${txt}</span></div>
+    <div class="rodape">${nome}</div>`;
+    $('.conteudo').append(modelo);
+    $('.content').textfill({
+      maxFontPixels: 0
+    });
+    $('.content').css('text-align','center');
+    $('.rodape').css('font-size','20px');
+    if(congelar('valida')==true){
+      var text = `{"funcao":[{"nome":"viewMusica","valor":"${btoa(modelo)}" }]}`;
+      socket.emit("send", text);
+    }  
+}
+//Adiciona a Música na Programação
+function adicionar_musica(id){
+    verse=$('#verso'+id).html();
+    verse=verse.replace(/verso_/g,"item_verso_");
+    verse=verse.replace(/'BR'/g,"");
+    verse=nl2br(verse);
+    data='<ul id="item_verso'+id+'">'+verse+'</ul>';
+    titulo=$('#head'+id+' a').html();
+    chromeTabs.addTab({
+      title: titulo,
+      conteudo: data
+    });
+    setTimeout(() => slideAtivo(),700);
 }
 //Lista as Biblias Disponiveis
 function catBiblias(){
@@ -393,39 +443,6 @@ function lista_biblia(){
 }
 function lista_capitulos(id){
     cat=$('#cat_biblia').val();
-    /*
-    let modelo=`
-    <div class="card">
-        <div class="card-header" id="head_biblia_[id_livro]_[id_capitulo]">
-            <h4 class="mb-0">
-            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse_biblia_[id_livro]_[id_capitulo]" aria-expanded="false" aria-controls="collapse_biblia_[id_livro]_[id_capitulo]">
-                [id_capitulo]
-            </button>
-            </h4>
-        </div>
-    
-        <div id="collapse_biblia_[id_livro]_[id_capitulo]" class="biblia_livro collapse" aria-labelledby="collapse_biblia_[id_livro]_[id_capitulo]" data-parent="#list_biblia_[id_livro]">
-            <div class="card-body" id="list_biblia_[id_livro]_[id_capitulo]">
-                <ul id="versiculo"></ul>
-            </div>
-        </div>
-    </div>`;
-    */
-   /*
-   let modelo=`
-   <div class="card">
-      <div class="card-header">
-        <a class="card-link" data-toggle="collapse" href="#biblia_[id_livro]_[id_capitulo]">
-            [id_capitulo]
-        </a>
-      </div>
-      <div id="biblia_[id_livro]_[id_capitulo]" class="collapse" data-parent="#list_biblia_[id_livro]">
-        <div class="card-body" id="list_biblia_[id_livro]_[id_capitulo]"></div>
-      </div>
-    </div>
-   `;
-   */
-  
     let modelo=`
     <h3>
         <a onclick="lista_versiculo([id_livro],[id_capitulo])">
@@ -547,5 +564,50 @@ function backgroundRapido(url){
     if($('#player').length){
       let player = document.getElementById("player");
       player.pause();
+    }
+}
+
+
+/* Chrome Tabs */
+//Tabs List
+$('#navegacao a').click(function (e) {
+    e.preventDefault()
+    $(this).tab('show')
+  });
+  var el = document.querySelector('.chrome-tabs')
+  var chromeTabs = new ChromeTabs()
+  
+  chromeTabs.init(el, {
+    tabOverlapDistance: 14,
+    minWidth: 45,
+    maxWidth: 243
+  })
+  
+  el.addEventListener('activeTabChange', ({ detail }) => console.log('Active tab changed', detail.tabEl))
+  el.addEventListener('tabAdd', ({ detail }) => console.log('Tab added', detail.tabEl))
+  el.addEventListener('tabRemove', ({ detail }) => console.log('Tab removed', detail.tabEl))
+  
+  if(document.querySelector('button[data-remove-tab]')){
+    document.querySelector('button[data-remove-tab]').addEventListener('click', function(){
+      chromeTabs.removeTab(el.querySelector('.chrome-tab-current'))
+    });
+}
+function slideAtivo(){
+    if(!$('.chrome-conteudo-show ul').length){
+      setTimeout(() => slideAtivo(),200);
+    }else{
+      currenteId=document.querySelector(".chrome-conteudo-show ul").id;
+      header = document.getElementById(currenteId);
+      btns = header.getElementsByClassName("item_verso_musica");
+      for (i = 0; i < btns.length; i++) {
+        current = document.getElementsByClassName("ativo");
+        btns[i].addEventListener("click", function() {
+  
+          if (current.length > 0) {
+            current[0].className = current[0].className.replace(" ativo", "");
+          }
+          this.className += " ativo";
+        });
+      }
     }
 }

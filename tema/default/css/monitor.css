@@ -105,9 +105,15 @@ form{
 #preview-list{
     overflow-y: scroll;
     width: 100%;
-    height: 48vh;/*37vh;*/
+    height: 43vh;/*37vh;*/
     padding-top: 5px;
 
+}
+#musicas #preview-list{
+    height: 38vh;
+}
+#biblias #preview-list{
+    height: 38vh;
 }
 #preview-imagens{
     margin: 0;
