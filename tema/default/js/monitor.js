@@ -268,25 +268,23 @@ function lista_musica(){
         $('#list_music').html('');
        let modelo=`
        <div class="card">
-    <div class="card-header" id="head[id_musica]">
-      <h4 class="mb-0">
-        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse[id_musica]" aria-expanded="true" aria-controls="collapse[id_musica]">
+      <div class="card-header">
+        <a class="card-link" data-toggle="collapse" href="#musica[id_musica]">
             [nome_musica] ([artista_musica])
-        </button>
+        </a>
         <span class="acoes_item">
           <a href="javascript:void(0);" data-toggle="modal" data-target="#new_music" data-whatever="[id_musica]"><i class="fas fa-edit"></i></a>
           <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
           <a href="javascript:void(0);" onclick="remover_musica('[id_musica]')"><i class="fas fa-trash"></i></a>
         </span>
-      </h4>
-    </div>
-
-    <div id="collapse[id_musica]" class="collapse" aria-labelledby="collapse[id_musica]" data-parent="#list_music">
-      <div class="card-body">
-        <ul id="verso[id_musica]"></ul>
+      </div>
+      <div id="musica[id_musica]" class="collapse" data-parent="#list_music">
+        <div class="card-body">
+            <ul id="verso[id_musica]"></ul>
+        </div>
       </div>
     </div>
-  </div>`;
+    `;
         $.ajax({
             type: "GET",
             url: urlSocket+'/categoria/musica/'+cat,
@@ -359,20 +357,20 @@ function catBiblias(){
 //Lista a Biblia Selecionada
 function lista_biblia(){
     cat=$('#cat_biblia').val();
-    let modelo=`
-    <div class="card">
-        <div class="card-header" id="head_biblia_[id_livro]">
-            <h4 class="mb-0">
-            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse_biblia_[id_livro]" aria-expanded="true" aria-controls="collapse_biblia_[id_livro]">
-                [nome_livro]
-            </button>
-            </h4>
+   let modelo=`
+   <div class="card">
+      <div class="card-header">
+        <a class="card-link" data-toggle="collapse" href="#biblia_[id_livro]">
+            [nome_livro]
+        </a>
+      </div>
+      <div id="biblia_[id_livro]" class="collapse" data-parent="#list_biblia">
+        <div class="card-body">
+            <div id="list_biblia_[id_livro]"></div>
         </div>
-    
-        <div id="collapse_biblia_[id_livro]" class="biblia_livro collapse" aria-labelledby="collapse_biblia_[id_livro]" data-parent="#list_biblia">
-            <div class="card-body" id="list_biblia_[id_livro]"></div>
-        </div>
-    </div>`;
+      </div>
+    </div>
+   `;
     $('#list_biblia').html('');
     $.ajax({
         type: "GET",
@@ -383,12 +381,10 @@ function lista_biblia(){
                 t_rows=data.data.length;
                 result=data.data;
                 for(i=0;i<t_rows;i++){
-                   item=modelo.replace(/\[id_livro\]/g,result[i].id);
-                   item=item.replace(/\[nome_livro\]/g,result[i].nome);
-                   //if(result[i].id==1){
+                    item=modelo.replace(/\[id_livro\]/g,result[i].id);
+                    item=item.replace(/\[nome_livro\]/g,result[i].nome);
                     $('#list_biblia').append(item);
                     lista_capitulos(result[i].id);
-                   //}
                 }
             }
         }
@@ -397,11 +393,12 @@ function lista_biblia(){
 }
 function lista_capitulos(id){
     cat=$('#cat_biblia').val();
+    /*
     let modelo=`
     <div class="card">
         <div class="card-header" id="head_biblia_[id_livro]_[id_capitulo]">
             <h4 class="mb-0">
-            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse_biblia_[id_livro]_[id_capitulo]" aria-expanded="true" aria-controls="collapse_biblia_[id_livro]_[id_capitulo]">
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse_biblia_[id_livro]_[id_capitulo]" aria-expanded="false" aria-controls="collapse_biblia_[id_livro]_[id_capitulo]">
                 [id_capitulo]
             </button>
             </h4>
@@ -413,6 +410,33 @@ function lista_capitulos(id){
             </div>
         </div>
     </div>`;
+    */
+   /*
+   let modelo=`
+   <div class="card">
+      <div class="card-header">
+        <a class="card-link" data-toggle="collapse" href="#biblia_[id_livro]_[id_capitulo]">
+            [id_capitulo]
+        </a>
+      </div>
+      <div id="biblia_[id_livro]_[id_capitulo]" class="collapse" data-parent="#list_biblia_[id_livro]">
+        <div class="card-body" id="list_biblia_[id_livro]_[id_capitulo]"></div>
+      </div>
+    </div>
+   `;
+   */
+  
+    let modelo=`
+    <h3>
+        <a onclick="lista_versiculo([id_livro],[id_capitulo])">
+            <i class="fas fa-bible"></i>  [id_capitulo]
+        </a>
+    </h3>
+    <div>
+        <ul id="versiculo"></ul>
+    </div>
+    `;
+    
     $.ajax({
         type: "GET",
         url: urlSocket+'/capitulo/biblia/'+cat+'/'+id,
@@ -430,6 +454,9 @@ function lista_capitulos(id){
                         $('#list_biblia_'+result[i].id).append(item);
                         $('#current_loading').html('Listando Livros da Biblias: '+result[i].nome+' '+c);
                   }
+                  $('#list_biblia_'+result[i].id).accordion({
+                    collapsible: true
+                  });
                   ultimo=t_rows-1;
                   if(i==ultimo){
                     fechar_loandig();
@@ -504,4 +531,21 @@ function viewVideo(url){
 function play_video(){
 	player.play();
 	player.volume=0;
+}
+// Troca o Fundo Removendo o Texto
+function backgroundRapido(url){
+    $('#video').css('display','none');
+    $('#preview img').css('display','block');
+    $("#preview img").fadeOut(150, function() {
+        $("#preview img").attr('src',atob(url));
+    }).fadeIn(200);
+    if(congelar('valida')==true){
+      var text = `{"funcao":[{"nome":"background","valor":"${url}" }]}`;
+      socket.emit("send", text);
+    }
+    setTimeout(() => removeConteudo(), 200);
+    if($('#player').length){
+      let player = document.getElementById("player");
+      player.pause();
+    }
 }

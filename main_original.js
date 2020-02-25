@@ -3,9 +3,8 @@ const electron = require('electron');
 //Importo os modulos
 const { app, BrowserWindow, powerSaveBlocker, Menu } = require('electron');
 const id_power_monitor = powerSaveBlocker.start('prevent-display-sleep');
-const config = require('./config');
+//app.commandLine.hasSwitch('disable-gpu');
 //Inicio a aplicação
-app.allowRendererProcessReuse=true;
 app.on('ready', function() {
     //Pego a altura e largura do monitor principal
     const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
@@ -31,12 +30,15 @@ app.on('ready', function() {
         height,
         show: false,
         title: 'Live Praise - Projeção',
-        icon: __dirname+'/app/icon/livepraise.png'
+        icon: __dirname+'/app/icon/livepraise.png',
+        webPreferences: {
+            nodeIntegration: true
+        }
     });
-    const server = require("./server2");
+    const server = require("./server");
     //Abro a URL do monitor
     win.setMenuBarVisibility(false);
-    win.loadURL('file://' + __dirname + '/tema/'+config.tema+'/index.html');
+    win.loadURL('file://' + __dirname + '/app/index.html');
     win.openDevTools();
     win.once('ready-to-show',()=>{
         win.show();

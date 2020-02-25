@@ -3,6 +3,7 @@ module.exports = app => {
   const config = require('../config');  
   var db = new sqlite3.Database(config.dir_app+'/dsw.db');
   app.get('/categoria/musica', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     sql="SELECT * FROM cat_musicas";
     db.all(sql, [], (err, rows) => {
       if (err) {
@@ -19,6 +20,7 @@ module.exports = app => {
     });
   })
   app.get('/categoria/musica/:id', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     id= req.params.id;
     sql="SELECT * FROM musica WHERE cat='"+id+"'";
     db.all(sql, [], (err, rows) => {
@@ -36,6 +38,7 @@ module.exports = app => {
     });
   })
   app.get('/musica/verso/:id', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     id= req.params.id;
     sql="SELECT * FROM musica_versos WHERE musica='"+id+"'";
     db.all(sql, [], (err, rows) => {
