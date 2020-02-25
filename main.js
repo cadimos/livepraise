@@ -31,7 +31,7 @@ app.on('ready', function() {
         height,
         show: false,
         title: 'Live Praise - Projeção',
-        icon: __dirname+'/app/icon/livepraise.png'
+        icon: __dirname+'/app/icon/livepraise.png',
     });
     const server = require("./server2");
     //Abro a URL do monitor
