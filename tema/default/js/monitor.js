@@ -1,9 +1,12 @@
 var urlSocket=document.URL.replace('/tema/','').replace('/index.html','');
 if(urlSocket.indexOf("///")>0){
     urlSocket='http://localhost:3000';
+    user='Monitor';
+}else{
+    user='Monitor_Remoto';
 }
 var socket = io.connect(urlSocket);
-socket.emit("join", 'Monitor');
+socket.emit("join", user);
 ready = true;
 socket.on("chat", function(client,msg) {
     if (ready) {
@@ -59,10 +62,15 @@ function nl2br (str) {
 function CalculaLinhas(quant,div){
     let largura=$(div).innerWidth();
     let altura=$(div).innerHeight();
-    console.log(largura+'x'+altura);
     carcteres_linha=50;
     font=((altura/quant)-(largura/carcteres_linha))-quant;
     return font;
+}
+//Remove o ativo dos versiculos
+function LimpaBiblia(){
+    $.each($('.versiculo'), function () {
+      $(this).removeClass('ativo');
+    })
 }
 //Congela a tela, permitindo alterações apenas na do operador
 function congelar(acao){
@@ -418,7 +426,7 @@ function lista_biblia(){
     cat=$('#cat_biblia').val();
    let modelo=`
    <div class="card">
-      <div class="card-header">
+      <div class="card-header" id="head_biblia_[id_livro]">
         <a class="card-link" data-toggle="collapse" href="#biblia_[id_livro]">
             [nome_livro]
         </a>
@@ -453,7 +461,7 @@ function lista_biblia(){
 function lista_capitulos(id){
     cat=$('#cat_biblia').val();
     let modelo=`
-    <h3>
+    <h3 id="head_biblia_[id_livro]_[id_capitulo]">
         <a onclick="lista_versiculo('${cat}',[id_livro],[id_capitulo])">
             <i class="fas fa-bible"></i>  [id_capitulo]
         </a>
@@ -481,7 +489,8 @@ function lista_capitulos(id){
                         $('#current_loading').html('Listando Livros da Biblias: '+result[i].nome+' '+c);
                   }
                   $('#list_biblia_'+result[i].id).accordion({
-                    collapsible: true
+                    collapsible: true,
+                    active: false
                   });
                   ultimo=t_rows-1;
                   if(i==ultimo){
@@ -499,7 +508,7 @@ function lista_versiculo(cat,livro,capitulo){
     if(cat!=cat_selecionado){
         cat=cat_selecionado;
     }
-    modelo_versiculo=`<a name="versiculo_[id_capitulo]_[id_versiculo]"></a><li onclick="viewBiblia('versiculo_[id_capitulo]_[id_versiculo]','[local_biblia]','BR');" id="versiculo_[id_capitulo]_[id_versiculo]" class="versiculo">[texto]</li>`;
+    modelo_versiculo=`<a name="versiculo_[id_livro]_[id_capitulo]_[id_versiculo]"></a><li onclick="viewBiblia('versiculo_[id_livro]_[id_capitulo]_[id_versiculo]','[local_biblia]','BR');" id="versiculo_[id_livro]_[id_capitulo]_[id_versiculo]" class="versiculo">[texto]</li>`;
     modelo_versiculo=modelo_versiculo.replace(/\[id_livro\]/g,livro);
     modelo_versiculo=modelo_versiculo.replace(/\[id_capitulo\]/g,capitulo);
     $.ajax({
@@ -566,6 +575,55 @@ function viewBiblia(id,nome,br){
       },200);
     }
   
+}
+// Busco na biblia
+function buscaBiblia(){
+    cat=$('#cat_biblia').val();
+    texto=$('#busca_biblia').val();
+    if(texto.length>1){
+        $.ajax({
+            type: "GET",
+            url: urlSocket+'/busca/biblia/'+cat+'/'+texto,
+            dataType: "json",
+            success: function(data) {
+                if(data.status=='successo'){
+                    result=data.livro;
+                    livro=result[0].id;
+                    capitulo=data.capitulo;
+                    versiculo=data.versiculo;
+                    if(livro!=''){
+                        //Verificar se o livro esta aberto
+                        aberto_livro=$('#biblia_'+livro+'.show').length;
+                        if(!aberto_livro){
+                            $(`#head_biblia_${livro} a`).trigger('click');
+                            let ancora=`#head_biblia_${livro}`;
+                            location.href=ancora;
+                            $('#busca_biblia').focus();
+                        }
+                    }
+                    if(capitulo!=''){
+                        //Verificar se o capitulo esta aberto
+                        aberto_capitulo=$(`#collapse_${livro}_${capitulo}.ui-accordion-content-active`).length;
+                        if(!aberto_capitulo){
+                            $(`#head_biblia_${livro}_${capitulo} a`).trigger('click');
+                            let ancora=`#head_biblia_${livro}_${capitulo}`;
+                            location.href=ancora;
+                            $('#busca_biblia').focus();
+                        }
+                    }
+                    //verificar se existe o versiculo
+                    if(versiculo!=''){
+                        LimpaBiblia();
+                        $(`#versiculo_${livro}_${capitulo}_${versiculo}`).trigger('click');
+                        $(`#versiculo_${livro}_${capitulo}_${versiculo}`).trigger('focus');
+                        let ancora=`#versiculo_${livro}_${capitulo}_${versiculo}`;
+                        location.href=ancora;
+                        $('#busca_biblia').focus();
+                    }
+                }
+            }
+        });
+    }
 }
 //Listagem Background Rápido
 function lista_background_rapido(){
@@ -655,25 +713,25 @@ function backgroundRapido(url){
 $('#navegacao a').click(function (e) {
     e.preventDefault()
     $(this).tab('show')
-  });
-  var el = document.querySelector('.chrome-tabs')
-  var chromeTabs = new ChromeTabs()
-  
-  chromeTabs.init(el, {
+});
+var el = document.querySelector('.chrome-tabs')
+var chromeTabs = new ChromeTabs()
+chromeTabs.init(el, {
     tabOverlapDistance: 14,
     minWidth: 45,
     maxWidth: 243
-  })
+})
   
-  el.addEventListener('activeTabChange', ({ detail }) => console.log('Active tab changed', detail.tabEl))
-  el.addEventListener('tabAdd', ({ detail }) => console.log('Tab added', detail.tabEl))
-  el.addEventListener('tabRemove', ({ detail }) => console.log('Tab removed', detail.tabEl))
+el.addEventListener('activeTabChange', ({ detail }) => console.log('Active tab changed', detail.tabEl))
+el.addEventListener('tabAdd', ({ detail }) => console.log('Tab added', detail.tabEl))
+el.addEventListener('tabRemove', ({ detail }) => console.log('Tab removed', detail.tabEl))
   
-  if(document.querySelector('button[data-remove-tab]')){
+if(document.querySelector('button[data-remove-tab]')){
     document.querySelector('button[data-remove-tab]').addEventListener('click', function(){
       chromeTabs.removeTab(el.querySelector('.chrome-tab-current'))
     });
 }
+
 function slideAtivo(){
     if(!$('.chrome-conteudo-show ul').length){
       setTimeout(() => slideAtivo(),200);

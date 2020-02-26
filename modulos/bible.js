@@ -99,7 +99,12 @@ module.exports = app => {
       capitulo=texto;
       versiculo='';
     }
-    sql="SELECT id FROM livros WHERE `nome` LIKE '"+livro+"%' OR `nome2` LIKE '"+livro+"%' LIMIT 1";
+    if(livro=='jo'){
+      sql="SELECT id FROM livros WHERE `nome` LIKE '"+livro+"' OR `nome2` LIKE '"+livro+"' LIMIT 1";
+    }else{
+      sql="SELECT id FROM livros WHERE `nome` LIKE '"+livro+"%' OR `nome2` LIKE '"+livro+"%' LIMIT 1";
+    }
+
     db.all(sql, [], (err, rows) => {
       if (err) {
         res.status(400).json({
