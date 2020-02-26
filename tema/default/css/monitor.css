@@ -297,6 +297,9 @@ li.ativo{
 #versiculo li {
     margin-bottom: 2px;
 }
+.ui-accordion .ui-accordion-content{
+    height: auto !important;
+}
 @keyframes scale {
   0%, 100% {
     transform: scale(0.0);

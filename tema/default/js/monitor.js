@@ -54,7 +54,16 @@ function nl2br (str) {
     }
     var breakTag = `<br />`;
     return (str + '').replace(/(\r\n|\n\r|\r|\n)/g, breakTag)
-  }
+}
+//Calcula quantidade de linhas para biblia
+function CalculaLinhas(quant,div){
+    let largura=$(div).innerWidth();
+    let altura=$(div).innerHeight();
+    console.log(largura+'x'+altura);
+    carcteres_linha=50;
+    font=((altura/quant)-(largura/carcteres_linha))-quant;
+    return font;
+}
 //Congela a tela, permitindo alterações apenas na do operador
 function congelar(acao){
     s=$('#freeze').val();
@@ -445,11 +454,11 @@ function lista_capitulos(id){
     cat=$('#cat_biblia').val();
     let modelo=`
     <h3>
-        <a onclick="lista_versiculo([id_livro],[id_capitulo])">
+        <a onclick="lista_versiculo('${cat}',[id_livro],[id_capitulo])">
             <i class="fas fa-bible"></i>  [id_capitulo]
         </a>
     </h3>
-    <div>
+    <div id="collapse_[id_livro]_[id_capitulo]">
         <ul id="versiculo"></ul>
     </div>
     `;
@@ -484,7 +493,80 @@ function lista_capitulos(id){
     });
     return true;
 }
-
+//Funçao de Listar os Versiculos por demanda
+function lista_versiculo(cat,livro,capitulo){
+    cat_selecionado=$('#cat_biblia').val();
+    if(cat!=cat_selecionado){
+        cat=cat_selecionado;
+    }
+    modelo_versiculo=`<a name="versiculo_[id_capitulo]_[id_versiculo]"></a><li onclick="viewBiblia('versiculo_[id_capitulo]_[id_versiculo]','[local_biblia]','BR');" id="versiculo_[id_capitulo]_[id_versiculo]" class="versiculo">[texto]</li>`;
+    modelo_versiculo=modelo_versiculo.replace(/\[id_livro\]/g,livro);
+    modelo_versiculo=modelo_versiculo.replace(/\[id_capitulo\]/g,capitulo);
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/versiculo/biblia/'+cat+'/'+livro+'/'+capitulo,
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                $('#collapse_'+livro+'_'+capitulo+' #versiculo').html('');
+                for(i=0;i<t_rows;i++){
+                    versiculo=modelo_versiculo.replace(/\[id_versiculo\]/g,result[i].versiculo);
+                    versiculo=versiculo.replace(/\[texto\]/g,(result[i].texto));
+                    versiculo=versiculo.replace(/\[local_biblia\]/g,livro+'-'+capitulo+'-'+result[i].versiculo);
+                    $('#collapse_'+livro+'_'+capitulo+' #versiculo').append(versiculo);
+                }
+            }
+        }
+    });
+}
+//Exibir Musica
+function viewBiblia(id,nome,br){
+    cat=$('#cat_biblia').val();
+    $('.conteudo').html('');
+    txt=$('#'+id).html();
+    if(br=='BR'){
+      txt=nl2br(txt);
+    }
+    let modelo=`
+    <div class="titulo"></div>
+    <div class="content"><span>${txt}</span></div>
+    <div class="rodape"></div>`;
+    $('.conteudo').append(modelo);
+    $('.content').textfill({maxFontPixels: CalculaLinhas(5,'.content'),debug: true  });
+    $('.content').css('text-align','left');
+    $('.titulo').css('font-size','20px');
+    nome=nome.split('-');
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/capitulo/biblia/'+cat+'/'+nome[0],
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                $('.titulo').html(result[0].nome+' '+nome[1]+':'+nome[2]);
+            }
+        }
+    });
+    $.each($('.versiculo'), function () {
+      $(this).removeClass('ativo');
+    });
+    $('#'+id).addClass('ativo');
+    if(congelar('valida')==true){
+      setTimeout(function(){
+        tit=$('.titulo').html();
+        let modelo_send=`
+        <div class="titulo">${tit}</div>
+        <div class="content"><span>${txt}</span></div>
+        <div class="rodape"></div>`;
+        var text = `{"funcao":[{"nome":"viewBiblia","valor":"${btoa(modelo_send)}" }]}`;
+        socket.emit("send", text);
+      },200);
+    }
+  
+}
 //Listagem Background Rápido
 function lista_background_rapido(){
     let modelo=`<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 background-rapido">
