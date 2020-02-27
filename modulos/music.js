@@ -284,29 +284,4 @@ function remover_musica(id,conf){
     });
   }
 }
-//Exibir Musica
-function viewMusica(id,nome,br){
-
-  $('.conteudo').html('');
-  txt=$('#'+id).html();
-  txt=iso_encode(txt);
-  if(br=='BR'){
-    txt=nl2br(txt);
-  }
-  let modelo=`
-  <div class="titulo"></div>
-  <div class="content"><span>${txt}</span></div>
-  <div class="rodape">${nome}</div>`;
-  $('.conteudo').append(modelo);
-  $('.content').textfill({
-    maxFontPixels: 0
-  });
-  $('.content').css('text-align','center');
-  $('.rodape').css('font-size','20px');
-  if(congelar('valida')==true){
-    var text = '{"funcao":[' +'{"nome":"viewMusica","valor":"'+btoa(modelo)+'" }]}';
-    socket.emit("send", text);
-  }
-
-}
 */
