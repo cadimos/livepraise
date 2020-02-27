@@ -110,7 +110,8 @@ function atualizar(vl){
       let text = '{"funcao":[' +'{"nome":"atualizar","valor":"'+btoa(txt)+'" }]}';
       socket.emit("send", text);
     }
-    setTimeout(() => location.reload(),100);
+    local=location.href.replace(location.hash,'');
+    setTimeout(() => location.href=local,100);
 }
 var stop_color=false;
 function color_animate(tempo){
@@ -588,37 +589,39 @@ function buscaBiblia(){
             success: function(data) {
                 if(data.status=='successo'){
                     result=data.livro;
-                    livro=result[0].id;
-                    capitulo=data.capitulo;
-                    versiculo=data.versiculo;
-                    if(livro!=''){
-                        //Verificar se o livro esta aberto
-                        aberto_livro=$('#biblia_'+livro+'.show').length;
-                        if(!aberto_livro){
-                            $(`#head_biblia_${livro} a`).trigger('click');
-                            let ancora=`#head_biblia_${livro}`;
+                    if(result.length>0){
+                        livro=result[0].id;
+                        capitulo=data.capitulo;
+                        versiculo=data.versiculo;
+                        if(livro!=''){
+                            //Verificar se o livro esta aberto
+                            aberto_livro=$('#biblia_'+livro+'.show').length;
+                            if(!aberto_livro){
+                                $(`#head_biblia_${livro} a`).trigger('click');
+                                let ancora=`#head_biblia_${livro}`;
+                                location.href=ancora;
+                                $('#busca_biblia').focus();
+                            }
+                        }
+                        if(capitulo!=''){
+                            //Verificar se o capitulo esta aberto
+                            aberto_capitulo=$(`#collapse_${livro}_${capitulo}.ui-accordion-content-active`).length;
+                            if(!aberto_capitulo){
+                                $(`#head_biblia_${livro}_${capitulo} a`).trigger('click');
+                                let ancora=`#head_biblia_${livro}_${capitulo}`;
+                                location.href=ancora;
+                                $('#busca_biblia').focus();
+                            }
+                        }
+                        //verificar se existe o versiculo
+                        if(versiculo!=''){
+                            LimpaBiblia();
+                            $(`#versiculo_${livro}_${capitulo}_${versiculo}`).trigger('click');
+                            $(`#versiculo_${livro}_${capitulo}_${versiculo}`).trigger('focus');
+                            let ancora=`#versiculo_${livro}_${capitulo}_${versiculo}`;
                             location.href=ancora;
                             $('#busca_biblia').focus();
                         }
-                    }
-                    if(capitulo!=''){
-                        //Verificar se o capitulo esta aberto
-                        aberto_capitulo=$(`#collapse_${livro}_${capitulo}.ui-accordion-content-active`).length;
-                        if(!aberto_capitulo){
-                            $(`#head_biblia_${livro}_${capitulo} a`).trigger('click');
-                            let ancora=`#head_biblia_${livro}_${capitulo}`;
-                            location.href=ancora;
-                            $('#busca_biblia').focus();
-                        }
-                    }
-                    //verificar se existe o versiculo
-                    if(versiculo!=''){
-                        LimpaBiblia();
-                        $(`#versiculo_${livro}_${capitulo}_${versiculo}`).trigger('click');
-                        $(`#versiculo_${livro}_${capitulo}_${versiculo}`).trigger('focus');
-                        let ancora=`#versiculo_${livro}_${capitulo}_${versiculo}`;
-                        location.href=ancora;
-                        $('#busca_biblia').focus();
                     }
                 }
             }
