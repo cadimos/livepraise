@@ -398,6 +398,78 @@ function adicionar_musica(id){
     });
     setTimeout(() => slideAtivo(),700);
 }
+//Busca Musica
+function buscaMusica(submit){
+    if(!submit){
+      buscaMusicaLocal();
+    }else{
+      buscaMusicaOnline();
+    }
+}
+//Busca Musica local
+function buscaMusicaLocal(){
+    cat=$('#cat_musica').val();
+    busca=$("#busca_musica").val();
+    if(busca.length<3){
+      lista_musica();
+    }else	if(cat!=''){
+        $('#list_music').html('');
+        let modelo=`
+       <div class="card">
+      <div class="card-header" id="head[id_musica]">
+        <a class="card-link" data-toggle="collapse" href="#musica[id_musica]">
+            [nome_musica] ([artista_musica])
+        </a>
+        <span class="acoes_item">
+          <a href="javascript:void(0);" data-toggle="modal" data-target="#new_music" data-whatever="[id_musica]"><i class="fas fa-edit"></i></a>
+          <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
+          <a href="javascript:void(0);" onclick="remover_musica('[id_musica]')"><i class="fas fa-trash"></i></a>
+        </span>
+      </div>
+      <div id="musica[id_musica]" class="collapse" data-parent="#list_music">
+        <div class="card-body">
+            <ul id="verso[id_musica]"></ul>
+        </div>
+      </div>
+    </div>
+    `;
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/busca/musica/'+busca,
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                for(i=0;i<t_rows;i++){
+                    musica=result[i];
+                    item=modelo.replace(/\[id_musica\]/g,musica.id);
+                    item=item.replace(/\[nome_musica\]/g,musica.nome);
+                    item=item.replace(/\[artista_musica\]/g,musica.artista);
+                    $('#list_music').append(item);
+                    lista_musica_verso(musica.id,musica.nome,musica.artista);
+                }
+            }
+        }
+    });
+        /*
+      db.serialize(function() {
+        db.each("SELECT id,nome,artista FROM musica WHERE cat='"+cat+"' AND (`nome` LIKE '%"+busca+"%' OR `artista` LIKE '%"+busca+"%') ORDER BY nome ASC", function(err, musica) {
+          item=modelo.replace(/\[id_musica\]/g,musica.id);
+          item=item.replace(/\[nome_musica\]/g,musica.nome);
+          item=item.replace(/\[artista_musica\]/g,musica.artista);
+          $('#list_music').append(item);
+          db.each("SELECT id,verso FROM musica_versos WHERE `musica`='"+musica.id+"'", function(err, row) {
+            verse=row.verso;
+            verse=verse.replace(/<br \/>/g,"\n");
+            modelo_item=`<li class="verso_musica" onclick='viewMusica("verso_${musica.id}_${row.id}","${musica.nome} (${musica.artista})","BR");' id="verso_${musica.id}_${row.id}">${verse}</li>`;
+            $('#verso'+musica.id).append(modelo_item);
+          });
+        });
+      });
+      */
+    }
+}
 //Lista as Biblias Disponiveis
 function catBiblias(){
     $('#cat_biblia').html('');
