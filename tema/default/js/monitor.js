@@ -44,6 +44,62 @@ socket.on("chat", function(client,msg) {
     */
     }
 });
+//Teclado
+const KEY_DOWN = 40;
+const KEY_UP = 38;
+const KEY_LEFT = 37;
+const KEY_RIGHT = 39;
+
+const KEY_END = 35;
+const KEY_BEGIN = 36;
+
+const KEY_BACK_TAB = 8;
+const KEY_TAB = 9;
+const KEY_SH_TAB = 16;
+const KEY_ENTER = 13;
+const KEY_ESC = 27;
+const KEY_SPACE = 32;
+const KEY_DEL = 46;
+
+const KEY_ALT = 18;
+const KEY_CTRL = 17;
+const KEY_SHIFT = 16;
+
+const KEY_A = 65;
+const KEY_B = 66;
+const KEY_C = 67;
+const KEY_D = 68;
+const KEY_E = 69;
+const KEY_F = 70;
+const KEY_G = 71;
+const KEY_H = 72;
+const KEY_I = 73;
+const KEY_J = 74;
+const KEY_K = 75;
+const KEY_L = 76;
+const KEY_M = 77;
+const KEY_N = 78;
+const KEY_O = 79;
+const KEY_P = 80;
+const KEY_Q = 81;
+const KEY_R = 82;
+const KEY_S = 83;
+const KEY_T = 84;
+const KEY_U = 85;
+const KEY_V = 86;
+const KEY_W = 87;
+const KEY_X = 88;
+const KEY_Y = 89;
+const KEY_Z = 90;
+
+const KEY_PF1 = 112;
+const KEY_PF2 = 113;
+const KEY_PF3 = 114;
+const KEY_PF4 = 115;
+const KEY_PF5 = 116;
+const KEY_PF6 = 117;
+const KEY_PF7 = 118;
+const KEY_PF8 = 119;
 //Converte em ISO-8859-1
 function iso_encode(str){
     str = str.replace(/\'/g, '&apos;');
@@ -497,8 +553,7 @@ function buscaMusicaOnline(){
             $(this).remove();
           });
             t_resultado=data.resultado.length;
-          for(i=0;i<t_resultado;i++){
-            
+          for(i=0;i<t_resultado;i++){    
             result=data.resultado[i];
             item=modelo_web.replace(/\[id_musica\]/g,'api'+result.id);
             item=item.replace(/\[nome_musica\]/g,result.nome);
@@ -892,9 +947,9 @@ chromeTabs.init(el, {
     maxWidth: 243
 })
   
-el.addEventListener('activeTabChange', ({ detail }) => console.log('Active tab changed', detail.tabEl))
-el.addEventListener('tabAdd', ({ detail }) => console.log('Tab added', detail.tabEl))
-el.addEventListener('tabRemove', ({ detail }) => console.log('Tab removed', detail.tabEl))
+//el.addEventListener('activeTabChange', ({ detail }) => console.log('Active tab changed', detail.tabEl))
+//el.addEventListener('tabAdd', ({ detail }) => console.log('Tab added', detail.tabEl))
+//el.addEventListener('tabRemove', ({ detail }) => console.log('Tab removed', detail.tabEl))
   
 if(document.querySelector('button[data-remove-tab]')){
     document.querySelector('button[data-remove-tab]').addEventListener('click', function(){
@@ -921,3 +976,88 @@ function slideAtivo(){
       }
     }
 }
+var pressedCtrl = false; //variável de controle
+$(document).keyup(function (e) {  //O evento Kyeup é acionado quando as teclas são soltas
+  if(e.which == KEY_CTRL) pressedCtrl=false; //Quando qualuer tecla for solta é preciso informar que Crtl não está pressionada
+  })
+$(document).keydown(function (e) { //Quando uma tecla é pressionada
+  if(e.which == KEY_CTRL) pressedCtrl = true; //Informando que Crtl está acionado
+  if((e.which == KEY_ENTER|| e.keyCode == KEY_ENTER) && pressedCtrl == true) { //Reconhecendo tecla Enter
+    alert('O comando Crtl+Enter foi acionado')
+    }
+  if(e.which == KEY_LEFT || e.keyCode == KEY_LEFT || e.which == KEY_RIGHT || e.keyCode == KEY_RIGHT){
+    if(!$('#busca_musica').is(':focus') || $('#busca_musica').val()==''){
+      //percorre todo sequencia atual
+      let proximo = 1;
+      let index = 1;
+      $.each($('.chrome-conteudo-show .item_verso_musica'), function () {
+        if($(this).hasClass('ativo')) {
+          switch (e.keyCode) {
+            case KEY_RIGHT:
+              proximo += index;
+              break;
+            case KEY_LEFT:
+              proximo = index - 1;
+              break;
+          }
+        }
+        index++;
+      });
+      index = 1;
+      // VERIFICA SE O RETORNO É MAIOR QUE O NUMERO TOTAL DE DIVS E RETORNA FALSO PARA A NAVEGACAO NÃO SAIR DE DAS DIVS
+      if(proximo > $('.chrome-conteudo-show .item_verso_musica').length) {
+          return false;
+      // VERIFICA SE O RETORNO É MENOR QUE 1 E RETORNA FALSO PARA A NAVEGAÇÃO NÃO SAIR DAS DIVS
+      }else if(proximo < 1 ) {
+          return false;
+      }
+      // PERCORRE TODAS AS DIVS ITEMS PARA ATRIBUIR A CLASSE SELECTED NA DIV QUE O CURSOR DEVE IR SETADO NA VARIAVEL PROXIMO
+      $.each($('.chrome-conteudo-show .item_verso_musica'), function () {
+          $(this).removeClass('ativo');
+          if (index === proximo) {
+              $(this).addClass('ativo');
+              $(this).trigger('click');
+          }
+          index++;
+      })
+    }
+  }
+  if(e.which == KEY_UP || e.keyCode == KEY_UP || e.which == KEY_DOWN || e.keyCode == KEY_DOWN){
+    if(!$('#busca_musica').is(':focus') || $('#busca_musica').val()==''){
+      //percorre todo sequencia atual
+      let proximo = 1;
+      let index = 1;
+      $("#busca_biblia").blur();
+      $.each($('.versiculo'), function () {
+        if($(this).hasClass('ativo')) {
+          switch (e.keyCode) {
+            case KEY_DOWN:
+              proximo += index;
+              break;
+            case KEY_UP:
+              proximo = index - 1;
+              break;
+          }
+        }
+        index++;
+      });
+      index = 1;
+      // VERIFICA SE O RETORNO É MAIOR QUE O NUMERO TOTAL DE DIVS E RETORNA FALSO PARA A NAVEGACAO NÃO SAIR DE DAS DIVS
+      if(proximo > $('.versiculo').length) {
+          return false;
+      // VERIFICA SE O RETORNO É MENOR QUE 1 E RETORNA FALSO PARA A NAVEGAÇÃO NÃO SAIR DAS DIVS
+      }else if(proximo < 1 ) {
+          return false;
+      }
+      // PERCORRE TODAS AS DIVS ITEMS PARA ATRIBUIR A CLASSE SELECTED NA DIV QUE O CURSOR DEVE IR SETADO NA VARIAVEL PROXIMO
+      $.each($('.versiculo'), function () {
+          $(this).removeClass('ativo');
+          if (index === proximo) {
+              $(this).addClass('ativo');
+              $(this).trigger('click');
+          }
+          index++;
+      })
+    }
+  }
+});
