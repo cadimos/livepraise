@@ -461,26 +461,23 @@ function buscaMusicaOnline(){
       lista_musica();
     }else{
       $('#list_music').html('');
-      /*
-      let modelo_web=`<div class="panel panel-default">
-        <div class="panel-heading" role="tab" id="head[id_musica]">
-        <h4 class="panel-title">
-        <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
-        [nome_musica] ([artista_musica])
-        </a>
-        <span class="acoes_item">
-          <a href="javascript:void(0);" onclick='adicionar_musica_salvar("[id_musica]","[nome_musica]","[artista_musica]","[compositor_musica]")'><i class="fas fa-check-circle"></i></a>
-        </span>
-        </h4>
+      let modelo_web=`
+       <div class="card">
+        <div class="card-header" id="head[id_musica]">
+            <a class="card-link" data-toggle="collapse" href="#musica[id_musica]">
+                [nome_musica] ([artista_musica])
+            </a>
+            <span class="acoes_item">
+                <a href="javascript:void(0);" onclick='adicionar_musica_salvar("[id_musica]","[nome_musica]","[artista_musica]","[compositor_musica]")'><i class="fas fa-check-circle"></i></a>
+            </span>
         </div>
-        <div id="collapse[id_musica]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head[id_musica]">
-        <div class="panel-body">
-        <ul id="verso[id_musica]"></ul>
+        <div id="musica[id_musica]" class="collapse" data-parent="#list_music">
+            <div class="card-body">
+                <ul id="verso[id_musica]"></ul>
+            </div>
         </div>
         </div>
-      </div>`;
-      */
-     let modelo_web='';
+        `;
       $('#list_music').append('<div class="alert alert-info" role="alert" id="alerta_pesquisa_musica">Procurando Música na Internet</div>');
       $.ajax({
         type: "GET",
@@ -501,7 +498,7 @@ function buscaMusicaOnline(){
           });
             t_resultado=data.resultado.length;
           for(i=0;i<t_resultado;i++){
-            /*
+            
             result=data.resultado[i];
             item=modelo_web.replace(/\[id_musica\]/g,'api'+result.id);
             item=item.replace(/\[nome_musica\]/g,result.nome);
@@ -515,11 +512,58 @@ function buscaMusicaOnline(){
               let modelo_item=`<li class="verso_musica" onclick='viewMusica("verso_api${result.id}_${v}","${result.nome} (${result.artista})","BR");' id="verso_api${result.id}_${v}">${verse}</li>`;
                 $('#verso'+'api'+result.id).append(modelo_item);
             }
-            */
           }
         }
       });
     }
+}
+function adicionar_musica_salvar(id,nome,artista,compositor){
+    cat=1;
+    versos=$('#verso'+id+' li');
+    t_versos=versos.length;
+    nome=iso_encode(nome);
+    artista=iso_encode(artista);
+    compositor=iso_encode(compositor);
+    dados={
+        cat:cat,
+        nome:nome,
+        artista:artista,
+        compositor:compositor
+    }
+    $.ajax({
+        type: "POST",
+        url: urlSocket+'/add/musica/',
+        data: dados,
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                id_musica=data.id;
+                for(i=0;i<t_versos;i++){
+                    v=$(versos[i]).html();
+                    v=iso_encode(v);
+                    adicionar_verso(id_musica,v);
+                } 
+            }
+        }
+    });
+  adicionar_musica(id);
+}
+function adicionar_verso(musica,verso){
+    dados={
+        musica:musica,
+        verso:verso
+    }
+    $.ajax({
+        type: "POST",
+        url: urlSocket+'/add/musica/verso',
+        data: dados,
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                id_verso=data.id;
+            }
+        }
+    });
 }
 //Lista as Biblias Disponiveis
 function catBiblias(){

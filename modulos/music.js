@@ -73,6 +73,71 @@ module.exports = app => {
       })
     });
   })
+  app.post("/add/musica/", (req, res, next) => {
+    var errors=[]
+    if (!req.body.cat){
+        errors.push("Categoria Obrigatória");
+    }
+    if (!req.body.nome){
+        errors.push("Nome Obrigatório");
+    }
+    if (!req.body.artista){
+        errors.push("Artista Obrigatório");
+    }
+    if (errors.length){
+        res.status(400).json({"error":errors.join(",")});
+        return;
+    }
+    var data = {
+        cat: req.body.cat,
+        nome: req.body.nome,
+        artista : req.body.artista,
+        compositor : req.body.compositor
+    }
+    var sql ='INSERT INTO musica (cat, nome, nome2, artista,compositor) VALUES (?,?,?,?,?)'
+    var params =[data.cat, data.nome,data.nome, data.artista,data.compositor]
+    db.run(sql, params, function (err, result) {
+        if (err){
+            res.status(400).json({"error": err.message})
+            return;
+        }
+        res.json({
+            "status":"successo",
+            "data": data,
+            "id" : this.lastID
+        })
+    });
+  })
+  app.post("/add/musica/verso", (req, res, next) => {
+    var errors=[]
+    if (!req.body.musica){
+        errors.push("Id da Musica Obrigatória");
+    }
+    if (!req.body.verso){
+        errors.push("Verso Obrigatório");
+    }
+    if (errors.length){
+        res.status(400).json({"error":errors.join(",")});
+        return;
+    }
+    var data = {
+        musica: req.body.musica,
+        verso: req.body.verso,
+    }
+    var sql ='INSERT INTO musica_versos (musica, verso) VALUES (?,?)'
+    var params =[data.musica, data.verso]
+    db.run(sql, params, function (err, result) {
+        if (err){
+            res.status(400).json({"error": err.message})
+            return;
+        }
+        res.json({
+            "status":"successo",
+            "data": data,
+            "id" : this.lastID
+        })
+    });
+  })
 }
 
 
