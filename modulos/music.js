@@ -82,67 +82,7 @@ module.exports = app => {
 //Busca Musica
 
 
-function buscaMusicaOnline(){
-  busca=$("#busca_musica").val();
-  if(busca.length<3){
-    lista_musica();
-  }else{
-    $('#list_music').html('');
-    let modelo_web=`<div class="panel panel-default">
-	  <div class="panel-heading" role="tab" id="head[id_musica]">
-	  <h4 class="panel-title">
-	  <a role="button" data-toggle="collapse" data-parent="#list_music" href="#collapse[id_musica]" aria-expanded="true" aria-controls="collapseOne">
-	  [nome_musica] ([artista_musica])
-	  </a>
-	  <span class="acoes_item">
-	    <a href="javascript:void(0);" onclick='adicionar_musica_salvar("[id_musica]","[nome_musica]","[artista_musica]","[compositor_musica]")'><i class="fas fa-check-circle"></i></a>
-	  </span>
-	  </h4>
-	  </div>
-	  <div id="collapse[id_musica]" class="panel-collapse collapse" role="tabpanel" aria-labelledby="head[id_musica]">
-	  <div class="panel-body">
-	  <ul id="verso[id_musica]"></ul>
-	  </div>
-	  </div>
-    </div>`;
-    $('#list_music').append('<div class="alert alert-info" role="alert" id="alerta_pesquisa_musica">Procurando Música na Internet</div>');
-    $.ajax({
-      type: "GET",
-      url: "https://api.livepraise.tk/busca/musicas/"+encodeURI(busca),
-      dataType: "json",
-      error: function(erro){
-        $('#alerta_pesquisa_musica').remove();
-        $('#list_music').append('<div class="alert alert-danger" role="alert" id="alerta_erro_musica">Houve um erro ao Buscar a música na internet. Verifique sua conexão e tente novamente!</div>');
-        $('#alerta_erro_musica').fadeOut(10000,function(){
-          $(this).remove();
-        });
-      },
-      success: function(data) {
-        $('#alerta_pesquisa_musica').remove();
-        $('#list_music').append('<div class="alert alert-success" role="alert" id="alerta_sucesso_musica">Localizado Músicas na Internet</div>');
-        $('#alerta_sucesso_musica').fadeOut(2000,function(){
-          $(this).remove();
-        });
-      	t_resultado=data.resultado.length;
-        for(i=0;i<t_resultado;i++){
-          result=data.resultado[i];
-          item=modelo_web.replace(/\[id_musica\]/g,'api'+result.id);
-          item=item.replace(/\[nome_musica\]/g,result.nome);
-          item=item.replace(/\[artista_musica\]/g,result.artista.trim());
-          item=item.replace(/\[compositor_musica\]/g,result.compositor.trim());
-          $('#list_music').append(item);
-          t_verso=result.versos.length;
-          for(v=0;v<t_verso;v++){
-            verse=result.versos[v];
-            verse=verse.replace(/<br \/>/g,"\n");
-            let modelo_item=`<li class="verso_musica" onclick='viewMusica("verso_api${result.id}_${v}","${result.nome} (${result.artista})","BR");' id="verso_api${result.id}_${v}">${verse}</li>`;
-	          $('#verso'+'api'+result.id).append(modelo_item);
-          }
-        }
-      }
-    });
-  }
-}
+
 
 
 
