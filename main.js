@@ -71,13 +71,10 @@ app.on('ready', function() {
             show: false,
             frame: false,
             title: 'Live Praise - Projetor',
-            icon: __dirname+'/app/icon/livepraise.png',
-            webPreferences: {
-                nodeIntegration: true
-            }
+            icon: __dirname+'/app/icon/livepraise.png'
         });
         //Abro a url do monitor externo
-        win2.loadURL('file://' + __dirname + '/app/projetor.html');
+        win2.loadURL('file://' + __dirname + '/tema/'+config.tema+'/projetor.html');
         win2.openDevTools();
         win2.once('ready-to-show',()=>{
             win2.show();
