@@ -44,7 +44,7 @@
   },
   "private": true,
   "dependencies": {
-    "blueimp-md5": "^2.12.0",
+    "blueimp-md5": "^2.13.0",
     "body-parser": "^1.19.0",
     "child-process-promise": "^2.2.1",
     "consign": "^0.1.6",
@@ -53,19 +53,19 @@
     "ffmpeg-static": "^2.7.0",
     "graceful-fs": "^4.2.3",
     "jquery": "^3.4.1",
-    "node-abi": "^2.14.0",
+    "node-abi": "^2.15.0",
     "node-pre-gyp": "^0.13.0",
     "request": "^2.88.2",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "sqlite3": "^4.1.1",
-    "systeminformation": "^4.21.2",
+    "systeminformation": "^4.23.3",
     "webcamjs": "^1.0.26"
   },
   "devDependencies": {
     "debug": "^4.1.1",
-    "electron": "^8.0.0",
+    "electron": "^8.2.1",
     "electron-packager": "^13.1.1",
-    "electron-rebuild": "^1.10.0"
+    "electron-rebuild": "^1.10.1"
   }
 }

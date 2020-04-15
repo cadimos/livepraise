@@ -12,6 +12,7 @@ module.exports = app => {
             cat.push(name.replace(config.dir_app+'/',''));
           }
         }
+        cat.sort();
         res.json({
             "status":"successo",
             "data":cat

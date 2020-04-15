@@ -55,6 +55,14 @@
     width: 100vw;
     margin-top: 10px;
 }
+.btn-search{
+    background: #fff;
+}
+.btn-search:hover{
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
 .container-fluid{
     padding: 0 !important;
 }

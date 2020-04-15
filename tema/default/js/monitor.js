@@ -222,13 +222,7 @@ function loanding(){
         bib==true
     ){
         parar_cor();
-        //fechar_loandig();
     }
-    /*
-    
-    
-    lista_tela();
-    */
 }
   
 function fechar_loandig(){
@@ -570,6 +564,58 @@ function buscaMusicaOnline(){
           }
         }
       });
+    }
+}
+function salvar_musica(id){
+    cat=1;
+    nome=$('#new_music #nome').val();
+    nome=iso_encode(nome);
+    if(nome==''){
+        alert('O nome da Música é Obrigatória!');
+    }
+    artista=$('#new_music #artista').val();
+    artista=iso_encode(artista);
+    if(artista==''){
+        alert('O nome do Artista é Obrigatória!');
+    }
+    compositor=$('#new_music #compositor').val();
+    compositor=iso_encode(compositor);
+    letra=$('#new_music #letra').val();
+    letra=iso_encode(letra);
+    if(letra==''){
+        alert('A letra da Música é Obrigatória!');
+    }
+    if(nome!='' && artista!='' && letra!=''){
+        letra=nl2br(letra);
+        versos=letra.split("<br /><br />");
+        t_versos=versos.length;
+        if(id==0){
+            dados={
+                cat:cat,
+                nome:nome,
+                artista:artista,
+                compositor:compositor
+            }
+            $.ajax({
+                type: "POST",
+                url: urlSocket+'/add/musica/',
+                data: dados,
+                dataType: "json",
+                success: function(data) {
+                    if(data.status=='successo'){
+                        id_musica=data.id;
+                        for(i=0;i<t_versos;i++){
+                            if(versos[i]!=''){
+                                v=versos[i]
+                                v=iso_encode(v);
+                                adicionar_verso(id_musica,v);
+                                $('#new_music').modal('hide')
+                            }
+                        } 
+                    }
+                }
+            });
+        }
     }
 }
 function adicionar_musica_salvar(id,nome,artista,compositor){

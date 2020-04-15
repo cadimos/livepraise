@@ -160,8 +160,10 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Nova Música</h4>
+                            <h5 class="modal-title">Nova Música</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
                         <div class="modal-body">
                             <form class="form-horizontal">
@@ -196,7 +198,7 @@
                             </form>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-                                <button type="button" class="btn btn-success" id="button_salvar_musica" onclick="salvar_musica();">Salvar</button>
+                                <button type="button" class="btn btn-success" id="button_salvar_musica" onclick="salvar_musica(0);">Salvar</button>
                             </div>
                         </div>
                     </div>
@@ -226,8 +228,10 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Configurar Tela de Projeção</h4>
+                            <h5 class="modal-title">Configurar Tela de Projeção</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
                         <div class="modal-body">
                             <form class="form-horizontal">
@@ -250,14 +254,14 @@
                                 <div class="form-group">
                                     <label class="col-md-3 control-label" for="largura">Largura:</label>
                                     <div class="col-md-9">
-                                        <input id="largura" name="largura" type="text" class="form-control input-md" required="">
+                                        <input id="largura" name="largura" type="number" class="form-control input-md" required="" onchange="ajustarTela();">
                                     </div>
                                 </div>
                                 <!-- Altura-->
                                 <div class="form-group">
                                     <label class="col-md-3 control-label" for="altura">Altura:</label>
                                     <div class="col-md-9">
-                                        <input id="altura" name="altura" type="text" class="form-control input-md">
+                                        <input id="altura" name="altura" type="number" class="form-control input-md" onchange="ajustarTela();">
                                     </div>
                                 </div>
                             </form>
@@ -351,9 +355,9 @@
                                     <form action="javascript:buscaMusica(true)">
                                         <div class="input-group">
                                             <input type="text" class="form-control" placeholder="Pesquisar" id="busca_musica" onkeyup="buscaMusica()">
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-default" type="button" onclick="buscaMusica(true)"><i class="fas fa-search"></i></button>
-                                            </span>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-search" type="button" onclick="buscaMusica(true)"><i class="fas fa-search"></i></button>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>
@@ -375,8 +379,8 @@
                                     <form action="javascript:buscaBiblia()">
                                         <div class="input-group">
                                             <input type="text" class="form-control" placeholder="Pesquisar" id="busca_biblia" onkeyup="buscaBiblia()">
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-default" type="button" onclick="buscaBiblia()"><i class="fas fa-search"></i></button>
+                                            <span class="input-group-append">
+                                                <button class="btn btn-search" type="button" onclick="buscaBiblia()"><i class="fas fa-search"></i></button>
                                             </span>
                                         </div>
                                     </form>
