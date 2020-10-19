@@ -52,7 +52,7 @@
     "express": "^4.17.1",
     "ffmpeg-static": "^2.7.0",
     "graceful-fs": "^4.2.3",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "node-abi": "^2.15.0",
     "node-pre-gyp": "^0.13.0",
     "request": "^2.88.2",
