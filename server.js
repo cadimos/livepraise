@@ -1,7 +1,7 @@
 var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
-const io = require('socket.io')(http);
+const io = require('socket.io')(http,{cookie: false});
 const porta = 3000;
 if(__dirname.indexOf('resources')<0){
     var base=__dirname;
