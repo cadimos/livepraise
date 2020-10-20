@@ -45,8 +45,11 @@
   "private": true,
   "dependencies": {
     "blueimp-md5": "^2.18.0",
+    "body-parser": "^1.19.0",
     "child-process-promise": "^2.2.1",
+    "consign": "^0.1.6",
     "draggabilly": "^2.3.0",
+    "electron-updater": "^4.3.5",
     "express": "^4.17.1",
     "ffmpeg-static": "^2.7.0",
     "graceful-fs": "^4.2.4",
@@ -64,6 +67,7 @@
     "debug": "^4.2.0",
     "electron": "^8.5.2",
     "electron-packager": "^13.1.1",
-    "electron-rebuild": "^1.11.0"
+    "electron-rebuild": "^1.11.0",
+    "electron-log": "^4.2.4"
   }
 }
