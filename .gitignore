@@ -2,4 +2,5 @@ Dados/
 release-builds/
 node_modules/
 wiki/
+dist/
 dsw.db
