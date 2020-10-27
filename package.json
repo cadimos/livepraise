@@ -24,7 +24,7 @@
     "Igreja"
   ],
   "license": "UNLICENSED",
-  "homepage": "https://bitbucket.org/cadimos/livepraise#readme",
+  "homepage": "https://github.com/cadimos/livepraise",
   "bugs": {
     "url": "https://bitbucket.org/cadimos/livepraise/issues",
     "email": "livepraise@teraidc.com.br"
@@ -36,13 +36,42 @@
     "linux32": "electron-packager . LivePraise --platform=linux --arch=ia32 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
     "linux64": "electron-packager . LivePraise --platform=linux --arch=x64 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
     "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/livepraise.icns --prune=true --out=release-builds  --overwrite",
-    "rebuild": "electron-rebuild -f -w sqlite3"
+    "rebuild": "electron-rebuild -f -w sqlite3",
+    "dist": "electron-builder",
+    "dist-win": "electron-builder --win"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/cadimos/livepraise.git"
+    "url": "git+ssh://git@github.com:cadimos/livepraise.git"
   },
   "private": true,
+  "build": {
+    "asar": false,
+    "productName": "Live Praise",
+    "compression": "maximum",
+    "appId": "com.cadimos.livepraise",
+    "win": {
+      "icon": "app/icon/livepraise.ico",
+      "publish": "github"
+    },
+    "nsis": {
+      "oneClick": true,
+      "installerIcon": "app/icon/livepraise.ico",
+      "uninstallerIcon": "app/icon/livepraise.ico",
+      "installerHeaderIcon": "app/icon/livepraise.ico",
+      "installerLanguages": "pt-BR",
+      "language": "1046",
+      "publish": "github"
+    },
+    "linux": {
+      "icon": "app/icon/livepraise.png",
+      "publish": "github"
+    },
+    "mac": {
+      "icon": "app/icon/livepraise.icns",
+      "publish": "github"
+    }
+  },
   "dependencies": {
     "blueimp-md5": "^2.18.0",
     "body-parser": "^1.19.0",
@@ -60,14 +89,14 @@
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.1",
     "sqlite3": "^4.2.0",
-    "systeminformation": "^4.27.10",
+    "systeminformation": "^4.27.11",
     "webcamjs": "^1.0.26"
   },
   "devDependencies": {
     "debug": "^4.2.0",
     "electron": "^8.5.2",
-    "electron-packager": "^13.1.1",
+    "electron-log": "^4.2.4",
     "electron-rebuild": "^1.11.0",
-    "electron-log": "^4.2.4"
+    "electron-builder": "^22.9.1"
   }
 }
