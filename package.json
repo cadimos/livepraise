@@ -94,9 +94,9 @@
   },
   "devDependencies": {
     "debug": "^4.2.0",
-    "electron": "^8.5.2",
+    "electron": "^8.5.3",
+    "electron-builder": "^22.9.1",
     "electron-log": "^4.2.4",
-    "electron-rebuild": "^1.11.0",
-    "electron-builder": "^22.9.1"
+    "electron-rebuild": "^1.11.0"
   }
 }
