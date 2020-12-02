@@ -1,6 +1,6 @@
 {
   "name": "live_praise",
-  "version": "1.0.0-beta.5",
+  "version": "0.0.1",
   "main": "main.js",
   "author": {
     "name": "Thiago de Lucena Sobrinho",
@@ -24,9 +24,9 @@
     "Igreja"
   ],
   "license": "UNLICENSED",
-  "homepage": "https://bitbucket.org/cadimos/livepraise#readme",
+  "homepage": "https://github.com/cadimos/livepraise#readme",
   "bugs": {
-    "url": "https://bitbucket.org/cadimos/livepraise/issues",
+    "url": "https://github.com/cadimos/livepraise/issues",
     "email": "livepraise@teraidc.com.br"
   },
   "scripts": {
@@ -36,11 +36,12 @@
     "linux32": "electron-packager . LivePraise --platform=linux --arch=ia32 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
     "linux64": "electron-packager . LivePraise --platform=linux --arch=x64 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
     "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/livepraise.icns --prune=true --out=release-builds  --overwrite",
+    "deploy": "electron-builder build --linux --win --publish always",
     "rebuild": "electron-rebuild -f -w sqlite3"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/cadimos/livepraise.git"
+    "url": "git+https://github.com/cadimos/livepraise.git"
   },
   "private": true,
   "dependencies": {
@@ -65,9 +66,10 @@
   },
   "devDependencies": {
     "debug": "^4.2.0",
-    "electron": "^8.5.2",
-    "electron-packager": "^13.1.1",
-    "electron-rebuild": "^1.11.0",
-    "electron-log": "^4.2.4"
+    "electron": "^11.0.3",
+    "electron-builder": "^22.9.1",
+    "electron-log": "^4.2.4",
+    "electron-packager": "^15.1.0",
+    "electron-rebuild": "^2.3.4"
   }
 }
