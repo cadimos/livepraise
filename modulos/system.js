@@ -9,6 +9,7 @@ var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(dir_app+'/dsw.db');
 var ffmpeg = require('ffmpeg-static');
 */
+/*
 const si = require('systeminformation');
 var md5 = require("blueimp-md5");
 
@@ -78,3 +79,4 @@ function chaveSystem(os,hd,rede){
   `;
   console.log(msg);
 }
+*/

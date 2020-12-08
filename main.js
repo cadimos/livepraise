@@ -34,7 +34,7 @@ app.on('ready', function() {
         title: 'Live Praise - Projeção',
         icon: __dirname+'/app/icon/livepraise.png',
     });
-    const server = require("./server2");
+    const server = require("./server");
     //Abro a URL do monitor
     win.setMenuBarVisibility(false);
     win.loadURL('file://' + __dirname + '/tema/'+config.tema+'/index.html');

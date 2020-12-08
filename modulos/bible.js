@@ -1,6 +1,7 @@
 module.exports = app => {
   var sqlite3 = require('sqlite3').verbose();
   const config = require('../config');  
+  /*
   app.get('/categoria/biblia', (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       var db = new sqlite3.Database(config.dir_app+'/dsw.db');
@@ -79,12 +80,15 @@ module.exports = app => {
         })
     });
   })
+  
   app.get('/busca/biblia/:biblia/:busca',(req,res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     biblia= req.params.biblia;
     busca= req.params.busca;
     var db = new sqlite3.Database(config.dir_app+'/Dados/biblias/'+biblia);
-    livro = busca.match(/^([0-3]|[a-z]) *([a-z])*/ig);
+    */
+    //livro = busca.match(/^([0-3]|[a-z]) *([a-z])*/ig);
+    /*
     texto=busca.replace(livro,'');
     texto=texto.replace(' ','');
     if(texto.indexOf(":")>0){
@@ -122,4 +126,5 @@ module.exports = app => {
       })
     });
   })
+  */
 }

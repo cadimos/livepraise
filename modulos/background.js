@@ -1,6 +1,7 @@
 module.exports = app => {
     var sqlite3 = require('sqlite3').verbose();
     const config = require('../config');
+    /*
     var db = new sqlite3.Database(config.dir_app+'/dsw.db');
     app.get('/background-rapido', (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,4 +20,5 @@ module.exports = app => {
             })
         });
     })
+    */
 }

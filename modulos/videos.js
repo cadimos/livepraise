@@ -3,6 +3,7 @@ module.exports = app => {
     const config = require('../config');
     const ffmpeg = require('ffmpeg-static');
     const exec = require('child-process-promise').exec;
+    /*
     app.get('/categoria/video', (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', '*');
         dir='Dados/videos';
@@ -53,6 +54,7 @@ module.exports = app => {
           "thumb":thumb
       })
     })
+    */
 }
 /*
 //converter Video

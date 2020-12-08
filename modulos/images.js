@@ -1,6 +1,7 @@
 module.exports = app => {
     const fs = require('graceful-fs');
     const config = require('../config');
+    /*
     app.get('/categoria/imagem', (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', '*');
         dir=config.dir_app+'/Dados/imagens';
@@ -36,4 +37,5 @@ module.exports = app => {
         "data":cat
     })
   })
+  */
 }

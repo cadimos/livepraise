@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "debug": "^4.2.0",
-    "electron": "^11.0.3",
+    "electron": "^11.0.4",
     "electron-builder": "^22.9.1",
     "electron-log": "^4.2.4",
     "electron-packager": "^15.1.0",

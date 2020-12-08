@@ -1,6 +1,7 @@
 module.exports = app => {
   var sqlite3 = require('sqlite3').verbose();
   const config = require('../config');
+  /*
   var db = new sqlite3.Database(config.dir_app+'/dsw.db');
   app.get('/display', (req, res) => {
     sql="SELECT * FROM tela";
@@ -37,4 +38,5 @@ module.exports = app => {
         })
     });
   })
+  */
 }
