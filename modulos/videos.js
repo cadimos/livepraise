@@ -3,10 +3,10 @@ module.exports = app => {
     const config = require('../config');
     const ffmpeg = require('ffmpeg-static');
     const exec = require('child-process-promise').exec;
-    /*
+    
     app.get('/categoria/video', (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', '*');
-        dir='Dados/videos';
+        dir=config.homedir+'/livepraise/videos';
         var files = fs.readdirSync(dir);
         cat=[];
         for (var i in files){
@@ -23,7 +23,7 @@ module.exports = app => {
     app.get('/categoria/video/:dir', (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       cat= req.params.dir;
-      dir=config.dir_app+'/Dados/videos/'+cat;
+      dir=config.homedir+'/livepraise/videos/'+cat;
       var files = fs.readdirSync(dir);
       video=[];
       thumb=[];
@@ -31,7 +31,7 @@ module.exports = app => {
         var name = dir + '/' + files[i];
         if (fs.statSync(name).isDirectory()){
         }else{
-          vd=name.replace(config.dir_app+'/','');
+          vd=name.replace(config.homedir+'/','');
           ext=vd.substr(-4);
           ext=ext.replace(/\./g,'');
           video.push(vd);
@@ -40,7 +40,7 @@ module.exports = app => {
           preview=preview.replace('.mpg','.jpg');
           preview=preview.replace('.avi','.jpg');
           cmd_preview = ffmpeg.path+' -ss 00:00:02 -i "'+name+'" -vf scale=400:-1 -vframes 1 "'+preview+'"';
-          preview=preview.replace(config.dir_app+'/','');
+          preview=preview.replace(config.homedir+'/','');
           if (fs.existsSync(preview)) {
           }else{
             exec(cmd_preview)
@@ -54,7 +54,7 @@ module.exports = app => {
           "thumb":thumb
       })
     })
-    */
+    
 }
 /*
 //converter Video

@@ -1,7 +1,8 @@
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 const dir_app = process.cwd();
 var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database(dir_app+'/dsw.db');
+const config = require('../config');
+var db = new sqlite3.Database(config.homedir+'/livepraise/dsw.bd');
 
 function loanding(){
 	db.serialize(function() {

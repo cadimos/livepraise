@@ -1,10 +1,10 @@
 module.exports = app => {
   var sqlite3 = require('sqlite3').verbose();
   const config = require('../config');  
-  /*
+  
   app.get('/categoria/biblia', (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
-      var db = new sqlite3.Database(config.dir_app+'/dsw.db');
+      var db = new sqlite3.Database(config.homedir+'/livepraise/dsw.bd');
       sql="SELECT * FROM cat_biblia";
       db.all(sql, [], (err, rows) => {
           if (err) {
@@ -23,7 +23,7 @@ module.exports = app => {
   app.get('/livros/biblia/:biblia', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     biblia= req.params.biblia;
-    var db = new sqlite3.Database(config.dir_app+'/Dados/biblias/'+biblia);
+    var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
     sql="SELECT id,nome FROM livros";
     db.all(sql, [], (err, rows) => {
         if (err) {
@@ -43,7 +43,7 @@ module.exports = app => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     biblia= req.params.biblia;
     livro= req.params.livro;
-    var db = new sqlite3.Database(config.dir_app+'/Dados/biblias/'+biblia);
+    var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
     sql="SELECT * FROM livros WHERE  id ="+livro+";"
     db.all(sql, [], (err, rows) => {
         if (err) {
@@ -64,7 +64,7 @@ module.exports = app => {
     biblia= req.params.biblia;
     livro= req.params.livro;
     capitulo= req.params.capitulo;
-    var db = new sqlite3.Database(config.dir_app+'/Dados/biblias/'+biblia);
+    var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
     sql="SELECT id,texto,versiculo FROM versiculos WHERE  livro ="+livro+" AND capitulo="+capitulo+";"
     db.all(sql, [], (err, rows) => {
         if (err) {
@@ -85,10 +85,10 @@ module.exports = app => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     biblia= req.params.biblia;
     busca= req.params.busca;
-    var db = new sqlite3.Database(config.dir_app+'/Dados/biblias/'+biblia);
-    */
-    //livro = busca.match(/^([0-3]|[a-z]) *([a-z])*/ig);
-    /*
+    var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
+    
+    livro = busca.match(/^([0-3]|[a-z]) *([a-z])*/ig);
+    
     texto=busca.replace(livro,'');
     texto=texto.replace(' ','');
     if(texto.indexOf(":")>0){
@@ -126,5 +126,5 @@ module.exports = app => {
       })
     });
   })
-  */
+  
 }

@@ -8,7 +8,9 @@ var request = require('request');//Teste
 var socket = io.connect("http://localhost:3000");
 socket.emit("join", 'Monitor');
 var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database(dir_app+'/dsw.db');
+const config = require('../config');
+var db = new sqlite3.Database(config.homedir+'/livepraise/dsw.bd');
+console.log(config.homedir+'/livepraise/dsw.bd');
 const si = require('systeminformation');
 var md5 = require("blueimp-md5");
 var ffmpeg = require('ffmpeg-static');
@@ -194,6 +196,7 @@ function loanding(){
   setTimeout(() => lista_biblia(),200);
   lista_background_rapido();
   lista_tela();
+  fechar_loandig();
 }
 
 function fechar_loandig(){
@@ -291,7 +294,7 @@ function lista_background_rapido(){
   db.serialize(function() {
     db.each("SELECT url,diretorio,inicial FROM background_rapido ORDER BY id ASC", function(err, res) {
       if(res.diretorio=='/'){
-        dir=dir_app+'/';
+        dir=homedir+'/livepraise/';
       }else{
         dir=res.diretorio;
       }
@@ -428,7 +431,7 @@ function congelar(acao){
 //Lista a Categoria das Imagens
 function catImagens(){
   $('#cat_imagens').html();
-  dir=dir_app+'/Dados/imagens';
+  dir=homedir+'/livepraise/Dados/imagens';
   var files = fs.readdirSync(dir);
   for (var i in files){
     var name = dir + '/' + files[i];
@@ -468,7 +471,7 @@ function lista_imagem(dir){
 //Lista as Categorias de Videos
 function catVideos(){
   $('#cat_imagens').html();
-  dir=dir_app+'/Dados/videos';
+  dir=homedir+'/livepraise/Dados/videos';
   var files = fs.readdirSync(dir);
   for (var i in files){
     var name = dir + '/' + files[i];

@@ -6,7 +6,7 @@ const fs = require('graceful-fs');
 const exec = require('child-process-promise').exec;
 var request = require('request');//Teste
 var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database(dir_app+'/dsw.db');
+var db = new sqlite3.Database(home_dir+'/livepraise/dsw.bd');
 var ffmpeg = require('ffmpeg-static');
 */
 /*
