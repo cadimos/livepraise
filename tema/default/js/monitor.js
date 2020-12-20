@@ -914,7 +914,11 @@ function lista_background_rapido(){
                 result=data.data;
                 for(i=0;i<t_rows;i++){
                     inicial=result[i].inicial;
-                    url_img=urlSocket+'/'+result[i].url;
+                    if(result[i].url.indexOf("base64")>0){
+                    	url_img=result[i].url;
+                    }else{
+                    	url_img=urlSocket+'/'+result[i].url;
+                    }
                     if(inicial=='S'){
                         $('#preview img').attr('src',url_img);
                     }
