@@ -12,7 +12,7 @@ module.exports = app => {
         for (var i in files){
           var name = dir + '/' + files[i];
           if (fs.statSync(name).isDirectory()){
-            cat.push(name);
+            cat.push(name.replace(config.homedir+'/livepraise/videos/',''));
           }
         }
         res.json({
@@ -31,7 +31,7 @@ module.exports = app => {
         var name = dir + '/' + files[i];
         if (fs.statSync(name).isDirectory()){
         }else{
-          vd=name.replace(config.homedir+'/','');
+          vd=name.replace(config.homedir+'/livepraise/','');
           ext=vd.substr(-4);
           ext=ext.replace(/\./g,'');
           video.push(vd);
@@ -40,7 +40,7 @@ module.exports = app => {
           preview=preview.replace('.mpg','.jpg');
           preview=preview.replace('.avi','.jpg');
           cmd_preview = ffmpeg.path+' -ss 00:00:02 -i "'+name+'" -vf scale=400:-1 -vframes 1 "'+preview+'"';
-          preview=preview.replace(config.homedir+'/','');
+          preview=preview.replace(config.homedir+'/livepraise/','');
           if (fs.existsSync(preview)) {
           }else{
             exec(cmd_preview)
