@@ -23,7 +23,7 @@
     "DataShow",
     "Igreja"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "homepage": "https://github.com/cadimos/livepraise#readme",
   "bugs": {
     "url": "https://github.com/cadimos/livepraise/issues",
