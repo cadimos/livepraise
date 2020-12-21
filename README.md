@@ -26,6 +26,8 @@ Para o funcionamento do sistema é necessário que ele atenda os requisitos mini
 - Exibição de Músicas
 - Exibição de Biblias
 
+Confira nossa [Wiki](https://github.com/cadimos/livepraise/wiki) para maiores detalhes
+
 ## Sistema desenvolvido com Colaboração ##
 
 Todo o sistema é desenvolvido com a colaboração de varias pessoas, ideias, e construido com ElectronJs.
