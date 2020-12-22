@@ -116,8 +116,8 @@ function video(vl){
 }
 
 function texto(vl){
-	vl=decodeURI(vl);
-	$('.conteudo').append('<span>'+vl+'</span>');
+	cont=decodeURI(vl);
+	$('.conteudo').append('<span>'+cont+'</span>');
 	$('.conteudo').textfill({
 		maxFontPixels: -1
 		});
@@ -133,9 +133,9 @@ function viewMusica(vl){
 }
 
 function viewBiblia(vl){
-	vl=decodeURI(vl);
+	cont=decodeURI(vl);
 	$('.conteudo').html('');
-	$('.conteudo').append(vl);
+	$('.conteudo').append(cont);
 	$('.content').textfill({maxFontPixels: CalculaLinhas(5,'.content')});
 	$('.content').css('text-align','left');
 	$('.titulo').css('font-size','35px');
