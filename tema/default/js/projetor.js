@@ -17,7 +17,7 @@ socket.on("chat", function(client,msg) {
 	fn=obj.funcao[0].nome;
 	vl=obj.funcao[0].valor;
 	vl=atob(vl);
-	console.log('Função: '+fn+' e Valor: '+vl);
+	//console.log('Função: '+fn+' e Valor: '+vl);
 	switch(fn){
 		case 'background':
 			background(vl);
@@ -88,6 +88,7 @@ function loanding(){
 loanding();
 
 function background(vl){
+	vl=decodeURI(vl);
 	$('#video').css('display','none');
 	$('#fundo img').css('display','block');
 	$("#fundo img").fadeOut(150, function() {
@@ -101,6 +102,7 @@ function background(vl){
 }
 
 function video(vl){
+	vl=decodeURI(vl);
 	$('#fundo img').css('display','none');
 	$('#video').css('display','block');
 	$('#video').html('');
@@ -114,6 +116,7 @@ function video(vl){
 }
 
 function texto(vl){
+	vl=decodeURI(vl);
 	$('.conteudo').append('<span>'+vl+'</span>');
 	$('.conteudo').textfill({
 		maxFontPixels: -1
@@ -121,6 +124,7 @@ function texto(vl){
 	$('.conteudo').css('text-align','center');
 }
 function viewMusica(vl){
+	vl=decodeURI(vl);
 	$('.conteudo').html('');
 	$('.conteudo').append(vl);
 	$('.content').textfill({maxFontPixels: -1});
@@ -129,6 +133,7 @@ function viewMusica(vl){
 }
 
 function viewBiblia(vl){
+	vl=decodeURI(vl);
 	$('.conteudo').html('');
 	$('.conteudo').append(vl);
 	$('.content').textfill({maxFontPixels: CalculaLinhas(5,'.content')});
