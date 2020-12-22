@@ -926,6 +926,7 @@ function lista_background_rapido(){
                     }
                     item_back=modelo.replace(/\[url\]/g,url_img);
                     item_back=item_back.replace(/\[url64\]/g,btoa(url_img));
+                    item_back=decodeURI(item_back);
                     $('#background-rapido').append(item_back);
                 }
             }
