@@ -268,8 +268,8 @@ function lista_imagem(dir){
                 result=data.data;
                 for(i=0;i<t_rows;i++){                    
                     img=result[i];
-                    img=encodeURI(img);
-                    url_img=urlSocket+'/'+img
+                    imag=encodeURI(img);
+                    url_img=urlSocket+'/'+imag
                     $('#preview-imagens').append('<li><img src="'+url_img+'" onclick="background(\''+btoa(url_img)+'\')"></li>')
                 }
             }
@@ -755,8 +755,8 @@ function lista_capitulos(id){
                   for(a=0;a<capitulos;a++){
                         c=a+1;
                         item=modelo.replace(/\[id_livro\]/g,result[i].id);
-                        item=item.replace(/\[id_capitulo\]/g,c);
-                        $('#list_biblia_'+result[i].id).append(item);
+                        items=item.replace(/\[id_capitulo\]/g,c);
+                        $('#list_biblia_'+result[i].id).append(items);
                         $('#current_loading').html('Listando Livros da Biblias: '+result[i].nome+' '+c);
                   }
                   $('#list_biblia_'+result[i].id).accordion({

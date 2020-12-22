@@ -371,7 +371,7 @@ function catImagens(){
   $('#current_loading').html('Carregado Imagens');
   */
 }
-
+/*
 //Lista Imagens
 function lista_imagem(dir){
   $('#preview-imagens').html('');
@@ -388,7 +388,7 @@ function lista_imagem(dir){
   }
   $('#current_loading').html('Carregado Preview de Imagens');
 }
-
+*/
 // Funções de Videos
 
 //Lista as Categorias de Videos
