@@ -313,9 +313,9 @@ function lista_video(dir){
                 preview=data.thumb;
                 erro=false;
                 for(i=0;i<t_rows;i++){                    
-                    video=vid[i];
-                    thumb=preview[i];
-                    $('#preview-videos').append('<li><img id="video'+i+'" src="'+urlSocket+'/'+thumb+'" onclick="viewVideo(\''+btoa(urlSocket+'/'+video)+'\')"></li>');
+                    video=urlSocket+'/'+vid[i];
+                    thumb=urlSocket+'/'+preview[i];
+                    $('#preview-videos').append('<li><img id="video'+i+'" src="'+thumb+'" onclick="viewVideo(\''+btoa(video)+'\')"></li>');
                 }
             }
         }
@@ -926,8 +926,8 @@ function lista_background_rapido(){
                     }
                     item_back=modelo.replace(/\[url\]/g,url_img);
                     item_back=item_back.replace(/\[url64\]/g,btoa(url_img));
-                    item_back=decodeURI(item_back);
-                    $('#background-rapido').append(item_back);
+                    item_rapido=decodeURI(item_back);
+                    $('#background-rapido').append(item_rapido);
                 }
             }
         }
