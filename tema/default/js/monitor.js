@@ -268,7 +268,7 @@ function lista_imagem(dir){
                 result=data.data;
                 for(i=0;i<t_rows;i++){                    
                     img=result[i];
-                    img=img.replace('#','%23');
+                    img=encodeURI(img);
                     url_img=urlSocket+'/'+img
                     $('#preview-imagens').append('<li><img src="'+url_img+'" onclick="background(\''+btoa(url_img)+'\')"></li>')
                 }

@@ -579,7 +579,7 @@ function slideAtivo(){
     }
   }
 }
-
+/*
 //Busca Musica
 function buscaMusicaLocal(){
   cat=$('#cat_musica').val();
@@ -685,7 +685,7 @@ function buscaMusicaOnline(){
     });
   }
 }
-
+*/
 function buscaMusica(submit){
   if(!submit){
     buscaMusicaLocal();
