@@ -1,8 +1,10 @@
-var urlSocket=document.URL.replace('/tema/','').replace('projetor.html','');
-if(urlSocket.indexOf("///")>0){
+let urlSocket=document.documentURI.split('//');
+if(urlSocket[0]=='file:'){
     urlSocket='http://localhost:3000';
     user='Monitor';
 }else{
+    endereco=urlSocket[1].split('/');
+    urlSocket=urlSocket[0]+'//'+endereco[0];
     user='Monitor_Remoto';
 }
 var socket = io.connect(urlSocket);
