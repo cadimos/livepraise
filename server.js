@@ -38,8 +38,9 @@ io.on("connection", function (client) {
     });
 
     client.on("send", function(msg){
+      mensagem=encodeURI(msg);
     	//console.log("Message: " + msg);
-      client.broadcast.emit("chat", clients[client.id], msg);
+      client.broadcast.emit("chat", clients[client.id], mensagem);
     });
     //Usuario Desconectado
     client.on("disconnect", function(){
