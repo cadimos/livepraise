@@ -1,4 +1,4 @@
-var urlSocket=document.URL.replace('/tema/','').replace('/index.html','');
+const urlSocket=document.URL.replace('/tema/','').replace('/index.html','');
 if(urlSocket.indexOf("///")>0){
     urlSocket='http://localhost:3000';
     user='Monitor';
