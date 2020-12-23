@@ -23,8 +23,8 @@ module.exports = app => {
   app.get('/categoria/musica/:id', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     id= req.params.id;
-    sql="SELECT * FROM musica WHERE cat='"+id+"'";
-    db.all(sql, [], (err, rows) => {
+    sql="SELECT * FROM musica WHERE cat='?'";
+    db.all(sql, [id], (err, rows) => {
       if (err) {
         res.status(400).json({
             "status":"erro",
@@ -41,8 +41,8 @@ module.exports = app => {
   app.get('/musica/verso/:id', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     id= req.params.id;
-    sql="SELECT * FROM musica_versos WHERE musica='"+id+"'";
-    db.all(sql, [], (err, rows) => {
+    sql="SELECT * FROM musica_versos WHERE musica='?'";
+    db.all(sql, [id], (err, rows) => {
       if (err) {
         res.status(400).json({
             "status":"erro",
