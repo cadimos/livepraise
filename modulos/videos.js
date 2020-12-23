@@ -24,6 +24,7 @@ module.exports = app => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       cat= decodeURI(req.params.dir);
       dir=config.homedir+'/livepraise/videos/'+cat;
+      //  deepcode ignore PT: Listagem dos videos no diretorio
       var files = fs.readdirSync(dir);
       video=[];
       thumb=[];
