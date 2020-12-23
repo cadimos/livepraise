@@ -23,8 +23,8 @@ module.exports = app => {
     tipo= req.params.tipo;
     largura= req.params.largura;
     altura= req.params.altura;
-    sql=`UPDATE tela SET tipo='${tipo}',largura='${largura}',altura='${altura}'`;
-    db.run(sql, [], (err, rows) => {
+    sql=`UPDATE tela SET tipo= ? ,largura= ? ,altura= ?`;
+    db.run(sql, [tipo, largura, altura], (err, rows) => {
         if (err) {
           res.status(400).json({
               "status":"erro",
