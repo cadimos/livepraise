@@ -1,4 +1,5 @@
 function texto(vl){
+	vl=decodeURI(vl);
 	$('.conteudo').append('<span>'+vl+'</span>');
 	$('.conteudo').textfill({
 		maxFontPixels: -1
@@ -6,6 +7,7 @@ function texto(vl){
 	$('.conteudo').css('text-align','center');
 }
 function viewMusica(vl){
+	vl=decodeURI(vl);
 	$('.conteudo').html('');
 	$('.conteudo').append(vl);
 	$('.content').textfill();
@@ -15,6 +17,7 @@ function viewMusica(vl){
 }
 
 function viewBiblia(vl){
+	vl=decodeURI(vl);
 	$('.conteudo').html('');
 	$('.conteudo').append(vl);
 	$('.content').textfill();
@@ -38,6 +41,7 @@ function CalculaLinhas(quant,div){
   return font;
 }
 function background(vl){
+	vl=decodeURI(vl);
 	vl=vl.split("Dados");
 	vl='Dados'+vl[1];
 	console.log(vl);
