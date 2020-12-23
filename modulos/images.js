@@ -21,7 +21,7 @@ module.exports = app => {
   })
   app.get('/categoria/imagem/:dir', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    cat= req.params.dir;
+    cat= decodeURI(req.params.dir);
     dir=config.homedir+'/livepraise/imagens/'+cat;
     var files = fs.readdirSync(dir);
     cat=[];

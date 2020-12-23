@@ -19,7 +19,7 @@ app.use(bodyParser.json())
 app.use(express.static(__dirname+'/public'));
 app.use('/app',express.static(__dirname+'/app'));
 app.use('/tema',express.static(__dirname+'/tema/default'));
-app.use('/node_modules',express.static(__dirname+'/node_modules'));
+app.use('/libs',express.static(__dirname+'/node_modules'));
 app.use('/imagens',express.static(config.homedir+'/livepraise/imagens'));
 app.use('/videos',express.static(config.homedir+'/livepraise/videos'));
 app.get('/teste', function(req, res){

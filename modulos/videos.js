@@ -22,7 +22,7 @@ module.exports = app => {
     })
     app.get('/categoria/video/:dir', (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
-      cat= req.params.dir;
+      cat= decodeURI(req.params.dir);
       dir=config.homedir+'/livepraise/videos/'+cat;
       var files = fs.readdirSync(dir);
       video=[];
