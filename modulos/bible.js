@@ -44,8 +44,8 @@ module.exports = app => {
     biblia= req.params.biblia;
     livro= req.params.livro;
     var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
-    sql="SELECT * FROM livros WHERE  id ="+livro+";"
-    db.all(sql, [], (err, rows) => {
+    sql="SELECT * FROM livros WHERE  id = ?";
+    db.all(sql, [livro], (err, rows) => {
         if (err) {
           res.status(400).json({
               "status":"erro",
@@ -65,8 +65,8 @@ module.exports = app => {
     livro= req.params.livro;
     capitulo= req.params.capitulo;
     var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
-    sql="SELECT id,texto,versiculo FROM versiculos WHERE  livro ="+livro+" AND capitulo="+capitulo+";"
-    db.all(sql, [], (err, rows) => {
+    sql="SELECT id,texto,versiculo FROM versiculos WHERE  livro = ? AND capitulo= ?";
+    db.all(sql, [livro, capitulo], (err, rows) => {
         if (err) {
           res.status(400).json({
               "status":"erro",
@@ -104,12 +104,13 @@ module.exports = app => {
       versiculo='';
     }
     if(livro=='jo'){
-      sql="SELECT id FROM livros WHERE `nome` LIKE '"+livro+"' OR `nome2` LIKE '"+livro+"' LIMIT 1";
+      sql="SELECT id FROM livros WHERE `nome` LIKE ? OR `nome2` LIKE ? LIMIT 1";
     }else{
-      sql="SELECT id FROM livros WHERE `nome` LIKE '"+livro+"%' OR `nome2` LIKE '"+livro+"%' LIMIT 1";
+      livro=livro+'%';
+      sql="SELECT id FROM livros WHERE `nome` LIKE ? OR `nome2` LIKE ? LIMIT 1";
     }
 
-    db.all(sql, [], (err, rows) => {
+    db.all(sql, [livro, livro], (err, rows) => {
       if (err) {
         res.status(400).json({
             "status":"erro",
