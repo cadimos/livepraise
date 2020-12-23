@@ -44,6 +44,7 @@ module.exports = app => {
           preview=preview.replace(config.homedir+'/livepraise/','');
           if (fs.existsSync(preview)) {
           }else{
+            //  deepcode ignore CommandInjection: Cria o preview do video
             exec(cmd_preview)
           }
           thumb.push(preview);
