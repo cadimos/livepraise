@@ -58,9 +58,9 @@ module.exports = app => {
   })
   app.get('/busca/musica/:busca', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    busca= req.params.busca;
-    sql=`SELECT DISTINCT(musica.id) as id,nome,nome2,artista,compositor FROM musica INNER JOIN musica_versos ON musica_versos.musica = musica.id WHERE nome2 LIKE '%${busca}%' OR musica_versos.verso LIKE '%${busca}%'`;
-    db.all(sql, [], (err, rows) => {
+    busca= '%'+req.params.busca;+'%';
+    sql=`SELECT DISTINCT(musica.id) as id,nome,nome2,artista,compositor FROM musica INNER JOIN musica_versos ON musica_versos.musica = musica.id WHERE nome2 LIKE  ? OR musica_versos.verso LIKE ?`;
+    db.all(sql, [busca, busca], (err, rows) => {
       if (err) {
         res.status(400).json({
             "status":"erro",
