@@ -23,6 +23,7 @@ module.exports = app => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     cat= decodeURI(req.params.dir);
     dir=config.homedir+'/livepraise/imagens/'+cat;
+    //  deepcode ignore PT: Listagem das imagens na pasta local
     var files = fs.readdirSync(dir);
     cat=[];
     for (var i in files){
