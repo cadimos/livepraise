@@ -1,3 +1,4 @@
+// file deepcode ignore DOMXSS: Funcoes
 function texto(vl){
 	vl=decodeURI(vl);
 	$('.conteudo').append('<span>'+vl+'</span>');
