@@ -241,7 +241,7 @@ function lista_tela(){
 }
 
 //Ajustar tela
-function ajustarTela(hide){
+function ajustarTela(hide,h){
   tm=$('#conf_tela #tamanho_tela').val();
   lg=$('#conf_tela #largura').val();
   at=$('#conf_tela #altura').val();
