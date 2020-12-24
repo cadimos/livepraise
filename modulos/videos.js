@@ -5,7 +5,7 @@ module.exports = app => {
     const exec = require('child-process-promise').exec;
     
     app.get('/categoria/video', (req, res) => {
-        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Origin', origin);
         dir=config.homedir+'/livepraise/videos';
         var files = fs.readdirSync(dir);
         cat=[];
@@ -21,7 +21,7 @@ module.exports = app => {
         })
     })
     app.get('/categoria/video/:dir', (req, res) => {
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Origin', origin);
       cat= decodeURI(req.params.dir);
       dir=config.homedir+'/livepraise/videos/'+cat;
       //  deepcode ignore PT: Listagem dos videos no diretorio
