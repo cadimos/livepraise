@@ -4,7 +4,7 @@ module.exports = app => {
   
   var db = new sqlite3.Database(config.homedir+'/livepraise/dsw.bd');
   app.get('/categoria/musica', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', origin);
     sql="SELECT * FROM cat_musicas";
     db.all(sql, [], (err, rows) => {
       if (err) {
@@ -21,7 +21,7 @@ module.exports = app => {
     });
   })
   app.get('/categoria/musica/:id', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', origin);
     id= req.params.id;
     sql="SELECT * FROM musica WHERE cat = ?";
     db.all(sql, [id], (err, rows) => {
@@ -39,7 +39,7 @@ module.exports = app => {
     });
   })
   app.get('/musica/verso/:id', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', origin);
     id= req.params.id;
     sql="SELECT * FROM musica_versos WHERE musica = ?";
     db.all(sql, [id], (err, rows) => {
@@ -57,7 +57,7 @@ module.exports = app => {
     });
   })
   app.get('/busca/musica/:busca', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', origin);
     busca= '%'+req.params.busca;+'%';
     sql=`SELECT DISTINCT(musica.id) as id,nome,nome2,artista,compositor FROM musica INNER JOIN musica_versos ON musica_versos.musica = musica.id WHERE nome2 LIKE  ? OR musica_versos.verso LIKE ?`;
     db.all(sql, [busca, busca], (err, rows) => {
