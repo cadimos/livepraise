@@ -3,7 +3,7 @@ module.exports = app => {
     const config = require('../config');
     
     app.get('/categoria/imagem', (req, res) => {
-        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Origin', origin);
         dir=config.homedir+'/livepraise/imagens';
         var files = fs.readdirSync(dir);
         cat=[];
@@ -20,7 +20,7 @@ module.exports = app => {
         })
   })
   app.get('/categoria/imagem/:dir', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', origin);
     cat= decodeURI(req.params.dir);
     dir=config.homedir+'/livepraise/imagens/'+cat;
     //  deepcode ignore PT: Listagem das imagens na pasta local
