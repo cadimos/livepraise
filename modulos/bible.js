@@ -88,7 +88,7 @@ module.exports = app => {
     var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
     //  deepcode ignore HTTPSourceWithUncheckedType: busca
     let livro = busca.match(/^([0-3]|[a-z]) *([a-z])*/ig);
-    
+    //  deepcode ignore HTTPSourceWithUncheckedType: busca
     texto=busca.replace(livro,'');
     texto=texto.replace(' ','');
     if(texto.indexOf(":")>0){
