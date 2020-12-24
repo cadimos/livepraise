@@ -3,6 +3,7 @@ var express = require('express');
 var consign = require('consign');
 var bodyParser = require('body-parser');
 var app = require('express')();
+//  deepcode ignore HttpToHttps: Execução local dispensa https
 var http = require('http').Server(app);
 const io = require('socket.io')(http,{cookie: false});
 const config = require('./config');
