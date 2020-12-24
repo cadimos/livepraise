@@ -3,7 +3,7 @@ module.exports = app => {
   const config = require('../config');  
   
   app.get('/categoria/biblia', (req, res) => {
-      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Origin', origin);
       var db = new sqlite3.Database(config.homedir+'/livepraise/dsw.bd');
       sql="SELECT * FROM cat_biblia";
       db.all(sql, [], (err, rows) => {
@@ -21,7 +21,7 @@ module.exports = app => {
       });
   })
   app.get('/livros/biblia/:biblia', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', origin);
     biblia= req.params.biblia;
     var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
     sql="SELECT id,nome FROM livros";
@@ -40,7 +40,7 @@ module.exports = app => {
     });
   })
   app.get('/capitulo/biblia/:biblia/:livro', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', origin);
     biblia= req.params.biblia;
     livro= req.params.livro;
     var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
@@ -60,7 +60,7 @@ module.exports = app => {
     });
   })
   app.get('/versiculo/biblia/:biblia/:livro/:capitulo', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', origin);
     biblia= req.params.biblia;
     livro= req.params.livro;
     capitulo= req.params.capitulo;
@@ -82,7 +82,7 @@ module.exports = app => {
   })
   
   app.get('/busca/biblia/:biblia/:busca',(req,res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', origin);
     biblia= req.params.biblia;
     busca= req.params.busca;
     var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
