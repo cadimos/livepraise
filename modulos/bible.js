@@ -87,7 +87,7 @@ module.exports = app => {
     busca= req.params.busca;
     var db = new sqlite3.Database(config.homedir+'/livepraise/biblias/'+biblia);
     
-    livro = busca.match(/^([0-3]|[a-z]) *([a-z])*/ig);
+    let livro = busca.match(/^([0-3]|[a-z]) *([a-z])*/ig);
     
     texto=busca.replace(livro,'');
     texto=texto.replace(' ','');
