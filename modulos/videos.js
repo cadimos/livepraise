@@ -29,6 +29,7 @@ module.exports = app => {
       video=[];
       thumb=[];
       for (var i in files){
+//  deepcode ignore PrototypePollution: busca
         var name = dir + '/' + files[i];
         if (fs.statSync(name).isDirectory()){
         }else{
