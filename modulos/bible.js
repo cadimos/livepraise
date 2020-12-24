@@ -90,6 +90,7 @@ module.exports = app => {
     let livro = busca.match(/^([0-3]|[a-z]) *([a-z])*/ig);
     //  deepcode ignore HTTPSourceWithUncheckedType: busca
     texto=busca.replace(livro,'');
+//  deepcode ignore GlobalReplacementRegex: busca
     texto=texto.replace(' ','');
     if(texto.indexOf(":")>0){
       i=texto.split(':');
