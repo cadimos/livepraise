@@ -27,6 +27,7 @@ module.exports = app => {
     var files = fs.readdirSync(dir);
     cat=[];
     for (var i in files){
+//  deepcode ignore PrototypePollution: busca
       var name = dir + '/' + files[i];
       if (fs.statSync(name).isDirectory()){
       }else{
