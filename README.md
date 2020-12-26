@@ -1,5 +1,6 @@
 # Live Praise ( Software para Projeção em Igrejas) #
 
+[![deepcode](https://www.deepcode.ai/api/gh/badge?key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybTEiOiJnaCIsIm93bmVyMSI6ImNhZGltb3MiLCJyZXBvMSI6ImxpdmVwcmFpc2UiLCJpbmNsdWRlTGludCI6ZmFsc2UsImF1dGhvcklkIjoyNjE2MSwiaWF0IjoxNjA5MDIzNzg1fQ.l4OENwEY40rgU-tOfnyjxDM4zLHUCqiwprA_6qcKEoM)](https://www.deepcode.ai/app/gh/cadimos/livepraise/_/dashboard?utm_content=gh%2Fcadimos%2Flivepraise)
 
 Live Praise é um software dedicado a exibição de Louvores, Biblias, Videos e outras atividades na igreja.
 Com ele é possível realizar as tarefas essênciais para o bom andamento do culto de forma fácil e rápida, permitindo realizar operações Ao Vivo, que esteja fora do planejamento inicial, com agilidade.
