@@ -3,7 +3,7 @@ module.exports = app => {
     const config = require('../config');
     const ffmpeg = require('ffmpeg-static');
     const exec = require('child-process-promise').exec;
-    
+    //  deepcode ignore NoRateLimitingForExpensiveWebOperation: videos
     app.get('/categoria/video', (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', origin);
         dir=config.homedir+'/livepraise/videos';
