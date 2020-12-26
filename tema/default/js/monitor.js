@@ -1058,11 +1058,9 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
       });
       index = 1;
       // VERIFICA SE O RETORNO É MAIOR QUE O NUMERO TOTAL DE DIVS E RETORNA FALSO PARA A NAVEGACAO NÃO SAIR DE DAS DIVS
-      if(proximo > $('.chrome-conteudo-show .item_verso_musica').length) {
+      if(proximo > $('.chrome-conteudo-show .item_verso_musica').length || próximo < 1) {
           return false;
       // VERIFICA SE O RETORNO É MENOR QUE 1 E RETORNA FALSO PARA A NAVEGAÇÃO NÃO SAIR DAS DIVS
-      }else if(proximo < 1 ) {
-          return false;
       }
       // PERCORRE TODAS AS DIVS ITEMS PARA ATRIBUIR A CLASSE SELECTED NA DIV QUE O CURSOR DEVE IR SETADO NA VARIAVEL PROXIMO
       $.each($('.chrome-conteudo-show .item_verso_musica'), function () {
