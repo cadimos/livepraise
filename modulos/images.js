@@ -1,7 +1,7 @@
 module.exports = app => {
     const fs = require('graceful-fs');
     const config = require('../config');
-    
+    //  deepcode ignore NoRateLimitingForExpensiveWebOperation: imagens
     app.get('/categoria/imagem', (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', origin);
         dir=config.homedir+'/livepraise/imagens';
@@ -19,6 +19,7 @@ module.exports = app => {
             "data":cat
         })
   })
+//  deepcode ignore NoRateLimitingForExpensiveWebOperation: imagens
   app.get('/categoria/imagem/:dir', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', origin);
     cat= decodeURI(req.params.dir);
