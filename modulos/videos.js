@@ -20,6 +20,7 @@ module.exports = app => {
             "data":cat
         })
     })
+//  deepcode ignore NoRateLimitingForExpensiveWebOperation: lista vídeos
     app.get('/categoria/video/:dir', (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', origin);
       cat= decodeURI(req.params.dir);
