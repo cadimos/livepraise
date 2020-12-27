@@ -5,7 +5,7 @@ module.exports = app => {
     const exec = require('child-process-promise').exec;
     //  deepcode ignore NoRateLimitingForExpensiveWebOperation: videos
     app.get('/categoria/video', (req, res) => {
-        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Origin', 'Origin');
         dir=config.homedir+'/livepraise/videos';
         var files = fs.readdirSync(dir);
         cat=[];
@@ -22,7 +22,7 @@ module.exports = app => {
     })
 //  deepcode ignore NoRateLimitingForExpensiveWebOperation: lista vídeos
     app.get('/categoria/video/:dir', (req, res) => {
-      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Origin', 'Origin');
       cat= decodeURI(req.params.dir);
       dir=config.homedir+'/livepraise/videos/'+cat;
       //  deepcode ignore PT: Listagem dos videos no diretorio

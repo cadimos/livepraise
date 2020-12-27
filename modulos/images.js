@@ -3,7 +3,7 @@ module.exports = app => {
     const config = require('../config');
     //  deepcode ignore NoRateLimitingForExpensiveWebOperation: imagens
     app.get('/categoria/imagem', (req, res) => {
-        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Origin', 'Origin');
         dir=config.homedir+'/livepraise/imagens';
         var files = fs.readdirSync(dir);
         cat=[];
@@ -21,7 +21,7 @@ module.exports = app => {
   })
 //  deepcode ignore NoRateLimitingForExpensiveWebOperation: imagens
   app.get('/categoria/imagem/:dir', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Origin', 'Origin');
     cat= decodeURI(req.params.dir);
     dir=config.homedir+'/livepraise/imagens/'+cat;
     //  deepcode ignore PT: Listagem das imagens na pasta local

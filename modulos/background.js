@@ -4,7 +4,7 @@ module.exports = app => {
     
     var db = new sqlite3.Database(config.homedir+'/livepraise/dsw.bd');
     app.get('/background-rapido', (req, res) => {
-        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Origin', 'Origin');
         sql="SELECT url,diretorio,inicial FROM background_rapido ORDER BY id ASC";
         db.all(sql, [], (err, rows) => {
             if (err) {

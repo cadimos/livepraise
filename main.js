@@ -1,6 +1,7 @@
 ﻿//Inicio o Electon
+const electron = require('electron');
 //Importo os modulos
-const { electron, app, BrowserWindow, powerSaveBlocker, Menu } = require('electron');
+const { app, BrowserWindow, powerSaveBlocker, Menu } = require('electron');
 const id_power_monitor = powerSaveBlocker.start('prevent-display-sleep');
 const config = require('./config');
 

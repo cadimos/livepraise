@@ -732,7 +732,7 @@ function lista_biblia(){
 function lista_capitulos(id){
     cat=$('#cat_biblia').val();
     let modelo=`
-    <h3 id="head_biblia_[id_livro]_[id_capitulo]">
+    <h3 id="head_biblia_[id_livro]_[id_capitulo]" onclick="lista_versiculo('${cat}',[id_livro],[id_capitulo])">
         <a onclick="lista_versiculo('${cat}',[id_livro],[id_capitulo])">
             <i class="fas fa-bible"></i>  [id_capitulo]
         </a>
@@ -1058,7 +1058,7 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
       });
       index = 1;
       // VERIFICA SE O RETORNO É MAIOR QUE O NUMERO TOTAL DE DIVS E RETORNA FALSO PARA A NAVEGACAO NÃO SAIR DE DAS DIVS
-      if(proximo > $('.chrome-conteudo-show .item_verso_musica').length || próximo < 1) {
+      if(proximo > $('.chrome-conteudo-show .item_verso_musica').length || proximo < 1) {
           return false;
       // VERIFICA SE O RETORNO É MENOR QUE 1 E RETORNA FALSO PARA A NAVEGAÇÃO NÃO SAIR DAS DIVS
       }
