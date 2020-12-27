@@ -1,5 +1,6 @@
 ﻿//Inicio o Electon
 const electron = require('electron');
+//  deepcode ignore JavascriptDuplicateImport: necessário para iniciação
 //Importo os modulos
 const { app, BrowserWindow, powerSaveBlocker, Menu } = require('electron');
 const id_power_monitor = powerSaveBlocker.start('prevent-display-sleep');
