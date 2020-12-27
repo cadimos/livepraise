@@ -1,7 +1,6 @@
 # Live Praise ( Software para Projeção em Igrejas) #
 
 ![version](https://shields.io/github/package-json/v/cadimos/livepraise)
-![check](https://shields.io/github/checks-status/cadimos/livepraise/master)
 [![deepcode](https://www.deepcode.ai/api/gh/badge?key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbGF0Zm9ybTEiOiJnaCIsIm93bmVyMSI6ImNhZGltb3MiLCJyZXBvMSI6ImxpdmVwcmFpc2UiLCJpbmNsdWRlTGludCI6ZmFsc2UsImF1dGhvcklkIjoyNjE2MSwiaWF0IjoxNjA5MDIzNzg1fQ.l4OENwEY40rgU-tOfnyjxDM4zLHUCqiwprA_6qcKEoM)](https://www.deepcode.ai/app/gh/cadimos/livepraise/_/dashboard?utm_content=gh%2Fcadimos%2Flivepraise)
 ![david](https://status.david-dm.org/gh/cadimos/livepraise.svg)
 ![Discord](https://img.shields.io/discord/792531940838342686)
