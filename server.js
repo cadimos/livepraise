@@ -1,4 +1,4 @@
-var sqlite3 = require('sqlite3').verbose();
+var sqlite3 = require('better-sqlite3');
 var express = require('express');
 var consign = require('consign');
 var bodyParser = require('body-parser');

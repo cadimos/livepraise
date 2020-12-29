@@ -350,7 +350,7 @@ function lista_musica(){
     if(cat!='' && cat!=null){
         $('#list_music').html('');
        let modelo=`
-       <div class="card">
+       <div class="card" id="music[id_musica]">
       <div class="card-header" id="head[id_musica]">
         <a class="card-link" data-toggle="collapse" href="#musica[id_musica]">
             [nome_musica] ([artista_musica])
@@ -467,7 +467,7 @@ function buscaMusicaLocal(){
     }else	if(cat!=''){
         $('#list_music').html('');
         let modelo=`
-       <div class="card">
+       <div class="card" id="music[id_musica]">
         <div class="card-header" id="head[id_musica]">
             <a class="card-link" data-toggle="collapse" href="#musica[id_musica]">
                 [nome_musica] ([artista_musica])
@@ -514,7 +514,7 @@ function buscaMusicaOnline(){
     }else{
       $('#list_music').html('');
       let modelo_web=`
-       <div class="card">
+       <div class="card" id="music[id_musica]">
         <div class="card-header" id="head[id_musica]">
             <a class="card-link" data-toggle="collapse" href="#musica[id_musica]">
                 [nome_musica] ([artista_musica])
@@ -667,6 +667,56 @@ function adicionar_verso(musica,verso){
             }
         }
     });
+}
+//Remover musica
+function remover_musica(id,conf){
+  rand=Math.floor(Math.random() * 1000000);
+  if(conf!=true){
+    $.confirm({
+      title: 'Deseja Realmente Remover?',
+      content: `<form action="" class="formName">
+      <div class="form-group">
+      <label>Digite o Código a seguir para Excluir: ${rand}</label>
+      <input type="text" placeholder="Código" class="codigo form-control" required />
+      </div>
+      </form>
+      `,
+      buttons: {
+          formSubmit: {
+              text: 'Excluir',
+              btnClass: 'btn-red',
+              action: function () {
+                  var cod = this.$content.find('.codigo').val();
+                  if(!cod || cod!=rand){
+                      $.alert('Código incorreto! Tente novamente');
+                      return false;
+                  }else{
+                    $("#music"+id).remove();
+                    /*
+                    db.serialize(function() {
+                      db.run("DELETE FROM `musica` WHERE `id`='"+id+"'");
+                      lista_musica();
+                    });
+                    */
+                  }
+              }
+          },
+          cancel: {
+            text: 'Cancelar',
+            action: function () {}
+          }
+      },
+      onContentReady: function () {
+          // bind to events
+          var jc = this;
+          this.$content.find('form').on('submit', function (e) {
+              // if the user submits the form by pressing enter in the field.
+              e.preventDefault();
+              jc.$$formSubmit.trigger('click'); // reference the button and click it
+          });
+      }
+    });
+  }
 }
 //Lista as Biblias Disponiveis
 function catBiblias(){

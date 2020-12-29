@@ -1,78 +1,42 @@
 module.exports = app => {
-  var sqlite3 = require('sqlite3').verbose();
+  var sqlite3 = require('better-sqlite3');
   const config = require('../config');  
   
-  var db = new sqlite3.Database(config.homedir+'/livepraise/dsw.bd');
+  var db = new sqlite3(config.homedir+'/livepraise/dsw.bd');
   app.get('/categoria/musica', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
-    sql="SELECT * FROM cat_musicas";
-    db.all(sql, [], (err, rows) => {
-      if (err) {
-        res.status(400).json({
-            "status":"erro",
-            "erro":err.message
-          });
-        return;
-      }
-      res.json({
-          "status":"successo",
-          "data":rows
-      })
-    });
+    rows=db.prepare("SELECT * FROM cat_musicas").all();
+    res.json({
+        "status":"successo",
+        "data":rows
+    })
   })
   app.get('/categoria/musica/:id', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
     id= req.params.id;
-    sql="SELECT * FROM musica WHERE cat = ?";
-    db.all(sql, [id], (err, rows) => {
-      if (err) {
-        res.status(400).json({
-            "status":"erro",
-            "erro":err.message
-          });
-        return;
-      }
-      res.json({
-          "status":"successo",
-          "data":rows
-      })
-    });
+    rows=db.prepare("SELECT * FROM musica WHERE cat = ?").all(id);
+    res.json({
+        "status":"successo",
+        "data":rows
+    })
   })
   app.get('/musica/verso/:id', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
     id= req.params.id;
-    sql="SELECT * FROM musica_versos WHERE musica = ?";
-    db.all(sql, [id], (err, rows) => {
-      if (err) {
-        res.status(400).json({
-            "status":"erro",
-            "erro":err.message
-          });
-        return;
-      }
-      res.json({
-          "status":"successo",
-          "data":rows
-      })
-    });
+    rows=db.prepare("SELECT * FROM musica_versos WHERE musica = ?").all(id);
+    res.json({
+        "status":"successo",
+        "data":rows
+    })
   })
   app.get('/busca/musica/:busca', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
     busca= '%'+req.params.busca;+'%';
-    sql=`SELECT DISTINCT(musica.id) as id,nome,nome2,artista,compositor FROM musica INNER JOIN musica_versos ON musica_versos.musica = musica.id WHERE nome2 LIKE  ? OR musica_versos.verso LIKE ?`;
-    db.all(sql, [busca, busca], (err, rows) => {
-      if (err) {
-        res.status(400).json({
-            "status":"erro",
-            "erro":err.message
-          });
-        return;
-      }
-      res.json({
-          "status":"successo",
-          "data":rows
-      })
-    });
+    rows=db.prepare("SELECT DISTINCT(musica.id) as id,nome,nome2,artista,compositor FROM musica INNER JOIN musica_versos ON musica_versos.musica = musica.id WHERE nome2 LIKE  (? || '%') OR musica_versos.verso LIKE (? || '%')").all(busca,busca)
+    res.json({
+        "status":"successo",
+        "data":rows
+    })
   })
   app.post("/add/musica/", (req, res, next) => {
     var errors=[]
@@ -95,19 +59,13 @@ module.exports = app => {
         artista : req.body.artista,
         compositor : req.body.compositor
     }
-    var sql ='INSERT INTO musica (cat, nome, nome2, artista,compositor) VALUES (?,?,?,?,?)'
-    var params =[data.cat, data.nome,data.nome, data.artista,data.compositor]
-    db.run(sql, params, function (err, result) {
-        if (err){
-            res.status(400).json({"error": err.message})
-            return;
-        }
-        res.json({
-            "status":"successo",
-            "data": data,
-            "id" : this.lastID
-        })
-    });
+    sql=db.prepare("INSERT INTO musica (cat, nome, nome2, artista,compositor) VALUES (?,?,?,?,?)")
+    info=sql.run(data.cat, data.nome,data.nome, data.artista,data.compositor);
+    res.json({
+          "status":"successo",
+          "data": data,
+          "id" : info.lastInsertRowid
+      })
   })
   app.post("/add/musica/verso", (req, res, next) => {
     var errors=[]
@@ -125,19 +83,13 @@ module.exports = app => {
         musica: req.body.musica,
         verso: req.body.verso,
     }
-    var sql ='INSERT INTO musica_versos (musica, verso) VALUES (?,?)'
-    var params =[data.musica, data.verso]
-    db.run(sql, params, function (err, result) {
-        if (err){
-            res.status(400).json({"error": err.message})
-            return;
-        }
-        res.json({
-            "status":"successo",
-            "data": data,
-            "id" : this.lastID
-        })
-    });
+    sql=db.prepare("INSERT INTO musica_versos (musica, verso) VALUES (?,?)")
+    info=sql.run(data.musica, data.verso);
+    res.json({
+          "status":"successo",
+          "data": data,
+          "id" : info.lastInsertRowid
+      })
   })
   
 }

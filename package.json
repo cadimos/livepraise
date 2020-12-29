@@ -37,7 +37,9 @@
     "linux64": "electron-packager . LivePraise --platform=linux --arch=x64 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
     "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/livepraise.icns --prune=true --out=release-builds  --overwrite",
     "deploy": "electron-builder build --linux --win --publish always",
-    "rebuild": "electron-rebuild -f -w sqlite3"
+    "win": "electron-builder build --win",
+    "linux": "electron-builder build --linux",
+    "rebuild": "electron-rebuild -f -w better-sqlite3"
   },
   "repository": {
     "type": "git",
@@ -45,6 +47,7 @@
   },
   "private": true,
   "dependencies": {
+    "better-sqlite3": "^7.1.2",
     "blueimp-md5": "^2.18.0",
     "body-parser": "^1.19.0",
     "child-process-promise": "^2.2.1",
@@ -60,7 +63,6 @@
     "request": "^2.88.2",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.1",
-    "sqlite3": "^4.2.0",
     "systeminformation": "^4.31.1",
     "webcamjs": "^1.0.26"
   },
@@ -69,7 +71,6 @@
     "electron": "^11.1.0",
     "electron-builder": "^22.9.1",
     "electron-log": "^4.3.1",
-    "electron-packager": "^15.2.0",
     "electron-rebuild": "^2.3.4"
   }
 }
