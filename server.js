@@ -24,7 +24,7 @@ app.use('/libs',express.static(__dirname+'/node_modules'));
 app.use('/imagens',express.static(config.homedir+'/livepraise/imagens'));
 app.use('/videos',express.static(config.homedir+'/livepraise/videos'));
 app.get('/teste', function(req, res){
-    res.send('Bem Vindo ao Sistema de Projeção!'+__dirname );
+    res.send('Bem Vindo ao Sistema de Projeção!<br>'+__dirname+'<br>'+__dirname+'/modulos');
 });
 var clients = {};
 //SocketIO vem aqui
@@ -50,7 +50,9 @@ io.on("connection", function (client) {
       delete clients[client.id];
     });
 });
-consign()
+consign({
+  cwd: __dirname
+})
   .include('modulos')
   .into(app)
   http.listen(config.port,function(){
