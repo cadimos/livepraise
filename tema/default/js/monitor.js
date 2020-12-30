@@ -910,6 +910,7 @@ function buscaBiblia(){
             success: function(data) {
                 if(data.status=='successo'){
                     result=data.livro;
+                    console.log(result)
                     if(result.length>0){
                         livro=result[0].id;
                         capitulo=data.capitulo;

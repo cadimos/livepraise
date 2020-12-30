@@ -165,7 +165,6 @@ function CalculaLinhas(quant,div){
 function ajustarTela(largura,altura){
 	screenWidth = screen.width;
   	screenHeight = screen.height;
-  	console.log(largura+'-'+altura);
 	if(!altura){
 		if(!largura){
 			$.ajax({

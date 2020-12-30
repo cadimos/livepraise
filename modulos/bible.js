@@ -34,6 +34,7 @@ module.exports = app => {
             "data":rows
     })
   })
+  //Listo os versiculos
   app.get('/versiculo/biblia/:biblia/:livro/:capitulo', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
     biblia= req.params.biblia;
@@ -46,7 +47,7 @@ module.exports = app => {
             "data":rows
     })
   })
-  
+  //faco a busca do livro
   app.get('/busca/biblia/:biblia/:busca',(req,res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
     biblia= req.params.biblia;
@@ -71,10 +72,10 @@ module.exports = app => {
       versiculo='';
     }
     if(livro=='jo'){
-      rows=db.prepare("SELECT id FROM livros WHERE `nome` LIKE ? OR `nome2` LIKE ?").get(livro,livro);
+      rows=db.prepare("SELECT id FROM livros WHERE `nome` LIKE ? OR `nome2` LIKE ?").all(livro,livro);
     }else{
       livro=livro+'%';
-      rows=db.prepare("SELECT id FROM livros WHERE `nome` LIKE ? OR `nome2` LIKE ?").get(livro,livro);
+      rows=db.prepare("SELECT id FROM livros WHERE `nome` LIKE ? OR `nome2` LIKE ?").all(livro,livro);
     }
     res.json({
       "status":"successo",
