@@ -1001,6 +1001,37 @@ function background(url){
         player.pause();
     }
 }
+//Ajustar tela
+function ajustarTela(hide){
+	tm=$('#conf_tela #tamanho_tela').val();
+	lg=$('#conf_tela #largura').val();
+	if(lg==''){
+		lg=0;
+	}
+	at=$('#conf_tela #altura').val();
+	if(at==''){
+		at=0;
+	}
+		$.ajax({
+	    type: "GET",
+	    url: urlSocket+'/display/'+tm+'/'+lg+'/'+at,
+	    dataType: "json",
+	    success: function(data) {
+	    }
+	});
+	if(tm=='personalizado'){
+		vl=btoa(lg+'x'+at)
+		var text = '{"funcao":[' +
+		'{"nome":"ajustarTela","valor":"'+vl+'" }]}';
+	}else{
+		var text = '{"funcao":[' +
+		'{"nome":"ajustarTela","valor":"'+btoa(tm)+'" }]}';
+	}
+	socket.emit("send", text);
+	if(hide){
+		$('#conf_tela').modal('hide');
+	}
+}
 //Visualiza o Video
 function viewVideo(url){
     $('#preview img').css('display','none');

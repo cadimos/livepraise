@@ -15,6 +15,7 @@ socket.emit("join", 'Projetor');
 
 socket.on("chat", function(client,msg) {
 	if (ready) {
+	msg=decodeURI(msg);
 	obj = JSON.parse(msg);
 	fn=obj.funcao[0].nome;
 	vl=obj.funcao[0].valor;
@@ -75,7 +76,11 @@ function loanding(){
                 result=data.data;
                 for(i=0;i<t_rows;i++){
                     inicial=result[i].inicial;
-                    url_img=urlSocket+'/'+result[i].url;
+		            if(result[i].url.indexOf("base64")>0){
+		            	url_img=result[i].url;
+		            }else{
+		            	url_img=urlSocket+'/'+result[i].url;
+		            }
                     if(inicial=='S'){
                         background(url_img);
                     }
@@ -160,6 +165,7 @@ function CalculaLinhas(quant,div){
 function ajustarTela(largura,altura){
 	screenWidth = screen.width;
   	screenHeight = screen.height;
+  	console.log(largura+'-'+altura);
 	if(!altura){
 		if(!largura){
 			$.ajax({
@@ -197,11 +203,18 @@ function ajustarTela(largura,altura){
 			frm_inicio=dimensao[0];
 			frm_fim=dimensao[1];
 			new_altura=(screenWidth*frm_fim)/frm_inicio;
+			//Corrijo altura
 			$('#fundo').css('height',new_altura+'px');
 			$('#fundo img').css('height',new_altura+'px');
 			$('#video').css('height',new_altura+'px');
 			$('#fundo video').css('height',new_altura+'px');
 			$('.conteudo').css('height',new_altura+'px');
+			//Fixo largura
+			$('#fundo').css('width',screenWidth+'px');
+			$('#fundo img').css('width',screenWidth+'px');
+			$('#video').css('width',screenWidth+'px');
+			$('#fundo video').css('width',screenWidth+'px');
+			$('.conteudo').css('width',screenWidth+'px');
 		}
 	}else{
 			$('#fundo').css('height',altura+'px');
