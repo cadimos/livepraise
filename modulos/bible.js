@@ -1,7 +1,7 @@
 module.exports = app => {
   var sqlite3 = require('better-sqlite3');
   const config = require('../config');  
-  
+  //Listo as Versoes de biblias instaladas
   app.get('/categoria/biblia', (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', 'Origin');
       var db = new sqlite3(config.homedir+'/livepraise/dsw.bd');
@@ -11,6 +11,7 @@ module.exports = app => {
               "data":rows
       })
   })
+  //Listo os livros da Biblia
   app.get('/livros/biblia/:biblia', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
     biblia= req.params.biblia;
@@ -21,12 +22,13 @@ module.exports = app => {
             "data":rows
     })
   })
+  //Listo os capitulos do Livro
   app.get('/capitulo/biblia/:biblia/:livro', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
     biblia= req.params.biblia;
     livro= req.params.livro;
     var db = new sqlite3(config.homedir+'/livepraise/biblias/'+biblia);
-    rows=db.prepare("SELECT * FROM livros WHERE  id = ?").get(livro);
+    rows=db.prepare("SELECT * FROM livros WHERE  id = ?").all(livro);
     res.json({
             "status":"successo",
             "data":rows
