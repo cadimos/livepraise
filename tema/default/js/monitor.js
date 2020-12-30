@@ -224,6 +224,7 @@ function loanding(){
         bib==true
     ){
         parar_cor();
+	fechar_loandig()
     }
 }
   
