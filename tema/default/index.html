@@ -424,6 +424,18 @@
                 </div>
             </div>
         </div>
+        <div class="notifica_update">
+            <p id="version"></p>
+            <div id="notification" class="hidden">
+              <p id="message"></p>
+              <button id="close-button" onClick="closeNotification()">
+                Fechar
+              </button>
+              <button id="restart-button" onClick="restartApp()" class="hidden">
+                Reiniciar
+              </button>
+          </div>
+        </div>
         <!-- Jquery Web -->
         <script src="js/jquery.min.js"></script>
         <!-- Bootstrap -->
@@ -449,5 +461,6 @@
         <link rel="stylesheet" type="text/css" href="css/jquery-confirm.min.css">
         <!-- Comandos Monitor -->
         <script src="js/monitor.js"></script>
+        <script src="js/update.js"></script>
     </body>
 </html>

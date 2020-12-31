@@ -2,8 +2,10 @@
 const electron = require('electron');
 //Importo os modulos
 //  deepcode ignore JavascriptDuplicateImport: necessário para iniciação
-const { app, BrowserWindow, powerSaveBlocker, Menu } = require('electron');
+const { app, BrowserWindow, powerSaveBlocker, Menu, ipcMain } = require('electron');
+const {autoUpdater} = require ('electron-updater');
 const id_power_monitor = powerSaveBlocker.start('prevent-display-sleep');
+const path = require("path");
 const config = require('./config');
 
 //Inicio a aplicação
@@ -26,6 +28,7 @@ app.on('ready', function() {
     });
     splash.loadURL('file://' + __dirname + '/app/splash.html');
     //Crio minha janela no monitor principal
+    let windows = ["worker", "ui"];
     let win = new BrowserWindow({
         x: 0,
         y: 0,
@@ -34,6 +37,12 @@ app.on('ready', function() {
         show: false,
         title: 'Live Praise - Projeção',
         icon: __dirname+'/app/icon/livepraise.png',
+        webPreferences: {
+          nodeIntegration: false, // is default value after Electron v5
+          contextIsolation: true, // protect against prototype pollution
+          enableRemoteModule: false, // turn off remote
+          preload: path.join(__dirname, "preload.js") // use a preload script
+        }
     });
     const server = require("./server");
     //Abro a URL do monitor
@@ -43,13 +52,14 @@ app.on('ready', function() {
     win.once('ready-to-show',()=>{
         win.show();
         splash.close();
+        autoUpdater.checkForUpdatesAndNotify();
     })
     win.webContents.on('new-window', (event, url) => {
         event.preventDefault()
         const win_link = new BrowserWindow({
             title: 'Live Praise',
             icon: __dirname+'/app/icon/livepraise.png',
-            show: false
+            show: false,
             })
         win_link.once('ready-to-show', () => win_link.show())
         win_link.loadURL(url)
@@ -77,7 +87,7 @@ app.on('ready', function() {
         });
         //Abro a url do monitor externo
         win2.loadURL('file://' + __dirname + '/tema/'+config.tema+'/projetor.html');
-        win2.openDevTools();
+        //win2.openDevTools();
         win2.once('ready-to-show',()=>{
             win2.show();
         })
@@ -86,9 +96,20 @@ app.on('ready', function() {
         });
 
     }
-
     //Ação ao fechar
     win.on('closed', () => {
         app.quit()
     });
+});
+ipcMain.on('app_version', (event) => {
+  event.sender.send('app_version', { version: app.getVersion() });
+});
+autoUpdater.on('update-available', () => {
+  win.webContents.send('update_available');
+});
+autoUpdater.on('update-downloaded', () => {
+  win.webContents.send('update_downloaded');
+});
+ipcMain.on('restart_app', () => {
+  autoUpdater.quitAndInstall();
 });
