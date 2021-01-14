@@ -7,13 +7,6 @@ var app = require('express')();
 var http = require('http').Server(app);
 const io = require('socket.io')(http,{cookie: false});
 const config = require('./config');
-const fs = require('graceful-fs');
-const fse = require('fs-extra');
-const fileBD= config.homedir+'/livepraise/dsw.bd';
-if (fs.existsSync(fileBD)===false) {
-  //Crio o BD, caso não exista
-  fse.copy(process.cwd()+'/install/livepraise', config.homedir+'/livepraise');
-}
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())

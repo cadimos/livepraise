@@ -7,6 +7,9 @@ const {autoUpdater} = require ('electron-updater');
 const id_power_monitor = powerSaveBlocker.start('prevent-display-sleep');
 const path = require("path");
 const config = require('./config');
+const fs = require('graceful-fs');
+const fse = require('fs-extra');
+const fileBD= config.homedir+'/livepraise/dsw.bd';
 
 //Inicio a aplicação
 app.allowRendererProcessReuse=true;
@@ -44,7 +47,21 @@ app.on('ready', function() {
           preload: path.join(__dirname, "preload.js") // use a preload script
         }
     });
-    const server = require("./server");
+    if (fs.existsSync(fileBD)===false) {
+      //Crio o BD, caso não exista
+      async function filesInit() {
+        try {
+          await fse.copy(process.cwd()+'/install/livepraise', config.homedir+'/livepraise');
+          console.log('success!')
+          const server = require("./server");
+        } catch (err) {
+          console.error(err)
+        }
+      }
+      filesInit()
+    }else{
+        const server = require("./server");
+    }
     //Abro a URL do monitor
     win.setMenuBarVisibility(false);
     win.loadURL('file://' + __dirname + '/tema/'+config.tema+'/index.html');
