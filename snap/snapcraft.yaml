@@ -1,0 +1,10 @@
+
+  name: livepraise
+  version: '0.0.1'
+  summary: Sistema de Projecao para igrejas
+  description: |
+    Live Praise é um software dedicado a exibição de 
+    Louvores, Biblias, Videos e outras atividades na igreja.
+
+  grade: stable
+  confinement: strict
