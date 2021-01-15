@@ -1,5 +1,5 @@
 {
-  "name": "live_praise",
+  "name": "livepraise",
   "version": "0.0.1",
   "main": "main.js",
   "author": {
@@ -36,7 +36,7 @@
     "linux32": "electron-packager . LivePraise --platform=linux --arch=ia32 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
     "linux64": "electron-packager . LivePraise --platform=linux --arch=x64 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
     "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/livepraise.icns --prune=true --out=release-builds  --overwrite",
-    "deploy": "electron-builder build --linux --win --publish always",
+    "snap": "electron-builder build --linux snap",
     "win": "electron-builder build --win --publish always",
     "linux": "electron-builder build --linux --publish always",
     "rebuild": "electron-rebuild -f -w better-sqlite3"
