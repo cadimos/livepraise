@@ -3,4 +3,4 @@ image:
 
 tasks:
   - init: npm install
-    command: npm run start
+    command: npm run server
