@@ -1,3 +1,5 @@
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/cadimos/livepraise)
+
 # Live Praise ( Software para Projeção em Igrejas) #
 
 ![version](https://shields.io/github/package-json/v/cadimos/livepraise)
