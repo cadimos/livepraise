@@ -6,4 +6,4 @@ description: |
   Louvores, Biblias, Videos e outras atividades na igreja.
 
 grade: stable
-confinement: strict
+confinement: classic
