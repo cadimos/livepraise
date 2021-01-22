@@ -1,7 +1,3 @@
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/cadimos/livepraise)
-
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/cadimos/livepraise)
-
 # Live Praise ( Software para Projeção em Igrejas) #
 
 ![version](https://shields.io/github/package-json/v/cadimos/livepraise)
@@ -10,6 +6,7 @@
 ![Discord](https://img.shields.io/discord/792531940838342686)
 [![livepraise](https://snapcraft.io/livepraise/badge.svg)](https://snapcraft.io/livepraise)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/cadimos/livepraise)
+
 
 Live Praise é um software dedicado a exibição de Louvores, Biblias, Videos e outras atividades na igreja.
 Com ele é possível realizar as tarefas essênciais para o bom andamento do culto de forma fácil e rápida, permitindo realizar operações Ao Vivo, que esteja fora do planejamento inicial, com agilidade.
