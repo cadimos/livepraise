@@ -30,7 +30,8 @@ module.exports = app => {
       video=[];
       thumb=[];
       for (var i in files){
-//  deepcode ignore PrototypePollution: busca
+        //  deepcode ignore PrototypePollution: busca
+        //  deepcode ignore UserControlledProperty: <comment the reason here>
         var name = dir + '/' + files[i];
         if (fs.statSync(name).isDirectory()){
         }else{
