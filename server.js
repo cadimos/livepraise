@@ -26,6 +26,7 @@ io.on("connection", function (client) {
     //console.log('Usuario Conectado');
     client.on("join", function(name){
     	//console.log("Joined: " + name);
+    //  deepcode ignore PrototypePollutionFunctionParams: Comunicacao
       clients[client.id] = name;
       client.emit("update", "You have connected to the server.");
       client.broadcast.emit("update", name + " has joined the server.")
