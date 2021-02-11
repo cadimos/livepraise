@@ -16,6 +16,7 @@ socket.emit("join", 'Projetor');
 socket.on("chat", function(client,msg) {
 	if (ready) {
 	msg=decodeURI(msg);
+	msg=decodeURI(msg);
 	obj = JSON.parse(msg);
 	fn=obj.funcao[0].nome;
 	vl=obj.funcao[0].valor;

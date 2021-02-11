@@ -58,6 +58,7 @@ $(document).ready(function(){
 
 	socket.on("chat", function(client,msg) {
 		if (ready) {
+		msg=decodeURI(msg);
 		obj = JSON.parse(msg);
 		fn=obj.funcao[0].nome;
 		vl=obj.funcao[0].valor;
