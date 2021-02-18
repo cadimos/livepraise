@@ -5,7 +5,6 @@
 ![david](https://status.david-dm.org/gh/cadimos/livepraise.svg)
 ![Discord](https://img.shields.io/discord/792531940838342686)
 [![livepraise](https://snapcraft.io/livepraise/badge.svg)](https://snapcraft.io/livepraise)
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/cadimos/livepraise)
 
 
 Live Praise é um software dedicado a exibição de Louvores, Biblias, Videos e outras atividades na igreja.
