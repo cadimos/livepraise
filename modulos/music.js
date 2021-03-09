@@ -14,7 +14,7 @@ module.exports = app => {
   app.get('/categoria/musica/:id', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
     id= req.params.id;
-    rows=db.prepare("SELECT * FROM musica WHERE cat = ?").all(id);
+    rows=db.prepare("SELECT * FROM musica WHERE cat = ? ORDER BY `nome2` ASC").all(id);
     res.json({
         "status":"successo",
         "data":rows
