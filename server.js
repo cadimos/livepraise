@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 var app = require('express')();
 //  deepcode ignore HttpToHttps: Execução local dispensa https
 var http = require('http').Server(app);
-const io = require('socket.io')(http,{cookie: false});
+const io = require('socket.io')(http,{cookie: false, allowEIO3: true});
 const config = require('./config');
 
 app.use(bodyParser.urlencoded({ extended: false }));
