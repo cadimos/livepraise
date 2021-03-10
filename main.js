@@ -65,7 +65,7 @@ app.on('ready', function() {
     //Abro a URL do monitor
     win.setMenuBarVisibility(false);
     win.loadURL('file://' + __dirname + '/tema/'+config.tema+'/index.html');
-    win.openDevTools();
+    //win.openDevTools();
     win.once('ready-to-show',()=>{
         win.show();
         splash.close();
