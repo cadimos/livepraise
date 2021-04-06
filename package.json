@@ -61,7 +61,7 @@
     "jquery": "^3.5.1",
     "socket.io": "^3.1.0",
     "socket.io-client": "^3.1.0",
-    "systeminformation": "^5.3.1",
+    "systeminformation": "^5.6.4",
     "webcamjs": "^1.0.26"
   },
   "devDependencies": {
