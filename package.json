@@ -63,6 +63,7 @@
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1",
     "systeminformation": "^5.10.7",
+    "update-electron-app": "^2.0.1",
     "webcamjs": "^1.0.26"
   },
   "devDependencies": {

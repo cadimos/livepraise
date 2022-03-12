@@ -3,6 +3,7 @@ const electron = require('electron');
 //Importo os modulos
 //  deepcode ignore JavascriptDuplicateImport: necessário para iniciação
 const { app, BrowserWindow, powerSaveBlocker, Menu, ipcMain } = require('electron');
+//require('update-electron-app')();
 const {autoUpdater} = require ('electron-updater');
 const id_power_monitor = powerSaveBlocker.start('prevent-display-sleep');
 const path = require("path");
@@ -14,6 +15,7 @@ const fileBD= config.homedir+'/livepraise/dsw.bd';
 //Inicio a aplicação
 app.allowRendererProcessReuse=true;
 app.on('ready', function() {
+
     //Pego a altura e largura do monitor principal
     const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
     var xcenter=(width/2)-200;
@@ -44,7 +46,7 @@ app.on('ready', function() {
           nodeIntegration: false, // is default value after Electron v5
           contextIsolation: true, // protect against prototype pollution
           enableRemoteModule: false, // turn off remote
-          preload: path.join(__dirname, "preload.js") // use a preload script
+          preload: path.join(__dirname, 'preload.js') // use a preload script
         }
     });
     if (fs.existsSync(fileBD)===false) {
@@ -62,10 +64,11 @@ app.on('ready', function() {
     }else{
         const server = require("./server");
     }
+
     //Abro a URL do monitor
     win.setMenuBarVisibility(false);
     win.loadURL('file://' + __dirname + '/tema/'+config.tema+'/index.html');
-    //win.openDevTools();
+    win.openDevTools();
     win.once('ready-to-show',()=>{
         win.show();
         splash.close();
@@ -118,8 +121,16 @@ app.on('ready', function() {
         app.quit()
     });
 });
+
+if(app.getName()=='Electron'){
+    var packageJsonInfo = require('./package.json');
+    versao=packageJsonInfo.version;
+}else{
+    versao=app.getVersion();
+}
+
 ipcMain.on('app_version', (event) => {
-  event.sender.send('app_version', { version: app.getVersion() });
+  event.sender.send('app_version', { version: versao });
 });
 autoUpdater.on('update-available', () => {
   win.webContents.send('update_available');

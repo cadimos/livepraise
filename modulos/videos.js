@@ -43,7 +43,7 @@ module.exports = app => {
           preview=preview.replace('.mp4','.jpg');
           preview=preview.replace('.mpg','.jpg');
           preview=preview.replace('.avi','.jpg');
-          cmd_preview = ffmpeg.path+' -ss 00:00:02 -i "'+name+'" -vf scale=400:-1 -vframes 1 "'+preview+'"';
+          cmd_preview = ffmpeg+' -ss 00:00:02 -i "'+name+'" -vf scale=400:-1 -vframes 1 "'+preview+'"';
           preview=preview.replace(config.homedir+'/livepraise/','');
           if (fs.existsSync(preview)) {
           }else{
