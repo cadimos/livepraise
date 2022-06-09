@@ -1,6 +1,7 @@
 module.exports = app => {
   var sqlite3 = require('better-sqlite3');
   const config = require('../config');  
+  const fs = require('graceful-fs');
   //Listo as Versoes de biblias instaladas
   app.get('/categoria/biblia', (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', 'Origin');
@@ -85,5 +86,29 @@ module.exports = app => {
       "versiculo": versiculo,
     })
   })
-  
+  //Listar todas as biblias do projeto https://github.com/damarals/biblias
+  app.get('/lista/biblias', (req, res) => {
+      res.setHeader('Access-Control-Allow-Origin', 'Origin');
+      dir=config.homedir+'/livepraise/biblias';
+      var files = fs.readdirSync(dir);
+      biblias=[];
+      nome=[];
+      for (var i in files){
+        var name = dir + '/' + files[i];
+        if (fs.statSync(name).isDirectory()){
+        }else{
+          if(name.indexOf("sqlite") != -1){
+            biblias.push(name.replace(dir+'/',''));
+            let db = new sqlite3(name);
+            rows=db.prepare("SELECT value FROM metadata WHERE `key` LIKE ?").all('copyright');
+            nome.push(rows);
+          }
+        }
+      }
+      res.json({
+          "status":"successo",
+          "biblias":biblias,
+          "nomes": nome
+      })
+    })
 }

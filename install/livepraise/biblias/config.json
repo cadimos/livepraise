@@ -1,0 +1,88 @@
+{
+	"biblia":[
+		{
+			"nome": "Almeida Corrigida e Fiel",
+			"sigla": "ACF",
+			"arquivo": "ACF.json",
+			"padrao": true
+		},
+		{
+			"nome": "Almeida Revista e Atualizada",
+			"sigla": "ARA",
+			"arquivo": "ARA.json",
+			"padrao": false
+		},
+		{
+			"nome": "Almeida Revista e Corrigida",
+			"sigla": "ARC",
+			"arquivo": "ARC.json",
+			"padrao": false
+		},
+		{
+			"nome": "Almeida Século XXI",
+			"sigla": "AS21",
+			"arquivo": "AS21.json",
+			"padrao": false
+		},
+		{
+			"nome": "Almeida Atualizada",
+			"sigla": "JFAA",
+			"arquivo": "JFAA.json",
+			"padrao": false
+		},
+		{
+			"nome": "Almeida Revisada Imprensa Bíblica",
+			"sigla": "AA",
+			"arquivo": "AA.json",
+			"padrao": false
+		},
+		{
+			"nome": "King James Atualizada",
+			"sigla": "KJA",
+			"arquivo": "KJA.json",
+			"padrao": false
+		},
+		{
+			"nome": "King James Fiel",
+			"sigla": "KJF",
+			"arquivo": "KJF.json",
+			"padrao": false
+		},
+		{
+			"nome": "Nova Almeida Atualizada",
+			"sigla": "NAA",
+			"arquivo": "NAA.json",
+			"padrao": false
+		},
+		{
+			"nome": "Nova Bíblia Viva",
+			"sigla": "NBV",
+			"arquivo": "NBV.json",
+			"padrao": false
+		},
+		{
+			"nome": "Nova Tradução na Linguagem de Hoje",
+			"sigla": "NTLH",
+			"arquivo": "NTLH.json",
+			"padrao": false
+		},
+		{
+			"nome": "Nova Versão Internacional",
+			"sigla": "NVI",
+			"arquivo": "NVI.json",
+			"padrao": false
+		},
+		{
+			"nome": "Nova Versão Transformadora",
+			"sigla": "NVT",
+			"arquivo": "NVT.json",
+			"padrao": false
+		},
+		{
+			"nome": "Tradução Brasileira",
+			"sigla": "TB",
+			"arquivo": "TB.json",
+			"padrao": false
+		}
+	]
+}
