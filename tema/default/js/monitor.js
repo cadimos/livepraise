@@ -724,15 +724,15 @@ function catBiblias(){
     $('#cat_biblia').html('');
     $.ajax({
         type: "GET",
-        url: urlSocket+'/categoria/biblia',
+        url: urlSocket+'/lista/biblias',
         dataType: "json",
         success: function(data) {
             if(data.status=='successo'){
-                t_rows=data.data.length;
-                result=data.data;
+                t_rows=data.biblias.length;
+                result=data.biblias;
                 for(i=0;i<t_rows;i++){
                     option=result[i].nome;
-                    id=result[i].url
+                    id=result[i].arquivo
                     $('#cat_biblia').append('<option value="'+id+'">'+option+'</option>');
                     if(i==0){
                         lista_biblia();
@@ -803,21 +803,14 @@ function lista_capitulos(id){
                 result=data.data;
                 for(i=0;i<t_rows;i++){
                   capitulos=result[i].capitulos;
-                  for(a=0;a<capitulos;a++){
-                        c=a+1;
-                        item=modelo.replace(/\[id_livro\]/g,result[i].id);
-                        items=item.replace(/\[id_capitulo\]/g,c);
-                        $('#list_biblia_'+result[i].id).append(items);
-                        $('#current_loading').html('Listando Livros da Biblias: '+result[i].nome+' '+c);
-                  }
+                  item=modelo.replace(/\[id_livro\]/g,id);
+                  items=item.replace(/\[id_capitulo\]/g,capitulos);
+                  $('#list_biblia_'+id).append(items);
                   $('#list_biblia_'+result[i].id).accordion({
                     collapsible: true,
                     active: false
                   });
-                  ultimo=t_rows-1;
-                  if(i==ultimo){
-                    fechar_loandig();
-                  }
+                  fechar_loandig();
                 }
             }
         }

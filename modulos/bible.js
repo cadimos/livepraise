@@ -17,7 +17,7 @@ module.exports = app => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
     biblia= req.params.biblia;
     var db = new sqlite3(config.homedir+'/livepraise/biblias/'+biblia);
-    rows=db.prepare("SELECT id,nome FROM livros").all();
+    rows=db.prepare("SELECT id,name as nome FROM book").all();
     res.json({
             "status":"successo",
             "data":rows
@@ -29,7 +29,7 @@ module.exports = app => {
     biblia= req.params.biblia;
     livro= req.params.livro;
     var db = new sqlite3(config.homedir+'/livepraise/biblias/'+biblia);
-    rows=db.prepare("SELECT * FROM livros WHERE  id = ?").all(livro);
+    rows=db.prepare("SELECT DISTINCT(chapter) as capitulos FROM verse WHERE book_id = ?").all(livro);
     res.json({
             "status":"successo",
             "data":rows
@@ -86,29 +86,30 @@ module.exports = app => {
       "versiculo": versiculo,
     })
   })
-  //Listar todas as biblias do projeto https://github.com/damarals/biblias
+  //Listar todas as biblias do projeto, presentes no diretorio https://github.com/damarals/biblias
   app.get('/lista/biblias', (req, res) => {
       res.setHeader('Access-Control-Allow-Origin', 'Origin');
       dir=config.homedir+'/livepraise/biblias';
       var files = fs.readdirSync(dir);
-      biblias=[];
-      nome=[];
+      items=[];
       for (var i in files){
         var name = dir + '/' + files[i];
         if (fs.statSync(name).isDirectory()){
         }else{
           if(name.indexOf("sqlite") != -1){
-            biblias.push(name.replace(dir+'/',''));
             let db = new sqlite3(name);
             rows=db.prepare("SELECT value FROM metadata WHERE `key` LIKE ?").all('copyright');
-            nome.push(rows);
+            let item={
+              'nome': rows[0].value,
+              'arquivo':name.replace(dir+'/','')
+            }
+            items.push(item);
           }
         }
       }
       res.json({
           "status":"successo",
-          "biblias":biblias,
-          "nomes": nome
+          "biblias": items
       })
     })
 }
