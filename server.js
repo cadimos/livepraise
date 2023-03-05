@@ -10,7 +10,8 @@ const config = require('./config');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
-app.use(express.static(__dirname+'/public'));
+//app.use(express.static(__dirname+'/public'));
+app.use('/',express.static(__dirname+'/tema/default'));
 app.use('/app',express.static(__dirname+'/app'));
 app.use('/tema',express.static(__dirname+'/tema/default'));
 app.use('/libs',express.static(__dirname+'/node_modules'));

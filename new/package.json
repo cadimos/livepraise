@@ -1,0 +1,19 @@
+{
+  "name": "livepraise",
+  "version": "0.0.2",
+  "description": "Novo Layout LivePraise",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Thiago Lucena",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^7.6.2",
+    "consign": "^0.1.6",
+    "express": "^4.18.2",
+    "graceful-fs": "^4.2.10",
+    "http": "^0.0.1-security"
+  }
+}

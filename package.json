@@ -47,29 +47,27 @@
   },
   "private": true,
   "dependencies": {
-    "better-sqlite3": "^7.5.3",
+    "better-sqlite3": "^8.1.0",
     "blueimp-md5": "^2.19.0",
-    "body-parser": "^1.20.0",
+    "body-parser": "^1.20.2",
     "child-process-promise": "^2.2.1",
     "consign": "^0.1.6",
     "draggabilly": "^3.0.0",
-    "electron-updater": "^5.0.1",
-    "express": "^4.18.1",
-    "ffmpeg-static": "^5.0.0",
-    "fs-extra": "^10.1.0",
+    "electron-updater": "^5.3.0",
+    "express": "^4.18.2",
+    "ffmpeg-static": "^5.1.0",
+    "fs-extra": "^11.1.0",
     "graceful-fs": "^4.2.10",
-    "jquery": "^3.6.0",
-    "lowdb": "^2.1.0",
-    "npmlog": "^6.0.2",
-    "socket.io": "^4.5.1",
-    "socket.io-client": "^4.5.1",
-    "systeminformation": "^5.11.16",
-    "update-electron-app": "^2.0.1",
-    "webcamjs": "^1.0.26"
+    "jquery": "^3.6.3",
+    "node-abi": "^3.33.0",
+    "socket.io": "^4.6.1",
+    "socket.io-client": "^4.6.1",
+    "systeminformation": "^5.17.12",
+    "update-electron-app": "^2.0.1"
   },
   "devDependencies": {
-    "electron": "^19.0.1",
-    "electron-builder": "^23.0.3",
-    "electron-rebuild": "^3.2.7"
+    "@electron/rebuild": "^3.2.10",
+    "electron": "^23.1.2",
+    "electron-builder": "^24.0.0"
   }
 }

@@ -1,15 +1,37 @@
 name: livepraise # you probably want to 'snapcraft register <name>'
-base: core18 # the base snap is the execution environment for this snap
+title: Live Paise #Titulo
+base: core22 # the base snap is the execution environment for this snap
 version: '0.0.4' # just for humans, typically '1.2+git' or '1.3.2'
+contact: thiagolucenaelvis@gmail.com
 summary: Sistema de Projecao para igrejas # 79 char long summary
+icon: app/icon/livepraise.png
 description: |
   Live Praise é um software dedicado a exibição de 
   Louvores, Biblias, Videos e outras atividades na igreja.
 
 grade: stable # must be 'stable' to release into candidate/stable channels
-confinement: strict # use 'strict' once you have the right plugs and slots
-
+confinement: classic # use 'strict' once you have the right plugs and slots
 parts:
-  my-part:
+  livepraise:
     # See 'snapcraft plugins'
-    plugin: nil
+    plugin: npm
+    plugs:
+      - network
+      - network-bind
+      - audio-playback
+      - home
+      - audio-playback
+      - opengl
+      - camera
+      - personal-files
+      - removable-media
+      - desktop
+      - desktop-legacy
+      - wayland
+      - unity7
+      - x11
+      - alsa
+      - avahi-observe
+      - browser-support
+      - screen-inhibit-control
+      - upower-observe

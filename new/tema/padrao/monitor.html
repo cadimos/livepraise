@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Praise - Monitor</title>
+    <!-- Estilo Principal -->
+    <link rel="stylesheet" href="css/monitor.css">
+    <!-- Fonts Icones -->
+    <link rel="stylesheet" type="text/css" href="css/all.min.css">
+    <!-- Chrome Tabs -->
+    <link rel="stylesheet" type="text/css" href="css/chrome-tabs.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li>
+                <a onclick="teste()"><i class="fas fa-snowflake"></i> Congelar</a>
+            </li>
+            <li>
+                <a onclick="teste()"><i class="fas fa-desktop"></i> Limpar</a>
+            </li>
+            <li>
+                <a onclick="teste()"><i class="fas fa-file-alt"></i> Nova Música</a>
+            </li>
+            <li>
+                <a onclick="teste()"><i class="fas fa-sticky-note"></i> Bloco de Notas</a>
+            </li>
+            <li>
+                <a onclick="teste()"><i class="fas fa-redo-alt"></i>Recarregar</a>
+            </li>
+            <li>
+                <a><i class="fas fa-cogs"></i>  Configurações <i class="fa fa-caret-down"></i></a>
+                <ul>
+                    <li>
+                        <a onclick="teste()">Telas de Projeção</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a><i class="fas fa-question"></i>  Ajuda <i class="fa fa-caret-down"></i></a>
+                <ul>
+                    <li>
+                        <a href="https://github.com/cadimos/livepraise/wiki" target='_blank'>Manual</a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/cadimos/livepraise/issues" target='_blank'>Informar Problema</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    <div class="conteudo">
+        <div class="operacoes">
+            <input checked="checked" id="tab1" type="radio" name="tab" />
+            <input id="tab2" type="radio" name="tab" />
+            <input id="tab3" type="radio" name="tab" />
+            <input id="tab4" type="radio" name="tab" />
+            <nav>
+                <ul>
+                    <li class="tab1">
+                        <label for="tab1"><i class="fas fa-image"></i> Imagens</label>
+                    </li>
+                    <li class="tab2">
+                        <label for="tab2"><i class="fas fa-video"></i> Videos</label>
+                    </li>
+                    <li class="tab3">
+                        <label for="tab3"><i class="fas fa-book-open"></i> Músicas</label>
+                    </li>
+                    <li class="tab4">
+                        <label for="tab4"><i class="fas fa-book-open"></i> Biblia</label>
+                    </li>
+                </ul>
+            </nav>
+            <section>
+                <div class="tab1">
+                    <h2>First</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus itaque quidem minus nostrum, voluptatem accusamus aspernatur quia harum ratione, officia laudantium inventore autem doloribus atque labore numquam non. Hic, animi.</p>
+                </div>
+                <div class="tab2">
+                    <h2>Second</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum nesciunt ipsum dolore error repellendus officiis aliquid a, vitae reprehenderit, accusantium vero, ad. Obcaecati numquam sapiente cupiditate. Praesentium eaque, quae error!</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perferendis, maiores.</p>
+                </div>
+                <div class="tab3">
+                    <h2>Third</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio, nobis culpa rem, vitae earum aliquid.</p>
+                </div>
+                <div class="tab4">
+                    <select id="cat_biblia" class="form-control" onchange="lista_biblia()"></select>
+                    <div id="list_biblia"></div>
+                </div>
+            </section>
+        </div>
+        <div class="direita">
+            <ul id="background-rapido">
+                <li>
+                    <img src="imagens/1.jpg" alt="" onclick="teste()">
+                </li>
+                <li>
+                    <img src="imagens/2.jpg" alt="" onclick="teste()">
+                </li>
+                <li>
+                    <img src="imagens/3.jpg" alt="" onclick="teste()">
+                </li>
+                <li>
+                    <img src="imagens/4.jpg" alt="" onclick="teste()">
+                </li>
+                <li>
+                    <img src="imagens/5.jpg" alt="" onclick="teste()">
+                </li>
+            </ul>
+            <div class="preview"></div>
+        </div>
+    </div>
+    <footer>
+        <div class="chrome-tabs">
+            <div class="chrome-tabs-content">
+            </div>
+            <div class="chrome-tabs-bottom-bar"></div>
+            <div class="chrome-tabs-conteudo">
+            </div>
+        </div>
+    </footer>
+    <!-- JQuery -->
+    <script src="js/jquery.min.js"></script>
+    <!-- Draggabilly -->
+    <script src="js/draggabilly.pkgd.min.js" async></script>
+    <!-- Chrome Tabs -->
+    <script src="js/chrome-tabs.js"></script>
+    <!-- Script Principal -->
+    <script src="js/monitor.js"></script>
+</body>
+</html>
