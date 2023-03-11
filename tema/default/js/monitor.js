@@ -747,7 +747,7 @@ function catBiblias(){
 function lista_biblia(){
     cat=$('#cat_biblia').val();
     let modelo=`<button class="collaps_livro">[nome_livro]</button>
-    <div class="content" id="biblia_[id_livro]">
+    <div class="content_biblia" id="biblia_[id_livro]">
     </div>`;
     $('#list_biblia').html('');
     $.ajax({
@@ -769,11 +769,11 @@ function lista_biblia(){
     });
     drop();
     return true;
-  }
-  function lista_capitulos(id){
+}
+function lista_capitulos(id){
     cat=$('#cat_biblia').val();
     let modelo=`<button class="collaps_capitulo" onclick="lista_versiculo('${cat}',[id_livro],[id_capitulo])"><i class="fas fa-bible"></i> [id_capitulo]</button>
-    <div class="content" id="collapse_[id_livro]_[id_capitulo]">
+    <div class="content_biblia" id="collapse_[id_livro]_[id_capitulo]">
         <ul id="versiculo"></ul>
     </div>`;
     $.ajax({
@@ -784,80 +784,98 @@ function lista_biblia(){
             if(data.status=='successo'){
                 let t_rows=data.data[0].capitulos
                 for(i=0;i<t_rows;i++){
-                  capitulos=i+1;
-                  item=modelo.replace(/\[id_livro\]/g,id);
-                  items=item.replace(/\[id_capitulo\]/g,capitulos);
-                  $('#biblia_'+id).append(items);
+                    capitulos=i+1;
+                    item=modelo.replace(/\[id_livro\]/g,id);
+                    items=item.replace(/\[id_capitulo\]/g,capitulos);
+                    $('#biblia_'+id).append(items);
                 }
             }
         }
     });
     return true;
-  }
-  //Funçao de Listar os Versiculos por demanda
-  function lista_versiculo(cat,livro,capitulo){
-    cat_selecionado=$('#cat_biblia').val();
-    if(cat!=cat_selecionado){
-        cat=cat_selecionado;
-    }
-    modelo_versiculo=`<a name="versiculo_[id_livro]_[id_capitulo]_[id_versiculo]"></a><li onclick="viewBiblia('versiculo_[id_livro]_[id_capitulo]_[id_versiculo]','[local_biblia]','BR');" id="versiculo_[id_livro]_[id_capitulo]_[id_versiculo]" class="versiculo">[texto]</li>`;
-    modelo_versiculo=modelo_versiculo.replace(/\[id_livro\]/g,livro);
-    modelo_versiculo=modelo_versiculo.replace(/\[id_capitulo\]/g,capitulo);
-    $.ajax({
-        type: "GET",
-        url: urlSocket+'/versiculo/biblia/'+cat+'/'+livro+'/'+capitulo,
-        dataType: "json",
-        success: function(data) {
-            if(data.status=='successo'){
-                t_rows=data.data.length;
-                result=data.data;
-                $('#collapse_'+livro+'_'+capitulo+' #versiculo').html('');
-                for(i=0;i<t_rows;i++){
-                    versiculo=modelo_versiculo.replace(/\[id_versiculo\]/g,result[i].versiculo);
-                    versiculo=versiculo.replace(/\[texto\]/g,(result[i].texto));
-                    versiculo=versiculo.replace(/\[local_biblia\]/g,livro+'-'+capitulo+'-'+result[i].versiculo);
-                    $('#collapse_'+livro+'_'+capitulo+' #versiculo').append(versiculo);
+}
+//Funçao de Listar os Versiculos por demanda
+function lista_versiculo(cat,livro,capitulo){
+cat_selecionado=$('#cat_biblia').val();
+if(cat!=cat_selecionado){
+    cat=cat_selecionado;
+}
+modelo_versiculo=`<a name="versiculo_[id_livro]_[id_capitulo]_[id_versiculo]"></a><li onclick="viewBiblia('versiculo_[id_livro]_[id_capitulo]_[id_versiculo]','[nome_livro]','BR');" id="versiculo_[id_livro]_[id_capitulo]_[id_versiculo]" class="versiculo">[texto]</li>`;
+modelo_versiculo=modelo_versiculo.replace(/\[id_livro\]/g,livro);
+modelo_versiculo=modelo_versiculo.replace(/\[id_capitulo\]/g,capitulo);
+sessionStorage.setItem('capitulo','carregando');
+$.ajax({
+    type: "GET",
+    url: urlSocket+'/versiculo/biblia/'+cat+'/'+livro+'/'+capitulo,
+    dataType: "json",
+    success: function(data) {
+        if(data.status=='successo'){
+            t_rows=data.data.length;
+            result=data.data;
+            $('#collapse_'+livro+'_'+capitulo+' #versiculo').html('');
+            for(i=0;i<t_rows;i++){
+                versiculo=modelo_versiculo.replace(/\[id_versiculo\]/g,result[i].versiculo);
+                versiculo=versiculo.replace(/\[texto\]/g,(result[i].texto));
+                versiculo=versiculo.replace(/\[nome_livro\]/g,data.livro.name);
+                $('#collapse_'+livro+'_'+capitulo+' #versiculo').append(versiculo);
+                if(i==(t_rows-1)){
+                    sessionStorage.setItem('capitulo','ok');
                 }
             }
         }
+    }
+});
+}
+function checkVersiculo(id){
+    let cap= sessionStorage.getItem('capitulo');
+    if (cap=='ok') {
+        console.log(document.querySelector(id+' ul').getBoundingClientRect().height+'px')
+    }else{
+        setTimeout(() => {
+            checkVersiculo(id)
+        }, 100);
+    }
+}
+function drop(){
+setTimeout(() => {
+    //Menu Drop Livros
+    var coll = document.getElementsByClassName("collaps_livro");
+    var l;
+
+    for (l = 0; l < coll.length; l++) {
+    coll[l].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.maxHeight){
+        content.style.maxHeight = null;
+        } else {
+        //content.style.maxHeight = content.scrollHeight + "px";
+        //content.style.maxHeight='100%';
+        content.style.maxHeight='fit-content';
+        } 
     });
-  }
-  function drop(){
-    setTimeout(() => {
-      //Menu Drop Livros
-      var coll = document.getElementsByClassName("collaps_livro");
-      var l;
-  
-      for (l = 0; l < coll.length; l++) {
-        coll[l].addEventListener("click", function() {
-          this.classList.toggle("active");
-          var content = this.nextElementSibling;
-          if (content.style.maxHeight){
+    }
+    //Menu Drop Capitulos
+    var coll_cap = document.getElementsByClassName("collaps_capitulo");
+    var c;
+
+    for (c = 0; c < coll_cap.length; c++) {
+        coll_cap[c].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.maxHeight){
             content.style.maxHeight = null;
-          } else {
+        } else {
             //content.style.maxHeight = content.scrollHeight + "px";
-            content.style.maxHeight='100%';
-          } 
-        });
-      }
-      //Menu Drop Capitulos
-      var coll_cap = document.getElementsByClassName("collaps_capitulo");
-      var c;
-  
-      for (c = 0; c < coll_cap.length; c++) {
-          coll_cap[c].addEventListener("click", function() {
-          this.classList.toggle("active");
-          var content = this.nextElementSibling;
-          if (content.style.maxHeight){
-            content.style.maxHeight = null;
-          } else {
-            //content.style.maxHeight = content.scrollHeight + "px";
-            content.style.maxHeight='100%';
-          } 
-        });
-      }
-    }, 1000);
-  }
+            //content.style.maxHeight='100%';
+            content.style.maxHeight='fit-content';
+            //let id='#'+content.id;
+            //checkVersiculo(id);
+        } 
+    });
+    }
+}, 1000);
+}
 /*
 //Lista a Biblia Selecionada
 function lista_biblia(){
@@ -967,47 +985,35 @@ function lista_versiculo(cat,livro,capitulo){
 function viewBiblia(id,nome,br){
     cat=$('#cat_biblia').val();
     $('.conteudo').html('');
-    txt=$('#'+id).html();
+    let itens=id.split('_');
+    let capitulo = itens[2];
+    let versiculo = itens[3];
+    let txt=$('#'+id).html();
     if(br=='BR'){
       txt=nl2br(txt);
     }
     let modelo=`
-    <div class="titulo"></div>
+    <div class="titulo">${nome} ${capitulo}:${versiculo}</div>
     <div class="content"><span>${txt}</span></div>
     <div class="rodape"></div>`;
     $('.conteudo').append(modelo);
-    $('.content').textfill({maxFontPixels: CalculaLinhas(5,'.content'),debug: true  });
+    $('.content').textfill({maxFontPixels: CalculaLinhas(5,'.content')});
     $('.content').css('text-align','left');
     $('.titulo').css('font-size','20px');
-    nome=nome.split('-');
-    $.ajax({
-        type: "GET",
-        url: urlSocket+'/capitulo/biblia/'+cat+'/'+nome[0],
-        dataType: "json",
-        success: function(data) {
-            if(data.status=='successo'){
-                t_rows=data.data.length;
-                result=data.data;
-                $('.titulo').html(result[0].nome+' '+nome[1]+':'+nome[2]);
-            }
-        }
-    });
     $.each($('.versiculo'), function () {
       $(this).removeClass('ativo');
     });
     $('#'+id).addClass('ativo');
     if(congelar('valida')==true){
       setTimeout(function(){
-        tit=$('.titulo').html();
         let modelo_send=`
-        <div class="titulo">${tit}</div>
+        <div class="titulo">${nome} ${capitulo}:${versiculo}</div>
         <div class="content"><span>${txt}</span></div>
         <div class="rodape"></div>`;
         var text = `{"funcao":[{"nome":"viewBiblia","valor":"${btoa(modelo_send)}" }]}`;
         socket.emit("send", text);
       },200);
     }
-  
 }
 /*
 // Busco na biblia

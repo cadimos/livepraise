@@ -70,9 +70,11 @@ module.exports = app => {
     livro= req.params.livro;
     capitulo= req.params.capitulo;
     var db = new sqlite3(config.homedir+'/livepraise/biblias/'+biblia);
+    nomeLivro=db.prepare("SELECT name FROM book WHERE  book_reference_id = ?").get(livro);
     rows=db.prepare("SELECT id,text as texto,verse as versiculo FROM verse WHERE  book_id = ? AND chapter= ?").all(livro,capitulo);
     res.json({
             "status":"successo",
+            "livro": nomeLivro,
             "data":rows
     })
   })
@@ -101,10 +103,10 @@ module.exports = app => {
       versiculo='';
     }
     if(livro=='jo'){
-      rows=db.prepare("SELECT id FROM livros WHERE `nome` LIKE ? OR `nome2` LIKE ?").all(livro,livro);
+      rows=db.prepare("SELECT id FROM book WHERE `name` LIKE ?").all(livro);
     }else{
       livro=livro+'%';
-      rows=db.prepare("SELECT id FROM livros WHERE `nome` LIKE ? OR `nome2` LIKE ?").all(livro,livro);
+      rows=db.prepare("SELECT id FROM book WHERE `name` LIKE ?").all(livro);
     }
     res.json({
       "status":"successo",

@@ -176,7 +176,7 @@ form{
     padding-left: 5px;
 }
 li.ativo{
-    border: solid 2px #3000fc;
+    border: solid 2px #3000fc !important;
 }
 .panel-body{
     padding-top: 0px;
@@ -269,12 +269,12 @@ li.ativo{
     padding-left: 1vh;
 }
 .content{
-    padding: 1vh;
-    height: 37vh;
+    height: 80%;
 }
 .content span{
     display: table;
     width: 100%;
+    padding: 1vh 1vw;
 }
 .rodape{
     height: 5vh;
@@ -350,7 +350,7 @@ li.ativo{
     background-color: #555;
   }
   
-  .content {
+.content_biblia {
     padding: 0 18px !important;
     max-height: 0;
     overflow: hidden;
