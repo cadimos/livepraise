@@ -763,11 +763,13 @@ function lista_biblia(){
                     item=item.replace(/\[nome_livro\]/g,result[i].nome);
                     $('#list_biblia').append(item);
                     lista_capitulos(result[i].id);
+                    if(i==(t_rows-1)){
+                        dropLivros()
+                    }
                 }
             }
         }
     });
-    drop();
     return true;
 }
 function lista_capitulos(id){
@@ -788,6 +790,9 @@ function lista_capitulos(id){
                     item=modelo.replace(/\[id_livro\]/g,id);
                     items=item.replace(/\[id_capitulo\]/g,capitulos);
                     $('#biblia_'+id).append(items);
+                    if(i==(t_rows-1)){
+                        dropCapitulos()
+                    }
                 }
             }
         }
@@ -836,6 +841,47 @@ function checkVersiculo(id){
         }, 100);
     }
 }
+function dropLivros(){
+    //Menu Drop Livros
+    var coll = document.getElementsByClassName("collaps_livro");
+    var l;
+
+    for (l = 0; l < coll.length; l++) {
+    coll[l].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.maxHeight){
+        content.style.maxHeight = null;
+        } else {
+        //content.style.maxHeight = content.scrollHeight + "px";
+        //content.style.maxHeight='100%';
+        content.style.maxHeight='fit-content';
+        } 
+    });
+    }
+}
+function dropCapitulos(){
+    //Menu Drop Capitulos
+    var coll_cap = document.getElementsByClassName("collaps_capitulo");
+    var c;
+
+    for (c = 0; c < coll_cap.length; c++) {
+        coll_cap[c].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.maxHeight){
+            content.style.maxHeight = null;
+        } else {
+            //content.style.maxHeight = content.scrollHeight + "px";
+            //content.style.maxHeight='100%';
+            content.style.maxHeight='fit-content';
+            //let id='#'+content.id;
+            //checkVersiculo(id);
+        } 
+    });
+    }
+}
+/*
 function drop(){
 setTimeout(() => {
     //Menu Drop Livros
@@ -876,6 +922,7 @@ setTimeout(() => {
     }
 }, 1000);
 }
+*/
 /*
 //Lista a Biblia Selecionada
 function lista_biblia(){
@@ -1005,14 +1052,8 @@ function viewBiblia(id,nome,br){
     });
     $('#'+id).addClass('ativo');
     if(congelar('valida')==true){
-      setTimeout(function(){
-        let modelo_send=`
-        <div class="titulo">${nome} ${capitulo}:${versiculo}</div>
-        <div class="content"><span>${txt}</span></div>
-        <div class="rodape"></div>`;
-        var text = `{"funcao":[{"nome":"viewBiblia","valor":"${btoa(modelo_send)}" }]}`;
+        var text = `{"funcao":[{"nome":"viewBiblia","valor":"${btoa(modelo)}" }]}`;
         socket.emit("send", text);
-      },200);
     }
 }
 /*
