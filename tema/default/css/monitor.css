@@ -359,7 +359,7 @@ li.ativo{
   }
 /*Menu drop Capitulo*/
 .collaps_capitulo {
-    background-color: #777;
+    background-color: #212529;
     color: white;
     cursor: pointer;
     padding: 18px;
@@ -368,8 +368,11 @@ li.ativo{
     text-align: left;
     outline: none;
     font-size: 15px;
+    border-bottom: solid 1px #131313;
   }
-  
+  .collaps_capitulo.active{
+    background-color: #6c757d;
+  }
   .active, .collaps_capitulo:hover {
     background-color: #555;
   }

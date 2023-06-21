@@ -105,10 +105,18 @@ const KEY_PF8 = 119;
 //Analisa se está sendo digitado algo
 var typingTimer; //timer identifier
 var doneTypingInterval = 500; //time in ms
+//Faço a busca da musica quando para de digitar
 $('#busca_musica').keyup(function() {
     clearTimeout(typingTimer);
     if ($('#busca_musica').val) {
         typingTimer = setTimeout(buscaMusica, doneTypingInterval);
+    }
+});
+//Faço a busca na biblia quando para de digitar
+$('#busca_biblia').keyup(function() {
+    clearTimeout(typingTimer);
+    if ($('#busca_biblia').val) {
+        typingTimer = setTimeout(buscaBiblia, doneTypingInterval);
     }
 });
 //Converte em ISO-8859-1
