@@ -926,12 +926,37 @@ function viewBiblia(id,nome,br){
         socket.emit("send", text);
     }
 }
-/*
+function buscarLivro(texto) {
+    // Remove acentos e transforma tudo em minúsculas
+    texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    
+    // Obtém todos os elementos <li> com a classe "versiculo"
+    var versiculos = document.querySelectorAll(".collaps_livro");
+    
+    // Percorre os versículos e verifica se o texto buscado está presente
+    for (var i = 0; i < versiculos.length; i++) {
+      var versiculo = versiculos[i];
+      
+      // Remove acentos e transforma tudo em minúsculas para comparação
+      var versiculoTexto = versiculo.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      
+      // Verifica se o texto buscado está presente no versículo
+      if (versiculoTexto.includes(texto)) {
+          if(!versiculo.classList.value.includes('active')){
+            versiculo.click()
+            }
+      }
+    }
+  }
+  
+  // Exemplo de uso: buscar o texto "ceu" desconsiderando a acentuação
 // Busco na biblia
 function buscaBiblia(){
     cat=$('#cat_biblia').val();
     texto=$('#busca_biblia').val();
     if(texto.length>1){
+        buscarLivro(texto);
+        /*
         $.ajax({
             type: "GET",
             url: urlSocket+'/busca/biblia/'+cat+'/'+texto,
@@ -977,9 +1002,9 @@ function buscaBiblia(){
                 }
             }
         });
+        */
     }
 }
-*/
 //Listagem Background Rápido
 function lista_background_rapido(){
     let modelo=`<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 background-rapido">
