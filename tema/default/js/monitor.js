@@ -108,7 +108,7 @@ var doneTypingInterval = 500; //time in ms
 $('#busca_musica').keyup(function() {
     clearTimeout(typingTimer);
     if ($('#busca_musica').val) {
-    typingTimer = setTimeout(doneTyping, buscaMusica);
+        typingTimer = setTimeout(buscaMusica, doneTypingInterval);
     }
 });
 //Converte em ISO-8859-1
