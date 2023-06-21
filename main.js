@@ -68,7 +68,7 @@ async function monitorPrincipal(){
     win_link.setMenuBarVisibility(false);
     event.newGuest = win_link
   })
-  //win.openDevTools();
+  win.openDevTools();
 
   win.once('ready-to-show',()=>{
     autoUpdater.checkForUpdatesAndNotify();
@@ -109,7 +109,7 @@ async function openMonitor(item, index){
     item.id.once('ready-to-show',()=>{
       item.id.show();
     })
-    //item.id.openDevTools();
+    item.id.openDevTools();
     item.id.on('closed', () => {
       app.quit()
     });

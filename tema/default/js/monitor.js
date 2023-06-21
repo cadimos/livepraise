@@ -102,6 +102,15 @@ const KEY_PF5 = 116;
 const KEY_PF6 = 117;
 const KEY_PF7 = 118;
 const KEY_PF8 = 119;
+//Analisa se está sendo digitado algo
+var typingTimer; //timer identifier
+var doneTypingInterval = 500; //time in ms
+$('#busca_musica').keyup(function() {
+    clearTimeout(typingTimer);
+    if ($('#busca_musica').val) {
+    typingTimer = setTimeout(doneTyping, buscaMusica);
+    }
+});
 //Converte em ISO-8859-1
 function iso_encode(str){
     str = str.replace(/\'/g, '&apos;');
@@ -790,7 +799,7 @@ function lista_capitulos(id){
                     item=modelo.replace(/\[id_livro\]/g,id);
                     items=item.replace(/\[id_capitulo\]/g,capitulos);
                     $('#biblia_'+id).append(items);
-                    if(i==(t_rows-1)){
+                    if(i==(t_rows-1) && id==66){
                         dropCapitulos()
                     }
                 }

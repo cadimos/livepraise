@@ -5,8 +5,8 @@
         <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
         <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
 -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: http://*:3000 ws://*:3000; script-src 'self' 'unsafe-inline' data: http://*:3000 ws://*:3000">
-        <meta http-equiv="X-Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: http://*:3000 ws://*:3000; script-src 'self' 'unsafe-inline' data: http://*:3000 ws://*:3000">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: http://*:3000 ws://*:3000 https://*.teraidc.com.br; script-src 'self' 'unsafe-inline' data: http://*:3000 ws://*:3000">
+        <meta http-equiv="X-Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: http://*:3000 ws://*:3000 https://*.teraidc.com.br; script-src 'self' 'unsafe-inline' data: http://*:3000 ws://*:3000">
 
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="description" content="Sistema de Projeção para Igrejas">
@@ -383,7 +383,7 @@
                                 <div class="col-md-12">
                                     <form action="javascript:buscaMusica(true)">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Pesquisar" id="busca_musica" onkeyup="buscaMusica()">
+                                            <input type="text" class="form-control" placeholder="Pesquisar" id="busca_musica">
                                             <div class="input-group-append">
                                                 <button class="btn btn-search" type="button" onclick="buscaMusica(true)"><i class="fas fa-search"></i></button>
                                             </div>
