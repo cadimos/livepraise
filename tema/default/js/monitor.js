@@ -763,7 +763,7 @@ function catBiblias(){
 //Lista a Biblia Selecionada
 function lista_biblia(){
     cat=$('#cat_biblia').val();
-    let modelo=`<button class="collaps_livro">[nome_livro]</button>
+    let modelo=`<button class="collaps_livro" id="ancora_biblia_[id_livro]">[nome_livro]</button>
     <div class="content_biblia" id="biblia_[id_livro]">
     </div>`;
     $('#list_biblia').html('');
@@ -791,7 +791,7 @@ function lista_biblia(){
 }
 function lista_capitulos(id){
     cat=$('#cat_biblia').val();
-    let modelo=`<button class="collaps_capitulo" onclick="lista_versiculo('${cat}',[id_livro],[id_capitulo])"><i class="fas fa-bible"></i> [id_capitulo]</button>
+    let modelo=`<button class="collaps_capitulo" id="biblia_[id_livro]_[id_capitulo]" onclick="lista_versiculo('${cat}',[id_livro],[id_capitulo])"><i class="fas fa-bible"></i> [id_capitulo]</button>
     <div class="content_biblia" id="collapse_[id_livro]_[id_capitulo]">
         <ul id="versiculo"></ul>
     </div>`;
@@ -929,24 +929,35 @@ function viewBiblia(id,nome,br){
 function buscarLivro(texto) {
     // Remove acentos e transforma tudo em minúsculas
     texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    
     // Obtém todos os elementos <li> com a classe "versiculo"
-    var versiculos = document.querySelectorAll(".collaps_livro");
-    
+    let versiculos = document.querySelectorAll(".collaps_livro");
+    let encontrado=0;
+    let idLocalizado=0;
     // Percorre os versículos e verifica se o texto buscado está presente
     for (var i = 0; i < versiculos.length; i++) {
-      var versiculo = versiculos[i];
+      let versiculo = versiculos[i];
       
       // Remove acentos e transforma tudo em minúsculas para comparação
-      var versiculoTexto = versiculo.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      let versiculoTexto = versiculo.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
       
       // Verifica se o texto buscado está presente no versículo
-      if (versiculoTexto.includes(texto)) {
-          if(!versiculo.classList.value.includes('active')){
-            versiculo.click()
+        if (versiculoTexto.includes(texto)) {
+            if(encontrado==0){
+                idLocalizado=versiculo.nextSibling.nextSibling.id;
+                if(!versiculo.classList.value.includes('active')){
+                    encontrado++;
+                    versiculo.click();
+                }
+            }else if(versiculo.classList?.value.includes('active')){
+                versiculo.classList?.remove('active');
             }
-      }
+        }else{
+            if(versiculo.classList?.value.includes('active')){
+                versiculo.classList?.remove('active');
+            }
+        }
     }
+    return idLocalizado;
   }
   
   // Exemplo de uso: buscar o texto "ceu" desconsiderando a acentuação
@@ -955,54 +966,54 @@ function buscaBiblia(){
     cat=$('#cat_biblia').val();
     texto=$('#busca_biblia').val();
     if(texto.length>1){
-        buscarLivro(texto);
-        /*
-        $.ajax({
-            type: "GET",
-            url: urlSocket+'/busca/biblia/'+cat+'/'+texto,
-            dataType: "json",
-            success: function(data) {
-                if(data.status=='successo'){
-                    result=data.livro;
-                    console.log(result)
-                    if(result.length>0){
-                        livro=result[0].id;
-                        capitulo=data.capitulo;
-                        versiculo=data.versiculo;
-                        if(livro!=''){
-                            //Verificar se o livro esta aberto
-                            aberto_livro=$('#biblia_'+livro+'.show').length;
-                            if(!aberto_livro){
-                                $(`#head_biblia_${livro} a`).trigger('click');
-                                let ancora=`#head_biblia_${livro}`;
-                                location.href=ancora;
-                                $('#busca_biblia').focus();
-                            }
-                        }
-                        if(capitulo!=''){
-                            //Verificar se o capitulo esta aberto
-                            aberto_capitulo=$(`#collapse_${livro}_${capitulo}.ui-accordion-content-active`).length;
-                            if(!aberto_capitulo){
-                                $(`#head_biblia_${livro}_${capitulo} a`).trigger('click');
-                                let ancora=`#head_biblia_${livro}_${capitulo}`;
-                                location.href=ancora;
-                                $('#busca_biblia').focus();
-                            }
-                        }
-                        //verificar se existe o versiculo
-                        if(versiculo!=''){
-                            LimpaBiblia();
-                            $(`#versiculo_${livro}_${capitulo}_${versiculo}`).trigger('click');
-                            $(`#versiculo_${livro}_${capitulo}_${versiculo}`).trigger('focus');
-                            let ancora=`#versiculo_${livro}_${capitulo}_${versiculo}`;
-                            location.href=ancora;
-                            $('#busca_biblia').focus();
-                        }
-                    }
+        let busca=texto.split(' ');
+        let tBusca=busca.length-1;
+        let primeiro=parseInt(busca[0].substr(0,1));
+        let livro='';
+        let capitulo=0;
+        let versiculo=0;
+        if(!isNaN(primeiro)){
+            livro=`${primeiro} ${busca[1]}`
+            tBusca=tBusca-1;
+        }else{
+            livro=busca[0];
+        }
+        let idLivro=buscarLivro(livro);
+        location.href=`#ancora_${idLivro}`;
+        document.querySelector("#busca_biblia").focus();
+        if(tBusca>0){
+            if(tBusca==2){
+                capitulo=busca[1];
+                versiculo=busca[2];
+            }else{
+                let capVer=busca[tBusca];
+                if(capVer.includes(':')){
+                    let capB=capVer.split(':');
+                    capitulo=capB[0];
+                    versiculo=capB[1];
+                }else{
+                    capitulo=capVer;
                 }
             }
-        });
-        */
+            
+            if(capitulo!=0){
+                let divcapitulo=document.querySelector(`#${idLivro}_${capitulo}`);
+                if(!divcapitulo.classList.value.includes('active')){
+                    divcapitulo.click();
+                }
+                location.href=`#${idLivro}_${capitulo}`;
+                document.querySelector("#busca_biblia").focus();
+            }
+            if(versiculo!=0){
+                let newBiblia=idLivro.replace('biblia','versiculo');
+                let divversiculo=document.querySelector(`#${newBiblia}_${capitulo}_${versiculo}`);
+                if(!divversiculo.classList?.value.includes('active')){
+                    divversiculo.click();
+                }
+                location.href=`#${newBiblia}_${capitulo}_${versiculo}`;
+                document.querySelector("#busca_biblia").focus();
+            }
+        }
     }
 }
 //Listagem Background Rápido
