@@ -1,6 +1,6 @@
 {
   "name": "livepraise",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "main.js",
   "author": {
     "name": "Thiago de Lucena Sobrinho",
@@ -30,7 +30,7 @@
     "email": "livepraise@teraidc.com.br"
   },
   "scripts": {
-    "start": "electron main.js",
+    "start": "electron --inspect=5858 main.js",
     "win32": "electron-packager . LivePraise --platform=win32 --arch=ia32 --icon=app/icon/livepraise.ico --prune=true --out=release-builds  --overwrite",
     "win64": "electron-packager . LivePraise --platform=win32 --arch=x64 --icon=app/icon/livepraise.ico --prune=true --out=release-builds  --overwrite",
     "linux32": "electron-packager . LivePraise --platform=linux --arch=ia32 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
@@ -39,7 +39,7 @@
     "snap": "electron-builder build --linux snap",
     "win": "electron-builder build --win --publish always",
     "linux": "electron-builder build --linux --publish always",
-    "rebuild": "electron-rebuild -f -w better-sqlite3"
+    "rebuild": "electron-rebuild -f -w sqlite3"
   },
   "repository": {
     "type": "git",
@@ -47,27 +47,29 @@
   },
   "private": true,
   "dependencies": {
-    "better-sqlite3": "^8.1.0",
+    "better-sqlite3": "^8.6.0",
     "blueimp-md5": "^2.19.0",
     "body-parser": "^1.20.2",
     "child-process-promise": "^2.2.1",
+    "compression": "^1.7.4",
     "consign": "^0.1.6",
     "draggabilly": "^3.0.0",
-    "electron-updater": "^5.3.0",
+    "electron-updater": "^6.1.4",
     "express": "^4.18.2",
-    "ffmpeg-static": "^5.1.0",
-    "fs-extra": "^11.1.0",
-    "graceful-fs": "^4.2.10",
-    "jquery": "^3.6.3",
-    "node-abi": "^3.33.0",
-    "socket.io": "^4.6.1",
-    "socket.io-client": "^4.6.1",
-    "systeminformation": "^5.17.12",
+    "ffmpeg-static": "^5.2.0",
+    "fs-extra": "^11.1.1",
+    "graceful-fs": "^4.2.11",
+    "jquery": "^3.7.1",
+    "node-abi": "^3.47.0",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
+    "sqlite3": "^5.1.6",
+    "systeminformation": "^5.21.9",
     "update-electron-app": "^2.0.1"
   },
   "devDependencies": {
-    "@electron/rebuild": "^3.2.10",
-    "electron": "^23.1.2",
-    "electron-builder": "^24.0.0"
+    "@electron/rebuild": "^3.3.0",
+    "electron": "^26.2.1",
+    "electron-builder": "^24.6.4"
   }
 }

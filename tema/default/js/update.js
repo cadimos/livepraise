@@ -1,3 +1,4 @@
+/*
 const version = document.getElementById('version');
 const message = document.getElementById('message');
 const not = document.getElementById('notification');
@@ -24,3 +25,4 @@ function closeNotification() {
 function restartApp() {
   window.api.send('restart_app');
 }
+*/

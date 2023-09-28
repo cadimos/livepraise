@@ -1,14 +1,18 @@
+const BD = require('../middlewares/bd');
+const db=new BD();
+//Indico a exportação, para ser usado nas rotas
 module.exports = app => {
-    var sqlite3 = require('better-sqlite3');
-    const config = require('../config');    
-    var db = new sqlite3(config.homedir+'/livepraise/dsw.bd');
-    app.get('/background-rapido', (req, res) => {
+    //Grupo de Rotas
+    app.get('/background-rapido',async (req,res)=>{
         res.setHeader('Access-Control-Allow-Origin', 'Origin');
-        rows=db.prepare("SELECT url,diretorio,inicial FROM background_rapido ORDER BY id ASC").all();
+        items=await db.all("SELECT url,diretorio,inicial FROM background_rapido ORDER BY id ASC");
+        if(items.status=='Error'){
+            res.json(items);
+            return;
+        }
         res.json({
-                "status":"successo",
-                "data":rows
+            status:"Sucesso",
+            items
         })
     })
-    
 }

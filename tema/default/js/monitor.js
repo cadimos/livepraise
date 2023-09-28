@@ -105,6 +105,89 @@ const KEY_PF8 = 119;
 //Analisa se está sendo digitado algo
 var typingTimer; //timer identifier
 var doneTypingInterval = 500; //time in ms
+let stop_color=false;
+//Muda cores da animacao
+function color_animate(tempo){
+    if(stop_color==false){
+        let r=Math.floor(Math.random() * 256);
+        let g=Math.floor(Math.random() * 256);
+        let b=Math.floor(Math.random() * 256);
+        let r2=Math.floor(Math.random() * 256);
+        let g2=Math.floor(Math.random() * 256);
+        let b2=Math.floor(Math.random() * 256);
+        let r3=Math.floor(Math.random() * 256);
+        let g3=Math.floor(Math.random() * 256);
+        let b3=Math.floor(Math.random() * 256);
+        $('.tree').css('fill','url(#gradient)');
+        $('#inicio_gradiente').attr('stop-color','rgb('+r+','+g+','+b+')');
+        $('#meio_gradiente').attr('stop-color','rgb('+r2+','+g2+','+b2+')');
+        $('#fim_gradiente').attr('stop-color','rgb('+r3+','+g3+','+b3+')');
+        setTimeout(() => color_animate(tempo),tempo);
+    }
+}
+//Inicia o sistema
+setTimeout(() => loanding(), 200);
+async function loanding(){
+    $('#current_loading').html('Iniciando Animaçao');
+    color_animate(2000);
+    $('#current_loading').html('Carregando Imagens');
+    let mus=await catMusicas();
+    /*
+    let img=catImagens();
+    let vid=catVideos();
+    let bg=lista_background_rapido();
+    let bib=catBiblias();
+
+    if(img){
+        $('#current_loading').html('Carregando Vídeos');
+    }
+    if(vid){
+        $('#current_loading').html('Carregando Músicas');
+    }
+    if(mus){
+        $('#current_loading').html('Carregando Biblias');
+    }
+    if(bib){
+        $('#current_loading').html('Carregando Background Rápido');
+    }
+    if(
+        img==true &&
+        vid==true &&
+        mus==true &&
+        bg ==true &&
+        bib==true
+    ){
+        parar_cor();
+	fechar_loandig()
+    }
+    */
+}
+//Lista as Categorias de Musicas
+async function catMusicas(){
+    console.log(urlSocket+'/categoria/musica');
+    /*
+    $('#cat_musica').html('');
+    $.ajax({
+        type: "GET",
+        url: urlSocket+'/categoria/musica',
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                t_rows=data.data.length;
+                result=data.data;
+                for(i=0;i<t_rows;i++){
+                    option=result[i].nome;
+                    id=result[i].id
+                    $('#cat_musica').append('<option value="'+id+'">'+option+'</option>');
+                }
+                lista_musica();
+            }
+        }
+    });
+    */
+    return true;
+}
+/*
 //Faço a busca da musica quando para de digitar
 $('#busca_musica').keyup(function() {
     clearTimeout(typingTimer);
@@ -188,68 +271,17 @@ function atualizar(vl){
     local=location.href.replace(location.hash,'');
     setTimeout(() => location.href=local,100);
 }
-var stop_color=false;
-function color_animate(tempo){
-    if(stop_color==false){
-        let r=Math.floor(Math.random() * 256);
-        let g=Math.floor(Math.random() * 256);
-        let b=Math.floor(Math.random() * 256);
-        let r2=Math.floor(Math.random() * 256);
-        let g2=Math.floor(Math.random() * 256);
-        let b2=Math.floor(Math.random() * 256);
-        let r3=Math.floor(Math.random() * 256);
-        let g3=Math.floor(Math.random() * 256);
-        let b3=Math.floor(Math.random() * 256);
-        $('.tree').css('fill','url(#gradient)');
-        $('#inicio_gradiente').attr('stop-color','rgb('+r+','+g+','+b+')');
-        $('#meio_gradiente').attr('stop-color','rgb('+r2+','+g2+','+b2+')');
-        $('#fim_gradiente').attr('stop-color','rgb('+r3+','+g3+','+b3+')');
-        setTimeout(() => color_animate(tempo),tempo);
-    }
-}
 function parar_cor(){
     stop_color = true;
     return true;
 }
-function loanding(){
-    $('#current_loading').html('Iniciando Animaçao');
-    color_animate(2000);
-    $('#current_loading').html('Carregando Imagens');
-    let mus=catMusicas();
-    let img=catImagens();
-    let vid=catVideos();
-    let bg=lista_background_rapido();
-    let bib=catBiblias();
 
-    if(img){
-        $('#current_loading').html('Carregando Vídeos');
-    }
-    if(vid){
-        $('#current_loading').html('Carregando Músicas');
-    }
-    if(mus){
-        $('#current_loading').html('Carregando Biblias');
-    }
-    if(bib){
-        $('#current_loading').html('Carregando Background Rápido');
-    }
-    if(
-        img==true &&
-        vid==true &&
-        mus==true &&
-        bg ==true &&
-        bib==true
-    ){
-        parar_cor();
-	fechar_loandig()
-    }
-}
   
 function fechar_loandig(){
     $('#loading').css('display','none');
 }
   
-setTimeout(() => loanding(), 200);
+
 //Lista a Categoria das Imagens
 function catImagens(){
     $('#cat_imagens').html('');
@@ -339,28 +371,6 @@ function lista_video(dir){
         }
     });
    return true;
-}
-//Lista as Categorias de Musicas
-function catMusicas(){
-    $('#cat_musica').html('');
-    $.ajax({
-        type: "GET",
-        url: urlSocket+'/categoria/musica',
-        dataType: "json",
-        success: function(data) {
-            if(data.status=='successo'){
-                t_rows=data.data.length;
-                result=data.data;
-                for(i=0;i<t_rows;i++){
-                    option=result[i].nome;
-                    id=result[i].id
-                    $('#cat_musica').append('<option value="'+id+'">'+option+'</option>');
-                }
-                lista_musica();
-            }
-        }
-    });
-    return true;
 }
 //Lista as Musicas
 function lista_musica(){
@@ -715,7 +725,7 @@ function remover_musica(id,conf){
                       db.run("DELETE FROM `musica` WHERE `id`='"+id+"'");
                       lista_musica();
                     });
-                    */
+                    * /
                   }
               }
           },
@@ -1135,7 +1145,7 @@ function backgroundRapido(url){
 }
 
 
-/* Chrome Tabs */
+/* Chrome Tabs * /
 //Tabs List
 $('#navegacao a').click(function (e) {
     e.preventDefault()
@@ -1259,3 +1269,4 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
     }
   }
 });
+*/

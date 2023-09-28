@@ -1,15 +1,39 @@
+const { route } = require('express/lib/application');
+
 module.exports = app => {
-  var sqlite3 = require('better-sqlite3');
+  //var sqlite3 = require('better-sqlite3');
+  var sqlite3 = require('sqlite3');
   const config = require('../config');  
   
-  var db = new sqlite3(config.homedir+'/livepraise/dsw.bd');
+  //var db = new sqlite3(config.homedir+'/livepraise/dsw.bd');
+  console.log(config.homedir+'/livepraise/dsw.bd');
+  var db = new sqlite3.Database(config.homedir+'/livepraise/dsw.bd');
   app.get('/categoria/musica', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
+    /*
+    res.json({
+      "status":"successo"
+    });
+    */
+   /*
     rows=db.prepare("SELECT * FROM cat_musicas").all();
+    console.log(rows);
     res.json({
         "status":"successo",
         "data":rows
     })
+    */
+    db.serialize(function() {
+      sql="SELECT * FROM cat_musicas";
+      params=[];
+      db.all(sql,params,(err, rows ) => {
+        console.log(rows) 
+        res.json({
+          "status":"successo",
+          "data":rows
+      })
+    });
+    });
   })
   app.get('/categoria/musica/:id', (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'Origin');
