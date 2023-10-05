@@ -1,17 +1,19 @@
+const express = require('express') //Modulo do servidor
 const BD = require('../middlewares/bd');
 const fs = require('graceful-fs');
 const db = new BD();
 const homedir = require('os').homedir();
 //Indico a exportação, para ser usado nas rotas
 module.exports = app => {
+    const api = express.Router(); //Defino em qual variavel vai ficar armazenado as rotas do grupo
     //Listo as Biblias
-    app.get('/lista/biblias', async (req, res) => {
+    api.get('/', async (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', 'Origin');
-        dir = homedir + '/livepraise/biblias';
-        var files = fs.readdirSync(dir);
-        items = [];
-        for (var i in files) {
-            var name = dir + '/' + files[i];
+        let dir = homedir + '/livepraise/biblias';
+        let files = fs.readdirSync(dir);
+        let items = [];
+        for (let i in files) {
+            let name = dir + '/' + files[i];
             if (fs.statSync(name).isDirectory()) {
             } else {
                 if (name.indexOf("sqlite") != -1) {
@@ -35,43 +37,63 @@ module.exports = app => {
         })
     })
     //Listo os livros da Biblia
-    app.get('/livros/biblia/:biblia', (req, res) => {
+    api.get('/livros/:biblia', async (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', 'Origin');
-        biblia = req.params.biblia;
-        var db = new sqlite3(homedir + '/livepraise/biblias/' + biblia);
-        rows = db.prepare("SELECT id,name as nome FROM book").all();
+        let biblia = req.params.biblia;
+        let dir = homedir + '/livepraise/biblias';
+        let name = dir + '/' + biblia;
+        let conn = db.connect(name);
+        items=await db.all("SELECT id,name as nome FROM book");
+        if(items.status=='Error'){
+            res.json(items);
+            return;
+        }
         res.json({
-            "status": "successo",
-            "data": rows
+            status:"Sucesso",
+            items
         })
     })
+    
     //Listo os capitulos do Livro
-    app.get('/capitulo/biblia/:biblia/:livro', (req, res) => {
+    api.get('/capitulo/:biblia/:livro', async (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', 'Origin');
         biblia = req.params.biblia;
         livro = req.params.livro;
-        var db = new sqlite3(homedir + '/livepraise/biblias/' + biblia);
-        rows = db.prepare("SELECT COUNT(DISTINCT(chapter)) as capitulos FROM verse WHERE book_id = ?").all(livro);
+        let dir = homedir + '/livepraise/biblias';
+        let name = dir + '/' + biblia;
+        let conn = db.connect(name);
+        items=await db.all(`SELECT COUNT(DISTINCT(chapter)) as capitulos FROM verse WHERE book_id = ${livro}`);
+        if(items.status=='Error'){
+            res.json(items);
+            return;
+        }
         res.json({
-            "status": "successo",
-            "data": rows
+            status:"Sucesso",
+            items
         })
     })
     //Listo os versiculos
-    app.get('/versiculo/biblia/:biblia/:livro/:capitulo', (req, res) => {
+    api.get('/versiculo/:biblia/:livro/:capitulo', async (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', 'Origin');
         biblia = req.params.biblia;
         livro = req.params.livro;
         capitulo = req.params.capitulo;
-        var db = new sqlite3(homedir + '/livepraise/biblias/' + biblia);
-        nomeLivro = db.prepare("SELECT name FROM book WHERE  book_reference_id = ?").get(livro);
-        rows = db.prepare("SELECT id,text as texto,verse as versiculo FROM verse WHERE  book_id = ? AND chapter= ?").all(livro, capitulo);
+        let dir = homedir + '/livepraise/biblias';
+        let name = dir + '/' + biblia;
+        let conn = db.connect(name);
+        let nomeLivro=await db.all(`SELECT name FROM book WHERE  book_reference_id =  ${livro}`);
+        let items=await db.all(`SELECT id,text as texto,verse as versiculo FROM verse WHERE  book_id = ${livro} AND chapter= ${capitulo}`);
+        if(items.status=='Error'){
+            res.json(items);
+            return;
+        }
         res.json({
-            "status": "successo",
-            "livro": nomeLivro,
-            "data": rows
+            status:"Sucesso",
+            livro: nomeLivro[0].name,
+            items
         })
     })
+    /*
     //faco a busca do livro
     app.get('/busca/biblia/:biblia/:busca', (req, res) => {
         res.setHeader('Access-Control-Allow-Origin', 'Origin');
@@ -79,7 +101,7 @@ module.exports = app => {
         busca = req.params.busca;
         var db = new sqlite3(homedir + '/livepraise/biblias/' + biblia);
         //  deepcode ignore HTTPSourceWithUncheckedType: busca
-        let livro = busca.match(/^([0-3]|[a-z]) *([a-z])*/ig);
+        let livro = busca.match(/^([0-3]|[a-z]) *([a-z])* /ig);
         //  deepcode ignore HTTPSourceWithUncheckedType: busca
         texto = busca.replace(livro, '');
         //  deepcode ignore GlobalReplacementRegex: busca
@@ -110,18 +132,6 @@ module.exports = app => {
             "versiculo": versiculo,
         })
     })
-    /*
-    app.get('/background-rapido', async (req, res) => {
-        res.setHeader('Access-Control-Allow-Origin', 'Origin');
-        items = await db.all("SELECT url,diretorio,inicial FROM background_rapido ORDER BY a ASC");
-        if (items.status == 'Error') {
-            res.json(items);
-            return;
-        }
-        res.json({
-            status: "Sucesso",
-            items
-        })
-    })
     */
+    app.use('/biblias',api); //defino o URL do Grupo e exporto ele, com todas as rotas
 }

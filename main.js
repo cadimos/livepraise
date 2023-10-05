@@ -54,9 +54,7 @@ async function monitorPrincipal() {
       preload: path.join(__dirname, 'preload.js') // use a preload script
     }
   });
-  //win.loadURL(`https://google.com.br`);
   win.loadURL(`http://localhost:${config.port}`);
-  //win.show();
   win.webContents.on('new-window', (event, url) => {
     event.preventDefault()
     const win_link = new BrowserWindow({
@@ -133,13 +131,12 @@ async function openMonitor(item, index) {
     });
     console.log(`Iniciando a URL: http://localhost:${config.port}/projetor.html`);
     item.id.loadURL(`http://localhost:${config.port}/projetor.html`);
-    //item.id.loadURL(`https://google.com.br`);
     console.log('Verificando se monitor está pronto');
     item.id.once('ready-to-show', () => {
       console.log('Exibindo monitor');
       item.id.show();
     })
-    //item.id.openDevTools();
+    item.id.openDevTools();
     item.id.on('closed', () => {
       app.quit()
     });
@@ -169,7 +166,7 @@ app.on('ready', async function () {
     intro.close();
   }
   console.log('Iniciando Monitores....');
-  //await monitores();
+  await monitores();
 });
 /*
 if(app.getName()=='Electron'){
