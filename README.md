@@ -16,8 +16,9 @@ Com ele é possível realizar as tarefas essênciais para o bom andamento do cul
 Para o funcionamento do sistema é necessário que ele atenda os requisitos minimos.
 
 
-**Processador:** Intel Pentium 4 ou posterior compatível com SSE2
+**Ambiente:** 64 bits
 
+**Espeço em Disco:** 8GB
 
 **Sistema Operacional:** Windows 7 ou Superior, Debian 8+ ou Ubuntu 14.04+ de 64 bits
 
