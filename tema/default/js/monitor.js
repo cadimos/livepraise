@@ -679,7 +679,6 @@ function ajustarTela(hide){
         $('#conf_tela').modal('hide');
     }
 }
-/*
 //Faço a busca da musica quando para de digitar
 $('#busca_musica').keyup(function() {
     clearTimeout(typingTimer);
@@ -687,45 +686,6 @@ $('#busca_musica').keyup(function() {
         typingTimer = setTimeout(buscaMusica, doneTypingInterval);
     }
 });
-//Faço a busca na biblia quando para de digitar
-$('#busca_biblia').keyup(function() {
-    clearTimeout(typingTimer);
-    if ($('#busca_biblia').val) {
-        typingTimer = setTimeout(buscaBiblia, doneTypingInterval);
-    }
-});
-//Remove o ativo dos versiculos
-function LimpaBiblia(){
-    $.each($('.versiculo'), function () {
-      $(this).removeClass('ativo');
-    })
-}
-//Atualizar e Regarregar Janelas
-function atualizar(vl){
-    let txt='ok';
-    if(vl!=txt){
-      let text = '{"funcao":[' +'{"nome":"atualizar","valor":"'+btoa(txt)+'" }]}';
-      socket.emit("send", text);
-    }
-    local=location.href.replace(location.hash,'');
-    setTimeout(() => location.href=local,100);
-}
-
-
-//Adiciona a Música na Programação
-function adicionar_musica(id){
-    verse=$('#verso'+id).html();
-    verse=verse.replace(/verso_/g,"item_verso_");
-    verse=verse.replace(/'BR'/g,"");
-    verse=nl2br(verse);
-    data='<ul id="item_verso'+id+'">'+verse+'</ul>';
-    titulo=$('#head'+id+' a').html();
-    chromeTabs.addTab({
-      title: titulo,
-      conteudo: data
-    });
-    setTimeout(() => slideAtivo(),700);
-}
 //Busca Musica
 function buscaMusica(submit){
     if(!submit){
@@ -741,6 +701,8 @@ function buscaMusicaLocal(){
     if(busca.length<3){
       lista_musica();
     }else	if(cat!=''){
+        buscarMusica(busca);
+        /*
         $('#list_music').html('');
         let modelo=`
        <div class="card" id="music[id_musica]">
@@ -780,8 +742,111 @@ function buscaMusicaLocal(){
                 }
             }
         });
+        */
     }
 }
+function buscarMusica(texto) {
+    // Remove acentos e transforma tudo em minúsculas
+    texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    titulos=document.querySelectorAll("#list_music .card-link");
+    listaVerso=document.querySelectorAll("#list_music .card-body li");
+    for (let i = 0; i < titulos.length; i++) {
+        let titulo = titulos[i];
+        // Remove acentos e transforma tudo em minúsculas para comparação
+        let tituloTexto = titulo.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+        let tituloId= titulo.hash.replace(/\D/g,'');
+        if (tituloTexto.includes(texto)) {
+            document.querySelector(`#music${tituloId}`).style='';
+        }else{
+            document.querySelector(`#music${tituloId}`).style='display:none';
+        }
+    }
+    for (let v = 0; v < listaVerso.length; v++) {
+        let listVerso=listaVerso[v];
+        let tituloVerso=listVerso.getAttribute('onclick').split(',')[1].replaceAll('"','').trim();
+        let versoTexto=listVerso.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+        let musicaId=listVerso.getAttribute('onclick').split('verso_')[1].split('_')[0];
+        if (versoTexto.includes(texto)) {
+            document.querySelector(`#music${musicaId}`).style='';
+            console.log('Musica: ',tituloVerso)
+        }
+    }
+
+}
+    /*
+    // Obtém todos os elementos <li> com a classe "versiculo"
+    let versiculos = document.querySelectorAll(".collaps_livro");
+    let encontrado=0;
+    let idLocalizado=0;
+    // Percorre os versículos e verifica se o texto buscado está presente
+    for (var i = 0; i < versiculos.length; i++) {
+      let versiculo = versiculos[i];
+      
+      // Remove acentos e transforma tudo em minúsculas para comparação
+      let versiculoTexto = versiculo.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      
+      // Verifica se o texto buscado está presente no versículo
+        if (versiculoTexto.includes(texto)) {
+            if(encontrado==0){
+                idLocalizado=versiculo.nextSibling.nextSibling.id;
+                if(!versiculo.classList.value.includes('active')){
+                    encontrado++;
+                    versiculo.click();
+                }
+            }else if(versiculo.classList?.value.includes('active')){
+                versiculo.classList?.remove('active');
+            }
+        }else{
+            if(versiculo.classList?.value.includes('active')){
+                versiculo.classList?.remove('active');
+            }
+        }
+    }
+    return idLocalizado;
+    */
+/*
+
+//Faço a busca na biblia quando para de digitar
+$('#busca_biblia').keyup(function() {
+    clearTimeout(typingTimer);
+    if ($('#busca_biblia').val) {
+        typingTimer = setTimeout(buscaBiblia, doneTypingInterval);
+    }
+});
+//Remove o ativo dos versiculos
+function LimpaBiblia(){
+    $.each($('.versiculo'), function () {
+      $(this).removeClass('ativo');
+    })
+}
+//Atualizar e Regarregar Janelas
+function atualizar(vl){
+    let txt='ok';
+    if(vl!=txt){
+      let text = '{"funcao":[' +'{"nome":"atualizar","valor":"'+btoa(txt)+'" }]}';
+      socket.emit("send", text);
+    }
+    local=location.href.replace(location.hash,'');
+    setTimeout(() => location.href=local,100);
+}
+
+
+//Adiciona a Música na Programação
+function adicionar_musica(id){
+    verse=$('#verso'+id).html();
+    verse=verse.replace(/verso_/g,"item_verso_");
+    verse=verse.replace(/'BR'/g,"");
+    verse=nl2br(verse);
+    data='<ul id="item_verso'+id+'">'+verse+'</ul>';
+    titulo=$('#head'+id+' a').html();
+    chromeTabs.addTab({
+      title: titulo,
+      conteudo: data
+    });
+    setTimeout(() => slideAtivo(),700);
+}
+
+
 //Busca Musica Online
 function buscaMusicaOnline(){
     busca=$("#busca_musica").val();
