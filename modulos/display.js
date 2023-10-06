@@ -19,5 +19,21 @@ module.exports = app => {
             data: items
         })
     })
+    api.get('/:tipo/:largura/:altura',async (req, res) => {
+        tipo= req.params.tipo;
+        largura= req.params.largura;
+        altura= req.params.altura;
+        console.log('BD Atual: ',db.getAtual())
+        up=await db.run("UPDATE tela SET tipo= ? ,largura= ? ,altura= ?",[tipo,largura,altura]);
+        items=await db.all("SELECT * FROM tela");
+        if(items.status=='Error'){
+            res.json(items);
+            return;
+        }
+        res.json({
+            status:"successo",
+            data: items
+        })
+      })
     app.use('/display',api); //defino o URL do Grupo e exporto ele, com todas as rotas
 }

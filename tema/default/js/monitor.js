@@ -643,6 +643,42 @@ function play_video() {
     player.play();
     player.volume = 0;
 }
+//Ajustar tela
+function ajustarTela(hide){
+    tm=$('#conf_tela #tamanho_tela').val();
+    lg=$('#conf_tela #largura').val();
+    if(lg==''){
+        lg=0;
+    }
+    at=$('#conf_tela #altura').val();
+    if(at==''){
+        at=0;
+    }
+        $.ajax({
+        type: "GET",
+        url: urlSocket+'/display/'+tm+'/'+lg+'/'+at,
+        dataType: "json",
+        success: function(data) {
+        }
+    });
+    let text={};
+    if(tm=='personalizado'){
+        vl=btoa(lg+'x'+at)
+        text={
+            acao: 'ajustarTela',
+            valor: vl
+        }
+    }else{
+        text={
+            acao: 'ajustarTela',
+            valor: btoa(tm)
+        }
+    }
+    socket.emit("send", JSON.stringify(text));
+    if(hide){
+        $('#conf_tela').modal('hide');
+    }
+}
 /*
 //Faço a busca da musica quando para de digitar
 $('#busca_musica').keyup(function() {
@@ -1063,41 +1099,6 @@ function buscaBiblia(){
         }
     }
 }
-//Ajustar tela
-function ajustarTela(hide){
-    tm=$('#conf_tela #tamanho_tela').val();
-    lg=$('#conf_tela #largura').val();
-    if(lg==''){
-        lg=0;
-    }
-    at=$('#conf_tela #altura').val();
-    if(at==''){
-        at=0;
-    }
-        $.ajax({
-        type: "GET",
-        url: urlSocket+'/display/'+tm+'/'+lg+'/'+at,
-        dataType: "json",
-        success: function(data) {
-        }
-    });
-    if(tm=='personalizado'){
-        vl=btoa(lg+'x'+at)
-        var text = '{"funcao":[' +
-        '{"nome":"ajustarTela","valor":"'+vl+'" }]}';
-    }else{
-        var text = '{"funcao":[' +
-        '{"nome":"ajustarTela","valor":"'+btoa(tm)+'" }]}';
-    }
-    socket.emit("send", text);
-    if(hide){
-        $('#conf_tela').modal('hide');
-    }
-}
-
-
-
-
 
 /* Chrome Tabs * /
 //Tabs List
