@@ -270,6 +270,9 @@ function viewMusica(id, nome, br) {
     });
     $('.content').css('text-align', 'center');
     $('.rodape').css('font-size', '20px');
+    $.each($(`.item_verso_musica`), function () {
+        $(this).removeClass('ativo');
+    });
     $.each($('.verso_musica'), function () {
         $(this).removeClass('ativo');
     });
@@ -808,6 +811,54 @@ function atualizar(vl) {
     local = location.href.replace(location.hash, '');
     setTimeout(() => location.href = local, 100);
 }
+//Adiciona a Música na Programação
+function adicionar_musica(id) {
+    verse = $('#verso' + id).html();
+    verse = verse.replace(/verso_/g, "item_verso_");
+    verse = verse.replace(/'BR'/g, "");
+    verse = nl2br(verse);
+    data = '<ul id="item_verso' + id + '">' + verse + '</ul>';
+    titulo = $('#head' + id + ' a').html();
+    chromeTabs.addTab({
+        title: titulo,
+        conteudo: data
+    });
+    setTimeout(() => slideAtivo(), 700);
+}
+/* Chrome Tabs */
+//Tabs List
+$('#navegacao a').click(function (e) {
+    e.preventDefault()
+    $(this).tab('show')
+});
+var el = document.querySelector('.chrome-tabs')
+var chromeTabs = new ChromeTabs()
+chromeTabs.init(el, {
+    tabOverlapDistance: 14,
+    minWidth: 45,
+    maxWidth: 243
+})
+
+//el.addEventListener('activeTabChange', ({ detail }) => console.log('Active tab changed', detail.tabEl))
+//el.addEventListener('tabAdd', ({ detail }) => console.log('Tab added', detail.tabEl))
+//el.addEventListener('tabRemove', ({ detail }) => console.log('Tab removed', detail.tabEl))
+
+if (document.querySelector('button[data-remove-tab]')) {
+    document.querySelector('button[data-remove-tab]').addEventListener('click', function () {
+        chromeTabs.removeTab(el.querySelector('.chrome-tab-current'))
+    });
+}
+function slideAtivo() {
+    if (!$('.chrome-conteudo-show ul').length) {
+        setTimeout(() => slideAtivo(), 200);
+    } else {
+        currenteId = document.querySelector(".chrome-conteudo-show ul").id;
+        console.log('ID Chrome:', currenteId);
+        $.each($(`#${currenteId} .item_verso_musica`), function () {
+            $(this).removeClass('ativo');
+        });
+    }
+}
 /*
 // Obtém todos os elementos <li> com a classe "versiculo"
 let versiculos = document.querySelectorAll(".collaps_livro");
@@ -857,20 +908,7 @@ function LimpaBiblia(){
 
 
 
-//Adiciona a Música na Programação
-function adicionar_musica(id){
-    verse=$('#verso'+id).html();
-    verse=verse.replace(/verso_/g,"item_verso_");
-    verse=verse.replace(/'BR'/g,"");
-    verse=nl2br(verse);
-    data='<ul id="item_verso'+id+'">'+verse+'</ul>';
-    titulo=$('#head'+id+' a').html();
-    chromeTabs.addTab({
-      title: titulo,
-      conteudo: data
-    });
-    setTimeout(() => slideAtivo(),700);
-}
+
 
 
 
@@ -1130,49 +1168,9 @@ function buscaBiblia(){
     }
 }
 
-/* Chrome Tabs * /
-//Tabs List
-$('#navegacao a').click(function (e) {
-    e.preventDefault()
-    $(this).tab('show')
-});
-var el = document.querySelector('.chrome-tabs')
-var chromeTabs = new ChromeTabs()
-chromeTabs.init(el, {
-    tabOverlapDistance: 14,
-    minWidth: 45,
-    maxWidth: 243
-})
-  
-//el.addEventListener('activeTabChange', ({ detail }) => console.log('Active tab changed', detail.tabEl))
-//el.addEventListener('tabAdd', ({ detail }) => console.log('Tab added', detail.tabEl))
-//el.addEventListener('tabRemove', ({ detail }) => console.log('Tab removed', detail.tabEl))
-  
-if(document.querySelector('button[data-remove-tab]')){
-    document.querySelector('button[data-remove-tab]').addEventListener('click', function(){
-      chromeTabs.removeTab(el.querySelector('.chrome-tab-current'))
-    });
-}
 
-function slideAtivo(){
-    if(!$('.chrome-conteudo-show ul').length){
-      setTimeout(() => slideAtivo(),200);
-    }else{
-      currenteId=document.querySelector(".chrome-conteudo-show ul").id;
-      header = document.getElementById(currenteId);
-      btns = header.getElementsByClassName("item_verso_musica");
-      for (i = 0; i < btns.length; i++) {
-        current = document.getElementsByClassName("ativo");
-        btns[i].addEventListener("click", function() {
-  
-          if (current.length > 0) {
-            current[0].className = current[0].className.replace(" ativo", "");
-          }
-          this.className += " ativo";
-        });
-      }
-    }
-}
+
+*/
 var pressedCtrl = false; //variável de controle
 $(document).keyup(function (e) {  //O evento Kyeup é acionado quando as teclas são soltas
   if(e.which == KEY_CTRL) pressedCtrl=false; //Quando qualuer tecla for solta é preciso informar que Crtl não está pressionada
@@ -1254,7 +1252,6 @@ $(document).keydown(function (e) { //Quando uma tecla é pressionada
     }
   }
 });
-*/
 var socket = io.connect(urlSocket);
 socket.emit("join", user);
 ready = true;
