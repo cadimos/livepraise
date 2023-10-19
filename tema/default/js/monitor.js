@@ -726,11 +726,11 @@ function buscaMusicaOnline() {
                 console.log(data);
                 let pesquisa = data.resultado;
                 pesquisa.forEach(result => {
-                    let versos='';
-                    let i=0;
+                    let versos = '';
+                    let i = 0;
                     result.versos.forEach(verse => {
-                        let v=verse.replace(/<br \/>/g,"\n");
-                        versos+=`<li class="verso_musica" onclick="viewMusica('verso_api${result.id}_${i}','${result.nome} (${result.artista})','BR');" id="verso_api${result.id}_${i}">${v}</li>`
+                        let v = verse.replace(/<br \/>/g, "\n");
+                        versos += `<li class="verso_musica" onclick="viewMusica('verso_api${result.id}_${i}','${result.nome} (${result.artista})','BR');" id="verso_api${result.id}_${i}">${v}</li>`
                         i++;
                     });
                     $('#list_music').append(`<div class="card" id="music${result.id}">
@@ -791,6 +791,19 @@ function buscarMusica(texto) {
     }
 
 }
+//Atualizar e Regarregar Janelas
+function atualizar(vl) {
+    let txt = 'ok';
+    if (vl != txt) {
+        let text = {
+            acao: 'atualizar',
+            valor: btoa(txt)
+        }
+        socket.emit("send", text);
+    }
+    local = location.href.replace(location.hash, '');
+    setTimeout(() => location.href = local, 100);
+}
 /*
 // Obtém todos os elementos <li> com a classe "versiculo"
 let versiculos = document.querySelectorAll(".collaps_livro");
@@ -837,16 +850,7 @@ function LimpaBiblia(){
       $(this).removeClass('ativo');
     })
 }
-//Atualizar e Regarregar Janelas
-function atualizar(vl){
-    let txt='ok';
-    if(vl!=txt){
-      let text = '{"funcao":[' +'{"nome":"atualizar","valor":"'+btoa(txt)+'" }]}';
-      socket.emit("send", text);
-    }
-    local=location.href.replace(location.hash,'');
-    setTimeout(() => location.href=local,100);
-}
+
 
 
 //Adiciona a Música na Programação
