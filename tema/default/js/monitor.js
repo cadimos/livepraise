@@ -270,6 +270,10 @@ function viewMusica(id, nome, br) {
     });
     $('.content').css('text-align', 'center');
     $('.rodape').css('font-size', '20px');
+    $.each($('.verso_musica'), function () {
+        $(this).removeClass('ativo');
+    });
+    $(`#${id}`).addClass('ativo');
     if (congelar('valida') == true) {
         let text = {
             acao: 'viewMusica',
