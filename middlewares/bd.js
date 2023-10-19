@@ -6,16 +6,16 @@ module.exports = class bd {
         this.status = 0;
         this.connect();
     }
-    async connect(arquivo='') {
+    async connect(arquivo = '') {
         let homedir = require('os').homedir();
-        if(arquivo==''){
-            arquivo=`${homedir}/livepraise/dsw.bd`
+        if (arquivo == '') {
+            arquivo = `${homedir}/livepraise/dsw.bd`
         }
-        this.arquivo=arquivo;
+        this.arquivo = arquivo;
         this.conn = new sql.Database(arquivo);
         this.status = 1;
     }
-    getAtual(){
+    getAtual() {
         return this.arquivo;
     }
     async validaConexao() {
@@ -43,18 +43,32 @@ module.exports = class bd {
             });
         });
     }
-    async run(query,data=[]) {
+    async run(query, data = []) {
         return new Promise((resolve, reject) => {
-            this.conn.run(query,data,(err,rows)=>{
-                if (err) {
-                    let ret = {
-                        status: "Error",
-                        mensagem: err
-                    };
-                    resolve(ret);
-                }
-                resolve(rows);
-            });
+            if (query.includes('INSERT')) {
+                this.conn.run(query, data, function (err) {
+                    if (err) {
+                        let ret = {
+                            status: "Error",
+                            mensagem: err
+                        };
+                        resolve(ret);
+                    }
+                    resolve(this.lastID);
+                });
+            } else {
+                this.conn.run(query, data, (err, rows) => {
+                    if (err) {
+                        let ret = {
+                            status: "Error",
+                            mensagem: err
+                        };
+                        resolve(ret);
+                    }
+                    resolve(rows);
+                });
+            }
+
         });
     }
 };

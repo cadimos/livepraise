@@ -825,6 +825,54 @@ function adicionar_musica(id) {
     });
     setTimeout(() => slideAtivo(), 700);
 }
+function adicionar_musica_salvar(id,nome,artista,compositor){
+    cat=1;
+    versos=$('#verso'+id+' li');
+    t_versos=versos.length;
+    nome=iso_encode(nome);
+    artista=iso_encode(artista);
+    compositor=iso_encode(compositor);
+    dados={
+        cat:cat,
+        nome:nome,
+        artista:artista,
+        compositor:compositor
+    }
+    $.ajax({
+        type: "POST",
+        url: urlSocket+'/musica',
+        data: dados,
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                id_musica=data.id;
+                for(i=0;i<t_versos;i++){
+                    v=$(versos[i]).html();
+                    v=iso_encode(v);
+                    adicionar_verso(id_musica,v);
+                } 
+            }
+        }
+    });
+  adicionar_musica(id);
+}
+function adicionar_verso(musica,verso){
+    dados={
+        musica:musica,
+        verso:verso
+    }
+    $.ajax({
+        type: "POST",
+        url: urlSocket+'/musica/verso',
+        data: dados,
+        dataType: "json",
+        success: function(data) {
+            if(data.status=='successo'){
+                id_verso=data.id;
+            }
+        }
+    });
+}
 /* Chrome Tabs */
 //Tabs List
 $('#navegacao a').click(function (e) {
@@ -964,54 +1012,8 @@ function salvar_musica(id){
         }
     }
 }
-function adicionar_musica_salvar(id,nome,artista,compositor){
-    cat=1;
-    versos=$('#verso'+id+' li');
-    t_versos=versos.length;
-    nome=iso_encode(nome);
-    artista=iso_encode(artista);
-    compositor=iso_encode(compositor);
-    dados={
-        cat:cat,
-        nome:nome,
-        artista:artista,
-        compositor:compositor
-    }
-    $.ajax({
-        type: "POST",
-        url: urlSocket+'/add/musica/',
-        data: dados,
-        dataType: "json",
-        success: function(data) {
-            if(data.status=='successo'){
-                id_musica=data.id;
-                for(i=0;i<t_versos;i++){
-                    v=$(versos[i]).html();
-                    v=iso_encode(v);
-                    adicionar_verso(id_musica,v);
-                } 
-            }
-        }
-    });
-  adicionar_musica(id);
-}
-function adicionar_verso(musica,verso){
-    dados={
-        musica:musica,
-        verso:verso
-    }
-    $.ajax({
-        type: "POST",
-        url: urlSocket+'/add/musica/verso',
-        data: dados,
-        dataType: "json",
-        success: function(data) {
-            if(data.status=='successo'){
-                id_verso=data.id;
-            }
-        }
-    });
-}
+
+
 //Remover musica
 function remover_musica(id,conf){
   rand=Math.floor(Math.random() * 1000000);

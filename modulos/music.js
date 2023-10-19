@@ -43,5 +43,56 @@ module.exports = app => {
             items
         })
     })
+    api.post("/", async (req, res, next) => {
+        var errors=[]
+        if (!req.body.cat){
+            errors.push("Categoria Obrigatória");
+        }
+        if (!req.body.nome){
+            errors.push("Nome Obrigatório");
+        }
+        if (!req.body.artista){
+            errors.push("Artista Obrigatório");
+        }
+        if (errors.length){
+            res.status(400).json({"error":errors.join(",")});
+            return;
+        }
+        var data = {
+            cat: req.body.cat,
+            nome: req.body.nome,
+            artista : req.body.artista,
+            compositor : req.body.compositor
+        }
+        info=await db.run("INSERT INTO musica (cat, nome, nome2, artista,compositor) VALUES (?,?,?,?,?)",[data.cat, data.nome,data.nome, data.artista,data.compositor]);
+        res.json({
+              "status":"successo",
+              "data": data,
+              "id" : info
+          });
+    })
+    api.post("/verso", async (req, res, next) => {
+        var errors=[]
+        if (!req.body.musica){
+            errors.push("Id da Musica Obrigatória");
+        }
+        if (!req.body.verso){
+            errors.push("Verso Obrigatório");
+        }
+        if (errors.length){
+            res.status(400).json({"error":errors.join(",")});
+            return;
+        }
+        var data = {
+            musica: req.body.musica,
+            verso: req.body.verso,
+        }
+        info=await db.run("INSERT INTO musica_versos (musica, verso) VALUES (?,?)",[data.musica, data.verso])
+        res.json({
+              "status":"successo",
+              "data": data,
+              "id" : info
+          })
+      })
     app.use('/musica',api); //defino o URL do Grupo e exporto ele, com todas as rotas
 }
