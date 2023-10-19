@@ -271,9 +271,9 @@ function viewMusica(id, nome, br) {
     $('.content').css('text-align', 'center');
     $('.rodape').css('font-size', '20px');
     if (congelar('valida') == true) {
-        let text={
-            acao:'viewMusica',
-            valor:btoa(modelo)
+        let text = {
+            acao: 'viewMusica',
+            valor: btoa(modelo)
         }
         socket.emit("send", JSON.stringify(text));
     }
@@ -445,9 +445,9 @@ function viewBiblia(id, nome, br) {
     });
     $('#' + id).addClass('ativo');
     if (congelar('valida') == true) {
-        let text={
-            acao:'viewBiblia',
-            valor:btoa(modelo)
+        let text = {
+            acao: 'viewBiblia',
+            valor: btoa(modelo)
         }
         socket.emit("send", JSON.stringify(text));
     }
@@ -504,7 +504,7 @@ function backgroundRapido(url) {
         $("#preview img").attr('src', atob(url));
     }).fadeIn(200);
     if (congelar('valida') == true) {
-        let text={
+        let text = {
             acao: 'background',
             valor: url
         }
@@ -569,7 +569,7 @@ function background(url) {
         $("#preview img").attr('src', atob(url));
     }).fadeIn(200);
     if (congelar('valida') == true) {
-        let text={
+        let text = {
             acao: 'background',
             valor: url
         }
@@ -627,8 +627,8 @@ function lista_video(dir) {
 function viewVideo(url) {
     $('#preview img').css('display', 'none');
     $('#video').css('display', 'block');
-    if (congelar('valida') == true) {        
-        let text={
+    if (congelar('valida') == true) {
+        let text = {
             acao: 'video',
             valor: url
         }
@@ -644,166 +644,184 @@ function play_video() {
     player.volume = 0;
 }
 //Ajustar tela
-function ajustarTela(hide){
-    tm=$('#conf_tela #tamanho_tela').val();
-    lg=$('#conf_tela #largura').val();
-    if(lg==''){
-        lg=0;
+function ajustarTela(hide) {
+    tm = $('#conf_tela #tamanho_tela').val();
+    lg = $('#conf_tela #largura').val();
+    if (lg == '') {
+        lg = 0;
     }
-    at=$('#conf_tela #altura').val();
-    if(at==''){
-        at=0;
+    at = $('#conf_tela #altura').val();
+    if (at == '') {
+        at = 0;
     }
-        $.ajax({
+    $.ajax({
         type: "GET",
-        url: urlSocket+'/display/'+tm+'/'+lg+'/'+at,
+        url: urlSocket + '/display/' + tm + '/' + lg + '/' + at,
         dataType: "json",
-        success: function(data) {
+        success: function (data) {
         }
     });
-    let text={};
-    if(tm=='personalizado'){
-        vl=btoa(lg+'x'+at)
-        text={
+    let text = {};
+    if (tm == 'personalizado') {
+        vl = btoa(lg + 'x' + at)
+        text = {
             acao: 'ajustarTela',
             valor: vl
         }
-    }else{
-        text={
+    } else {
+        text = {
             acao: 'ajustarTela',
             valor: btoa(tm)
         }
     }
     socket.emit("send", JSON.stringify(text));
-    if(hide){
+    if (hide) {
         $('#conf_tela').modal('hide');
     }
 }
 //Faço a busca da musica quando para de digitar
-$('#busca_musica').keyup(function() {
+$('#busca_musica').keyup(function () {
     clearTimeout(typingTimer);
     if ($('#busca_musica').val) {
         typingTimer = setTimeout(buscaMusica, doneTypingInterval);
     }
 });
 //Busca Musica
-function buscaMusica(submit){
-    if(!submit){
-      buscaMusicaLocal();
-    }else{
-      buscaMusicaOnline();
+function buscaMusica(submit) {
+    if (!submit) {
+        buscaMusicaLocal();
+    } else {
+        buscaMusicaOnline();
+    }
+}
+//Busca Musica Online
+function buscaMusicaOnline() {
+    busca = $("#busca_musica").val();
+    if (busca.length < 3) {
+        lista_musica();
+    } else {
+        $('#list_music').html('');
+        $('#list_music').append('<div class="alert alert-info" role="alert" id="alerta_pesquisa_musica">Procurando Música na Internet</div>');
+        let dataString = {
+            busca
+        }
+        $.ajax({
+            type: "POST",
+            url: `https://livepraise.teraidc.com.br/busca/musicas`,
+            data: JSON.stringify(dataString),
+            dataType: "json",
+            error: function (erro) {
+                $('#alerta_pesquisa_musica').remove();
+                $('#list_music').append('<div class="alert alert-danger" role="alert" id="alerta_erro_musica">Houve um erro ao Buscar a música na internet. Verifique sua conexão e tente novamente!</div>');
+                $('#alerta_erro_musica').fadeOut(10000, function () {
+                    $(this).reuove();
+                });
+            },
+            success: function (data) {
+                $('#alerta_pesquisa_musica').remove();
+                $('#list_music').append('<div class="alert alert-success" role="alert" id="alerta_sucesso_musica">Localizado Músicas na Internet</div>');
+                $('#alerta_sucesso_musica').fadeOut(2000, function () {
+                    $(this).remove();
+                });
+                console.log(data);
+                let pesquisa = data.resultado;
+                pesquisa.forEach(result => {
+                    let versos='';
+                    let i=0;
+                    result.versos.forEach(verse => {
+                        let v=verse.replace(/<br \/>/g,"\n");
+                        versos+=`<li class="verso_musica" onclick="viewMusica('verso_api${result.id}_${i}','${result.nome} (${result.artista})','BR');" id="verso_api${result.id}_${i}">${v}</li>`
+                        i++;
+                    });
+                    $('#list_music').append(`<div class="card" id="music${result.id}">
+                    <div class="card-header" id="head${result.id}">
+                    <a class="card-link" data-toggle="collapse" href="#musica${result.id}">
+                        ${result.nome} (${result.artista})
+                    </a>
+                    <span class="acoes_item">
+                        <a href="javascript:void(0);" onclick='adicionar_musica_salvar("${result.id}","${result.nome}","${result.artista}","${result.compositor}")'><i class="fas fa-check-circle"></i></a>
+                    </span>
+                    </div>
+                    <div id="musica${result.id}" class="collapse" data-parent="#list_music">
+                    <div class="card-body">
+                        <ul id="verso${result.id}">${versos}</ul>
+                    </div>
+                    </div>
+                </div>`);
+                });
+            }
+        });
     }
 }
 //Busca Musica local
-function buscaMusicaLocal(){
-    cat=$('#cat_musica').val();
-    busca=$("#busca_musica").val();
-    if(busca.length<3){
-      lista_musica();
-    }else	if(cat!=''){
+function buscaMusicaLocal() {
+    cat = $('#cat_musica').val();
+    busca = $("#busca_musica").val();
+    if (busca.length < 3) {
+        lista_musica();
+    } else if (cat != '') {
         buscarMusica(busca);
-        /*
-        $('#list_music').html('');
-        let modelo=`
-       <div class="card" id="music[id_musica]">
-        <div class="card-header" id="head[id_musica]">
-            <a class="card-link" data-toggle="collapse" href="#musica[id_musica]">
-                [nome_musica] ([artista_musica])
-            </a>
-            <span class="acoes_item">
-            <a href="javascript:void(0);" data-toggle="modal" data-target="#new_music" data-whatever="[id_musica]"><i class="fas fa-edit"></i></a>
-            <a href="javascript:void(0);" onclick="adicionar_musica('[id_musica]')"><i class="fas fa-check-circle"></i></a>
-            <a href="javascript:void(0);" onclick="remover_musica('[id_musica]')"><i class="fas fa-trash"></i></a>
-            </span>
-        </div>
-        <div id="musica[id_musica]" class="collapse" data-parent="#list_music">
-            <div class="card-body">
-                <ul id="verso[id_musica]"></ul>
-            </div>
-        </div>
-        </div>
-        `;
-        $.ajax({
-            type: "GET",
-            url: urlSocket+'/busca/musica/'+busca,
-            dataType: "json",
-            success: function(data) {
-                if(data.status=='successo'){
-                    t_rows=data.data.length;
-                    result=data.data;
-                    for(i=0;i<t_rows;i++){
-                        musica=result[i];
-                        item=modelo.replace(/\[id_musica\]/g,musica.id);
-                        item=item.replace(/\[nome_musica\]/g,musica.nome);
-                        item=item.replace(/\[artista_musica\]/g,musica.artista);
-                        $('#list_music').append(item);
-                        lista_musica_verso(musica.id,musica.nome,musica.artista);
-                    }
-                }
-            }
-        });
-        */
     }
 }
 function buscarMusica(texto) {
     // Remove acentos e transforma tudo em minúsculas
     texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    titulos=document.querySelectorAll("#list_music .card-link");
-    listaVerso=document.querySelectorAll("#list_music .card-body li");
+    titulos = document.querySelectorAll("#list_music .card-link");
+    listaVerso = document.querySelectorAll("#list_music .card-body li");
     for (let i = 0; i < titulos.length; i++) {
         let titulo = titulos[i];
         // Remove acentos e transforma tudo em minúsculas para comparação
         let tituloTexto = titulo.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
-        let tituloId= titulo.hash.replace(/\D/g,'');
+        let tituloId = titulo.hash.replace(/\D/g, '');
         if (tituloTexto.includes(texto)) {
-            document.querySelector(`#music${tituloId}`).style='';
-        }else{
-            document.querySelector(`#music${tituloId}`).style='display:none';
+            document.querySelector(`#music${tituloId}`).style = '';
+        } else {
+            document.querySelector(`#music${tituloId}`).style = 'display:none';
         }
     }
     for (let v = 0; v < listaVerso.length; v++) {
-        let listVerso=listaVerso[v];
-        let tituloVerso=listVerso.getAttribute('onclick').split(',')[1].replaceAll('"','').trim();
-        let versoTexto=listVerso.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
-        let musicaId=listVerso.getAttribute('onclick').split('verso_')[1].split('_')[0];
+        let listVerso = listaVerso[v];
+        let tituloVerso = listVerso.getAttribute('onclick').split(',')[1].replaceAll('"', '').trim();
+        let versoTexto = listVerso.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+        let musicaId = listVerso.getAttribute('onclick').split('verso_')[1].split('_')[0];
         if (versoTexto.includes(texto)) {
-            document.querySelector(`#music${musicaId}`).style='';
-            console.log('Musica: ',tituloVerso)
+            document.querySelector(`#music${musicaId}`).style = '';
+            console.log('Musica: ', tituloVerso)
         }
     }
 
 }
-    /*
-    // Obtém todos os elementos <li> com a classe "versiculo"
-    let versiculos = document.querySelectorAll(".collaps_livro");
-    let encontrado=0;
-    let idLocalizado=0;
-    // Percorre os versículos e verifica se o texto buscado está presente
-    for (var i = 0; i < versiculos.length; i++) {
-      let versiculo = versiculos[i];
-      
-      // Remove acentos e transforma tudo em minúsculas para comparação
-      let versiculoTexto = versiculo.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-      
-      // Verifica se o texto buscado está presente no versículo
-        if (versiculoTexto.includes(texto)) {
-            if(encontrado==0){
-                idLocalizado=versiculo.nextSibling.nextSibling.id;
-                if(!versiculo.classList.value.includes('active')){
-                    encontrado++;
-                    versiculo.click();
-                }
-            }else if(versiculo.classList?.value.includes('active')){
-                versiculo.classList?.remove('active');
+/*
+// Obtém todos os elementos <li> com a classe "versiculo"
+let versiculos = document.querySelectorAll(".collaps_livro");
+let encontrado=0;
+let idLocalizado=0;
+// Percorre os versículos e verifica se o texto buscado está presente
+for (var i = 0; i < versiculos.length; i++) {
+  let versiculo = versiculos[i];
+  
+  // Remove acentos e transforma tudo em minúsculas para comparação
+  let versiculoTexto = versiculo.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  
+  // Verifica se o texto buscado está presente no versículo
+    if (versiculoTexto.includes(texto)) {
+        if(encontrado==0){
+            idLocalizado=versiculo.nextSibling.nextSibling.id;
+            if(!versiculo.classList.value.includes('active')){
+                encontrado++;
+                versiculo.click();
             }
-        }else{
-            if(versiculo.classList?.value.includes('active')){
-                versiculo.classList?.remove('active');
-            }
+        }else if(versiculo.classList?.value.includes('active')){
+            versiculo.classList?.remove('active');
+        }
+    }else{
+        if(versiculo.classList?.value.includes('active')){
+            versiculo.classList?.remove('active');
         }
     }
-    return idLocalizado;
-    */
+}
+return idLocalizado;
+*/
 /*
 
 //Faço a busca na biblia quando para de digitar
@@ -847,68 +865,7 @@ function adicionar_musica(id){
 }
 
 
-//Busca Musica Online
-function buscaMusicaOnline(){
-    busca=$("#busca_musica").val();
-    if(busca.length<3){
-      lista_musica();
-    }else{
-      $('#list_music').html('');
-      let modelo_web=`
-       <div class="card" id="music[id_musica]">
-        <div class="card-header" id="head[id_musica]">
-            <a class="card-link" data-toggle="collapse" href="#musica[id_musica]">
-                [nome_musica] ([artista_musica])
-            </a>
-            <span class="acoes_item">
-                <a href="javascript:void(0);" onclick='adicionar_musica_salvar("[id_musica]","[nome_musica]","[artista_musica]","[compositor_musica]")'><i class="fas fa-check-circle"></i></a>
-            </span>
-        </div>
-        <div id="musica[id_musica]" class="collapse" data-parent="#list_music">
-            <div class="card-body">
-                <ul id="verso[id_musica]"></ul>
-            </div>
-        </div>
-        </div>
-        `;
-      $('#list_music').append('<div class="alert alert-info" role="alert" id="alerta_pesquisa_musica">Procurando Música na Internet</div>');
-      $.ajax({
-        type: "GET",
-        url: "https://livepraise.teraidc.com.br/busca/musicas/"+encodeURI(busca),
-        dataType: "json",
-        error: function(erro){
-          $('#alerta_pesquisa_musica').remove();
-          $('#list_music').append('<div class="alert alert-danger" role="alert" id="alerta_erro_musica">Houve um erro ao Buscar a música na internet. Verifique sua conexão e tente novamente!</div>');
-          $('#alerta_erro_musica').fadeOut(10000,function(){
-            $(this).remove();
-          });
-        },
-        success: function(data) {
-          $('#alerta_pesquisa_musica').remove();
-          $('#list_music').append('<div class="alert alert-success" role="alert" id="alerta_sucesso_musica">Localizado Músicas na Internet</div>');
-          $('#alerta_sucesso_musica').fadeOut(2000,function(){
-            $(this).remove();
-          });
-            t_resultado=data.resultado.length;
-          for(i=0;i<t_resultado;i++){    
-            result=data.resultado[i];
-            item=modelo_web.replace(/\[id_musica\]/g,'api'+result.id);
-            item=item.replace(/\[nome_musica\]/g,result.nome);
-            item=item.replace(/\[artista_musica\]/g,result.artista.trim());
-            item=item.replace(/\[compositor_musica\]/g,result.compositor.trim());
-            $('#list_music').append(item);
-            t_verso=result.versos.length;
-            for(v=0;v<t_verso;v++){
-              verse=result.versos[v];
-              verse=verse.replace(/<br \/>/g,"\n");
-              let modelo_item=`<li class="verso_musica" onclick='viewMusica("verso_api${result.id}_${v}","${result.nome} (${result.artista})","BR");' id="verso_api${result.id}_${v}">${verse}</li>`;
-                $('#verso'+'api'+result.id).append(modelo_item);
-            }
-          }
-        }
-      });
-    }
-}
+
 function salvar_musica(id){
     cat=1;
     nome=$('#new_music #nome').val();
