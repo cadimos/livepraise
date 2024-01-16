@@ -55,6 +55,7 @@ async function monitorPrincipal() {
     }
   });
   win.loadURL(`http://localhost:${config.port}`);
+  win.setMenuBarVisibility(false);
   win.webContents.on('new-window', (event, url) => {
     event.preventDefault()
     const win_link = new BrowserWindow({
@@ -67,7 +68,7 @@ async function monitorPrincipal() {
     win_link.setMenuBarVisibility(false);
     event.newGuest = win_link
   })
-  win.openDevTools();
+  //win.openDevTools();
   win.once('ready-to-show', () => {
     //autoUpdater.checkForUpdatesAndNotify();
     win.show();
@@ -76,20 +77,6 @@ async function monitorPrincipal() {
     app.quit()
   });
   /*
-  win.setMenuBarVisibility(false);
-win.loadURL(`http://localhost:${config.port}`);
-win.webContents.on('new-window', (event, url) => {
-  event.preventDefault()
-  const win_link = new BrowserWindow({
-      title: 'Live Praise',
-      icon: __dirname+'/assets/icon/livepraise.png',
-      show: false,
-      })
-  win_link.once('ready-to-show', () => win_link.show())
-  win_link.loadURL(url)
-  win_link.setMenuBarVisibility(false);
-  event.newGuest = win_link
-})
 win.openDevTools();
 
 win.once('ready-to-show',()=>{
@@ -136,7 +123,7 @@ async function openMonitor(item, index) {
       console.log('Exibindo monitor');
       item.id.show();
     })
-    item.id.openDevTools();
+    //item.id.openDevTools();
     item.id.on('closed', () => {
       app.quit()
     });

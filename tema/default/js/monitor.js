@@ -280,7 +280,7 @@ function viewMusica(id, nome, br) {
     if (congelar('valida') == true) {
         let text = {
             acao: 'viewMusica',
-            valor: btoa(modelo)
+            valor: btoa(unescape(encodeURIComponent(modelo)))
         }
         socket.emit("send", JSON.stringify(text));
     }
@@ -454,7 +454,7 @@ function viewBiblia(id, nome, br) {
     if (congelar('valida') == true) {
         let text = {
             acao: 'viewBiblia',
-            valor: btoa(modelo)
+            valor: btoa(unescape(encodeURIComponent(modelo)))
         }
         socket.emit("send", JSON.stringify(text));
     }
@@ -730,7 +730,6 @@ function buscaMusicaOnline() {
                 $('#alerta_sucesso_musica').fadeOut(2000, function () {
                     $(this).remove();
                 });
-                console.log(data);
                 let pesquisa = data.resultado;
                 pesquisa.forEach(result => {
                     let versos = '';
@@ -793,7 +792,6 @@ function buscarMusica(texto) {
         let musicaId = listVerso.getAttribute('onclick').split('verso_')[1].split('_')[0];
         if (versoTexto.includes(texto)) {
             document.querySelector(`#music${musicaId}`).style = '';
-            console.log('Musica: ', tituloVerso)
         }
     }
 
@@ -825,53 +823,169 @@ function adicionar_musica(id) {
     });
     setTimeout(() => slideAtivo(), 700);
 }
-function adicionar_musica_salvar(id,nome,artista,compositor){
-    cat=1;
-    versos=$('#verso'+id+' li');
-    t_versos=versos.length;
-    nome=iso_encode(nome);
-    artista=iso_encode(artista);
-    compositor=iso_encode(compositor);
-    dados={
-        cat:cat,
-        nome:nome,
-        artista:artista,
-        compositor:compositor
+function adicionar_musica_salvar(id, nome, artista, compositor) {
+    cat = 1;
+    versos = $('#verso' + id + ' li');
+    t_versos = versos.length;
+    nome = iso_encode(nome);
+    artista = iso_encode(artista);
+    compositor = iso_encode(compositor);
+    dados = {
+        cat: cat,
+        nome: nome,
+        artista: artista,
+        compositor: compositor
     }
     $.ajax({
         type: "POST",
-        url: urlSocket+'/musica',
+        url: urlSocket + '/musica',
         data: dados,
         dataType: "json",
-        success: function(data) {
-            if(data.status=='successo'){
-                id_musica=data.id;
-                for(i=0;i<t_versos;i++){
-                    v=$(versos[i]).html();
-                    v=iso_encode(v);
-                    adicionar_verso(id_musica,v);
-                } 
+        success: function (data) {
+            if (data.status == 'successo') {
+                id_musica = data.id;
+                for (i = 0; i < t_versos; i++) {
+                    v = $(versos[i]).html();
+                    v = iso_encode(v);
+                    adicionar_verso(id_musica, v);
+                }
             }
         }
     });
-  adicionar_musica(id);
+    adicionar_musica(id);
 }
-function adicionar_verso(musica,verso){
-    dados={
-        musica:musica,
-        verso:verso
+function adicionar_verso(musica, verso) {
+    dados = {
+        musica: musica,
+        verso: verso
     }
     $.ajax({
         type: "POST",
-        url: urlSocket+'/musica/verso',
+        url: urlSocket + '/musica/verso',
         data: dados,
         dataType: "json",
-        success: function(data) {
-            if(data.status=='successo'){
-                id_verso=data.id;
+        success: function (data) {
+            if (data.status == 'successo') {
+                id_verso = data.id;
             }
         }
     });
+}
+//Faço a busca na biblia quando para de digitar
+$('#busca_biblia').keyup(function () {
+    clearTimeout(typingTimer);
+    if ($('#busca_biblia').val) {
+        typingTimer = setTimeout(buscaBiblia, doneTypingInterval);
+    }
+});
+// Busco na biblia
+function buscaBiblia() {
+    cat = $('#cat_biblia').val();
+    texto = $('#busca_biblia').val();
+    if (texto.length > 1) {
+        let regexCartasCompleto = /^[1-3]\s(\w+)\s(\d+)\s(\d+)/;
+        let regexCartasParcial = /^[1-3]\s(\w+)\s(\d+)/;
+        let regexLivroCompleto = /^(\w+)\s(\d+)\s(\d+)/;
+        let regexLivroParcial = /^(\w+)\s(\d+)/;
+        let regexLivroCartas = /^[1-3]\s(\w+)/;
+        let regexLivro = /^(\w+)/;
+        let livro = texto;
+        let capitulo='';
+        let versiculo='';
+        //Faço consulta por regex, para normalizaçao
+        if (regexLivroParcial.test(texto)) {
+            livro = regexLivro.exec(texto)[0];
+            capitulo=texto.replace(livro,'').trim();
+        }
+        if (regexLivroCompleto.test(texto)) {
+            livro = regexLivro.exec(texto)[0];
+            capVer=texto.replace(livro,'').trim().split(' ');
+            capitulo=capVer[0];
+            versiculo=capVer[1];
+        }
+        if (regexCartasParcial.test(texto)) {
+            livro = regexLivroCartas.exec(texto)[0];
+            capitulo=texto.replace(livro,'').trim();
+        }
+        if (regexCartasCompleto.test(texto)) {
+            livro = regexLivroCartas.exec(texto)[0];
+            capVer=texto.replace(livro,'').trim().split(' ');
+            capitulo=capVer[0];
+            versiculo=capVer[1];
+        }
+        let idLivro = buscarLivro(livro);
+        if (capitulo) {
+            if (document.querySelector(`#${idLivro}_${capitulo}`).classList.value.includes('active')!=true) {
+                document.querySelector(`#${idLivro}_${capitulo}`).click();
+            }
+            setTimeout(() => {
+                if (versiculo) {
+                    document.querySelector(`#versiculo${idLivro.replace('biblia','')}_${capitulo}_${versiculo}`).click();
+                }
+            }, 300);
+            
+        }
+        document.querySelector("#busca_biblia").focus();
+        //window.location.hash=`#ancora_${idLivro}`; //Descomentar
+    }
+}
+function buscarLivro(texto) {
+    // Remove acentos e transforma tudo em minúsculas
+    texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    // Obtém todos os elementos <li> com a classe "versiculo"
+    let versiculos = document.querySelectorAll(".collaps_livro");
+    let encontrado = 0;
+    let idLocalizado = 0;
+    // Percorre os versículos e verifica se o texto buscado está presente
+    for (var i = 0; i < versiculos.length; i++) {
+        let versiculo = versiculos[i];
+
+        // Remove acentos e transforma tudo em minúsculas para comparação
+        let versiculoTexto = versiculo.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+        // Verifica se o texto buscado está presente no versículo
+        if (versiculoTexto.includes(texto)) {
+            //Verifico se a pesquisa é Jo
+            if (texto == 'jo') {
+                if (versiculoTexto == 'jo') {
+                    idLocalizado = versiculo.nextSibling.nextSibling.id;
+                    if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active')!=true) {
+                        encontrado++;
+                        versiculo.click();
+                    }
+                }
+            } else if (texto.includes('joa')) {
+                //Verifico se a pesquisa é João
+                let regexLivroCartas = /^[1-3]\s(\w+)/;
+                if (regexLivroCartas.test(texto)) {
+                    idLocalizado = versiculo.nextSibling.nextSibling.id;
+                    if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active')!=true) {
+                        encontrado++;
+                        versiculo.click();
+                    }
+                } else {
+                    if (versiculoTexto == 'joao') {
+                        idLocalizado = versiculo.nextSibling.nextSibling.id;
+                        if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active')!=true) {
+                            encontrado++;
+                            versiculo.click();
+                        }
+                    }
+                }
+            } else {
+                idLocalizado = versiculo.nextSibling.nextSibling.id;
+                if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active')!=true) {
+                    encontrado++;
+                    versiculo.click();
+                }
+            }
+        } else {
+            if (versiculo.classList?.value.includes('active')) {
+                versiculo.click();
+            }
+        }
+    }
+    return idLocalizado;
 }
 /* Chrome Tabs */
 //Tabs List
@@ -901,7 +1015,6 @@ function slideAtivo() {
         setTimeout(() => slideAtivo(), 200);
     } else {
         currenteId = document.querySelector(".chrome-conteudo-show ul").id;
-        console.log('ID Chrome:', currenteId);
         $.each($(`#${currenteId} .item_verso_musica`), function () {
             $(this).removeClass('ativo');
         });
@@ -940,13 +1053,7 @@ return idLocalizado;
 */
 /*
 
-//Faço a busca na biblia quando para de digitar
-$('#busca_biblia').keyup(function() {
-    clearTimeout(typingTimer);
-    if ($('#busca_biblia').val) {
-        typingTimer = setTimeout(buscaBiblia, doneTypingInterval);
-    }
-});
+
 //Remove o ativo dos versiculos
 function LimpaBiblia(){
     $.each($('.versiculo'), function () {
@@ -1079,180 +1186,93 @@ function checkVersiculo(id){
 }
 
 
-function buscarLivro(texto) {
-    // Remove acentos e transforma tudo em minúsculas
-    texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    // Obtém todos os elementos <li> com a classe "versiculo"
-    let versiculos = document.querySelectorAll(".collaps_livro");
-    let encontrado=0;
-    let idLocalizado=0;
-    // Percorre os versículos e verifica se o texto buscado está presente
-    for (var i = 0; i < versiculos.length; i++) {
-      let versiculo = versiculos[i];
-      
-      // Remove acentos e transforma tudo em minúsculas para comparação
-      let versiculoTexto = versiculo.textContent.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-      
-      // Verifica se o texto buscado está presente no versículo
-        if (versiculoTexto.includes(texto)) {
-            if(encontrado==0){
-                idLocalizado=versiculo.nextSibling.nextSibling.id;
-                if(!versiculo.classList.value.includes('active')){
-                    encontrado++;
-                    versiculo.click();
-                }
-            }else if(versiculo.classList?.value.includes('active')){
-                versiculo.classList?.remove('active');
-            }
-        }else{
-            if(versiculo.classList?.value.includes('active')){
-                versiculo.classList?.remove('active');
-            }
-        }
-    }
-    return idLocalizado;
-  }
+f
   
-  // Exemplo de uso: buscar o texto "ceu" desconsiderando a acentuação
-// Busco na biblia
-function buscaBiblia(){
-    cat=$('#cat_biblia').val();
-    texto=$('#busca_biblia').val();
-    if(texto.length>1){
-        let busca=texto.split(' ');
-        let tBusca=busca.length-1;
-        let primeiro=parseInt(busca[0].substr(0,1));
-        let livro='';
-        let capitulo=0;
-        let versiculo=0;
-        if(!isNaN(primeiro)){
-            livro=`${primeiro} ${busca[1]}`
-            tBusca=tBusca-1;
-        }else{
-            livro=busca[0];
-        }
-        let idLivro=buscarLivro(livro);
-        location.href=`#ancora_${idLivro}`;
-        document.querySelector("#busca_biblia").focus();
-        if(tBusca>0){
-            if(tBusca==2){
-                capitulo=busca[1];
-                versiculo=busca[2];
-            }else{
-                let capVer=busca[tBusca];
-                if(capVer.includes(':')){
-                    let capB=capVer.split(':');
-                    capitulo=capB[0];
-                    versiculo=capB[1];
-                }else{
-                    capitulo=capVer;
-                }
-            }
-            
-            if(capitulo!=0){
-                let divcapitulo=document.querySelector(`#${idLivro}_${capitulo}`);
-                if(!divcapitulo.classList.value.includes('active')){
-                    divcapitulo.click();
-                }
-                location.href=`#${idLivro}_${capitulo}`;
-                document.querySelector("#busca_biblia").focus();
-            }
-            if(versiculo!=0){
-                let newBiblia=idLivro.replace('biblia','versiculo');
-                let divversiculo=document.querySelector(`#${newBiblia}_${capitulo}_${versiculo}`);
-                if(!divversiculo.classList?.value.includes('active')){
-                    divversiculo.click();
-                }
-                location.href=`#${newBiblia}_${capitulo}_${versiculo}`;
-                document.querySelector("#busca_biblia").focus();
-            }
-        }
-    }
-}
+
 
 
 
 */
 var pressedCtrl = false; //variável de controle
 $(document).keyup(function (e) {  //O evento Kyeup é acionado quando as teclas são soltas
-  if(e.which == KEY_CTRL) pressedCtrl=false; //Quando qualuer tecla for solta é preciso informar que Crtl não está pressionada
-  })
+    if (e.which == KEY_CTRL) pressedCtrl = false; //Quando qualuer tecla for solta é preciso informar que Crtl não está pressionada
+})
 $(document).keydown(function (e) { //Quando uma tecla é pressionada
-  if(e.which == KEY_CTRL) pressedCtrl = true; //Informando que Crtl está acionado
-  if((e.which == KEY_ENTER|| e.keyCode == KEY_ENTER) && pressedCtrl == true) { //Reconhecendo tecla Enter
-    alert('O comando Crtl+Enter foi acionado')
+    if (e.which == KEY_CTRL) pressedCtrl = true; //Informando que Crtl está acionado
+    if ((e.which == KEY_ENTER || e.keyCode == KEY_ENTER) && pressedCtrl == true) { //Reconhecendo tecla Enter
+        alert('O comando Crtl+Enter foi acionado')
     }
-  if(e.which == KEY_LEFT || e.keyCode == KEY_LEFT || e.which == KEY_RIGHT || e.keyCode == KEY_RIGHT){
-    if(!$('#busca_musica').is(':focus') || $('#busca_musica').val()==''){
-      //percorre todo sequencia atual
-      let proximo = 1;
-      let index = 1;
-      $.each($('.chrome-conteudo-show .item_verso_musica'), function () {
-        if($(this).hasClass('ativo')) {
-          switch (e.keyCode) {
-            case KEY_RIGHT:
-              proximo += index;
-              break;
-            case KEY_LEFT:
-              proximo = index - 1;
-              break;
-          }
+    if (e.which == KEY_LEFT || e.keyCode == KEY_LEFT || e.which == KEY_RIGHT || e.keyCode == KEY_RIGHT) {
+        if (!$('#busca_musica').is(':focus') || $('#busca_musica').val() == '') {
+            //percorre todo sequencia atual
+            let proximo = 1;
+            let index = 1;
+            $.each($('.chrome-conteudo-show .item_verso_musica'), function () {
+                if ($(this).hasClass('ativo')) {
+                    switch (e.keyCode) {
+                        case KEY_RIGHT:
+                            proximo += index;
+                            break;
+                        case KEY_LEFT:
+                            proximo = index - 1;
+                            break;
+                    }
+                }
+                index++;
+            });
+            index = 1;
+            // VERIFICA SE O RETORNO É MAIOR QUE O NUMERO TOTAL DE DIVS E RETORNA FALSO PARA A NAVEGACAO NÃO SAIR DE DAS DIVS
+            if (proximo > $('.chrome-conteudo-show .item_verso_musica').length || proximo < 1) {
+                return false;
+                // VERIFICA SE O RETORNO É MENOR QUE 1 E RETORNA FALSO PARA A NAVEGAÇÃO NÃO SAIR DAS DIVS
+            }
+            // PERCORRE TODAS AS DIVS ITEMS PARA ATRIBUIR A CLASSE SELECTED NA DIV QUE O CURSOR DEVE IR SETADO NA VARIAVEL PROXIMO
+            $.each($('.chrome-conteudo-show .item_verso_musica'), function () {
+                $(this).removeClass('ativo');
+                if (index === proximo) {
+                    $(this).addClass('ativo');
+                    $(this).trigger('click');
+                }
+                index++;
+            })
         }
-        index++;
-      });
-      index = 1;
-      // VERIFICA SE O RETORNO É MAIOR QUE O NUMERO TOTAL DE DIVS E RETORNA FALSO PARA A NAVEGACAO NÃO SAIR DE DAS DIVS
-      if(proximo > $('.chrome-conteudo-show .item_verso_musica').length || proximo < 1) {
-          return false;
-      // VERIFICA SE O RETORNO É MENOR QUE 1 E RETORNA FALSO PARA A NAVEGAÇÃO NÃO SAIR DAS DIVS
-      }
-      // PERCORRE TODAS AS DIVS ITEMS PARA ATRIBUIR A CLASSE SELECTED NA DIV QUE O CURSOR DEVE IR SETADO NA VARIAVEL PROXIMO
-      $.each($('.chrome-conteudo-show .item_verso_musica'), function () {
-          $(this).removeClass('ativo');
-          if (index === proximo) {
-              $(this).addClass('ativo');
-              $(this).trigger('click');
-          }
-          index++;
-      })
     }
-  }
-  if(e.which == KEY_UP || e.keyCode == KEY_UP || e.which == KEY_DOWN || e.keyCode == KEY_DOWN){
-    if(!$('#busca_musica').is(':focus') || $('#busca_musica').val()==''){
-      //percorre todo sequencia atual
-      let proximo = 1;
-      let index = 1;
-      $("#busca_biblia").blur();
-      $.each($('.versiculo'), function () {
-        if($(this).hasClass('ativo')) {
-          switch (e.keyCode) {
-            case KEY_DOWN:
-              proximo += index;
-              break;
-            case KEY_UP:
-              proximo = index - 1;
-              break;
-          }
+    if (e.which == KEY_UP || e.keyCode == KEY_UP || e.which == KEY_DOWN || e.keyCode == KEY_DOWN) {
+        if (!$('#busca_musica').is(':focus') || $('#busca_musica').val() == '') {
+            //percorre todo sequencia atual
+            let proximo = 1;
+            let index = 1;
+            $("#busca_biblia").blur();
+            $.each($('.versiculo'), function () {
+                if ($(this).hasClass('ativo')) {
+                    switch (e.keyCode) {
+                        case KEY_DOWN:
+                            proximo += index;
+                            break;
+                        case KEY_UP:
+                            proximo = index - 1;
+                            break;
+                    }
+                }
+                index++;
+            });
+            index = 1;
+            // VERIFICA SE O RETORNO É MAIOR QUE O NUMERO TOTAL DE DIVS E RETORNA FALSO PARA A NAVEGACAO NÃO SAIR DE DAS DIVS
+            if (proximo > $('.versiculo').length || proximo < 1) {
+                return false;
+                // VERIFICA SE O RETORNO É MENOR QUE 1 E RETORNA FALSO PARA A NAVEGAÇÃO NÃO SAIR DAS DIVS
+            }
+            // PERCORRE TODAS AS DIVS ITEMS PARA ATRIBUIR A CLASSE SELECTED NA DIV QUE O CURSOR DEVE IR SETADO NA VARIAVEL PROXIMO
+            $.each($('.versiculo'), function () {
+                $(this).removeClass('ativo');
+                if (index === proximo) {
+                    $(this).addClass('ativo');
+                    $(this).trigger('click');
+                }
+                index++;
+            })
         }
-        index++;
-      });
-      index = 1;
-      // VERIFICA SE O RETORNO É MAIOR QUE O NUMERO TOTAL DE DIVS E RETORNA FALSO PARA A NAVEGACAO NÃO SAIR DE DAS DIVS
-      if(proximo > $('.versiculo').length || proximo < 1) {
-          return false;
-      // VERIFICA SE O RETORNO É MENOR QUE 1 E RETORNA FALSO PARA A NAVEGAÇÃO NÃO SAIR DAS DIVS
-      }
-      // PERCORRE TODAS AS DIVS ITEMS PARA ATRIBUIR A CLASSE SELECTED NA DIV QUE O CURSOR DEVE IR SETADO NA VARIAVEL PROXIMO
-      $.each($('.versiculo'), function () {
-          $(this).removeClass('ativo');
-          if (index === proximo) {
-              $(this).addClass('ativo');
-              $(this).trigger('click');
-          }
-          index++;
-      })
     }
-  }
 });
 var socket = io.connect(urlSocket);
 socket.emit("join", user);

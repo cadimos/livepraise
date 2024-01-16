@@ -1,6 +1,6 @@
 {
   "name": "livepraise",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "main.js",
   "author": {
     "name": "Thiago de Lucena Sobrinho",
@@ -38,7 +38,8 @@
     "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/livepraise.icns --prune=true --out=release-builds  --overwrite",
     "snap": "electron-builder build --linux snap",
     "win": "electron-builder build --win --publish always",
-    "linux": "electron-builder build --linux --publish always",
+    "linux": "electron-builder build --linux",
+    "linux2": "electron-builder build --linux --publish always",
     "rebuild": "electron-rebuild -f -w sqlite3",
     "dev": "nodemon ./server.js"
   },
@@ -47,31 +48,23 @@
     "url": "git+https://github.com/cadimos/livepraise.git"
   },
   "private": true,
+  "devDependencies": {
+    "electron": "^27.0.3",
+    "electron-builder": "^24.6.4",
+    "nodemon": "^3.0.1"
+  },
   "dependencies": {
-    "better-sqlite3": "^8.6.0",
-    "blueimp-md5": "^2.19.0",
-    "body-parser": "^1.20.2",
-    "child-process-promise": "^2.2.1",
+    "@electron/rebuild": "^3.3.0",
     "compression": "^1.7.4",
     "consign": "^0.1.6",
-    "draggabilly": "^3.0.0",
+    "dotenv": "^16.3.1",
     "electron-updater": "^6.1.4",
     "express": "^4.18.2",
     "ffmpeg-static": "^5.2.0",
     "fs-extra": "^11.1.1",
-    "graceful-fs": "^4.2.11",
-    "jquery": "^3.7.1",
-    "node-abi": "^3.47.0",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
     "sqlite3": "^5.1.6",
-    "systeminformation": "^5.21.9",
-    "update-electron-app": "^2.0.1"
-  },
-  "devDependencies": {
-    "@electron/rebuild": "^3.3.0",
-    "electron": "^26.2.4",
-    "electron-builder": "^24.6.4",
-    "nodemon": "^3.0.1"
+    "systeminformation": "^5.21.15"
   }
 }

@@ -1,14 +1,22 @@
 name: livepraise
+title: Live Praise
 base: core22
 version: '0.0.9'
+contact: thiagolucenaelvis@gmail.com
 summary: Sistema de Projecao para igrejas
+icon: app/icon/livepraise.png
 description: |
   Live Praise é um software dedicado a exibição de 
   Louvores, Biblias, Videos e outras atividades na igreja.
 
-grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: classic # use 'strict' once you have the right plugs and slots
-
+grade: stable
+confinement: classic
 parts:
   livepraise:
-    plugin: nil
+    plugin: npm
+    source: .
+    plugs:
+    - default
+    - network
+    - network-bind
+    - removable-media

@@ -130,7 +130,7 @@ function texto(vl) {
 	$('.conteudo').css('text-align', 'center');
 }
 function viewMusica(vl) {
-	vl = decodeURI(vl);
+	vl = decodeURIComponent(escape(vl))
 	$('.conteudo').html('');
 	$('.conteudo').append(vl);
 	$('.content').textfill({ maxFontPixels: -1 });
@@ -139,7 +139,7 @@ function viewMusica(vl) {
 }
 
 function viewBiblia(vl) {
-	cont = decodeURI(vl);
+	cont = decodeURIComponent(escape(vl));
 	$('.conteudo').html('');
 	$('.conteudo').append(cont);
 	$('.content').textfill({ maxFontPixels: CalculaLinhas(5, '.content') });
