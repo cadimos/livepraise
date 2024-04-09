@@ -871,6 +871,73 @@ function adicionar_verso(musica, verso) {
         }
     });
 }
+//Salvar musica
+function salvar_musica(id){
+    cat=1;
+    nome=$('#new_music #nome').val();
+    nome=iso_encode(nome);
+    if(nome==''){
+        alert('O nome da Música é Obrigatória!');
+    }
+    artista=$('#new_music #artista').val();
+    artista=iso_encode(artista);
+    if(artista==''){
+        alert('O nome do Artista é Obrigatória!');
+    }
+    compositor=$('#new_music #compositor').val();
+    compositor=iso_encode(compositor);
+    letra=$('#new_music #letra').val();
+    letra=iso_encode(letra);
+    if(letra==''){
+        alert('A letra da Música é Obrigatória!');
+    }
+    if(nome!='' && artista!='' && letra!=''){
+        letra=nl2br(letra);
+        versos=letra.split("<br /><br />");
+        t_versos=versos.length;
+        if(id==0){
+            dados={
+                cat:cat,
+                nome:nome,
+                artista:artista,
+                compositor:compositor
+            }
+            $.ajax({
+                type: "POST",
+                url: urlSocket+'/musica',
+                data: dados,
+                dataType: "json",
+                success: function(data) {
+                    if(data.status=='successo'){
+                        id_musica=data.id;
+                        for(i=0;i<t_versos;i++){
+                            if(versos[i]!=''){
+                                v=versos[i]
+                                v=iso_encode(v);
+                                adicionar_verso(id_musica,v);
+                                $('#new_music').modal('hide');
+                                limparModalMusica();
+                                lista_musica();
+                            }
+                        } 
+                    }
+                }
+            });
+        }
+    }
+}
+//Limpar modal ao cadastrar ou atualizar uma musica
+function limparModalMusica(){
+    $('#new_music #nome').val('');
+    $('#new_music #artista').val('');
+    $('#new_music #compositor').val('');
+    $('#new_music #letra').val('');
+}
+//Capturo o Id da musica a ser exibida no modal
+$('#new_music').on('shown.bs.modal', function (event) {
+    let button = $(event.relatedTarget)
+    let id = button.data('whatever')
+  })
 //Faço a busca na biblia quando para de digitar
 $('#busca_biblia').keyup(function () {
     clearTimeout(typingTimer);
@@ -1067,58 +1134,7 @@ function LimpaBiblia(){
 
 
 
-function salvar_musica(id){
-    cat=1;
-    nome=$('#new_music #nome').val();
-    nome=iso_encode(nome);
-    if(nome==''){
-        alert('O nome da Música é Obrigatória!');
-    }
-    artista=$('#new_music #artista').val();
-    artista=iso_encode(artista);
-    if(artista==''){
-        alert('O nome do Artista é Obrigatória!');
-    }
-    compositor=$('#new_music #compositor').val();
-    compositor=iso_encode(compositor);
-    letra=$('#new_music #letra').val();
-    letra=iso_encode(letra);
-    if(letra==''){
-        alert('A letra da Música é Obrigatória!');
-    }
-    if(nome!='' && artista!='' && letra!=''){
-        letra=nl2br(letra);
-        versos=letra.split("<br /><br />");
-        t_versos=versos.length;
-        if(id==0){
-            dados={
-                cat:cat,
-                nome:nome,
-                artista:artista,
-                compositor:compositor
-            }
-            $.ajax({
-                type: "POST",
-                url: urlSocket+'/add/musica/',
-                data: dados,
-                dataType: "json",
-                success: function(data) {
-                    if(data.status=='successo'){
-                        id_musica=data.id;
-                        for(i=0;i<t_versos;i++){
-                            if(versos[i]!=''){
-                                v=versos[i]
-                                v=iso_encode(v);
-                                adicionar_verso(id_musica,v);
-                                $('#new_music').modal('hide')
-                            }
-                        } 
-                    }
-                }
-            });
-        }
-    }
-}
+
 
 
 //Remover musica
