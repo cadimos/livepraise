@@ -43,6 +43,19 @@ module.exports = app => {
             items
         })
     })
+    api.get('/:codigo',async (req,res)=>{
+        let codigo = req.params.codigo;
+        res.setHeader('Access-Control-Allow-Origin', 'Origin');
+        items=await db.all(`SELECT * FROM musica WHERE id = ${codigo}`);
+        if(items.status=='Error'){
+            res.json(items);
+            return;
+        }
+        res.json({
+            status:"Sucesso",
+            items
+        })
+    })
     api.post("/", async (req, res, next) => {
         var errors=[]
         if (!req.body.cat){

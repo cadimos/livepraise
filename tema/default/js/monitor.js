@@ -872,72 +872,101 @@ function adicionar_verso(musica, verso) {
     });
 }
 //Salvar musica
-function salvar_musica(id){
-    cat=1;
-    nome=$('#new_music #nome').val();
-    nome=iso_encode(nome);
-    if(nome==''){
+function salvar_musica(id) {
+    cat = 1;
+    nome = $('#new_music #nome').val();
+    nome = iso_encode(nome);
+    if (nome == '') {
         alert('O nome da Música é Obrigatória!');
     }
-    artista=$('#new_music #artista').val();
-    artista=iso_encode(artista);
-    if(artista==''){
+    artista = $('#new_music #artista').val();
+    artista = iso_encode(artista);
+    if (artista == '') {
         alert('O nome do Artista é Obrigatória!');
     }
-    compositor=$('#new_music #compositor').val();
-    compositor=iso_encode(compositor);
-    letra=$('#new_music #letra').val();
-    letra=iso_encode(letra);
-    if(letra==''){
+    compositor = $('#new_music #compositor').val();
+    compositor = iso_encode(compositor);
+    letra = $('#new_music #letra').val();
+    letra = iso_encode(letra);
+    if (letra == '') {
         alert('A letra da Música é Obrigatória!');
     }
-    if(nome!='' && artista!='' && letra!=''){
-        letra=nl2br(letra);
-        versos=letra.split("<br /><br />");
-        t_versos=versos.length;
-        if(id==0){
-            dados={
-                cat:cat,
-                nome:nome,
-                artista:artista,
-                compositor:compositor
-            }
-            $.ajax({
-                type: "POST",
-                url: urlSocket+'/musica',
-                data: dados,
-                dataType: "json",
-                success: function(data) {
-                    if(data.status=='successo'){
-                        id_musica=data.id;
-                        for(i=0;i<t_versos;i++){
-                            if(versos[i]!=''){
-                                v=versos[i]
-                                v=iso_encode(v);
-                                adicionar_verso(id_musica,v);
-                                $('#new_music').modal('hide');
-                                limparModalMusica();
-                                lista_musica();
-                            }
-                        } 
+    if (nome != '' && artista != '' && letra != '') {
+        letra = nl2br(letra);
+        versos = letra.split("<br /><br />");
+        t_versos = versos.length;
+        let dados = {
+            cat: cat,
+            nome: nome,
+            artista: artista,
+            compositor: compositor
+        }
+        let url = id ? `${urlSocket}/musica/${id}` : `${urlSocket}/musica`
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: dados,
+            dataType: "json",
+            success: function (data) {
+                if (data.status == 'successo') {
+                    id_musica = data.id;
+                    for (i = 0; i < t_versos; i++) {
+                        if (versos[i] != '') {
+                            v = versos[i]
+                            v = iso_encode(v);
+                            adicionar_verso(id_musica, v);
+                            $('#new_music').modal('hide');
+                            limparModalMusica();
+                            lista_musica();
+                        }
                     }
                 }
-            });
-        }
+            }
+        });
     }
 }
 //Limpar modal ao cadastrar ou atualizar uma musica
-function limparModalMusica(){
+function limparModalMusica() {
     $('#new_music #nome').val('');
     $('#new_music #artista').val('');
     $('#new_music #compositor').val('');
     $('#new_music #letra').val('');
 }
+function viewModalMusica(id){
+    $.ajax({
+        type: "GET",
+        url: `${urlSocket}/musica/${id}`,
+        dataType: "json",
+        success: function (data) {
+            if (data.status == 'Sucesso') {
+                let item = data.items[0];
+                $('#new_music #nome').val(item.nome);
+                $('#new_music #artista').val(item.artista);
+                $('#new_music #compositor').val(item.compositor);
+                $.ajax({
+                    type: "GET",
+                    url: `${urlSocket}/musica/verso/${id}`,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.status == 'Sucesso') {
+                            let verso=[];
+                            data.items.forEach(item => {
+                                verso.push(item.verso.replaceAll('<br />',"\n").replaceAll('<br>',"\n"));
+                            });
+                            $('#new_music #letra').val(verso.join("\n\n"));
+                        }
+                    }
+                });
+            }
+        }
+    });
+}
 //Capturo o Id da musica a ser exibida no modal
 $('#new_music').on('shown.bs.modal', function (event) {
-    let button = $(event.relatedTarget)
-    let id = button.data('whatever')
-  })
+    let button = $(event.relatedTarget);
+    let id = button.data('whatever');
+    viewModalMusica(id);
+})
 //Faço a busca na biblia quando para de digitar
 $('#busca_biblia').keyup(function () {
     clearTimeout(typingTimer);
@@ -957,40 +986,40 @@ function buscaBiblia() {
         let regexLivroCartas = /^[1-3]\s(\w+)/;
         let regexLivro = /^(\w+)/;
         let livro = texto;
-        let capitulo='';
-        let versiculo='';
+        let capitulo = '';
+        let versiculo = '';
         //Faço consulta por regex, para normalizaçao
         if (regexLivroParcial.test(texto)) {
             livro = regexLivro.exec(texto)[0];
-            capitulo=texto.replace(livro,'').trim();
+            capitulo = texto.replace(livro, '').trim();
         }
         if (regexLivroCompleto.test(texto)) {
             livro = regexLivro.exec(texto)[0];
-            capVer=texto.replace(livro,'').trim().split(' ');
-            capitulo=capVer[0];
-            versiculo=capVer[1];
+            capVer = texto.replace(livro, '').trim().split(' ');
+            capitulo = capVer[0];
+            versiculo = capVer[1];
         }
         if (regexCartasParcial.test(texto)) {
             livro = regexLivroCartas.exec(texto)[0];
-            capitulo=texto.replace(livro,'').trim();
+            capitulo = texto.replace(livro, '').trim();
         }
         if (regexCartasCompleto.test(texto)) {
             livro = regexLivroCartas.exec(texto)[0];
-            capVer=texto.replace(livro,'').trim().split(' ');
-            capitulo=capVer[0];
-            versiculo=capVer[1];
+            capVer = texto.replace(livro, '').trim().split(' ');
+            capitulo = capVer[0];
+            versiculo = capVer[1];
         }
         let idLivro = buscarLivro(livro);
         if (capitulo) {
-            if (document.querySelector(`#${idLivro}_${capitulo}`).classList.value.includes('active')!=true) {
+            if (document.querySelector(`#${idLivro}_${capitulo}`).classList.value.includes('active') != true) {
                 document.querySelector(`#${idLivro}_${capitulo}`).click();
             }
             setTimeout(() => {
                 if (versiculo) {
-                    document.querySelector(`#versiculo${idLivro.replace('biblia','')}_${capitulo}_${versiculo}`).click();
+                    document.querySelector(`#versiculo${idLivro.replace('biblia', '')}_${capitulo}_${versiculo}`).click();
                 }
             }, 300);
-            
+
         }
         document.querySelector("#busca_biblia").focus();
         //window.location.hash=`#ancora_${idLivro}`; //Descomentar
@@ -1016,7 +1045,7 @@ function buscarLivro(texto) {
             if (texto == 'jo') {
                 if (versiculoTexto == 'jo') {
                     idLocalizado = versiculo.nextSibling.nextSibling.id;
-                    if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active')!=true) {
+                    if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active') != true) {
                         encontrado++;
                         versiculo.click();
                     }
@@ -1026,14 +1055,14 @@ function buscarLivro(texto) {
                 let regexLivroCartas = /^[1-3]\s(\w+)/;
                 if (regexLivroCartas.test(texto)) {
                     idLocalizado = versiculo.nextSibling.nextSibling.id;
-                    if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active')!=true) {
+                    if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active') != true) {
                         encontrado++;
                         versiculo.click();
                     }
                 } else {
                     if (versiculoTexto == 'joao') {
                         idLocalizado = versiculo.nextSibling.nextSibling.id;
-                        if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active')!=true) {
+                        if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active') != true) {
                             encontrado++;
                             versiculo.click();
                         }
@@ -1041,7 +1070,7 @@ function buscarLivro(texto) {
                 }
             } else {
                 idLocalizado = versiculo.nextSibling.nextSibling.id;
-                if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active')!=true) {
+                if (document.querySelector(`#ancora_${idLocalizado}`).classList.value.includes('active') != true) {
                     encontrado++;
                     versiculo.click();
                 }
