@@ -931,6 +931,7 @@ function limparModalMusica() {
     $('#new_music #artista').val('');
     $('#new_music #compositor').val('');
     $('#new_music #letra').val('');
+    document.querySelector('#button_salvar_musica').setAttribute('onclick',`salvar_musica(0)`);
 }
 function viewModalMusica(id){
     $.ajax({
@@ -966,6 +967,7 @@ $('#new_music').on('shown.bs.modal', function (event) {
     let button = $(event.relatedTarget);
     let id = button.data('whatever');
     viewModalMusica(id);
+    document.querySelector('#button_salvar_musica').setAttribute('onclick',`salvar_musica(${id})`);
 })
 //Faço a busca na biblia quando para de digitar
 $('#busca_biblia').keyup(function () {
