@@ -927,15 +927,72 @@ function salvar_musica(id) {
         });
     }
 }
+//Remover musica
+function remover_musica(id, conf) {
+    rand = Math.floor(Math.random() * 1000000);
+    if (conf != true) {
+        $.confirm({
+            title: 'Deseja Realmente Remover?',
+            content: `<form action="" class="formName">
+        <div class="form-group">
+        <label>Digite o Código a seguir para Excluir: ${rand}</label>
+        <input type="text" placeholder="Código" class="codigo form-control" required />
+        </div>
+        </form>
+        `,
+            buttons: {
+                formSubmit: {
+                    text: 'Excluir',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        var cod = this.$content.find('.codigo').val();
+                        if (!cod || cod != rand) {
+                            $.alert('Código incorreto! Tente novamente');
+                            return false;
+                        } else {
+                            $("#music" + id).remove();
+                            $.ajax({
+                                type: "DELETE",
+                                url: `${urlSocket}/musica/${id}`,
+                                dataType: "json",
+                                success: function (data) {
+                                }
+                            });
+                            /*
+                            db.serialize(function() {
+                              db.run("DELETE FROM `musica` WHERE `id`='"+id+"'");
+                              lista_musica();
+                            });
+                            */
+                        }
+                    }
+                },
+                cancel: {
+                    text: 'Cancelar',
+                    action: function () { }
+                }
+            },
+            onContentReady: function () {
+                // bind to events
+                var jc = this;
+                this.$content.find('form').on('submit', function (e) {
+                    // if the user submits the form by pressing enter in the field.
+                    e.preventDefault();
+                    jc.$$formSubmit.trigger('click'); // reference the button and click it
+                });
+            }
+        });
+    }
+}
 //Limpar modal ao cadastrar ou atualizar uma musica
 function limparModalMusica() {
     $('#new_music #nome').val('');
     $('#new_music #artista').val('');
     $('#new_music #compositor').val('');
     $('#new_music #letra').val('');
-    document.querySelector('#button_salvar_musica').setAttribute('onclick',`salvar_musica(0)`);
+    document.querySelector('#button_salvar_musica').setAttribute('onclick', `salvar_musica(0)`);
 }
-function viewModalMusica(id){
+function viewModalMusica(id) {
     $.ajax({
         type: "GET",
         url: `${urlSocket}/musica/${id}`,
@@ -952,9 +1009,9 @@ function viewModalMusica(id){
                     dataType: "json",
                     success: function (data) {
                         if (data.status == 'Sucesso') {
-                            let verso=[];
+                            let verso = [];
                             data.items.forEach(item => {
-                                verso.push(item.verso.replaceAll('<br />',"\n").replaceAll('<br>',"\n"));
+                                verso.push(item.verso.replaceAll('<br />', "\n").replaceAll('<br>', "\n"));
                             });
                             $('#new_music #letra').val(verso.join("\n\n"));
                         }
@@ -969,7 +1026,7 @@ $('#new_music').on('shown.bs.modal', function (event) {
     let button = $(event.relatedTarget);
     let id = button.data('whatever');
     viewModalMusica(id);
-    document.querySelector('#button_salvar_musica').setAttribute('onclick',`salvar_musica(${id})`);
+    document.querySelector('#button_salvar_musica').setAttribute('onclick', `salvar_musica(${id})`);
 })
 //Faço a busca na biblia quando para de digitar
 $('#busca_biblia').keyup(function () {
@@ -1160,69 +1217,6 @@ function LimpaBiblia(){
       $(this).removeClass('ativo');
     })
 }
-
-
-
-
-
-
-
-
-
-
-//Remover musica
-function remover_musica(id,conf){
-  rand=Math.floor(Math.random() * 1000000);
-  if(conf!=true){
-    $.confirm({
-      title: 'Deseja Realmente Remover?',
-      content: `<form action="" class="formName">
-      <div class="form-group">
-      <label>Digite o Código a seguir para Excluir: ${rand}</label>
-      <input type="text" placeholder="Código" class="codigo form-control" required />
-      </div>
-      </form>
-      `,
-      buttons: {
-          formSubmit: {
-              text: 'Excluir',
-              btnClass: 'btn-red',
-              action: function () {
-                  var cod = this.$content.find('.codigo').val();
-                  if(!cod || cod!=rand){
-                      $.alert('Código incorreto! Tente novamente');
-                      return false;
-                  }else{
-                    $("#music"+id).remove();
-                    /*
-                    db.serialize(function() {
-                      db.run("DELETE FROM `musica` WHERE `id`='"+id+"'");
-                      lista_musica();
-                    });
-                    * /
-                  }
-              }
-          },
-          cancel: {
-            text: 'Cancelar',
-            action: function () {}
-          }
-      },
-      onContentReady: function () {
-          // bind to events
-          var jc = this;
-          this.$content.find('form').on('submit', function (e) {
-              // if the user submits the form by pressing enter in the field.
-              e.preventDefault();
-              jc.$$formSubmit.trigger('click'); // reference the button and click it
-          });
-      }
-    });
-  }
-}
-
-
-
 function checkVersiculo(id){
     let cap= sessionStorage.getItem('capitulo');
     if (cap=='ok') {

@@ -137,5 +137,14 @@ module.exports = app => {
             "id": codigo
         });
     })
+    api.delete("/:codigo", async (req, res, next) => {
+        let codigo = req.params.codigo;
+        await db.run("DELETE FROM musica WHERE id=?", [codigo]);
+        await db.run("DELETE FROM musica_versos WHERE musica=?", [codigo]);
+        res.json({
+            "status": "successo",
+            "id": codigo
+        });
+    })
     app.use('/musica', api); //defino o URL do Grupo e exporto ele, com todas as rotas
 }
