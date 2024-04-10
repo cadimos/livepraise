@@ -895,7 +895,7 @@ function salvar_musica(id) {
         letra = nl2br(letra);
         versos = letra.split("<br /><br />");
         t_versos = versos.length;
-        let dados = {
+        const dados = {
             cat: cat,
             nome: nome,
             artista: artista,
@@ -908,8 +908,10 @@ function salvar_musica(id) {
             data: dados,
             dataType: "json",
             success: function (data) {
+                console.log(data);
                 if (data.status == 'successo') {
-                    id_musica = data.id;
+                    let id_musica = data.id;
+                    console.log(id_musica);
                     for (i = 0; i < t_versos; i++) {
                         if (versos[i] != '') {
                             v = versos[i]
