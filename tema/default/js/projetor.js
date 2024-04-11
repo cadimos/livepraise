@@ -142,6 +142,7 @@ function viewBiblia(vl) {
 	cont = decodeURIComponent(escape(vl));
 	$('.conteudo').html('');
 	$('.conteudo').append(cont);
+	console.log('Tamanho maximo letra',CalculaLinhas(5, '.content'))
 	$('.content').textfill({ maxFontPixels: CalculaLinhas(5, '.content') });
 	$('.content').css('text-align', 'left');
 	$('.titulo').css('font-size', '35px');
@@ -155,10 +156,13 @@ function atualizar() {
 	location.reload();
 }
 function CalculaLinhas(quant, div) {
-	let largura = $(div).innerWidth();
-	let altura = $(div).innerHeight();
+	let largura = document.querySelector(div).clientWidth;
+	let altura = document.querySelector(div).clientHeight;
 	carcteres_linha = 50;
 	font = ((altura / quant) - (largura / carcteres_linha)) - quant;
+	console.log('Largura Linha',largura);
+	console.log('Altura Linha',altura);
+	console.log('Font',font);
 	return font;
 }
 function ajustarTela(largura, altura) {
