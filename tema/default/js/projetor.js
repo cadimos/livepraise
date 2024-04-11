@@ -162,10 +162,12 @@ function CalculaLinhas(quant, div) {
 	return font;
 }
 function ajustarTela(largura, altura) {
-	screenWidth = screen.width;
-	screenHeight = screen.height;
+	screenWidth = window.innerWidth || screen.width;
+	screenHeight = window.innerHeight || screen.height;
 	if (!altura) {
+		console.log('Nao existe Altura')
 		if (!largura) {
+			console.log('Nao existe Largura')
 			$.ajax({
 				type: "GET",
 				url: urlSocket + '/display',
@@ -180,8 +182,10 @@ function ajustarTela(largura, altura) {
 								largura = result[i].largura;
 								altura = result[i].altura;
 								if (tipo == '16:9' || tipo == '4:3' || tipo == '7:3' || tipo == '5:3' || tipo == '13:7' || tipo == 'padrao') {
+									console.log('Inicio Tipo:'+tipo);
 									ajustarTela(tipo);
 								} else {
+									console.log(`Tamanho: ${largura}, ${altura}`)
 									ajustarTela(largura, altura);
 								}
 							}
@@ -190,6 +194,7 @@ function ajustarTela(largura, altura) {
 				}
 			});
 		} else if (largura.indexOf(':') < 0) {
+			console.log('Largura Fixa'+largura);
 			new_altura = screenHeight;
 			$('#fundo').css('height', new_altura + 'px');
 			$('#fundo img').css('height', new_altura + 'px');
@@ -197,10 +202,14 @@ function ajustarTela(largura, altura) {
 			$('#fundo video').css('height', new_altura + 'px');
 			$('.conteudo').css('height', new_altura + 'px');
 		} else {
+			console.log('tamanho baseado em dimensao');
 			dimensao = largura.split(':');
 			frm_inicio = dimensao[0];
 			frm_fim = dimensao[1];
 			new_altura = (screenWidth * frm_fim) / frm_inicio;
+			if(new_altura>screenHeight){
+				new_altura = (screenHeight * frm_fim) / frm_inicio;
+			}
 			//Corrijo altura
 			$('#fundo').css('height', new_altura + 'px');
 			$('#fundo img').css('height', new_altura + 'px');
