@@ -958,12 +958,6 @@ function remover_musica(id, conf) {
                                 success: function (data) {
                                 }
                             });
-                            /*
-                            db.serialize(function() {
-                              db.run("DELETE FROM `musica` WHERE `id`='"+id+"'");
-                              lista_musica();
-                            });
-                            */
                         }
                     }
                 },
