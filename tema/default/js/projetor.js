@@ -133,8 +133,10 @@ function viewMusica(vl) {
 	vl = decodeURIComponent(escape(vl))
 	$('.conteudo').html('');
 	$('.conteudo').append(vl);
+	$('.content').css('height', '80%');
 	$('.content').textfill({ maxFontPixels: -1 });
 	$('.content').css('text-align', 'center');
+	//$('.content').css('height', '80%');
 	$('.rodape').css('font-size', '35px');
 }
 
@@ -142,7 +144,7 @@ function viewBiblia(vl) {
 	cont = decodeURIComponent(escape(vl));
 	$('.conteudo').html('');
 	$('.conteudo').append(cont);
-	console.log('Tamanho maximo letra',CalculaLinhas(5, '.content'))
+	//$('.content').css('height', '100%');
 	$('.content').textfill({ maxFontPixels: CalculaLinhas(5, '.content') });
 	$('.content').css('text-align', 'left');
 	$('.titulo').css('font-size', '35px');
