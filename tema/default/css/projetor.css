@@ -41,7 +41,7 @@ body {
     padding-left: 5vw;
 }
 .content{
-    height: 100%;
+    height: calc(100% - 40px);
 }
 .content span{
     display: table;
