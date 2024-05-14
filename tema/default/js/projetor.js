@@ -133,7 +133,7 @@ function viewMusica(vl) {
 	vl = decodeURIComponent(escape(vl))
 	$('.conteudo').html('');
 	$('.conteudo').append(vl);
-	$('.content').css('height', '80%');
+	$('.content').css('height', 'calc(100% - 80px)');
 	$('.content').textfill({ maxFontPixels: -1 });
 	$('.content').css('text-align', 'center');
 	//$('.content').css('height', '80%');
