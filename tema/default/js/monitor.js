@@ -1077,7 +1077,7 @@ function buscaBiblia() {
 
         }
         document.querySelector("#busca_biblia").focus();
-        //window.location.hash=`#ancora_${idLivro}`; //Descomentar
+        window.location.hash=`#ancora_${idLivro}`; //Descomentar
     }
 }
 function buscarLivro(texto) {

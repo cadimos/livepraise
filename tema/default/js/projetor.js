@@ -213,9 +213,6 @@ function ajustarTela(largura, altura) {
 			frm_inicio = dimensao[0];
 			frm_fim = dimensao[1];
 			new_altura = (screenWidth * frm_fim) / frm_inicio;
-			if(new_altura>screenHeight){
-				new_altura = (screenHeight * frm_fim) / frm_inicio;
-			}
 			//Corrijo altura
 			$('#fundo').css('height', new_altura + 'px');
 			$('#fundo img').css('height', new_altura + 'px');
