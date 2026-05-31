@@ -5,6 +5,8 @@ import { fetchJson, mediaUrl } from '../../composables/useApi';
 import { usePreferences } from '../../composables/usePreferences';
 import { useLiveSocket } from '../../composables/useLiveSocket';
 import MediaTileContextMenu from '../MediaTileContextMenu.vue';
+import { summarizeLabel } from '@shared/queue-items';
+import { useQueueDrag } from '../../composables/useQueueDrag';
 import { projectTabVideoBackground } from '../../utils/projection-actions';
 
 interface VideoItem {
@@ -22,6 +24,12 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const { prefs, setVideoCategory, setVideoSearchQuery } = usePreferences();
 const { sendAction } = useLiveSocket();
+const { onDragStart } = useQueueDrag();
+
+function videoDragLabel(path: string): string {
+  const parts = path.replaceAll('\\', '/').split('/');
+  return summarizeLabel(parts[parts.length - 1] ?? path, 32);
+}
 
 const videoCategories = ref<string[]>([]);
 const videos = ref<VideoItem[]>([]);
@@ -151,17 +159,28 @@ onUnmounted(() => {
           media-kind="videos"
           :categories="videoCategories"
           :thumb-path="item.thumb"
+          :pipeline-status="item.pipelineStatus"
           @preview-bg="emit('previewBg', $event)"
           @refresh="reloadCurrentCategory"
         >
           <button
             type="button"
-            class="relative aspect-video w-full overflow-hidden rounded-lg border border-lp-surface transition hover:border-lp-primary"
+            draggable="true"
+            class="relative aspect-video w-full cursor-grab overflow-hidden rounded-lg border border-lp-surface transition hover:border-lp-primary active:cursor-grabbing"
             :class="{
               'pointer-events-none opacity-70':
                 item.pipelineStatus && item.pipelineStatus !== 'ready',
             }"
+            :title="t('tabs.dragHint')"
             @click="projectVideo(item)"
+            @dragstart="
+              onDragStart($event, {
+                kind: 'video',
+                label: videoDragLabel(item.video),
+                mediaPath: item.video,
+                thumbPath: item.thumb || undefined,
+              })
+            "
           >
             <img
               v-if="item.thumb"

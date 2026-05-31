@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { expandVersesForDisplay, normalizeVerseText } from '@shared/verse-estofres';
 import { fetchJson } from './useApi';
 import { usePreferences } from './usePreferences';
 
@@ -17,7 +18,7 @@ function preferences() {
 }
 
 export async function syncChromeTabs(): Promise<void> {
-  const { addChromeTab } = preferences();
+  const { addChromeTab, prefs } = preferences();
   const data = await fetchJson<{
     status: string;
     tabs: Array<{
@@ -36,10 +37,11 @@ export async function syncChromeTabs(): Promise<void> {
           status: string;
           items: Array<{ id: number; verso: string }>;
         }>(`/musica/verso/${tab.songId}`);
-        verses = (versesData.items ?? []).map((v) => ({
+        const raw = (versesData.items ?? []).map((v) => ({
           id: v.id,
-          text: v.verso.replace(/<br \/>/g, '\n'),
+          text: normalizeVerseText(v.verso),
         }));
+        verses = expandVersesForDisplay(raw, prefs.value.maxEstofreLines);
       } catch {
         verses = [];
       }

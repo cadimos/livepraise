@@ -8,6 +8,8 @@ import { setupAutoUpdater } from './updater.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SERVER_PORT = Number(process.env.LIVEPRAISE_PORT ?? process.env.APP_PORT ?? 3000);
+const SERVER_WAIT_MS = Number(process.env.LIVEPRAISE_SERVER_WAIT_MS ?? 60_000);
+const APP_ROOT = app.isPackaged ? app.getAppPath() : process.cwd();
 
 let splashWindow: BrowserWindow | null = null;
 let serverProcess: ChildProcess | null = null;
@@ -29,9 +31,14 @@ function shutdownLivepraise(): void {
 function startServerProcess(): void {
   const serverEntry = path.join(__dirname, '..', 'server', 'index.js');
   serverProcess = spawn(process.execPath, [serverEntry], {
-    cwd: process.cwd(),
+    cwd: APP_ROOT,
     stdio: 'inherit',
-    env: { ...process.env, LIVEPRAISE_PORT: String(SERVER_PORT) },
+    env: {
+      ...process.env,
+      ELECTRON_RUN_AS_NODE: '1',
+      LIVEPRAISE_PORT: String(SERVER_PORT),
+      LIVEPRAISE_APP_ROOT: APP_ROOT,
+    },
   });
 
   serverProcess.on('exit', (code) => {
@@ -42,18 +49,32 @@ function startServerProcess(): void {
   });
 }
 
-async function waitForServer(maxMs = 15000): Promise<void> {
+async function isCad194ServerReady(): Promise<boolean> {
+  const healthRes = await fetch(`http://127.0.0.1:${SERVER_PORT}/health`);
+  if (!healthRes.ok) return false;
+  const health = (await healthRes.json()) as { features?: { cad194?: boolean } };
+  if (health.features?.cad194 !== true) return false;
+
+  const pingRes = await fetch(`http://127.0.0.1:${SERVER_PORT}/video/importar/ping`);
+  if (!pingRes.ok) return false;
+  const ping = (await pingRes.json()) as { cad194?: boolean };
+  return ping.cad194 === true;
+}
+
+async function waitForServer(maxMs = SERVER_WAIT_MS): Promise<void> {
   const deadline = Date.now() + maxMs;
   while (Date.now() < deadline) {
     try {
-      const res = await fetch(`http://127.0.0.1:${SERVER_PORT}/health`);
-      if (res.ok) return;
+      if (await isCad194ServerReady()) return;
     } catch {
       // servidor ainda a subir
     }
     await new Promise((r) => setTimeout(r, 250));
   }
-  throw new Error(`Servidor não respondeu em ${maxMs}ms (porta ${SERVER_PORT})`);
+  throw new Error(
+    `Servidor CAD-194 indisponível em ${maxMs}ms (porta ${SERVER_PORT}). ` +
+      'Execute npm run build com Node 22+, encerre processos antigos na porta e use npm run dev.',
+  );
 }
 
 function createSplashWindow(): BrowserWindow {
@@ -102,6 +123,7 @@ async function launchWorkspace(): Promise<void> {
   });
 
   await displayManager.openAll();
+  displayManager.attachHotplugListeners();
   splashWindow?.close();
   splashWindow = null;
 }
@@ -116,6 +138,12 @@ app.whenReady().then(async () => {
     await launchWorkspace();
   } catch (err) {
     console.error('Falha ao iniciar Livepraise:', err);
+    if (serverProcess && !serverProcess.killed) {
+      serverProcess.kill();
+    }
+    serverProcess = null;
+    splashWindow?.close();
+    splashWindow = null;
     app.quit();
   }
 

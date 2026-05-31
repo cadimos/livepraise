@@ -1,14 +1,30 @@
 {
   "name": "high-contrast",
   "label": "Alto contraste (escuro)",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "colors": {
     "primary": "#0284c7",
     "background": "#000000",
     "surface": "#171717",
     "text": "#ffffff",
     "muted": "#cbd5e1",
-    "accent": "#fbbf24"
+    "accent": "#fbbf24",
+    "selection": {
+      "listBackground": "rgba(2, 132, 199, 0.45)",
+      "listText": "#ffffff",
+      "listHover": "rgba(2, 132, 199, 0.28)",
+      "listRing": "rgba(56, 189, 248, 0.75)",
+      "navBackground": "rgba(251, 191, 36, 0.28)",
+      "navText": "#ffffff",
+      "navHover": "rgba(251, 191, 36, 0.38)",
+      "navChipBackground": "rgba(251, 191, 36, 0.18)",
+      "navChipBorder": "rgba(251, 191, 36, 0.65)",
+      "navChipHover": "rgba(251, 191, 36, 0.32)",
+      "activeBackground": "rgba(16, 185, 129, 0.45)",
+      "activeText": "#ffffff",
+      "activeHover": "rgba(16, 185, 129, 0.32)",
+      "activeRing": "rgba(52, 211, 153, 0.75)"
+    }
   },
   "typography": {
     "fontFamily": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"

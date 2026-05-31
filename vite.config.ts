@@ -13,6 +13,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@shared': path.resolve(__dirname, 'shared'),
+      '@core': path.resolve(__dirname, 'core'),
     },
   },
 });

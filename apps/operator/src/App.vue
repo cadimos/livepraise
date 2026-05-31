@@ -9,7 +9,7 @@ import NotepadModal from './components/NotepadModal.vue';
 import AboutModal from './components/AboutModal.vue';
 import ApprovalQueue from './components/ApprovalQueue.vue';
 import SettingsModal from './components/SettingsModal.vue';
-import PreviewPanel from './components/PreviewPanel.vue';
+import MultiOutputPreviewColumn from './components/MultiOutputPreviewColumn.vue';
 import QuickBackgroundsStrip from './components/QuickBackgroundsStrip.vue';
 import { PREVIEW_COLUMN_WIDTH } from './constants/layout';
 import StatusBar from './components/StatusBar.vue';
@@ -23,8 +23,17 @@ import AppearancePanel from './components/panels/AppearancePanel.vue';
 import ApprovalsPanel from './components/panels/ApprovalsPanel.vue';
 import ErrorLogPanel from './components/panels/ErrorLogPanel.vue';
 import ShortcutsPanel from './components/panels/ShortcutsPanel.vue';
+import WorshipSettingsPanel from './components/panels/WorshipSettingsPanel.vue';
+import BibleSettingsPanel from './components/panels/BibleSettingsPanel.vue';
+import BackupRestorePanel from './components/panels/BackupRestorePanel.vue';
+import ProjectionTypographyPanel from './components/panels/ProjectionTypographyPanel.vue';
+import { useBackupRestore } from './composables/useBackupRestore';
+import ServiceTimerModal from './components/ServiceTimerModal.vue';
+import FooterAlertModal from './components/FooterAlertModal.vue';
 import { usePreferences, type OperatorPanel } from './composables/usePreferences';
+import { useFooterAlert } from './composables/useFooterAlert';
 import { connectLiveSocket, useLiveSocket } from './composables/useLiveSocket';
+import { startProjectionTypographySync } from './composables/useProjectionTypographySync';
 import { useShortcuts } from './composables/useShortcuts';
 import { useLocale } from './composables/useLocale';
 
@@ -32,7 +41,9 @@ const { t } = useI18n();
 const { prefs, setPanel } = usePreferences();
 const { refreshLocales } = useLocale();
 const { matches: matchesShortcut, shouldIgnoreGlobalShortcuts } = useShortcuts();
+const { backupMode } = useBackupRestore();
 const { toggleFrozen, sendAction } = useLiveSocket();
+const { previewPlayback } = useFooterAlert();
 
 const previewHtml = ref('');
 const previewBg = ref('');
@@ -51,6 +62,8 @@ function openEditSong(songId: number) {
 }
 const notepadOpen = ref(false);
 const aboutOpen = ref(false);
+const serviceTimerOpen = ref(false);
+const footerAlertOpen = ref(false);
 
 function toggleAbout(): void {
   aboutOpen.value = !aboutOpen.value;
@@ -88,12 +101,20 @@ const settingsTitle = computed(() => {
       return t('settings.users.title');
     case 'appearance':
       return t('settings.appearance.title');
+    case 'projectionTypography':
+      return t('settings.projectionTypography.title');
+    case 'worship':
+      return t('settings.worship.title');
+    case 'bible':
+      return t('settings.bible.title');
     case 'approvals':
       return t('settings.approvals.title');
     case 'errorLog':
       return t('settings.errorLog.title');
     case 'shortcuts':
       return t('settings.shortcuts.title');
+    case 'backupRestore':
+      return t('settings.backup.panelTitle');
     default:
       return '';
   }
@@ -135,6 +156,7 @@ function onQuickBackground(url: string) {
 
 onMounted(() => {
   connectLiveSocket();
+  startProjectionTypographySync();
   void refreshLocales();
   window.addEventListener('keydown', onGlobalKeydown);
 });
@@ -146,11 +168,20 @@ onUnmounted(() => {
 
 <template>
   <div class="flex h-screen flex-col overflow-hidden bg-lp-background font-lp text-lp-text">
+    <div
+      v-if="backupMode"
+      class="border-b border-amber-500/40 bg-amber-950/50 px-4 py-2 text-center text-sm text-amber-100"
+      role="status"
+    >
+      {{ t('settings.backup.globalBanner') }}
+    </div>
     <ActionBar
       @open-settings="openSettings"
       @open-new-song="openNewSong"
       @open-notepad="notepadOpen = true"
       @open-about="aboutOpen = true"
+      @open-service-timer="serviceTimerOpen = true"
+      @open-footer-alert="footerAlertOpen = true"
     />
     <ApprovalQueue />
 
@@ -186,28 +217,38 @@ onUnmounted(() => {
       </section>
 
       <aside
-        class="flex shrink-0 flex-col gap-2"
+        class="flex min-h-0 shrink-0 flex-col gap-2"
         :style="{ width: PREVIEW_COLUMN_WIDTH }"
       >
         <QuickBackgroundsStrip @preview-bg="onQuickBackground" @clear-preview="previewHtml = ''" />
-        <PreviewPanel :content-html="previewHtml" :background-url="previewBg" />
+        <MultiOutputPreviewColumn :footer-alert-preview="previewPlayback" />
       </aside>
     </div>
 
     <ChromeTabs />
-    <ChromeTabPanel @preview="onPreview" />
+    <ChromeTabPanel @preview="onPreview" @preview-bg="onPreviewBg" />
     <StatusBar @open-displays="openSettings('displays')" />
 
     <NewSongModal v-model:open="newSongOpen" v-model:edit-song-id="editSongId" />
     <NotepadModal v-model:open="notepadOpen" @preview="onPreview" />
     <AboutModal v-model:open="aboutOpen" />
+    <ServiceTimerModal v-model:open="serviceTimerOpen" />
+    <FooterAlertModal v-model:open="footerAlertOpen" />
 
-    <SettingsModal v-model:open="settingsOpen" :title="settingsTitle" :wide="settingsPanel === 'shortcuts'">
+    <SettingsModal
+      v-model:open="settingsOpen"
+      :title="settingsTitle"
+      :wide="settingsPanel === 'shortcuts' || settingsPanel === 'projectionTypography'"
+    >
       <DisplaysPanel v-if="settingsPanel === 'displays'" />
       <UsersPanel v-else-if="settingsPanel === 'users'" />
+      <WorshipSettingsPanel v-else-if="settingsPanel === 'worship'" />
+      <BibleSettingsPanel v-else-if="settingsPanel === 'bible'" />
       <AppearancePanel v-else-if="settingsPanel === 'appearance'" />
+      <ProjectionTypographyPanel v-else-if="settingsPanel === 'projectionTypography'" />
       <ApprovalsPanel v-else-if="settingsPanel === 'approvals'" />
       <ErrorLogPanel v-else-if="settingsPanel === 'errorLog'" />
+      <BackupRestorePanel v-else-if="settingsPanel === 'backupRestore'" />
       <ShortcutsPanel v-else-if="settingsPanel === 'shortcuts'" />
     </SettingsModal>
   </div>

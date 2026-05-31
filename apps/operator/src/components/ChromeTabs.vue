@@ -1,10 +1,27 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { AlertTriangle, X } from '@lucide/vue';
-import { usePreferences } from '../composables/usePreferences';
+import { AlertTriangle, Plus, X } from '@lucide/vue';
+import { usePreferences, type ChromeTab } from '../composables/usePreferences';
+import { useQueueDrag } from '../composables/useQueueDrag';
 
 const { t } = useI18n();
-const { prefs, setActiveTab, removeChromeTab } = usePreferences();
+const { prefs, setActiveTab, removeChromeTab, addBlankChromeTab } = usePreferences();
+const { onDragOver, handleDropOnTab } = useQueueDrag();
+
+const blankTabCount = computed(
+  () => prefs.value.chromeTabs.filter((tab) => !tab.songId && !(tab.items?.length)).length,
+);
+
+function createBlankTab(): ChromeTab {
+  const n = blankTabCount.value + 1;
+  return addBlankChromeTab(t('tabs.blankLabel', { n }));
+}
+
+function onNewBlankDrop(event: DragEvent): void {
+  const tab = createBlankTab();
+  handleDropOnTab(event, tab.id);
+}
 </script>
 
 <template>
@@ -26,6 +43,8 @@ const { prefs, setActiveTab, removeChromeTab } = usePreferences();
             ? 'border-amber-600/40 bg-amber-950/20 text-amber-100/90 hover:bg-amber-950/30'
             : 'border-transparent bg-lp-background/60 text-lp-muted hover:bg-lp-surface/50'
       "
+      @dragover="onDragOver"
+      @drop="handleDropOnTab($event, tab.id)"
     >
       <button type="button" class="min-h-11 min-w-0 flex-1 truncate text-left" @click="setActiveTab(tab.id)">
         <AlertTriangle
@@ -34,6 +53,7 @@ const { prefs, setActiveTab, removeChromeTab } = usePreferences();
           aria-hidden="true"
         />
         {{ tab.label }}
+        <span v-if="tab.items?.length" class="ml-1 text-xs text-lp-muted">({{ tab.items.length }})</span>
       </button>
       <button
         type="button"
@@ -44,6 +64,19 @@ const { prefs, setActiveTab, removeChromeTab } = usePreferences();
         <X class="h-4 w-4" aria-hidden="true" />
       </button>
     </div>
+
+    <button
+      type="button"
+      class="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-t-lg border border-dashed border-lp-surface px-3 py-1.5 text-sm text-lp-muted transition hover:border-lp-primary/50 hover:bg-lp-surface/50 hover:text-lp-text"
+      :title="t('tabs.newBlank')"
+      @click="createBlankTab()"
+      @dragover="onDragOver"
+      @drop="onNewBlankDrop"
+    >
+      <Plus class="h-4 w-4 shrink-0" aria-hidden="true" />
+      {{ t('tabs.newBlank') }}
+    </button>
+
     <p v-if="!prefs.chromeTabs.length" class="px-2 py-1.5 text-xs text-lp-muted">
       {{ t('tabs.empty') }}
     </p>

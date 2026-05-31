@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import { getMainDb } from '../db/connection.js';
 import { resolveSession } from '../../core/auth/sessions.js';
-import { isStaffRole } from '../../core/auth/roles.js';
+import { canAccessRemote, isStaffRole } from '../../core/auth/roles.js';
 import type { AuthContext, UserRole } from '../../core/auth/types.js';
 import { isLocalSocket } from './client-ip.js';
 import { jsonError } from './common.js';
@@ -74,6 +74,51 @@ export function requireRole(...roles: UserRole[]) {
  * Usado em `/api/users`, aprovações, chrome-tabs e error-log. Isenção baseada em
  * `socket.remoteAddress` (não `req.ip`/X-Forwarded-For) — ver `isLocalSocket`.
  */
+export function requireRemoteAccess(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  if (!req.auth) {
+    jsonError(res, 401, 'Autenticação obrigatória');
+    return;
+  }
+  if (!req.auth.user.active || !canAccessRemote(req.auth.user.role)) {
+    jsonError(res, 403, 'Permissão insuficiente');
+    return;
+  }
+  next();
+}
+
+/**
+ * CA-8 / CAD-238: rotas backup/restore — só `admin`.
+ * Loopback local (Electron) mantém bypass como admin implícito.
+ */
+export function requireAdminAccess(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  const token = readBearerToken(req);
+  if (token) {
+    const auth = resolveSession(getMainDb(), token);
+    if (auth?.user.active && auth.user.role === 'admin') {
+      req.auth = auth;
+      next();
+      return;
+    }
+    if (auth?.user.active) {
+      jsonError(res, 403, 'Permissão insuficiente');
+      return;
+    }
+  }
+  if (isLocalSocket(req)) {
+    next();
+    return;
+  }
+  jsonError(res, 401, 'Autenticação de administrador obrigatória');
+}
+
 export function requireOperatorAccess(
   req: Request,
   res: Response,

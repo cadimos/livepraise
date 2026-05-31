@@ -1,5 +1,20 @@
-const STORAGE_KEY = 'livepraise.externalDeviceId';
+import {
+  attachDisplayDebugOverlayListener,
+  updateLastActionBadge,
+} from '/shared/display-debug-overlay.js';
+import { resolveProjectionMediaUrl } from '/shared/projection-media-url.js';
+import { playProjectionVideo } from '/shared/projection-video-player.js';
+import { clearViewerStatus, setViewerStatus } from '/shared/viewer-status.js';
+import { ensureEndpointDeviceId } from '/shared/endpoint-device-id.js';
+import {
+  attachProjectionTypographyWs,
+  createProjectionTypographyController,
+  fetchProjectionTypographyPrefs,
+} from '/shared/projection-typography-runtime.js';
+
 const PROFILE = 'live';
+
+attachDisplayDebugOverlayListener();
 
 function wsUrl() {
   const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -7,12 +22,7 @@ function wsUrl() {
 }
 
 function ensureDeviceId() {
-  let id = localStorage.getItem(STORAGE_KEY);
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(STORAGE_KEY, id);
-  }
-  return id;
+  return ensureEndpointDeviceId(PROFILE);
 }
 
 function stripChordsForProjection(text) {
@@ -46,8 +56,52 @@ function byId(id) {
   return el;
 }
 
+/** CA-R21: /live não exibe fundo; remove vídeo/imagem para voltar ao preto. */
+function clearBackgroundMedia() {
+  const bgImg = byId('bg-image');
+  const videoWrap = byId('video-wrap');
+  const player = byId('player');
+  videoWrap.hidden = true;
+  player.pause();
+  player.removeAttribute('src');
+  player.load();
+  bgImg.hidden = true;
+  bgImg.removeAttribute('src');
+}
+
 const deviceId = ensureDeviceId();
 document.body.dataset.profile = PROFILE;
+
+const typography = createProjectionTypographyController({
+  rootEl: byId('conteudo'),
+  role: 'external-display',
+  externalProfile: PROFILE,
+  mode: 'output',
+});
+
+const statusEl = () => byId('last-action');
+let wsConnected = false;
+let hasProjectionContent = false;
+
+function refreshViewerStatus() {
+  if (document.body.dataset.displayDebug === 'true') {
+    return;
+  }
+  if (hasProjectionContent) {
+    clearViewerStatus(statusEl());
+    return;
+  }
+  if (!wsConnected) {
+    setViewerStatus(statusEl(), 'Reconectando…');
+    return;
+  }
+  setViewerStatus(
+    statusEl(),
+    hasProjectionContent
+      ? 'Ligado'
+      : 'Ligado — aguardando projeção do operador…',
+  );
+}
 
 async function registerDevice() {
   const res = await fetch(
@@ -64,12 +118,14 @@ function applyAction(action) {
 
   switch (action.acao) {
     case 'background':
-      return;
+    case 'limparFundo':
+      clearBackgroundMedia();
+      break;
     case 'video': {
       bgImg.hidden = true;
       videoWrap.hidden = false;
-      player.src = decodeURIComponent(action.valor);
-      void player.play();
+      player.src = resolveProjectionMediaUrl(action.valor);
+      void playProjectionVideo(player);
       break;
     }
     case 'texto':
@@ -81,22 +137,55 @@ function applyAction(action) {
       break;
     case 'removeConteudo':
       content.innerHTML = '';
+      hasProjectionContent = false;
       break;
     case 'atualizar':
       location.reload();
       break;
     case 'ajustarTela':
-      document.body.dataset.screen = action.valor;
+      /* /live ocupa viewport inteira — ajuste de tela é só do projetor */
       break;
     default:
       break;
   }
 
-  byId('last-action').textContent = `${action.acao} @ ${new Date().toLocaleTimeString()}`;
+  if (
+    action.acao === 'viewMusica' ||
+    action.acao === 'viewBiblia' ||
+    action.acao === 'texto'
+  ) {
+    hasProjectionContent = Boolean(
+      content.textContent?.trim() || content.innerHTML.trim(),
+    );
+  }
+
+  updateLastActionBadge(
+    statusEl(),
+    `${action.acao} @ ${new Date().toLocaleTimeString()}`,
+  );
+  typography.scheduleRefresh();
+  refreshViewerStatus();
 }
 
 function connect() {
+  wsConnected = false;
+  refreshViewerStatus();
+
   const socket = new WebSocket(wsUrl());
+  let handleWsMessage = (message) => {
+    if (message.type === 'joined') {
+      wsConnected = true;
+      refreshViewerStatus();
+      if (message.state?.lastAction) {
+        applyAction(message.state.lastAction);
+      }
+      return;
+    }
+    if (message.type === 'live-action') {
+      applyAction(message.action);
+    }
+  };
+  handleWsMessage = attachProjectionTypographyWs(typography, handleWsMessage);
 
   socket.addEventListener('open', () => {
     socket.send(
@@ -113,23 +202,23 @@ function connect() {
 
   socket.addEventListener('message', (event) => {
     const message = JSON.parse(String(event.data));
-    if (message.type === 'live-action') {
-      applyAction(message.action);
-    }
-    if (message.type === 'joined' && message.state?.lastAction) {
-      applyAction(message.state.lastAction);
-    }
+    handleWsMessage(message);
   });
 
   socket.addEventListener('close', () => {
+    wsConnected = false;
+    refreshViewerStatus();
     setTimeout(connect, 1500);
+  });
+
+  socket.addEventListener('error', () => {
+    socket.close();
   });
 }
 
-registerDevice()
-  .then(connect)
-  .catch((err) => {
-    console.error(err);
-    byId('last-action').textContent = 'Erro ao registar dispositivo';
-    setTimeout(connect, 3000);
-  });
+setViewerStatus(statusEl(), 'A ligar…');
+void registerDevice().catch((err) => {
+  console.warn('Registo dispositivo:', err);
+});
+void fetchProjectionTypographyPrefs().then((prefs) => typography.init(prefs));
+connect();

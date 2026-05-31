@@ -1,6 +1,16 @@
 const TOKEN_KEY = 'livepraise.auth.token';
 const USER_KEY = 'livepraise.auth.user';
 
+function saveSession(token, user) {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+function clearSession() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
 function readSession() {
   const token = localStorage.getItem(TOKEN_KEY);
   const rawUser = localStorage.getItem(USER_KEY);
@@ -16,33 +26,21 @@ function setStatus(text) {
   document.getElementById('status').textContent = text;
 }
 
-async function authHeaders() {
-  const session = readSession();
-  if (!session) return null;
-  const res = await fetch('/api/auth/session', {
-    headers: { Authorization: `Bearer ${session.token}` },
-  });
-  if (!res.ok) return null;
-  return { Authorization: `Bearer ${session.token}` };
+function showGate(message) {
+  document.getElementById('gate').hidden = false;
+  document.getElementById('gate-message').textContent = message;
+  document.getElementById('panel').hidden = true;
 }
 
-async function init() {
-  const session = readSession();
-  if (!session || session.user.role !== 'remote') {
-    document.getElementById('gate').hidden = false;
-    document.getElementById('panel').hidden = true;
-    return;
-  }
-
-  const headers = await authHeaders();
-  if (!headers) {
-    location.href = '/';
-    return;
-  }
-
+function showPanel(user, token) {
   document.getElementById('gate').hidden = true;
   document.getElementById('panel').hidden = false;
-  document.getElementById('user-name').textContent = session.user.username;
+  document.getElementById('user-name').textContent = user.username;
+
+  const authHeaders = () => ({
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  });
 
   document.getElementById('tab-form').addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -51,7 +49,7 @@ async function init() {
 
     const res = await fetch('/api/remote/chrome-tab', {
       method: 'POST',
-      headers: { ...headers, 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({ label, songName: songName || undefined }),
     });
     const data = await res.json();
@@ -69,7 +67,7 @@ async function init() {
 
     const res = await fetch('/api/remote/live-request', {
       method: 'POST',
-      headers: { ...headers, 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({ kind, payload }),
     });
     const data = await res.json();
@@ -79,6 +77,36 @@ async function init() {
         : data.error ?? 'Erro',
     );
   });
+}
+
+async function init() {
+  const session = readSession();
+  if (!session) {
+    showGate('Faça login no portal com perfil remoto.');
+    return;
+  }
+
+  const res = await fetch('/api/auth/session', {
+    headers: { Authorization: `Bearer ${session.token}` },
+  });
+
+  if (!res.ok) {
+    clearSession();
+    location.href = '/';
+    return;
+  }
+
+  const data = await res.json();
+  saveSession(session.token, data.user);
+
+  if (data.user.role !== 'remote' && data.user.role !== 'admin') {
+    showGate(
+      `Seu perfil (${data.user.role}) não tem acesso ao envio remoto. Entre com um usuário remoto ou peça ao administrador.`,
+    );
+    return;
+  }
+
+  showPanel(data.user, session.token);
 }
 
 void init();

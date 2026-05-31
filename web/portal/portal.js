@@ -22,6 +22,36 @@ function readSession() {
   }
 }
 
+function consumeReturnUrl() {
+  const params = new URLSearchParams(location.search);
+  const raw = params.get('return');
+  if (!raw) return null;
+  try {
+    const path = decodeURIComponent(raw);
+    if (!path.startsWith('/') || path.startsWith('//')) return null;
+    return path;
+  } catch {
+    return null;
+  }
+}
+
+function redirectAfterLogin(user) {
+  const returnTo = consumeReturnUrl();
+  if (!returnTo) return false;
+  if (returnTo.startsWith('/operator') && user.role !== 'operator' && user.role !== 'admin') {
+    return false;
+  }
+  if (
+    returnTo.startsWith('/remote') &&
+    user.role !== 'remote' &&
+    user.role !== 'admin'
+  ) {
+    return false;
+  }
+  location.replace(returnTo);
+  return true;
+}
+
 function showLoggedIn(user) {
   document.getElementById('login-section').hidden = true;
   document.getElementById('views-section').hidden = false;
@@ -29,8 +59,10 @@ function showLoggedIn(user) {
 
   const remoteLink = document.getElementById('remote-link');
   const operatorLink = document.getElementById('operator-link');
-  remoteLink.hidden = user.role !== 'remote';
-  operatorLink.hidden = user.role !== 'operator';
+  remoteLink.hidden = user.role !== 'remote' && user.role !== 'admin';
+  operatorLink.hidden = user.role !== 'operator' && user.role !== 'admin';
+
+  redirectAfterLogin(user);
 }
 
 async function verifyExistingSession() {

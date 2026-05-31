@@ -2,18 +2,37 @@ import {
   attachProjectionContrast,
   syncProjectionContentState,
 } from './projection-contrast.js';
+import {
+  attachDisplayDebugOverlayListener,
+  updateLastActionBadge,
+} from '/shared/display-debug-overlay.js';
+import { resolveProjectionMediaUrl } from '/shared/projection-media-url.js';
+import { clearProjectionVideoUnlock, playProjectionVideo } from '/shared/projection-video-player.js';
+import { playYoutubeProjection, stopYoutubeProjection } from './youtube-iframe-player.js';
+import { createFooterAlertOverlay } from '/shared/footer-alert-overlay.js';
+import { parseAjustarTelaPayload, buildAjustarTelaValor, normalizeContentFit } from '/shared/screen-layout.js';
+import { ensureEndpointDeviceId } from '/shared/endpoint-device-id.js';
+import { createServiceTimerOverlay } from '/shared/service-timer-overlay.js';
+import {
+  attachProjectionTypographyWs,
+  createProjectionTypographyController,
+  fetchProjectionTypographyPrefs,
+} from '/shared/projection-typography-runtime.js';
 
-/** Tipos locais do client projetor (espelham shared/types/live.ts). */
+attachDisplayDebugOverlayListener();
 
 type LiveActionName =
   | 'background'
   | 'texto'
   | 'video'
+  | 'youtube'
   | 'viewMusica'
   | 'viewBiblia'
   | 'removeConteudo'
   | 'atualizar'
-  | 'ajustarTela';
+  | 'ajustarTela'
+  | 'serviceTimer'
+  | 'footerAlert';
 
 interface LiveAction {
   acao: LiveActionName;
@@ -51,55 +70,132 @@ function projectorDisplayId(): number | null {
 }
 
 const LOCAL_DISPLAY_ID = projectorDisplayId();
+const LOCAL_DEVICE_ID =
+  LOCAL_DISPLAY_ID === null ? ensureEndpointDeviceId('projection') : null;
 
-function parseAjustarTelaPayload(valor: string): {
-  displayId: number | null;
-  size: string;
-} {
-  const pipe = valor.indexOf('|');
-  if (pipe < 0) {
-    return { displayId: null, size: valor };
+async function registerRemoteDevice(): Promise<void> {
+  if (!LOCAL_DEVICE_ID) return;
+  try {
+    await fetch(
+      `${location.origin}/api/devices/${encodeURIComponent(LOCAL_DEVICE_ID)}?profile=projection`,
+    );
+  } catch {
+    /* servidor pode ainda não estar pronto */
   }
-  const idPart = valor.slice(0, pipe);
-  const size = valor.slice(pipe + 1);
-  const displayId = Number.parseInt(idPart, 10);
-  return {
-    displayId: Number.isFinite(displayId) ? displayId : null,
-    size,
-  };
 }
 
-function shouldApplyScreenSize(valor: string): string | null {
-  const { displayId, size } = parseAjustarTelaPayload(valor);
-  if (displayId !== null && LOCAL_DISPLAY_ID !== null && displayId !== LOCAL_DISPLAY_ID) {
+const serviceTimerOverlay = createServiceTimerOverlay({
+  kind: 'display',
+  id: LOCAL_DISPLAY_ID !== null ? String(LOCAL_DISPLAY_ID) : (LOCAL_DEVICE_ID ?? ''),
+});
+
+const footerAlertOverlay = createFooterAlertOverlay({
+  kind: 'display',
+  id: LOCAL_DISPLAY_ID !== null ? String(LOCAL_DISPLAY_ID) : (LOCAL_DEVICE_ID ?? ''),
+});
+
+function shouldApplyScreenLayout(valor: string): ReturnType<typeof parseAjustarTelaPayload> | null {
+  const parsed = parseAjustarTelaPayload(valor);
+  if (parsed.deviceId !== null) {
+    if (LOCAL_DEVICE_ID === null || parsed.deviceId !== LOCAL_DEVICE_ID) {
+      return null;
+    }
+    return parsed;
+  }
+  if (
+    parsed.displayId !== null &&
+    LOCAL_DISPLAY_ID !== null &&
+    parsed.displayId !== LOCAL_DISPLAY_ID
+  ) {
     return null;
   }
-  return size;
+  if (parsed.displayId !== null && LOCAL_DISPLAY_ID === null && LOCAL_DEVICE_ID !== null) {
+    return null;
+  }
+  return parsed;
+}
+
+function applyScreenPosition(
+  position: string,
+  offsetX: number,
+  offsetY: number,
+): void {
+  const align =
+    position === 'topo' || position === 'personalizado' ? position : 'centro';
+  document.body.dataset.screenAlign = align;
+  const stage = byId<HTMLDivElement>('stage');
+  if (align === 'personalizado') {
+    stage.style.marginLeft = `${Math.max(0, offsetX)}px`;
+    stage.style.marginTop = `${Math.max(0, offsetY)}px`;
+  } else {
+    stage.style.marginLeft = '';
+    stage.style.marginTop = '';
+  }
+}
+
+function applyContentFit(contentFit: string): void {
+  document.body.dataset.contentFit = normalizeContentFit(contentFit);
 }
 
 async function applyStoredScreenSize(): Promise<void> {
-  if (LOCAL_DISPLAY_ID === null) return;
+  if (LOCAL_DISPLAY_ID !== null) {
+    try {
+      const res = await fetch(`${location.origin}/displays/config`);
+      if (!res.ok) return;
+      const data = (await res.json()) as {
+        config?: {
+          assignments?: Array<{
+            displayId: number;
+            screenSize?: {
+              preset: string;
+              largura: string;
+              altura: string;
+              position?: string;
+              offsetX?: string;
+              offsetY?: string;
+              contentFit?: string;
+            };
+          }>;
+        };
+      };
+      const assignment = data.config?.assignments?.find(
+        (a) => a.displayId === LOCAL_DISPLAY_ID,
+      );
+      const screen = assignment?.screenSize;
+      if (!screen) return;
+      applyScreenSize(buildAjustarTelaValor(screen.preset, screen.largura, screen.altura));
+      applyScreenPosition(screen.position ?? 'centro', Number.parseInt(screen.offsetX ?? '0', 10) || 0, Number.parseInt(screen.offsetY ?? '0', 10) || 0);
+      applyContentFit(screen.contentFit ?? 'estender');
+    } catch {
+      /* ignore */
+    }
+    return;
+  }
+
+  if (LOCAL_DEVICE_ID === null) return;
   try {
-    const res = await fetch(`${location.origin}/displays/config`);
+    const res = await fetch(
+      `${location.origin}/api/devices/${encodeURIComponent(LOCAL_DEVICE_ID)}`,
+    );
     if (!res.ok) return;
     const data = (await res.json()) as {
-      config?: {
-        assignments?: Array<{
-          displayId: number;
-          screenSize?: { preset: string; largura: string; altura: string };
-        }>;
+      device?: {
+        screenSize?: {
+          preset: string;
+          largura: string;
+          altura: string;
+          position?: string;
+          offsetX?: string;
+          offsetY?: string;
+          contentFit?: string;
+        } | null;
       };
     };
-    const assignment = data.config?.assignments?.find(
-      (a) => a.displayId === LOCAL_DISPLAY_ID,
-    );
-    const screen = assignment?.screenSize;
+    const screen = data.device?.screenSize;
     if (!screen) return;
-    const valor =
-      screen.preset === 'personalizado'
-        ? `${screen.largura.trim() || '0'}x${screen.altura.trim() || '0'}`
-        : screen.preset;
-    applyScreenSize(valor);
+    applyScreenSize(buildAjustarTelaValor(screen.preset, screen.largura, screen.altura));
+    applyScreenPosition(screen.position ?? 'centro', Number.parseInt(screen.offsetX ?? '0', 10) || 0, Number.parseInt(screen.offsetY ?? '0', 10) || 0);
+    applyContentFit(screen.contentFit ?? 'estender');
   } catch {
     /* ignore */
   }
@@ -168,25 +264,47 @@ function applyScreenSize(valor: string): void {
   document.body.dataset.screen = valor;
 }
 
+function hideBackgroundMedia(): void {
+  const bgImg = byId<HTMLImageElement>('bg-image');
+  const videoWrap = byId<HTMLDivElement>('video-wrap');
+  const player = byId<HTMLVideoElement>('player');
+  const youtubeWrap = byId<HTMLDivElement>('youtube-wrap');
+  videoWrap.hidden = true;
+  player.pause();
+  player.removeAttribute('src');
+  clearProjectionVideoUnlock(player);
+  youtubeWrap.hidden = true;
+  stopYoutubeProjection();
+  bgImg.hidden = true;
+}
+
 function applyAction(action: LiveAction): void {
   const content = byId<HTMLDivElement>('conteudo');
   const bgImg = byId<HTMLImageElement>('bg-image');
   const videoWrap = byId<HTMLDivElement>('video-wrap');
   const player = byId<HTMLVideoElement>('player');
+  const youtubeWrap = byId<HTMLDivElement>('youtube-wrap');
 
   switch (action.acao) {
     case 'background': {
-      videoWrap.hidden = true;
-      player.pause();
+      hideBackgroundMedia();
       bgImg.hidden = false;
-      bgImg.src = decodeURIComponent(action.valor);
+      bgImg.src = resolveProjectionMediaUrl(action.valor);
       break;
     }
     case 'video': {
+      hideBackgroundMedia();
       bgImg.hidden = true;
       videoWrap.hidden = false;
-      player.src = decodeURIComponent(action.valor);
-      void player.play();
+      player.src = resolveProjectionMediaUrl(action.valor);
+      void playProjectionVideo(player);
+      break;
+    }
+    case 'youtube': {
+      hideBackgroundMedia();
+      bgImg.hidden = true;
+      youtubeWrap.hidden = false;
+      void playYoutubeProjection(action.valor);
       break;
     }
     case 'texto': {
@@ -207,18 +325,34 @@ function applyAction(action: LiveAction): void {
       break;
     }
     case 'ajustarTela': {
-      const size = shouldApplyScreenSize(action.valor);
-      if (size !== null) applyScreenSize(size);
+      const layout = shouldApplyScreenLayout(action.valor);
+      if (layout !== null) {
+        applyScreenSize(layout.size);
+        applyScreenPosition(layout.position, layout.offsetX, layout.offsetY);
+        applyContentFit(layout.contentFit);
+      }
       break;
+    }
+    case 'serviceTimer': {
+      serviceTimerOverlay.applyValor(action.valor);
+      return;
+    }
+    case 'footerAlert': {
+      footerAlertOverlay.applyValor(action.valor);
+      return;
     }
   }
 
   const badge = byId<HTMLElement>('last-action');
-  badge.textContent = `${action.acao} @ ${new Date().toLocaleTimeString()}`;
+  updateLastActionBadge(
+    badge,
+    `${action.acao} @ ${new Date().toLocaleTimeString()}`,
+  );
   syncProjectionContentState(
     byId<HTMLDivElement>('stage'),
     content,
   );
+  typography.scheduleRefresh();
 }
 
 const projectionContrast = attachProjectionContrast({
@@ -229,17 +363,29 @@ const projectionContrast = attachProjectionContrast({
 });
 void projectionContrast;
 
+const typography = createProjectionTypographyController({
+  rootEl: byId<HTMLDivElement>('conteudo'),
+  role: 'projector',
+  mode: 'output',
+});
+
 function connect(): WebSocket {
   const socket = new WebSocket(wsUrl());
+  let handleWsMessage: (message: WsServerMessage) => void = () => {};
 
   socket.addEventListener('open', () => {
-    socket.send(
-      JSON.stringify({ type: 'join', role: 'projector', name: 'Projetor' }),
-    );
+    const join: Record<string, string> = {
+      type: 'join',
+      role: 'projector',
+      name: 'Projetor',
+    };
+    if (LOCAL_DEVICE_ID) {
+      join.deviceId = LOCAL_DEVICE_ID;
+    }
+    socket.send(JSON.stringify(join));
   });
 
-  socket.addEventListener('message', (event) => {
-    const message = JSON.parse(event.data as string) as WsServerMessage;
+  handleWsMessage = attachProjectionTypographyWs(typography, (message) => {
     if (message.type === 'live-action') {
       applyAction((message as WsLiveBroadcastMessage).action);
     }
@@ -247,6 +393,11 @@ function connect(): WebSocket {
       const last = (message as WsJoinedMessage).state.lastAction;
       if (last) applyAction(last);
     }
+  });
+
+  socket.addEventListener('message', (event) => {
+    const message = JSON.parse(event.data as string) as WsServerMessage;
+    handleWsMessage(message);
   });
 
   socket.addEventListener('close', () => {
@@ -257,6 +408,7 @@ function connect(): WebSocket {
 }
 
 connect();
-void applyStoredScreenSize();
+void registerRemoteDevice().then(() => applyStoredScreenSize());
+void fetchProjectionTypographyPrefs().then((prefs) => typography.init(prefs));
 
 export {};

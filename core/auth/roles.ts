@@ -20,6 +20,11 @@ export function isStaffRole(role: UserRole): boolean {
   return role === 'operator' || role === 'admin';
 }
 
+/** Envio remoto (UI `/remote`, API `/api/remote/*`, WS `remote-operator`). */
+export function canAccessRemote(role: UserRole): boolean {
+  return role === 'remote' || role === 'admin';
+}
+
 export function allowedDisplayRolesForUser(role: UserRole): DisplayRole[] {
   if (role === 'admin') return [...DISPLAY_ROLES_ALL];
   if (role === 'operator') return [...DISPLAY_ROLES_OPERATOR];

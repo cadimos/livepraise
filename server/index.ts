@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { createServer, type Server } from 'node:http';
 import { ensureDefaultAdmin } from '../core/auth/users.js';
 import { ensureLivepraiseDataDir } from './bootstrap.js';
+import { syncBundledFontsToHome } from '../core/fonts/sync.js';
+import { syncBundledThemesToHome } from '../core/themes/sync.js';
 import { DEFAULT_PORT, getLivepraiseHome } from './config/paths.js';
 import { closeMainDb, getMainDb } from './db/connection.js';
 import { runMigrations } from './db/migrate.js';
@@ -13,6 +15,7 @@ import { createBackgroundRouter, createBibleRouter } from './routes/bible.js';
 import { createDisplayRouter } from './routes/display.js';
 import { createDisplaysConfigRouter } from './routes/displays-config.js';
 import { createImageRouter, createVideoRouter } from './routes/media.js';
+import { createQueueImportRouter } from './routes/queue-import.js';
 import { createLocalesRouter } from './routes/locales.js';
 import { createMusicRouter } from './routes/music.js';
 import { createPlaylistRouter } from './routes/playlist.js';
@@ -21,7 +24,12 @@ import { createAuthRouter } from './routes/auth.js';
 import { createUsersRouter } from './routes/users.js';
 import { createRemoteRouter } from './routes/remote.js';
 import { createDevicesRouter } from './routes/devices.js';
+import { createBackupRouter, createRestoreRouter } from './routes/backup.js';
+import { backupModeGuard } from './middleware/backup-mode.js';
+import { createFontsRouter } from './routes/fonts.js';
+import { createProjectionTypographyRouter } from './routes/projection-typography.js';
 import { createSystemRouter, errorLogMiddleware, registerProcessErrorHandlers } from './routes/system.js';
+import { buildHealthReport } from './health.js';
 import {
   attachLiveWebSocket,
   LIVE_WS_PATH,
@@ -29,7 +37,9 @@ import {
 } from './websocket/index.js';
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
-const appRoot = path.resolve(moduleDir, '../..');
+const appRoot = process.env.LIVEPRAISE_APP_ROOT
+  ? path.resolve(process.env.LIVEPRAISE_APP_ROOT)
+  : path.resolve(moduleDir, '../..');
 
 export interface LivepraiseServer {
   app: Express;
@@ -42,6 +52,8 @@ let activeServer: LivepraiseServer | null = null;
 
 export async function prepareDatabase(): Promise<number> {
   await ensureLivepraiseDataDir();
+  await syncBundledThemesToHome();
+  await syncBundledFontsToHome();
   const applied = runMigrations();
   const bootstrap = ensureDefaultAdmin(getMainDb());
   if (bootstrap) {
@@ -62,16 +74,20 @@ export async function createLivepraiseApp(
   app.set('trust proxy', 1);
   app.use(cors());
   app.use(compression());
-  app.use(express.json());
+  app.use(express.json({ limit: '4mb' }));
   app.use(express.urlencoded({ extended: false }));
+  app.use(backupModeGuard);
 
   const home = getLivepraiseHome();
+  app.use('/fonts', createFontsRouter());
   app.use('/imagens', express.static(path.join(home, 'imagens')));
   app.use('/videos', express.static(path.join(home, 'videos')));
 
   app.use('/musica', createMusicRouter());
   app.use('/playlist', createPlaylistRouter());
   app.use('/biblias', createBibleRouter());
+  const queueImportRouter = createQueueImportRouter();
+  app.use('/api/queue', queueImportRouter);
   app.use('/imagem', createImageRouter());
   app.use('/video', createVideoRouter());
   app.use('/display', createDisplayRouter());
@@ -83,13 +99,24 @@ export async function createLivepraiseApp(
   app.use('/api/auth', createAuthRouter());
   app.use('/api/users', createUsersRouter());
   app.use('/api/system', createSystemRouter());
+  app.use('/api/projection-typography', createProjectionTypographyRouter(liveHub));
   if (liveHub) {
     app.use('/api/remote', createRemoteRouter(liveHub));
   }
   app.use('/api/devices', createDevicesRouter());
+  app.use('/api/backup', createBackupRouter());
+  app.use('/api/restore', createRestoreRouter());
+
+  app.get('/api/health', (_req, res) => {
+    res.json(buildHealthReport(Boolean(liveHub)));
+  });
 
   app.use(
     '/projector',
+    (req, res, next) => {
+      res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+      next();
+    },
     express.static(path.join(appRoot, 'apps/projector'), {
       index: 'index.html',
     }),
@@ -98,23 +125,61 @@ export async function createLivepraiseApp(
   app.get('/stage-return', (_req, res) => res.redirect(302, '/stage/'));
   app.get('/stage-return/', (_req, res) => res.redirect(302, '/stage/'));
 
-  app.use(
-    '/live',
-    express.static(path.join(appRoot, 'web/live'), { index: 'index.html' }),
-  );
+  app.use('/shared', express.static(path.join(appRoot, 'shared')));
 
-  const externalDisplayRoot = path.join(appRoot, 'web/external-display');
-  for (const route of ['/vocal', '/stage', '/player'] as const) {
+  const publicViewerRoutes = [
+    { mount: '/live', root: path.join(appRoot, 'web/live') },
+    {
+      mount: '/vocal',
+      root: path.join(appRoot, 'web/external-display'),
+    },
+    {
+      mount: '/stage',
+      root: path.join(appRoot, 'web/external-display'),
+    },
+    {
+      mount: '/player',
+      root: path.join(appRoot, 'web/external-display'),
+    },
+  ] as const;
+
+  for (const { mount, root } of publicViewerRoutes) {
+    app.get([mount, `${mount}/`], (_req, res) => {
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+      res.sendFile(path.join(root, 'index.html'));
+    });
     app.use(
-      route,
-      express.static(externalDisplayRoot, { index: 'index.html' }),
+      mount,
+      (req, res, next) => {
+        res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+        next();
+      },
+      express.static(root, {
+        index: false,
+        setHeaders(res, filePath) {
+          if (filePath.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-store');
+          }
+        },
+      }),
     );
   }
 
+  const operatorRoot = path.join(appRoot, 'dist/apps/operator');
+  app.get(['/operator', '/operator/'], (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.sendFile(path.join(operatorRoot, 'index.html'));
+  });
   app.use(
     '/operator',
-    express.static(path.join(appRoot, 'dist/apps/operator'), {
-      index: 'index.html',
+    express.static(operatorRoot, {
+      index: false,
+      setHeaders(res, filePath) {
+        if (filePath.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'no-store');
+        }
+      },
     }),
   );
 
@@ -133,11 +198,7 @@ export async function createLivepraiseApp(
   );
 
   app.get('/health', (_req, res) => {
-    res.json({
-      status: 'ok',
-      phase: 'fase-8-release',
-      websocket: LIVE_WS_PATH,
-    });
+    res.json(buildHealthReport(Boolean(liveHub)));
   });
 
   const openApiPath = path.join(appRoot, 'openapi.yaml');
@@ -189,7 +250,18 @@ export async function startLivepraiseServer(
 
   bootstrapApp.use(app);
 
-  await new Promise<void>((resolve) => {
+  await new Promise<void>((resolve, reject) => {
+    httpServer.once('error', (err: NodeJS.ErrnoException) => {
+      if (err.code === 'EADDRINUSE') {
+        reject(
+          new Error(
+            `Porta ${port} já em uso. Encerre outro processo Livepraise (ou node dist/server/index.js) antes de reiniciar.`,
+          ),
+        );
+        return;
+      }
+      reject(err);
+    });
     httpServer.listen(port, () => resolve());
   });
 

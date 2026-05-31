@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CAD-308 mock — Tipografia de projeção (settings)</title>
+  <link rel="stylesheet" href="../../shared/projection-layout.css" />
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --lp-bg: #0f172a;
+      --lp-surface: #1e293b;
+      --lp-text: #f1f5f9;
+      --lp-muted: #94a3b8;
+      --lp-primary: #3b82f6;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, sans-serif;
+      background: #020617;
+      color: var(--lp-text);
+      padding: 1rem;
+    }
+    h1 { margin: 0 0 0.25rem; font-size: 1.125rem; font-weight: 600; }
+    .intro { margin: 0 0 1rem; font-size: 0.875rem; color: var(--lp-muted); max-width: 72ch; }
+    .modal {
+      max-width: 56rem;
+      margin: 0 auto;
+      border-radius: 0.75rem;
+      border: 1px solid var(--lp-surface);
+      background: var(--lp-bg);
+      box-shadow: 0 25px 50px rgb(0 0 0 / 0.45);
+      overflow: hidden;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--lp-surface);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .modal-body { padding: 1rem; max-height: 85vh; overflow-y: auto; }
+    .tabs {
+      display: flex;
+      gap: 0.25rem;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--lp-surface);
+      margin-bottom: 1rem;
+      padding-bottom: 0;
+    }
+    .tab {
+      flex-shrink: 0;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8125rem;
+      border: none;
+      background: none;
+      color: var(--lp-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .tab.active { color: var(--lp-text); border-bottom-color: var(--lp-primary); font-weight: 500; }
+    .layout {
+      display: grid;
+      gap: 1.5rem;
+    }
+    @media (min-width: 1024px) {
+      .layout { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); }
+    }
+    fieldset {
+      border: none;
+      margin: 0 0 1.25rem;
+      padding: 0;
+    }
+    legend {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--lp-muted);
+      margin-bottom: 0.75rem;
+    }
+    label { display: flex; flex-direction: column; gap: 0.375rem; margin-bottom: 0.75rem; font-size: 0.875rem; }
+    label span.lbl { font-weight: 500; }
+    select, input[type="number"] {
+      border-radius: 0.375rem;
+      border: 1px solid var(--lp-surface);
+      background: var(--lp-bg);
+      color: var(--lp-text);
+      padding: 0.375rem 0.5rem;
+      font-size: 0.875rem;
+    }
+    .hint { font-size: 0.75rem; color: var(--lp-muted); margin: -0.25rem 0 0.75rem; }
+    .warn {
+      border-radius: 0.375rem;
+      border: 1px solid rgb(245 158 11 / 0.4);
+      background: rgb(69 26 3 / 0.4);
+      color: #fef3c7;
+      font-size: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .warn.hidden { display: none; }
+    .segmented {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+    }
+    .segmented button {
+      border-radius: 0.375rem;
+      border: 1px solid var(--lp-surface);
+      background: transparent;
+      color: var(--lp-text);
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8125rem;
+      cursor: pointer;
+    }
+    .segmented button.active {
+      background: var(--lp-primary);
+      border-color: var(--lp-primary);
+      color: #fff;
+      font-weight: 500;
+    }
+    .row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .row input[type="checkbox"] { width: 1rem; height: 1rem; }
+    .range-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .range-row label { flex: 1; margin: 0; flex-direction: row; align-items: center; gap: 0.5rem; }
+    .range-row input[type="range"] { flex: 1; min-width: 0; }
+    .range-row .val { width: 2.5rem; text-align: right; font-size: 0.75rem; color: var(--lp-muted); font-variant-numeric: tabular-nums; }
+    .shadow-card {
+      border-radius: 0.5rem;
+      border: 1px solid var(--lp-surface);
+      background: rgb(30 41 59 / 0.35);
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .shadow-card h4 { margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--lp-muted); }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .btn {
+      border-radius: 0.375rem;
+      border: 1px solid var(--lp-surface);
+      background: transparent;
+      color: var(--lp-text);
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8125rem;
+      cursor: pointer;
+    }
+    .btn:hover { background: rgb(30 41 59 / 0.6); }
+    .preview-col { position: sticky; top: 0; }
+    .preview-col h3 { margin: 0 0 0.5rem; font-size: 0.75rem; font-weight: 600; color: var(--lp-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .sample-btns { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 0.5rem; }
+    .sample-btns button {
+      border-radius: 9999px;
+      border: 1px solid var(--lp-surface);
+      background: transparent;
+      color: var(--lp-muted);
+      padding: 0.25rem 0.625rem;
+      font-size: 0.6875rem;
+      cursor: pointer;
+    }
+    .sample-btns button.active { background: var(--lp-surface); color: var(--lp-text); }
+    .projection-preview-frame {
+      container-type: size;
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      border-radius: 0.75rem;
+      border: 1px solid var(--lp-surface);
+      overflow: hidden;
+      background: #000;
+      box-shadow: inset 0 2px 8px rgb(0 0 0 / 0.4);
+      position: relative;
+    }
+    .preview-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #312e81 100%);
+    }
+    .text-scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgb(0 0 0 / 0.12) 0%, rgb(0 0 0 / 0.42) 55%, rgb(0 0 0 / 0.72) 100%);
+    }
+    .conteudo {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      color: #f8fafc;
+    }
+    .preview-foot { margin-top: 0.5rem; font-size: 0.75rem; color: var(--lp-muted); }
+    .layers.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>CAD-308 — Tipografia de projeção (mock settings)</h1>
+  <p class="intro">Mock interactivo da spec UX: painel dedicado, tabs por perfil, segmented estilo, sombra em camadas, prévia ao vivo com textfill simulado.</p>
+
+  <div class="modal" role="dialog" aria-label="Tipografia de projeção">
+    <div class="modal-header">
+      <span>Tipografia de projeção</span>
+      <span aria-hidden="true" style="color: var(--lp-muted);">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab active" data-profile="Projetor">Projetor</button>
+        <button type="button" class="tab" data-profile="Retorno palco">Retorno palco</button>
+        <button type="button" class="tab" data-profile="Live">Live</button>
+        <button type="button" class="tab" data-profile="Vocal">Vocal</button>
+        <button type="button" class="tab" data-profile="Palco">Palco</button>
+        <button type="button" class="tab" data-profile="Player">Player</button>
+      </div>
+
+      <div class="layout">
+        <div class="controls">
+          <p class="hint" style="margin-bottom: 1rem;">Configure fonte, tamanho e sombra do texto projectado para cada destino.</p>
+
+          <fieldset>
+            <legend>Fonte</legend>
+            <label>
+              <span class="lbl">Origem da fonte</span>
+              <select id="fontSource">
+                <option value="bundled">Fontes do Live Praise</option>
+                <option value="system">Fontes do sistema</option>
+              </select>
+            </label>
+            <div id="systemWarn" class="warn hidden">Fontes do sistema dependem do equipamento que projecta. Tablets ou PCs remotos podem não ter a mesma fonte instalada.</div>
+            <label>
+              <span class="lbl">Família tipográfica</span>
+              <select id="fontFamily">
+                <optgroup label="Fontes do Live Praise">
+                  <option value="Roboto">Roboto</option>
+                  <option value="Source Sans 3">Source Sans 3</option>
+                  <option value="Lato">Lato</option>
+                  <option value="Open Sans">Open Sans</option>
+                </optgroup>
+                <optgroup label="Fontes do sistema">
+                  <option value="Arial">Arial</option>
+                  <option value="Helvetica">Helvetica</option>
+                </optgroup>
+              </select>
+            </label>
+            <span class="lbl" style="display:block;margin-bottom:0.375rem;">Estilo</span>
+            <div class="segmented" role="group" aria-label="Estilo">
+              <button type="button" class="active" data-weight="400" data-style="normal">Normal</button>
+              <button type="button" data-weight="700" data-style="normal">Negrito</button>
+              <button type="button" data-weight="400" data-style="italic">Itálico</button>
+              <button type="button" data-weight="700" data-style="italic">Negrito itálico</button>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Tamanho</legend>
+            <label>
+              <span class="lbl">Tamanho mínimo (px)</span>
+              <input type="number" id="minPx" value="24" min="8" max="400" />
+            </label>
+            <label>
+              <span class="lbl">Tamanho máximo (px)</span>
+              <input type="number" id="maxPx" value="120" min="8" max="400" />
+            </label>
+            <p class="hint">Na saída real o texto cresce até ao máximo que couber na área útil.</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Auto-ajuste</legend>
+            <div class="row">
+              <input type="checkbox" id="textfill" checked />
+              <label for="textfill" style="margin:0;flex-direction:row;align-items:center;gap:0.5rem;">
+                <span>Auto-ajustar texto para caber</span>
+              </label>
+            </div>
+            <p class="hint">Reduz ou aumenta a fonte para evitar scroll e corte.</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Sombra no texto</legend>
+            <div class="row">
+              <input type="checkbox" id="shadowEnabled" checked />
+              <label for="shadowEnabled" style="margin:0;flex-direction:row;align-items:center;gap:0.5rem;">
+                <span>Usar sombra no texto</span>
+              </label>
+            </div>
+            <div id="layersPanel" class="layers">
+              <p class="hint" style="margin-top:0.5rem;">Camadas de sombra</p>
+              <div id="layerCards"></div>
+              <div class="btn-row">
+                <button type="button" class="btn" id="addLayer">Adicionar camada</button>
+                <button type="button" class="btn" id="removeLayer">Remover última</button>
+                <button type="button" class="btn" id="restoreShadow">Restaurar padrão</button>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="preview-col">
+          <h3>Prévia</h3>
+          <div class="sample-btns">
+            <button type="button" class="active" data-sample="worship">Louvor longo</button>
+            <button type="button" data-sample="bible">Bíblia</button>
+            <button type="button" data-sample="notes">Notas curtas</button>
+          </div>
+          <div class="projection-preview-frame">
+            <div class="preview-bg"></div>
+            <div class="text-scrim"></div>
+            <div id="previewContent" class="conteudo"></div>
+          </div>
+          <p class="preview-foot" id="previewFoot">Prévia: o texto cabe nesta área. Em Projetor a fonte pode ser maior.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_LAYERS = [
+      { x: 2, y: 2, blur: 0, color: '#000000' },
+      { x: 3, y: 3, blur: 0, color: '#000000' },
+      { x: 5, y: 5, blur: 0, color: '#000000' },
+      { x: 6, y: 6, blur: 0, color: '#000000' },
+    ];
+    let layers = structuredClone(DEFAULT_LAYERS);
+    let activeProfile = 'Projetor';
+    let activeSample = 'worship';
+    let fontWeight = 400;
+    let fontStyle = 'normal';
+
+    const samples = {
+      worship: `<div class="titulo"></div><div class="content"><span>Em cada estação do meu caminho<br>Tu estás comigo, não me deixas só<br>Quando a noite cai e o medo vem<br>Tua luz dissipa toda escuridão<br><br>Confio no Teu amor que não falha<br>Confio na Tua mão que me guia<br>Mesmo em provas, mesmo em dor<br>Sei que és o meu Senhor<br><br>Senhor, eu sei que Tu és fiel</span></div><div class="rodape">Exemplo de louvor (Artista)</div>`,
+      bible: `<div class="titulo">Salmos 23:1</div><div class="content"><span>O Senhor é o meu pastor; nada me faltará.</span></div><div class="rodape"></div>`,
+      notes: `<div class="titulo"></div><div class="content"><span>Intervalo — 5 min</span></div><div class="rodape"></div>`,
+    };
+
+    function renderLayerCards() {
+      const wrap = document.getElementById('layerCards');
+      wrap.innerHTML = layers.map((L, i) => `
+        <div class="shadow-card" data-idx="${i}">
+          <h4>Camada ${i + 1}</h4>
+          <div class="range-row"><label>X <input type="range" min="-20" max="20" value="${L.x}" data-field="x" data-idx="${i}"><span class="val">${L.x}</span></label></div>
+          <div class="range-row"><label>Y <input type="range" min="-20" max="20" value="${L.y}" data-field="y" data-idx="${i}"><span class="val">${L.y}</span></label></div>
+          <div class="range-row"><label>Blur <input type="range" min="0" max="20" value="${L.blur}" data-field="blur" data-idx="${i}"><span class="val">${L.blur}</span></label></div>
+          <label><span class="lbl">Cor</span><input type="color" value="${L.color}" data-field="color" data-idx="${i}"></label>
+        </div>
+      `).join('');
+      wrap.querySelectorAll('input').forEach((inp) => {
+        inp.addEventListener('input', (e) => {
+          const idx = +e.target.dataset.idx;
+          const field = e.target.dataset.field;
+          layers[idx][field] = field === 'color' ? e.target.value : +e.target.value;
+          e.target.closest('.range-row')?.querySelector('.val') && (e.target.closest('.range-row').querySelector('.val').textContent = layers[idx][field]);
+          updatePreview();
+        });
+      });
+    }
+
+    function shadowCss() {
+      if (!document.getElementById('shadowEnabled').checked) return 'none';
+      return layers.map((L) => `${L.x}px ${L.y}px ${L.blur}px ${L.color}`).join(', ');
+    }
+
+    function textfillPreview(contentEl, minPx, maxPx, enabled) {
+      const span = contentEl.querySelector('.content span') || contentEl.querySelector('.content');
+      if (!span) return;
+      const box = contentEl.querySelector('.content') || contentEl;
+      if (!enabled) {
+        span.style.fontSize = maxPx + 'px';
+        return;
+      }
+      let lo = minPx, hi = maxPx, best = minPx;
+      span.style.fontSize = hi + 'px';
+      while (lo <= hi) {
+        const mid = Math.floor((lo + hi) / 2);
+        span.style.fontSize = mid + 'px';
+        if (box.scrollHeight <= box.clientHeight && box.scrollWidth <= box.clientWidth) {
+          best = mid;
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
+      }
+      span.style.fontSize = best + 'px';
+    }
+
+    function updatePreview() {
+      const el = document.getElementById('previewContent');
+      el.innerHTML = samples[activeSample];
+      const family = document.getElementById('fontFamily').value;
+      const minPx = +document.getElementById('minPx').value;
+      const maxPx = +document.getElementById('maxPx').value;
+      const textfill = document.getElementById('textfill').checked;
+      el.style.fontFamily = family + ', sans-serif';
+      el.style.fontWeight = String(fontWeight);
+      el.style.fontStyle = fontStyle;
+      const content = el.querySelector('.content');
+      if (content) {
+        content.style.textShadow = shadowCss();
+        requestAnimationFrame(() => textfillPreview(el, minPx, maxPx, textfill));
+      }
+      document.getElementById('previewFoot').textContent =
+        `Prévia: o texto cabe nesta área. Em ${activeProfile} a fonte pode ser maior.`;
+    }
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeProfile = tab.dataset.profile;
+        updatePreview();
+      });
+    });
+
+    document.querySelectorAll('.sample-btns button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sample-btns button').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeSample = btn.dataset.sample;
+        updatePreview();
+      });
+    });
+
+    document.querySelectorAll('.segmented button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.segmented button').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        fontWeight = +btn.dataset.weight;
+        fontStyle = btn.dataset.style;
+        updatePreview();
+      });
+    });
+
+    document.getElementById('fontSource').addEventListener('change', (e) => {
+      document.getElementById('systemWarn').classList.toggle('hidden', e.target.value !== 'system');
+      updatePreview();
+    });
+
+    ['fontFamily', 'minPx', 'maxPx', 'textfill', 'shadowEnabled'].forEach((id) => {
+      document.getElementById(id).addEventListener('change', () => {
+        document.getElementById('layersPanel').classList.toggle('hidden', !document.getElementById('shadowEnabled').checked);
+        updatePreview();
+      });
+      document.getElementById(id).addEventListener('input', updatePreview);
+    });
+
+    document.getElementById('addLayer').addEventListener('click', () => {
+      layers.push({ x: 0, y: 0, blur: 0, color: '#000000' });
+      renderLayerCards();
+      updatePreview();
+    });
+    document.getElementById('removeLayer').addEventListener('click', () => {
+      if (layers.length > 1) layers.pop();
+      renderLayerCards();
+      updatePreview();
+    });
+    document.getElementById('restoreShadow').addEventListener('click', () => {
+      layers = structuredClone(DEFAULT_LAYERS);
+      renderLayerCards();
+      updatePreview();
+    });
+
+    renderLayerCards();
+    updatePreview();
+  </script>
+</body>
+</html>

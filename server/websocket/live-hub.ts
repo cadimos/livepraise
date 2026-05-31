@@ -1,119 +1,39 @@
 import type { Server } from 'node:http';
 import type { Socket } from 'node:net';
 import { WebSocketServer, WebSocket } from 'ws';
+import { canAccessRemote, isStaffRole } from '../../core/auth/roles.js';
 import { resolveSession } from '../../core/auth/sessions.js';
 import { getMainDb } from '../db/connection.js';
 import { isLoopbackAddress } from '../middleware/client-ip.js';
-import { createLiveStateStore, type LiveStateStore } from '../../core/live-state/index.js';
-import { parseLiveAction, sanitizeLiveAction } from '../../core/projection/index.js';
+import { getLivepraiseHome } from '../config/paths.js';
 import {
-  STAGE_RETURN_ACTIONS,
-  type ClientRole,
-  type ExternalDisplayProfile,
-  type LiveAction,
-  type LiveActionName,
-  type WsClientMessage,
-  type WsDevicePresenceMessage,
-  type WsLiveBroadcastMessage,
-  type WsServerMessage,
+  clearPersistedProjectionBackground,
+  createLiveStateStore,
+  loadPersistedProjectionBackground,
+  savePersistedProjectionBackground,
+  type LiveStateStore,
+} from '../../core/live-state/index.js';
+import { parseLiveAction, sanitizeLiveAction } from '../../core/projection/index.js';
+import { effectiveDeliveryAction } from '../../shared/live-delivery.js';
+import type {
+  ClientRole,
+  ExternalDisplayProfile,
+  LiveAction,
+  WsClientMessage,
+  WsDevicePresenceMessage,
+  WsLiveBroadcastMessage,
+  WsProjectionTypographySyncMessage,
+  WsServerMessage,
 } from '../../shared/types/live.js';
 import {
   getExternalDevice,
   isExternalDisplayProfile,
   touchExternalDevice,
 } from '../../core/devices/external-devices.js';
-
-const STAGE_ONLY = new Set<string>(STAGE_RETURN_ACTIONS);
-const PROJECTOR_ONLY = new Set<string>(['viewMusica', 'viewBiblia']);
-
-const SHARED_ACTIONS = new Set<string>([
-  'background',
-  'texto',
-  'video',
-  'removeConteudo',
-  'atualizar',
-  'ajustarTela',
-]);
-
-/** CA-R21: /live omite fundos (imagens/vídeos de background). */
-const LIVE_VIEWER_SKIP = new Set<string>(['background']);
-
-function externalDisplayReceives(
-  profile: ExternalDisplayProfile,
-  acao: LiveActionName,
-): boolean {
-  if (profile === 'live') {
-    if (STAGE_ONLY.has(acao) || acao === 'background') return false;
-    return (
-      PROJECTOR_ONLY.has(acao) ||
-      SHARED_ACTIONS.has(acao) ||
-      acao === 'removeConteudo' ||
-      acao === 'atualizar'
-    );
-  }
-  if (profile === 'vocal') {
-    if (STAGE_ONLY.has(acao) || acao === 'background' || acao === 'video') {
-      return false;
-    }
-    return (
-      PROJECTOR_ONLY.has(acao) ||
-      SHARED_ACTIONS.has(acao) ||
-      acao === 'removeConteudo' ||
-      acao === 'atualizar'
-    );
-  }
-  if (profile === 'stage') {
-    return (
-      STAGE_ONLY.has(acao) ||
-      acao === 'removeConteudo' ||
-      acao === 'atualizar'
-    );
-  }
-  if (profile === 'player') {
-    if (STAGE_ONLY.has(acao)) return false;
-    return PROJECTOR_ONLY.has(acao) || SHARED_ACTIONS.has(acao);
-  }
-  return false;
-}
-
-function actionReceivableByRole(
-  role: ClientRole,
-  acao: LiveActionName,
-  profile?: ExternalDisplayProfile,
-): boolean {
-  if (role === 'external-display' && profile) {
-    return externalDisplayReceives(profile, acao);
-  }
-  if (STAGE_ONLY.has(acao)) return role === 'stage-return';
-  if (PROJECTOR_ONLY.has(acao)) {
-    return role === 'projector' || role === 'live-viewer';
-  }
-  if (SHARED_ACTIONS.has(acao)) {
-    return (
-      role === 'projector' ||
-      role === 'stage-return' ||
-      role === 'live-viewer'
-    );
-  }
-  return true;
-}
-
-function shouldDeliver(
-  role: ClientRole,
-  action: LiveAction,
-  profile?: ExternalDisplayProfile,
-): boolean {
-  if (role === 'operator' || role === 'remote-operator') return false;
-  if (role === 'live-viewer' && LIVE_VIEWER_SKIP.has(action.acao)) return false;
-  if (
-    role === 'external-display' &&
-    (profile === 'live' || profile === 'vocal') &&
-    LIVE_VIEWER_SKIP.has(action.acao)
-  ) {
-    return false;
-  }
-  return actionReceivableByRole(role, action.acao, profile);
-}
+import {
+  loadProjectionTypographyPrefs,
+} from '../../core/projection-typography/persistence.js';
+import type { ProjectionTypographyPrefs } from '../../shared/projection-typography.js';
 
 export const LIVE_WS_PATH = '/ws/live';
 
@@ -132,6 +52,7 @@ export interface LiveWebSocketHub {
   store: LiveStateStore;
   path: string;
   broadcast(message: WsServerMessage): void;
+  broadcastProjectionTypography(projectionTypography: ProjectionTypographyPrefs): void;
   applyOperatorAction(action: LiveAction, from: string): void;
   close(): Promise<void>;
 }
@@ -154,7 +75,7 @@ function requireOperatorSession(
 ): { userId: number; username: string } | null {
   if (!token) return null;
   const auth = resolveSession(db, token);
-  if (!auth || auth.user.role !== 'operator' || !auth.user.active) return null;
+  if (!auth || !auth.user.active || !isStaffRole(auth.user.role)) return null;
   return { userId: auth.user.id, username: auth.user.username };
 }
 
@@ -163,19 +84,52 @@ export function attachLiveWebSocket(
   path = LIVE_WS_PATH,
 ): LiveWebSocketHub {
   const store = createLiveStateStore();
+  const persistedBackground = loadPersistedProjectionBackground();
+  if (persistedBackground) {
+    store.applyAction(persistedBackground, false);
+  }
   const db = getMainDb();
   const wss = new WebSocketServer({ server: httpServer, path });
   const clients = new Map<WebSocket, ClientMeta>();
   let nextId = 1;
 
+  function projectionTypographyState(): ProjectionTypographyPrefs {
+    return loadProjectionTypographyPrefs(getLivepraiseHome());
+  }
+
+  function broadcastProjectionTypography(
+    projectionTypography: ProjectionTypographyPrefs,
+  ): void {
+    const payload: WsProjectionTypographySyncMessage = {
+      type: 'projection-typography-sync',
+      projectionTypography,
+      ts: Date.now(),
+    };
+    emitAll(payload);
+  }
+
+  function sendProjectionTypographySync(ws: WebSocket): void {
+    send(ws, {
+      type: 'projection-typography-sync',
+      projectionTypography: projectionTypographyState(),
+      ts: Date.now(),
+    });
+  }
+
   function emitAll(message: WsServerMessage, except?: WebSocket): void {
     for (const [socket, meta] of clients) {
       if (socket === except || socket.readyState !== WebSocket.OPEN) continue;
-      if (
-        message.type === 'live-action' &&
-        !shouldDeliver(meta.role, message.action, meta.profile)
-      ) {
-        continue;
+      if (message.type === 'live-action') {
+        const delivered = effectiveDeliveryAction(
+          meta.role,
+          message.action,
+          meta.profile,
+        );
+        if (!delivered) continue;
+        if (delivered !== message.action) {
+          send(socket, { ...message, action: delivered });
+          continue;
+        }
       }
       send(socket, message);
     }
@@ -213,6 +167,11 @@ export function attachLiveWebSocket(
   function applyOperatorAction(action: LiveAction, from: string): void {
     const sanitized = sanitizeLiveAction(action);
     if (!sanitized) return;
+    if (sanitized.acao === 'background' || sanitized.acao === 'video') {
+      savePersistedProjectionBackground(sanitized);
+    } else if (sanitized.acao === 'limparFundo') {
+      clearPersistedProjectionBackground();
+    }
     const state = store.applyAction(sanitized, true);
     const broadcast: WsLiveBroadcastMessage = {
       type: 'live-action',
@@ -288,7 +247,7 @@ export function attachLiveWebSocket(
             return;
           }
           const auth = resolveSession(db, message.token);
-          if (!auth || auth.user.role !== 'remote' || !auth.user.active) {
+          if (!auth || !auth.user.active || !canAccessRemote(auth.user.role)) {
             send(ws, { type: 'error', message: 'Sessão remota inválida' });
             ws.close();
             return;
@@ -304,7 +263,7 @@ export function attachLiveWebSocket(
             send(ws, {
               type: 'error',
               message:
-                'external-display exige deviceId (UUID) e profile live|vocal|stage|player',
+                'external-display exige deviceId (UUID) e profile live|vocal|stage|player|projection',
             });
             ws.close();
             return;
@@ -321,6 +280,16 @@ export function attachLiveWebSocket(
           }
         }
 
+        if (message.role === 'projector') {
+          const deviceId = String(message.deviceId ?? '').trim();
+          if (deviceId && /^[0-9a-f-]{36}$/i.test(deviceId)) {
+            const device = touchExternalDevice(db, deviceId, 'projection');
+            meta.deviceId = deviceId;
+            meta.profile = 'projection';
+            meta.showChords = device.showChords;
+          }
+        }
+
         meta.role = message.role;
         if (message.name && message.role !== 'remote-operator') {
           meta.name = message.name;
@@ -332,7 +301,10 @@ export function attachLiveWebSocket(
         const state = store.getState();
         const useStageState =
           meta.role === 'stage-return' ||
-          (meta.role === 'external-display' && meta.profile === 'stage');
+          (meta.role === 'external-display' &&
+            (meta.profile === 'stage' || meta.profile === 'vocal'));
+        const timerReplay =
+          state.lastAction?.acao === 'serviceTimer' ? state.lastAction : null;
         send(ws, {
           type: 'joined',
           clientId,
@@ -340,13 +312,16 @@ export function attachLiveWebSocket(
           state: useStageState
             ? {
                 ...state,
-                lastAction: state.lastStageAction,
+                lastAction: timerReplay ?? state.lastStageAction,
               }
             : state,
         });
+        sendProjectionTypographySync(ws);
 
-        if (meta.role === 'external-display') {
-          broadcastDevicePresence('online', meta);
+        if (meta.role === 'external-display' || meta.role === 'projector') {
+          if (meta.deviceId && meta.profile) {
+            broadcastDevicePresence('online', meta);
+          }
         }
         return;
       }
@@ -392,21 +367,12 @@ export function attachLiveWebSocket(
         return;
       }
 
-      const state = store.applyAction(sanitized, true);
-      const broadcast: WsLiveBroadcastMessage = {
-        type: 'live-action',
-        from: meta.name,
-        action: sanitized,
-        revision: state.revision,
-        ts: Date.now(),
-      };
-
-      emitAll(broadcast);
+      applyOperatorAction(sanitized, meta.name);
     });
 
     ws.on('close', () => {
       const meta = clients.get(ws);
-      if (meta?.role === 'external-display') {
+      if (meta?.deviceId && meta.profile) {
         broadcastDevicePresence('offline', meta);
       }
       clients.delete(ws);
@@ -417,6 +383,7 @@ export function attachLiveWebSocket(
     store,
     path,
     broadcast: (message) => emitAll(message),
+    broadcastProjectionTypography,
     applyOperatorAction,
     close: () =>
       new Promise((resolve, reject) => {

@@ -1,4 +1,4 @@
-@import url('../portal/portal.css');
+@import url('/portal.css');
 
 .block {
   display: grid;

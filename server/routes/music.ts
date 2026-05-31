@@ -27,7 +27,13 @@ export function createMusicRouter(): Router {
     const codigo = req.params.codigo;
     const items = dbAll(
       db,
-      'SELECT * FROM musica WHERE cat = ? ORDER BY nome2 ASC',
+      `SELECT m.*,
+        (SELECT GROUP_CONCAT(mv.verso, ' ')
+         FROM musica_versos mv
+         WHERE mv.musica = m.id) AS texto_versos
+       FROM musica m
+       WHERE m.cat = ?
+       ORDER BY m.nome2 ASC`,
       [codigo],
     );
     if (isDbError(items)) {

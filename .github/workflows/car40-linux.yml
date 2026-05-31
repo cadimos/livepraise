@@ -1,0 +1,88 @@
+# CA-R40 — smoke + pacotes Linux (AppImage, deb, rpm)
+name: CA-R40 Linux
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, main]
+    paths:
+      - '.github/workflows/car40-linux.yml'
+      - 'scripts/smoke-car40.mjs'
+      - 'scripts/smoke-fase2.mjs'
+      - 'scripts/smoke-fase8.mjs'
+      - 'server/**'
+      - 'electron/**'
+      - 'electron-builder.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    branches: [master, main]
+    paths:
+      - '.github/workflows/car40-linux.yml'
+      - 'electron-builder.yml'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  smoke-and-linux-packages:
+    name: smoke + AppImage/deb/rpm/pacman (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install packaging tools (rpm)
+        run: sudo apt-get update && sudo apt-get install -y rpm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: CA-R40 video pipeline smoke
+        run: npm run test:video-pipeline
+
+      - name: Bootstrap smoke
+        run: npm run smoke:bootstrap
+
+      - name: Release smoke (socket + bootstrap limpo)
+        run: npm run smoke:fase8
+
+      - name: Build Linux packages (AppImage + deb + rpm + pacman)
+        run: npm run dist:linux
+        env:
+          CI: true
+
+      - name: Verify Linux artifacts
+        run: |
+          set -euo pipefail
+          ls -la release-builds/
+          test -n "$(find release-builds -maxdepth 1 -name '*.AppImage' -print -quit)"
+          test -n "$(find release-builds -maxdepth 1 -name '*.deb' -print -quit)"
+          test -n "$(find release-builds -maxdepth 1 -name '*.rpm' -print -quit)"
+          test -n "$(find release-builds -maxdepth 1 -name '*.pacman' -print -quit)" \
+            || test -n "$(find release-builds -maxdepth 1 -name '*.pkg.tar.*' -print -quit)"
+          ff='release-builds/linux-unpacked/resources/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg'
+          if [ ! -f "$ff" ]; then
+            echo "missing $ff"
+            exit 1
+          fi
+
+      - name: Upload Linux release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: livepraise-linux-${{ github.sha }}
+          path: |
+            release-builds/*.AppImage
+            release-builds/*.deb
+            release-builds/*.rpm
+            release-builds/*.pacman
+            release-builds/*.pkg.tar.*
+            release-builds/latest-linux*.yml
+          if-no-files-found: error
+          retention-days: 14

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue';
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
   fetchJson,
@@ -11,8 +11,16 @@ import {
 import { usePreferences } from '../../composables/usePreferences';
 import { useWorshipRefresh } from '../../composables/useWorshipRefresh';
 import { useLiveSocket } from '../../composables/useLiveSocket';
+import { expandVersesForDisplay, normalizeVerseText } from '../../utils/music';
 import { buildMusicHtml, buildMusicStageHtml } from '../../utils/projection';
+import {
+  createWorshipFuseIndex,
+  filterWorshipSongs,
+  type SongWithLyrics,
+} from '../../utils/worship-search';
+import { summarizeLabel } from '@shared/queue-items';
 import { CircleCheckBig, Pencil, Trash2 } from '@lucide/vue';
+import { useQueueDrag } from '../../composables/useQueueDrag';
 
 const emit = defineEmits<{
   preview: [html: string];
@@ -20,30 +28,74 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
-const { prefs, setMusicCategory, addChromeTab, removeChromeTabsForSong, setWorshipSearchQuery } = usePreferences();
+const { prefs, setMusicCategory, addChromeTab, removeChromeTabsForSong, setWorshipSearchQuery } =
+  usePreferences();
+const { onDragStart } = useQueueDrag();
 const { refreshToken } = useWorshipRefresh();
 const { sendAction } = useLiveSocket();
 
 const categories = ref<MusicCategory[]>([]);
-const songs = ref<Song[]>([]);
+const songs = ref<SongWithLyrics[]>([]);
 const verses = ref<Verse[]>([]);
 const selectedSong = ref<Song | null>(null);
+const selectedVerseId = ref<number | null>(null);
 const loading = ref(false);
 const error = ref('');
-const searchQuery = computed({
-  get: () => prefs.value.worshipSearchQuery,
-  set: (value: string) => setWorshipSearchQuery(value),
+
+const SEARCH_DEBOUNCE_MS = 150;
+const searchInput = ref(prefs.value.worshipSearchQuery);
+const filterQuery = ref(prefs.value.worshipSearchQuery);
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+function applyFilterQuery(value: string): void {
+  filterQuery.value = value;
+  setWorshipSearchQuery(value);
+}
+
+function scheduleDebouncedSearch(value: string): void {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    searchDebounceTimer = null;
+    applyFilterQuery(value);
+  }, SEARCH_DEBOUNCE_MS);
+}
+
+function onSearchInput(value: string): void {
+  searchInput.value = value;
+  scheduleDebouncedSearch(value);
+}
+
+function onSearchEnter(): void {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = null;
+  applyFilterQuery(searchInput.value);
+}
+
+/** Versos do BD expandidos para exibição/fila (CAD-182). */
+const displayVerses = computed(() => {
+  const raw = verses.value.map((v) => ({ id: v.id, text: v.verso }));
+  return expandVersesForDisplay(raw, prefs.value.maxEstofreLines).map((v) => ({
+    id: v.id,
+    verso: v.text,
+  }));
 });
 
-const filteredSongs = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase();
-  if (!q) return songs.value;
-  return songs.value.filter((song) => {
-    const name = (song.nome2 ?? song.nome).toLowerCase();
-    const artist = (song.artista ?? '').toLowerCase();
-    return name.includes(q) || artist.includes(q);
-  });
-});
+const worshipFuse = computed(() => (songs.value.length > 0 ? createWorshipFuseIndex(songs.value) : null));
+
+const filteredSongs = computed(() =>
+  filterWorshipSongs(songs.value, filterQuery.value, worshipFuse.value),
+);
+
+watch(
+  () => prefs.value.worshipSearchQuery,
+  (query) => {
+    if (query === searchInput.value && query === filterQuery.value) return;
+    if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = null;
+    searchInput.value = query;
+    filterQuery.value = query;
+  },
+);
 
 async function loadCategories() {
   loading.value = true;
@@ -69,6 +121,7 @@ async function loadCategories() {
 async function loadSongs(catId: string) {
   setMusicCategory(catId);
   selectedSong.value = null;
+  selectedVerseId.value = null;
   verses.value = [];
   try {
     const data = await fetchJson<{ status: string; items: Song[] }>(
@@ -82,13 +135,14 @@ async function loadSongs(catId: string) {
 
 async function selectSong(song: Song) {
   selectedSong.value = song;
+  selectedVerseId.value = null;
   try {
     const data = await fetchJson<{ status: string; items: Verse[] }>(
       `/musica/verso/${song.id}`,
     );
     verses.value = (data.items ?? []).map((v) => ({
       ...v,
-      verso: v.verso.replace(/<br \/>/g, '\n'),
+      verso: normalizeVerseText(v.verso),
     }));
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Erro ao carregar versos';
@@ -97,13 +151,14 @@ async function selectSong(song: Song) {
 
 function projectVerse(verse: Verse) {
   if (!selectedSong.value) return;
+  selectedVerseId.value = verse.id;
   const footer = `${selectedSong.value.nome} (${selectedSong.value.artista})`;
   const html = buildMusicHtml(verse.verso, footer);
   emit('preview', html);
   sendAction('viewMusica', html);
 
-  const idx = verses.value.findIndex((v) => v.id === verse.id);
-  const nextVerse = idx >= 0 ? verses.value[idx + 1] : undefined;
+  const idx = displayVerses.value.findIndex((v) => v.id === verse.id);
+  const nextVerse = idx >= 0 ? displayVerses.value[idx + 1] : undefined;
   const stageHtml = buildMusicStageHtml(
     verse.verso,
     nextVerse?.verso ?? null,
@@ -111,6 +166,20 @@ function projectVerse(verse: Verse) {
     true,
   );
   sendAction('viewMusicaRetorno', stageHtml);
+}
+
+function onVerseDragStart(event: DragEvent, verse: Verse): void {
+  if (!selectedSong.value) return;
+  selectedVerseId.value = verse.id;
+  onDragStart(event, {
+    kind: 'music',
+    label: summarizeLabel(verse.verso),
+    text: verse.verso,
+    verseId: verse.id,
+    songId: selectedSong.value.id,
+    songName: selectedSong.value.nome,
+    artist: selectedSong.value.artista,
+  });
 }
 
 function editSong(song: Song) {
@@ -128,6 +197,7 @@ async function deleteSong(song: Song) {
     removeChromeTabsForSong(song.id);
     if (selectedSong.value?.id === song.id) {
       selectedSong.value = null;
+      selectedVerseId.value = null;
       verses.value = [];
     }
     songs.value = songs.value.filter((s) => s.id !== song.id);
@@ -141,10 +211,11 @@ async function addToTabs(song: Song) {
     const data = await fetchJson<{ status: string; items: Verse[] }>(
       `/musica/verso/${song.id}`,
     );
-    const verses = (data.items ?? []).map((v) => ({
+    const rawVerses = (data.items ?? []).map((v) => ({
       id: v.id,
-      text: v.verso.replace(/<br \/>/g, '\n'),
+      text: normalizeVerseText(v.verso),
     }));
+    const verses = expandVersesForDisplay(rawVerses, prefs.value.maxEstofreLines);
     addChromeTab({
       label: song.nome2 ?? song.nome,
       songId: song.id,
@@ -171,6 +242,10 @@ watch(refreshToken, () => {
 onMounted(() => {
   void loadCategories();
 });
+
+onUnmounted(() => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+});
 </script>
 
 <template>
@@ -192,10 +267,12 @@ onMounted(() => {
 
     <label class="lp-panel-label">{{ t('common.search') }}</label>
     <input
-      v-model="searchQuery"
+      :value="searchInput"
       type="search"
       class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
       :placeholder="t('common.searchPlaceholder')"
+      @input="onSearchInput(($event.target as HTMLInputElement).value)"
+      @keydown.enter.prevent="onSearchEnter"
     />
 
     <div class="grid min-h-0 flex-1 grid-cols-2 gap-3">
@@ -206,8 +283,12 @@ onMounted(() => {
           <li
             v-for="song in filteredSongs"
             :key="song.id"
-            class="group flex items-center justify-between rounded-md px-2 py-2 text-sm transition hover:bg-sky-950/50"
-            :class="selectedSong?.id === song.id ? 'bg-lp-primary/25 text-lp-text' : 'text-lp-text/90'"
+            class="group flex items-center justify-between rounded-md px-2 py-2 text-sm transition hover:bg-lp-selection-list-hover"
+            :class="
+              selectedSong?.id === song.id
+                ? 'bg-lp-selection-list text-lp-selection-list-text ring-1 ring-lp-selection-list-ring'
+                : 'text-lp-text/90'
+            "
           >
             <button type="button" class="flex-1 text-left" @click="selectSong(song)">
               {{ song.nome2 ?? song.nome }}
@@ -253,10 +334,18 @@ onMounted(() => {
             {{ t('worship.selectSong') }}
           </li>
           <li
-            v-for="verse in verses"
+            v-for="verse in displayVerses"
             :key="verse.id"
-            class="cursor-pointer rounded-md px-2 py-2 text-sm text-slate-200 transition hover:bg-emerald-950/50 hover:text-emerald-100"
+            draggable="true"
+            class="cursor-grab rounded-md px-2 py-2 text-sm transition hover:bg-lp-selection-active-hover active:cursor-grabbing"
+            :class="
+              selectedVerseId === verse.id
+                ? 'bg-lp-selection-active text-lp-selection-active-text ring-1 ring-lp-selection-active-ring'
+                : 'text-lp-text/90 hover:text-lp-selection-active-text'
+            "
+            :title="t('tabs.dragHint')"
             @click="projectVerse(verse)"
+            @dragstart="onVerseDragStart($event, verse)"
           >
             <pre class="whitespace-pre-wrap font-sans">{{ verse.verso }}</pre>
           </li>

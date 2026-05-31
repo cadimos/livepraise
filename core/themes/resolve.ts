@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { isSafePathSegment } from '../security/safe-segment.js';
 import type { ThemeDefinition, ThemeSummary } from '../../shared/types/theme.js';
+import { normalizeTheme } from './normalize.js';
 
 function appRoot(): string {
   return process.env.LIVEPRAISE_APP_ROOT ?? process.cwd();
@@ -68,7 +69,7 @@ export function resolveTheme(themeId: string): ThemeDefinition | null {
 
   for (const themePath of candidates) {
     const theme = readThemeFile(themePath);
-    if (theme) return theme;
+    if (theme) return normalizeTheme(theme);
   }
 
   return null;

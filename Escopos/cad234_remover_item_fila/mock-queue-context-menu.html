@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CAD-234 — Mock menu contextual fila</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'lp-background': '#0f1419',
+            'lp-surface': '#1a2332',
+            'lp-text': '#e8edf4',
+            'lp-muted': '#8b9cb3',
+            'lp-primary': '#3b82f6',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; }
+    .viewport-label { position: fixed; top: 8px; left: 8px; z-index: 100; font-size: 11px; color: #8b9cb3; }
+    .playlist-verse-text { max-height: 5rem; overflow: hidden; }
+  </style>
+</head>
+<body class="bg-zinc-900 min-h-screen">
+  <p class="viewport-label" id="vp">1440×900 — menu contextual fila</p>
+
+  <section class="fixed bottom-0 left-0 right-0 border-t border-lp-surface bg-lp-background/95">
+    <div class="px-3 pb-2 pt-1">
+      <ul class="flex flex-nowrap items-stretch gap-2 overflow-x-auto pb-4">
+        <li class="flex w-[10rem] shrink-0 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-lp-surface bg-lp-surface/40 text-lp-muted">
+          <span class="text-2xl text-lp-primary">+</span>
+          <span class="mt-2 px-2 text-center text-xs">Adicionar</span>
+        </li>
+        <li class="relative w-[10rem] shrink-0 rounded-md border-2 border-lp-surface bg-lp-surface text-lp-muted">
+          <span class="absolute right-1 top-1 rounded bg-lp-background/80 px-1 text-[10px] uppercase tracking-wide text-lp-muted">Música</span>
+          <pre class="playlist-verse-text whitespace-pre-wrap p-2 pt-5 font-sans text-sm leading-snug">Coro
+Louvai ao Senhor</pre>
+        </li>
+        <li class="relative w-[10rem] shrink-0 rounded-md border-2 border-lp-primary bg-lp-primary/20 text-lp-text shadow-[0_3px_0_0_#3b82f6]">
+          <span class="absolute right-1 top-1 rounded bg-lp-background/80 px-1 text-[10px] uppercase tracking-wide text-lp-muted">Vídeo</span>
+          <div class="h-20 w-full bg-lp-surface/60 p-1 pt-5 flex items-center justify-center text-xs text-lp-muted">thumb vídeo</div>
+        </li>
+        <li class="relative w-[10rem] shrink-0 rounded-md border-2 border-lp-surface bg-lp-surface text-lp-muted">
+          <span class="absolute right-1 top-1 rounded bg-lp-background/80 px-1 text-[10px] uppercase tracking-wide text-lp-muted">Imagem</span>
+          <div class="h-20 w-full bg-gradient-to-br from-slate-600 to-slate-800 p-1 pt-5"></div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Menu contextual (to-be) sobre tile vídeo activo -->
+  <ul
+    class="fixed z-[60] min-w-[14rem] rounded-md border border-lp-surface bg-lp-background py-1 text-sm text-lp-text shadow-lg"
+    style="left: 52%; top: 72%;"
+    role="menu"
+  >
+    <li>
+      <button
+        type="button"
+        class="w-full px-3 py-2 text-left hover:bg-lp-surface"
+        role="menuitem"
+        aria-label="Remover «Vídeo culto 2026» da fila"
+      >
+        Remover da fila
+      </button>
+    </li>
+  </ul>
+</body>
+</html>

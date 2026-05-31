@@ -76,3 +76,10 @@ export function runMigrations(): number {
 
   return count;
 }
+
+/** Maior versão de migration embarcada na app (validação restore CAD-238). */
+export function getEmbeddedMaxMigrationVersion(): number {
+  const migrations = loadMigrations();
+  if (migrations.length === 0) return 0;
+  return Math.max(...migrations.map((m) => m.version));
+}

@@ -39,7 +39,18 @@ export class LiveStateStore {
   }
 
   applyAction(action: LiveAction, fromOperator: boolean): LiveState {
-    if (fromOperator && this.state.frozen && action.acao !== 'atualizar') {
+    if (
+      fromOperator &&
+      this.state.frozen &&
+      action.acao !== 'atualizar' &&
+      action.acao !== 'serviceTimer' &&
+      action.acao !== 'footerAlert'
+    ) {
+      return this.getState();
+    }
+
+    if (action.acao === 'footerAlert') {
+      this.state = { ...this.state, revision: this.state.revision + 1 };
       return this.getState();
     }
 

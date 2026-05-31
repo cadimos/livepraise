@@ -1,5 +1,19 @@
 /** Client retorno de palco — HTML+CSS+JS (CA-R10, CA-R20). */
 
+import {
+  attachDisplayDebugOverlayListener,
+  updateLastActionBadge,
+} from '/shared/display-debug-overlay.js';
+import { createFooterAlertOverlay } from '/shared/footer-alert-overlay.js';
+import { createServiceTimerOverlay } from '/shared/service-timer-overlay.js';
+import {
+  attachProjectionTypographyWs,
+  createProjectionTypographyController,
+  fetchProjectionTypographyPrefs,
+} from '/shared/projection-typography-runtime.js';
+
+attachDisplayDebugOverlayListener();
+
 type LiveActionName =
   | 'viewMusicaRetorno'
   | 'viewBibliaRetorno'
@@ -34,6 +48,33 @@ function byId<T extends HTMLElement>(id: string): T {
   return el as T;
 }
 
+function stageDisplayId(): number | null {
+  const raw = new URLSearchParams(location.search).get('displayId');
+  if (!raw) return null;
+  const id = Number.parseInt(raw, 10);
+  return Number.isFinite(id) ? id : null;
+}
+
+const LOCAL_DISPLAY_ID = stageDisplayId();
+
+const serviceTimerOverlay = createServiceTimerOverlay({
+  kind: 'display',
+  id: LOCAL_DISPLAY_ID !== null ? String(LOCAL_DISPLAY_ID) : '',
+});
+
+const footerAlertOverlay = createFooterAlertOverlay({
+  kind: 'display',
+  id: LOCAL_DISPLAY_ID !== null ? String(LOCAL_DISPLAY_ID) : '',
+});
+
+const typography = createProjectionTypographyController({
+  rootEl: byId<HTMLElement>('conteudo'),
+  role: 'stage-return',
+  mode: 'output',
+  shadowSelector: '.texto',
+  textfillOptions: { allTexto: true },
+});
+
 function applyAction(action: LiveAction): void {
   const content = byId<HTMLElement>('conteudo');
 
@@ -48,16 +89,27 @@ function applyAction(action: LiveAction): void {
     case 'atualizar':
       location.reload();
       break;
+    case 'serviceTimer':
+      serviceTimerOverlay.applyValor(action.valor);
+      return;
+    case 'footerAlert':
+      footerAlertOverlay.applyValor(action.valor);
+      return;
     default:
       return;
   }
 
   const badge = byId<HTMLElement>('last-action');
-  badge.textContent = `${action.acao} @ ${new Date().toLocaleTimeString()}`;
+  updateLastActionBadge(
+    badge,
+    `${action.acao} @ ${new Date().toLocaleTimeString()}`,
+  );
+  typography.scheduleRefresh();
 }
 
 function connect(): WebSocket {
   const socket = new WebSocket(wsUrl());
+  let handleWsMessage: (message: WsServerMessage) => void = () => {};
 
   socket.addEventListener('open', () => {
     socket.send(
@@ -65,8 +117,7 @@ function connect(): WebSocket {
     );
   });
 
-  socket.addEventListener('message', (event) => {
-    const message = JSON.parse(event.data as string) as WsServerMessage;
+  handleWsMessage = attachProjectionTypographyWs(typography, (message) => {
     if (message.type === 'live-action') {
       applyAction((message as WsLiveBroadcastMessage).action);
     }
@@ -74,6 +125,11 @@ function connect(): WebSocket {
       const last = (message as WsJoinedMessage).state.lastAction;
       if (last) applyAction(last);
     }
+  });
+
+  socket.addEventListener('message', (event) => {
+    const message = JSON.parse(event.data as string) as WsServerMessage;
+    handleWsMessage(message);
   });
 
   socket.addEventListener('close', () => {
@@ -84,5 +140,6 @@ function connect(): WebSocket {
 }
 
 connect();
+void fetchProjectionTypographyPrefs().then((prefs) => typography.init(prefs));
 
 export {};

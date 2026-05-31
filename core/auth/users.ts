@@ -76,11 +76,12 @@ export function createUser(
   const existing = findUserByUsername(db, input.username);
   if (existing) return { error: 'Usuário já existe' };
 
+  const now = new Date().toISOString();
   const id = dbRun(
     db,
-    `INSERT INTO users (username, password_hash, role, active)
-     VALUES (?, ?, ?, 1)`,
-    [input.username, hashPassword(input.password), input.role],
+    `INSERT INTO users (username, password_hash, role, active, created_at, updated_at)
+     VALUES (?, ?, ?, 1, ?, ?)`,
+    [input.username, hashPassword(input.password), input.role, now, now],
   );
   if (isDbError(id)) return { error: String(id.mensagem) };
 

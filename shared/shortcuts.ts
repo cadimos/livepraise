@@ -76,7 +76,7 @@ export const SHORTCUT_DEFINITIONS: ShortcutDefinition[] = [
     id: 'reload_data',
     labelKey: 'settings.shortcuts.actions.reloadData',
     contextKey: 'settings.shortcuts.context.operator',
-    defaultCombo: null,
+    defaultCombo: { key: 'F5', code: 'F5', ctrl: false, alt: false, shift: false },
   },
 ];
 

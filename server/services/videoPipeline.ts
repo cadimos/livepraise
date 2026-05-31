@@ -36,7 +36,7 @@ function ffmpegBinary(): string {
   return ffmpegPath;
 }
 
-function thumbRelPath(relativeVideo: string): string {
+export function thumbRelPath(relativeVideo: string): string {
   const key = jobKey(relativeVideo);
   const parts = key.split('/');
   const base = parts.pop() ?? 'frame';
@@ -198,4 +198,11 @@ export function scheduleVideoPipeline(
 export function resetVideoPipelineForTests(): void {
   jobs.clear();
   running.clear();
+}
+
+export function setVideoPipelineStateForTests(
+  relativePath: string,
+  state: VideoPipelineState,
+): void {
+  setJob(relativePath, state);
 }

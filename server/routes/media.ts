@@ -3,6 +3,7 @@ import path from 'node:path';
 import { Router, type Request, type Response } from 'express';
 import {
   mediaPathParts,
+  normalizeMediaRelativeRef,
   resolveMediaRelativePath,
   type MediaKind,
 } from '../../core/security/media-file.js';
@@ -13,7 +14,10 @@ import { requireOperatorAccess } from '../middleware/auth.js';
 import {
   getVideoPipelineState,
   scheduleVideoPipeline,
+  thumbRelPath,
 } from '../services/videoPipeline.js';
+import { clearQuickBackgroundsForDeletedMedia } from '../services/quickBackgrounds.js';
+import { registerQueueImportRoutes } from './queue-import.js';
 
 function listImageCategories(): string[] {
   const dir = path.join(getLivepraiseHome(), 'imagens');
@@ -102,6 +106,84 @@ function moveMediaFile(
   return `${kind}/${toCategory}/${parts.fileName}`.replaceAll('\\', '/');
 }
 
+function isDeletableLibraryPath(relativePath: string, kind: MediaKind): boolean {
+  const normalized = relativePath.replaceAll('\\', '/');
+  if (normalized.includes('/thumb/')) return false;
+  return mediaPathParts(normalized, kind) !== null;
+}
+
+function collectVideoDeleteTargets(
+  home: string,
+  abs: string,
+  rel: string,
+): { absPaths: string[]; relPaths: string[] } {
+  const normalized = rel.replaceAll('\\', '/');
+  const parts = mediaPathParts(normalized, 'videos');
+  if (!parts) {
+    return { absPaths: [abs], relPaths: [normalized] };
+  }
+
+  const absPaths: string[] = [];
+  const relPaths: string[] = [];
+  const pushUnique = (targetRel: string): void => {
+    const validated = resolveMediaRelativePath(home, 'videos', targetRel);
+    if (!validated || absPaths.includes(validated)) return;
+    absPaths.push(validated);
+    relPaths.push(targetRel.replaceAll('\\', '/'));
+  };
+
+  const base = path.basename(parts.fileName, path.extname(parts.fileName));
+  const ext = path.extname(parts.fileName).toLowerCase();
+  const thumbRel = thumbRelPath(normalized);
+  const mp4Rel = `videos/${parts.category}/${base}.mp4`;
+
+  pushUnique(thumbRel);
+  if (ext !== '.mp4') pushUnique(mp4Rel);
+  pushUnique(normalized);
+
+  return { absPaths, relPaths };
+}
+
+function deleteMediaFile(
+  home: string,
+  kind: MediaKind,
+  relativePath: string,
+): { ok: true; path: string } | { ok: false; status: number; message: string; code?: string } {
+  if (!isDeletableLibraryPath(relativePath, kind)) {
+    return { ok: false, status: 400, message: 'Ficheiro inválido', code: 'file_invalid' };
+  }
+
+  const abs = resolveMediaRelativePath(home, kind, relativePath);
+  if (!abs) {
+    return { ok: false, status: 400, message: 'Ficheiro inválido', code: 'file_invalid' };
+  }
+
+  const rel = relativePath.replaceAll('\\', '/');
+
+  if (kind === 'videos') {
+    const pipeline = getVideoPipelineState(rel);
+    if (pipeline.status === 'processing') {
+      return {
+        ok: false,
+        status: 409,
+        message: 'Aguarde o processamento terminar',
+        code: 'video_processing',
+      };
+    }
+
+    const { absPaths, relPaths } = collectVideoDeleteTargets(home, abs, rel);
+    for (const targetAbs of absPaths) {
+      fs.unlinkSync(targetAbs);
+    }
+    clearQuickBackgroundsForDeletedMedia('videos', relPaths);
+    return { ok: true, path: normalizeMediaRelativeRef(rel, 'videos') ?? rel };
+  }
+
+  fs.unlinkSync(abs);
+  clearQuickBackgroundsForDeletedMedia('imagens', [normalizeMediaRelativeRef(rel, 'imagens') ?? rel]);
+  return { ok: true, path: normalizeMediaRelativeRef(rel, 'imagens') ?? rel };
+}
+
 function registerMediaMutations(api: Router, kind: MediaKind): void {
   const home = getLivepraiseHome();
 
@@ -137,6 +219,27 @@ function registerMediaMutations(api: Router, kind: MediaKind): void {
       res.json({ status: 'successo', path: moved });
     },
   );
+
+  api.delete(
+    '/',
+    requireOperatorAccess,
+    (req: Request, res: Response) => {
+      allowCors(req, res, () => {});
+      const body = req.body as { path?: string };
+      const rel = String(body.path ?? '');
+      if (!rel) {
+        jsonError(res, 400, 'path é obrigatório', 'file_invalid');
+        return;
+      }
+
+      const result = deleteMediaFile(home, kind, rel);
+      if (!result.ok) {
+        jsonError(res, result.status, result.message, result.code);
+        return;
+      }
+      res.json({ status: 'successo', path: result.path });
+    },
+  );
 }
 
 export function createImageRouter(): Router {
@@ -168,6 +271,7 @@ export function createImageRouter(): Router {
   });
 
   registerMediaMutations(api, 'imagens');
+  registerQueueImportRoutes(api);
   return api;
 }
 
@@ -241,5 +345,6 @@ export function createVideoRouter(): Router {
   });
 
   registerMediaMutations(api, 'videos');
+  registerQueueImportRoutes(api);
   return api;
 }

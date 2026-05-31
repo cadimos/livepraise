@@ -9,6 +9,7 @@ export function jsonError(
   res: Response,
   status: number,
   message: string,
+  code?: string,
 ): Response {
-  return res.status(status).json({ error: message });
+  return res.status(status).json(code ? { error: message, code } : { error: message });
 }

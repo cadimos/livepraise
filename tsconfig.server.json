@@ -6,7 +6,7 @@
     "noEmit": false,
     "outDir": "dist",
     "rootDir": ".",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "types": ["node"]
   },
   "include": ["server/**/*.ts", "core/**/*.ts", "shared/**/*.ts"]

@@ -9,16 +9,30 @@ import {
   exportPlaylistFile,
   importPlaylistFile,
 } from '../composables/usePlaylistTransfer';
+import { playlistExportHasContent } from '@shared/playlist-transfer';
 import { useShortcuts } from '../composables/useShortcuts';
+import { useOperatorRole } from '../composables/useOperatorRole';
 import { Music, NotebookPen, Presentation, RotateCw, Snowflake } from '@lucide/vue';
 
-export type SettingsPanel = 'displays' | 'users' | 'appearance' | 'approvals' | 'errorLog' | 'shortcuts';
+export type SettingsPanel =
+  | 'displays'
+  | 'users'
+  | 'appearance'
+  | 'projectionTypography'
+  | 'worship'
+  | 'bible'
+  | 'approvals'
+  | 'errorLog'
+  | 'backupRestore'
+  | 'shortcuts';
 
 const emit = defineEmits<{
   openSettings: [panel: SettingsPanel];
   openNewSong: [];
   openNotepad: [];
   openAbout: [];
+  openServiceTimer: [];
+  openFooterAlert: [];
 }>();
 
 const { t } = useI18n();
@@ -26,12 +40,13 @@ const { frozen, toggleFrozen, sendAction } = useLiveSocket();
 const { pendingApprovals } = useRemoteSync();
 const { prefs, replaceChromeTabs } = usePreferences();
 const { comboLabel } = useShortcuts();
+const { isAdmin } = useOperatorRole();
 
 const importInput = ref<HTMLInputElement | null>(null);
 const playlistImportBusy = ref(false);
 
 function onExportPlaylist(): void {
-  if (!prefs.value.chromeTabs.length) {
+  if (!playlistExportHasContent(prefs.value.chromeTabs)) {
     window.alert(t('actions.playlistExportEmpty'));
     return;
   }
@@ -51,7 +66,11 @@ async function onImportPlaylistFile(ev: Event): Promise<void> {
   playlistImportBusy.value = true;
   try {
     const raw = await file.text();
-    const tabs = await importPlaylistFile(raw, t('tabs.missingSong'));
+    const tabs = await importPlaylistFile(
+      raw,
+      t('tabs.missingSong'),
+      prefs.value.maxEstofreLines,
+    );
     replaceChromeTabs(tabs);
   } catch (e) {
     const message = e instanceof Error ? e.message : t('tabs.importError');
@@ -131,7 +150,10 @@ function reloadApp() {
     <button
       type="button"
       class="inline-flex items-center gap-2 rounded-md px-3 py-2 font-medium transition hover:bg-white/15"
-      :title="t('actions.reload')"
+      :title="
+        t('actions.reload') +
+        (comboLabel('reload_data') !== '—' ? ` (${comboLabel('reload_data')})` : '')
+      "
       @click="reloadApp"
     >
       <RotateCw class="h-5 w-5 shrink-0" aria-hidden="true" />
@@ -146,6 +168,37 @@ function reloadApp() {
         class="hidden"
         @change="onImportPlaylistFile"
       />
+
+      <DropdownMenu :label="t('actions.tools')">
+        <template #default="{ close }">
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
+              class="block w-full px-4 py-2 text-left hover:bg-lp-surface/80"
+              @click="
+                emit('openServiceTimer');
+                close();
+              "
+            >
+              {{ t('actions.serviceTimer') }}
+            </button>
+          </li>
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
+              class="block w-full px-4 py-2 text-left hover:bg-lp-surface/80"
+              @click="
+                emit('openFooterAlert');
+                close();
+              "
+            >
+              {{ t('actions.footerAlert') }}
+            </button>
+          </li>
+        </template>
+      </DropdownMenu>
 
       <DropdownMenu :label="t('actions.playlist')">
         <template #default="{ close }">
@@ -231,11 +284,50 @@ function reloadApp() {
               role="menuitem"
               class="block w-full px-4 py-2 text-left hover:bg-lp-surface/80"
               @click="
+                emit('openSettings', 'worship');
+                close();
+              "
+            >
+              {{ t('actions.worshipSettings') }}
+            </button>
+          </li>
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
+              class="block w-full px-4 py-2 text-left hover:bg-lp-surface/80"
+              @click="
+                emit('openSettings', 'bible');
+                close();
+              "
+            >
+              {{ t('actions.bibleSettings') }}
+            </button>
+          </li>
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
+              class="block w-full px-4 py-2 text-left hover:bg-lp-surface/80"
+              @click="
                 emit('openSettings', 'appearance');
                 close();
               "
             >
               {{ t('actions.appearance') }}
+            </button>
+          </li>
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
+              class="block w-full px-4 py-2 text-left hover:bg-lp-surface/80"
+              @click="
+                emit('openSettings', 'projectionTypography');
+                close();
+              "
+            >
+              {{ t('actions.projectionTypography') }}
             </button>
           </li>
           <li role="none">
@@ -262,6 +354,19 @@ function reloadApp() {
               "
             >
               {{ t('actions.errorLog') }}
+            </button>
+          </li>
+          <li v-if="isAdmin" role="none">
+            <button
+              type="button"
+              role="menuitem"
+              class="block w-full px-4 py-2 text-left hover:bg-lp-surface/80"
+              @click="
+                emit('openSettings', 'backupRestore');
+                close();
+              "
+            >
+              {{ t('actions.backupRestore') }}
             </button>
           </li>
         </template>

@@ -2,9 +2,11 @@
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useErrorLog, type ErrorLogEntry } from '../../composables/useErrorLog';
+import { usePreferences } from '../../composables/usePreferences';
 
 const { t } = useI18n();
 const { items, loading, error, refresh, clear } = useErrorLog();
+const { prefs, setDisplayDebugOverlay } = usePreferences();
 
 const expandedIds = ref<Set<string>>(new Set());
 
@@ -49,6 +51,19 @@ onMounted(() => {
 <template>
   <div class="flex flex-col gap-3 text-sm">
     <p class="text-lp-muted">{{ t('settings.errorLog.intro') }}</p>
+
+    <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2">
+      <input
+        type="checkbox"
+        class="mt-0.5"
+        :checked="prefs.displayDebugOverlay"
+        @change="setDisplayDebugOverlay(($event.target as HTMLInputElement).checked)"
+      />
+      <span class="flex flex-col gap-0.5">
+        <span class="font-medium text-lp-text">{{ t('settings.errorLog.displayDebugOverlay') }}</span>
+        <span class="text-xs text-lp-muted">{{ t('settings.errorLog.displayDebugOverlayHint') }}</span>
+      </span>
+    </label>
 
     <div class="flex flex-wrap items-center gap-2">
       <button

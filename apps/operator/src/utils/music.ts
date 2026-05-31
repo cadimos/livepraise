@@ -1,5 +1,14 @@
 /** Utilitários de música — paridade v0.0.8 (salvar_musica / versos). */
 
+export {
+  clampMaxEstofreLines,
+  DEFAULT_MAX_ESTOFRE_LINES,
+  expandVersesForDisplay,
+  normalizeVerseText,
+  splitVerseTextForDisplay,
+  splitVerseLinesForDisplay,
+} from '@shared/verse-estofres';
+
 export function splitLyricsIntoVerses(lyrics: string): string[] {
   const normalized = lyrics.replace(/\r\n/g, '\n').trim();
   if (!normalized) return [];

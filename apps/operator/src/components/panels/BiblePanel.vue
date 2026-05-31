@@ -17,13 +17,22 @@ import {
   findBookFallbackForReference,
 } from '@shared/bible-reference';
 import { computeNextVerseIndex } from '@shared/bible-navigation';
+import { summarizeLabel } from '@shared/queue-items';
+import { useQueueDrag } from '../../composables/useQueueDrag';
 
 const emit = defineEmits<{
   preview: [html: string];
 }>();
 
 const { t } = useI18n();
-const { prefs, setBibleFile, setBibleSearchQuery, setBibleSelection } = usePreferences();
+const {
+  prefs,
+  setBibleFile,
+  setBibleSearchQuery,
+  setBibleSelection,
+  pushBibleSearchHistory,
+} = usePreferences();
+const { onDragStart } = useQueueDrag();
 const { sendAction } = useLiveSocket();
 const { matches: matchesShortcut } = useShortcuts();
 
@@ -48,6 +57,11 @@ const searchQuery = computed({
 });
 
 const parsedReference = computed(() => parseBibleReference(searchQuery.value));
+
+const bibleSearchHistoryVisible = computed(() => {
+  if (!prefs.value.bibleSearchHistoryEnabled) return [];
+  return prefs.value.bibleSearchHistory;
+});
 
 const filteredBooks = computed(() => {
   if (parsedReference.value) return books.value;
@@ -164,6 +178,20 @@ async function selectChapter(chapter: number) {
   }
 }
 
+function onVerseDragStart(event: DragEvent, verse: BibleVerse): void {
+  if (!selectedBook.value || selectedChapter.value === null) return;
+  onDragStart(event, {
+    kind: 'bible',
+    label: `${bookName.value || selectedBook.value.nome} ${selectedChapter.value}:${verse.versiculo}`,
+    text: verse.texto,
+    bibleFile: prefs.value.bibleFile,
+    bookId: selectedBook.value.id,
+    bookName: bookName.value || selectedBook.value.nome,
+    chapter: selectedChapter.value,
+    verseNum: verse.versiculo,
+  });
+}
+
 async function projectVerse(verse: BibleVerse) {
   if (!selectedBook.value || selectedChapter.value === null) return;
   selectedVerse.value = verse.versiculo;
@@ -190,6 +218,10 @@ async function projectVerse(verse: BibleVerse) {
   persistSelection();
 }
 
+function applySearchHistoryEntry(entry: string): void {
+  setBibleSearchQuery(entry);
+}
+
 async function navigateToReference() {
   const ref = parsedReference.value;
   if (!ref || books.value.length === 0) return;
@@ -201,6 +233,7 @@ async function navigateToReference() {
   }
 
   error.value = '';
+  pushBibleSearchHistory(searchQuery.value);
   await selectBook(book);
 
   if (ref.chapter != null && ref.chapter > chapterCount.value) {
@@ -300,6 +333,23 @@ onUnmounted(() => {
       class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
       :placeholder="t('bible.searchReferencePlaceholder')"
     />
+    <div
+      v-if="bibleSearchHistoryVisible.length"
+      class="flex flex-wrap gap-1.5"
+      role="list"
+      :aria-label="t('bible.searchHistoryLabel')"
+    >
+      <button
+        v-for="entry in bibleSearchHistoryVisible"
+        :key="entry"
+        type="button"
+        role="listitem"
+        class="rounded-full border border-lp-selection-nav-chip-border bg-lp-selection-nav-chip-bg px-2.5 py-0.5 text-xs text-lp-selection-nav-text transition hover:bg-lp-selection-nav-chip-hover"
+        @click="applySearchHistoryEntry(entry)"
+      >
+        {{ entry }}
+      </button>
+    </div>
 
     <div class="grid min-h-0 flex-1 grid-cols-3 gap-3">
       <div class="flex min-h-0 flex-col">
@@ -309,8 +359,12 @@ onUnmounted(() => {
             v-for="book in filteredBooks"
             :id="`bible-book-${book.id}`"
             :key="book.id"
-            class="cursor-pointer rounded px-2 py-1.5 transition hover:bg-violet-950/50"
-            :class="selectedBook?.id === book.id ? 'bg-violet-900/40 text-violet-100' : 'text-slate-200'"
+            class="cursor-pointer rounded px-2 py-1.5 transition hover:bg-lp-selection-nav-hover"
+            :class="
+              selectedBook?.id === book.id
+                ? 'bg-lp-selection-nav text-lp-selection-nav-text'
+                : 'text-lp-text/90'
+            "
             @click="selectBook(book)"
           >
             {{ book.nome }}
@@ -325,8 +379,12 @@ onUnmounted(() => {
             v-for="ch in chapters()"
             :id="selectedBook ? `bible-chapter-${selectedBook.id}-${ch}` : undefined"
             :key="ch"
-            class="cursor-pointer rounded px-2 py-1 text-center transition hover:bg-violet-950/50"
-            :class="selectedChapter === ch ? 'bg-violet-900/40 text-violet-100' : 'text-slate-200'"
+            class="cursor-pointer rounded px-2 py-1 text-center transition hover:bg-lp-selection-nav-hover"
+            :class="
+              selectedChapter === ch
+                ? 'bg-lp-selection-nav text-lp-selection-nav-text'
+                : 'text-lp-text/90'
+            "
             @click="selectChapter(ch)"
           >
             {{ ch }}
@@ -345,9 +403,16 @@ onUnmounted(() => {
                 : undefined
             "
             :key="verse.id"
-            class="cursor-pointer rounded px-2 py-1.5 text-slate-200 transition hover:bg-emerald-950/50"
-            :class="selectedVerse === verse.versiculo ? 'bg-emerald-900/40 text-emerald-100' : ''"
+            draggable="true"
+            class="cursor-grab rounded px-2 py-1.5 transition hover:bg-lp-selection-active-hover active:cursor-grabbing"
+            :class="
+              selectedVerse === verse.versiculo
+                ? 'bg-lp-selection-active text-lp-selection-active-text ring-1 ring-lp-selection-active-ring'
+                : 'text-lp-text/90'
+            "
+            :title="t('tabs.dragHint')"
             @click="projectVerse(verse)"
+            @dragstart="onVerseDragStart($event, verse)"
           >
             <span class="mr-2 font-semibold text-slate-500">{{ verse.versiculo }}</span>
             {{ verse.texto }}

@@ -1,17 +1,8 @@
 import os from 'node:os';
+import { isPrivateIpv4 } from './ip-policy.js';
 
 function isIpv4Family(family: string | number): boolean {
   return family === 'IPv4' || family === 4;
-}
-
-function isPrivateIpv4(address: string): boolean {
-  const parts = address.split('.').map(Number);
-  if (parts.length !== 4 || parts.some((n) => Number.isNaN(n))) return false;
-  const [a, b] = parts;
-  if (a === 10) return true;
-  if (a === 172 && b >= 16 && b <= 31) return true;
-  if (a === 192 && b === 168) return true;
-  return false;
 }
 
 function interfacePriority(name: string): number {

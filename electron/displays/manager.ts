@@ -1,8 +1,9 @@
-import { BrowserWindow, type Display } from 'electron';
+import { BrowserWindow, screen, type Display } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { applyChromiumUserAgent } from '../chromium-user-agent.js';
 import type { DisplayAssignment, DisplaysConfig } from './types.js';
-import { loadOrCreateConfig } from './config.js';
+import { loadOrCreateConfig, saveAssignments } from './config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -17,6 +18,7 @@ export class DisplayManager {
   private readonly windows = new Map<string, BrowserWindow>();
   private config: DisplaysConfig;
   private shuttingDown = false;
+  private hotplugAttached = false;
 
   constructor(private readonly options: DisplayManagerOptions) {
     this.config = loadOrCreateConfig();
@@ -35,14 +37,33 @@ export class DisplayManager {
   }
 
   async openAll(): Promise<void> {
-    for (const assignment of this.config.assignments) {
-      if (assignment.role === 'off') continue;
-      this.openWindow(assignment);
-    }
+    this.syncWithSystemDisplays();
   }
+
+  /** Escuta ligação/desligação de monitores e abre/fecha janelas sem reiniciar (CAD-175). */
+  attachHotplugListeners(): void {
+    if (this.hotplugAttached) return;
+    this.hotplugAttached = true;
+    screen.on('display-added', this.onDisplayChanged);
+    screen.on('display-removed', this.onDisplayChanged);
+    screen.on('display-metrics-changed', this.onDisplayChanged);
+  }
+
+  detachHotplugListeners(): void {
+    if (!this.hotplugAttached) return;
+    this.hotplugAttached = false;
+    screen.off('display-added', this.onDisplayChanged);
+    screen.off('display-removed', this.onDisplayChanged);
+    screen.off('display-metrics-changed', this.onDisplayChanged);
+  }
+
+  private readonly onDisplayChanged = (): void => {
+    this.syncWithSystemDisplays();
+  };
 
   closeAll(): void {
     this.shuttingDown = true;
+    this.detachHotplugListeners();
     for (const win of this.windows.values()) {
       if (!win.isDestroyed()) win.close();
     }
@@ -51,6 +72,40 @@ export class DisplayManager {
 
   reloadFromDisk(): void {
     this.config = loadOrCreateConfig();
+  }
+
+  private syncWithSystemDisplays(): void {
+    if (this.shuttingDown) return;
+
+    const before = JSON.stringify(this.config.assignments);
+    this.reloadFromDisk();
+    const connectedIds = new Set(screen.getAllDisplays().map((d) => d.id));
+
+    for (const [key, win] of [...this.windows.entries()]) {
+      const displayId = Number(key);
+      if (!connectedIds.has(displayId)) {
+        if (!win.isDestroyed()) win.close();
+        this.windows.delete(key);
+      }
+    }
+
+    for (const assignment of this.config.assignments) {
+      if (assignment.role === 'off') continue;
+      if (!connectedIds.has(assignment.displayId)) continue;
+      this.openWindow(assignment);
+      this.repositionWindow(assignment);
+    }
+
+    if (JSON.stringify(this.config.assignments) !== before) {
+      this.config = saveAssignments(this.config.assignments);
+    }
+  }
+
+  private repositionWindow(assignment: DisplayAssignment): void {
+    const win = this.windows.get(String(assignment.displayId));
+    if (!win || win.isDestroyed()) return;
+    const { x, y, width, height } = assignment.bounds;
+    win.setBounds({ x, y, width, height });
   }
 
   private urlForRole(assignment: DisplayAssignment): string {
@@ -98,6 +153,7 @@ export class DisplayManager {
       },
     });
 
+    applyChromiumUserAgent(win.webContents);
     win.setMenuBarVisibility(false);
     void win.loadURL(this.urlForRole(assignment));
 

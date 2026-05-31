@@ -4,6 +4,11 @@ export interface DisplayScreenSize {
   preset: string;
   largura: string;
   altura: string;
+  livePreview?: boolean;
+  position?: 'centro' | 'topo' | 'personalizado';
+  offsetX?: string;
+  offsetY?: string;
+  contentFit?: 'estender' | 'centralizar' | 'proporcional';
 }
 
 export interface DisplayAssignment {

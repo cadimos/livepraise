@@ -6,7 +6,7 @@ import {
   resolveTheme,
   resolveThemeAssetsDir,
 } from '../../core/themes/resolve.js';
-import { cssVariablesBlock } from '../../core/themes/css-vars.js';
+import { cssVariablesBlockNormalized } from '../../core/themes/css-vars.js';
 
 export function createThemesRouter(): Router {
   const router = Router();
@@ -40,7 +40,7 @@ export function createThemesRouter(): Router {
       res.status(404).type('text/plain').send('/* tema não encontrado */');
       return;
     }
-    res.type('text/css').send(cssVariablesBlock(theme));
+    res.type('text/css').send(cssVariablesBlockNormalized(theme));
   });
 
   router.get('/:themeId/assets/:filename', (req, res) => {

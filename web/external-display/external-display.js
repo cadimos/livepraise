@@ -2,9 +2,25 @@ import {
   attachProjectionContrast,
   syncProjectionContentState,
 } from './projection-contrast.js';
+import {
+  attachDisplayDebugOverlayListener,
+  updateLastActionBadge,
+} from '/shared/display-debug-overlay.js';
+import { resolveProjectionMediaUrl } from '/shared/projection-media-url.js';
+import { playProjectionVideo } from '/shared/projection-video-player.js';
+import { createFooterAlertOverlay } from '/shared/footer-alert-overlay.js';
+import { ensureEndpointDeviceId } from '/shared/endpoint-device-id.js';
+import { createServiceTimerOverlay } from '/shared/service-timer-overlay.js';
+import { clearViewerStatus, setViewerStatus } from '/shared/viewer-status.js';
+import {
+  attachProjectionTypographyWs,
+  createProjectionTypographyController,
+  fetchProjectionTypographyPrefs,
+} from '/shared/projection-typography-runtime.js';
 
-const STORAGE_KEY = 'livepraise.externalDeviceId';
 const PROFILES = new Set(['vocal', 'stage', 'player']);
+
+attachDisplayDebugOverlayListener();
 
 function wsUrl() {
   const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -18,13 +34,8 @@ function detectProfile() {
   return PROFILES.has(fromQuery ?? '') ? fromQuery : 'vocal';
 }
 
-function ensureDeviceId() {
-  let id = localStorage.getItem(STORAGE_KEY);
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(STORAGE_KEY, id);
-  }
-  return id;
+function ensureDeviceId(profile) {
+  return ensureEndpointDeviceId(profile);
 }
 
 function stripChordsForProjection(text) {
@@ -59,10 +70,55 @@ function byId(id) {
 }
 
 const profile = detectProfile();
-const deviceId = ensureDeviceId();
+const deviceId = ensureDeviceId(profile);
 document.body.dataset.profile = profile;
 
+const usesStageReturnLayout = profile === 'stage' || profile === 'vocal';
+
+const typography = createProjectionTypographyController({
+  rootEl: byId('conteudo'),
+  role: 'external-display',
+  externalProfile: profile,
+  mode: 'output',
+  textfillOptions: usesStageReturnLayout ? { allTexto: true } : undefined,
+  shadowSelector: usesStageReturnLayout ? '.texto-fill, .texto, .content' : '.content',
+});
+
+const serviceTimerOverlay = createServiceTimerOverlay({
+  kind: 'external',
+  id: deviceId,
+});
+
+const footerAlertOverlay = createFooterAlertOverlay({
+  kind: 'external',
+  id: deviceId,
+});
+
+const statusEl = () => byId('last-action');
+let wsConnected = false;
+let hasProjectionContent = false;
+
 let showChords = profile !== 'vocal';
+
+function refreshViewerStatus() {
+  if (document.body.dataset.displayDebug === 'true') {
+    return;
+  }
+  if (hasProjectionContent) {
+    clearViewerStatus(statusEl());
+    return;
+  }
+  if (!wsConnected) {
+    setViewerStatus(statusEl(), 'Reconectando…');
+    return;
+  }
+  setViewerStatus(
+    statusEl(),
+    hasProjectionContent
+      ? 'Ligado'
+      : 'Ligado — aguardando projeção do operador…',
+  );
+}
 
 async function registerDevice() {
   const res = await fetch(
@@ -96,43 +152,70 @@ function applyAction(action) {
       videoWrap.hidden = true;
       player.pause();
       bgImg.hidden = false;
-      bgImg.src = decodeURIComponent(action.valor);
+      bgImg.src = resolveProjectionMediaUrl(action.valor);
       break;
     case 'video':
       if (profile === 'vocal') return;
       bgImg.hidden = true;
       videoWrap.hidden = false;
-      player.src = decodeURIComponent(action.valor);
-      void player.play();
+      player.src = resolveProjectionMediaUrl(action.valor);
+      void playProjectionVideo(player);
       break;
     case 'texto':
       content.textContent = decodeURIComponent(action.valor);
       break;
     case 'viewMusica':
     case 'viewBiblia':
-      if (profile === 'stage') return;
+      if (usesStageReturnLayout) return;
       content.innerHTML = filterHtml(action.valor);
       break;
     case 'viewMusicaRetorno':
     case 'viewBibliaRetorno':
-      if (profile !== 'stage') return;
+      if (!usesStageReturnLayout) return;
+      content.style.visibility = 'hidden';
       content.innerHTML = filterHtml(action.valor);
       break;
     case 'removeConteudo':
       content.innerHTML = '';
+      hasProjectionContent = false;
       break;
     case 'atualizar':
       location.reload();
       break;
     case 'ajustarTela':
+      /* vocal/stage/live ocupam viewport inteira — ajuste de tela é só do projetor/player */
+      if (profile !== 'player') break;
       document.body.dataset.screen = action.valor;
       break;
+    case 'serviceTimer':
+      serviceTimerOverlay.applyValor(action.valor);
+      return;
+    case 'footerAlert':
+      footerAlertOverlay.applyValor(action.valor);
+      return;
     default:
       break;
   }
 
-  byId('last-action').textContent = `${action.acao} @ ${new Date().toLocaleTimeString()}`;
+  if (
+    action.acao === 'viewMusica' ||
+    action.acao === 'viewBiblia' ||
+    action.acao === 'viewMusicaRetorno' ||
+    action.acao === 'viewBibliaRetorno' ||
+    action.acao === 'texto'
+  ) {
+    hasProjectionContent = Boolean(
+      content.textContent?.trim() || content.innerHTML.trim(),
+    );
+  }
+
+  updateLastActionBadge(
+    statusEl(),
+    `${action.acao} @ ${new Date().toLocaleTimeString()}`,
+  );
   syncProjectionContentState(byId('stage'), content);
+  typography.scheduleRefresh();
+  refreshViewerStatus();
 }
 
 attachProjectionContrast({
@@ -143,7 +226,24 @@ attachProjectionContrast({
 });
 
 function connect() {
+  wsConnected = false;
+  refreshViewerStatus();
+
   const socket = new WebSocket(wsUrl());
+  let handleWsMessage = (message) => {
+    if (message.type === 'joined') {
+      wsConnected = true;
+      refreshViewerStatus();
+      if (message.state?.lastAction) {
+        applyAction(message.state.lastAction);
+      }
+      return;
+    }
+    if (message.type === 'live-action') {
+      applyAction(message.action);
+    }
+  };
+  handleWsMessage = attachProjectionTypographyWs(typography, handleWsMessage);
 
   socket.addEventListener('open', () => {
     socket.send(
@@ -160,23 +260,23 @@ function connect() {
 
   socket.addEventListener('message', (event) => {
     const message = JSON.parse(String(event.data));
-    if (message.type === 'live-action') {
-      applyAction(message.action);
-    }
-    if (message.type === 'joined' && message.state?.lastAction) {
-      applyAction(message.state.lastAction);
-    }
+    handleWsMessage(message);
   });
 
   socket.addEventListener('close', () => {
+    wsConnected = false;
+    refreshViewerStatus();
     setTimeout(connect, 1500);
+  });
+
+  socket.addEventListener('error', () => {
+    socket.close();
   });
 }
 
-registerDevice()
-  .then(connect)
-  .catch((err) => {
-    console.error(err);
-    byId('last-action').textContent = 'Erro ao registar dispositivo';
-    setTimeout(connect, 3000);
-  });
+setViewerStatus(statusEl(), 'A ligar…');
+void registerDevice().catch((err) => {
+  console.warn('Registo dispositivo:', err);
+});
+void fetchProjectionTypographyPrefs().then((prefs) => typography.init(prefs));
+connect();

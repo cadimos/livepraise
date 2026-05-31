@@ -12,7 +12,7 @@ import {
 } from '../../core/chrome-tabs/store.js';
 import type { LiveWebSocketHub } from '../websocket/index.js';
 import { getMainDb } from '../db/connection.js';
-import { requireAuth, requireOperatorAccess, requireRole } from '../middleware/auth.js';
+import { requireAuth, requireOperatorAccess, requireRemoteAccess } from '../middleware/auth.js';
 import { allowCors, jsonError } from '../middleware/common.js';
 
 export function createRemoteRouter(liveHub: LiveWebSocketHub): Router {
@@ -22,7 +22,7 @@ export function createRemoteRouter(liveHub: LiveWebSocketHub): Router {
   api.post(
     '/chrome-tab',
     requireAuth,
-    requireRole('remote'),
+    requireRemoteAccess,
     (req: Request, res: Response) => {
       allowCors(req, res, () => {});
       const label = String(req.body.label ?? '').trim();
@@ -62,7 +62,7 @@ export function createRemoteRouter(liveHub: LiveWebSocketHub): Router {
   api.post(
     '/live-request',
     requireAuth,
-    requireRole('remote'),
+    requireRemoteAccess,
     (req: Request, res: Response) => {
       allowCors(req, res, () => {});
       const kind = String(req.body.kind ?? '');

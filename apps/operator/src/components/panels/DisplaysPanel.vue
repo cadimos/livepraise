@@ -7,9 +7,11 @@ import { useLiveSocket } from '../../composables/useLiveSocket';
 import type { DisplayAssignment, DisplayScreenSize, ExternalDisplayProfile } from '@shared/types/live';
 import {
   SCREEN_SIZE_PRESETS,
-  buildAjustarTelaValor,
+  SCREEN_POSITIONS,
+  SCREEN_CONTENT_FITS,
+  buildAjustarTelaPayload,
+  buildAjustarTelaPayloadForDevice,
   defaultScreenSize,
-  encodeAjustarTelaForDisplay,
 } from '../../utils/screen-size';
 import { Settings } from '@lucide/vue';
 
@@ -25,10 +27,13 @@ interface ExternalDeviceDraft {
   label: string;
   showChords: boolean;
   online: boolean;
+  screenSize: DisplayScreenSize;
 }
 
 const externalDrafts = ref<ExternalDeviceDraft[]>([]);
 const savingExternalId = ref<string | null>(null);
+const savingRemoteDeviceId = ref<string | null>(null);
+const expandedRemoteDeviceId = ref<string | null>(null);
 
 const assignments = ref<DisplayAssignment[]>([]);
 const savingRoles = ref(false);
@@ -51,6 +56,24 @@ const presetOptions = computed(() =>
   })),
 );
 
+const positionOptions = computed(() =>
+  SCREEN_POSITIONS.map((value) => ({
+    value,
+    label: t(`displays.screenSize.positions.${value}`),
+  })),
+);
+
+const contentFitOptions = computed(() =>
+  SCREEN_CONTENT_FITS.map((value) => ({
+    value,
+    label: t(`displays.screenSize.contentFits.${value}`),
+  })),
+);
+
+function normalizeScreenSize(raw?: Partial<DisplayScreenSize>): DisplayScreenSize {
+  return { ...defaultScreenSize(), ...raw };
+}
+
 function ensureScreenSize(item: DisplayAssignment): DisplayScreenSize {
   if (!item.screenSize) {
     item.screenSize = defaultScreenSize();
@@ -58,12 +81,20 @@ function ensureScreenSize(item: DisplayAssignment): DisplayScreenSize {
   return item.screenSize;
 }
 
+function isExpandedDisplay(displayId: number): boolean {
+  return expandedDisplayId.value !== null && expandedDisplayId.value === displayId;
+}
+
 function isProjectionRole(role: DisplayRole): boolean {
   return role === 'projection';
 }
 
 function toggleScreenConfig(displayId: number): void {
-  expandedDisplayId.value = expandedDisplayId.value === displayId ? null : displayId;
+  expandedDisplayId.value = isExpandedDisplay(displayId) ? null : displayId;
+  if (expandedDisplayId.value !== null) {
+    const item = assignments.value.find((a) => a.displayId === expandedDisplayId.value);
+    if (item) previewDisplayScreen(item);
+  }
 }
 
 async function persistAssignments(): Promise<void> {
@@ -77,6 +108,39 @@ async function persistAssignments(): Promise<void> {
   });
 }
 
+function ensureRemoteScreenSize(item: ExternalDeviceDraft): DisplayScreenSize {
+  if (!item.screenSize) {
+    item.screenSize = defaultScreenSize();
+  }
+  return item.screenSize;
+}
+
+function remoteProjectorLabel(item: ExternalDeviceDraft): string {
+  const custom = item.label.trim();
+  if (custom) return custom;
+  return t('displays.remoteProjection.defaultLabel', { id: item.deviceId.slice(0, 8) });
+}
+
+const projectionRemoteDrafts = computed(() =>
+  externalDrafts.value.filter((d) => d.profile === 'projection'),
+);
+
+const otherExternalDrafts = computed(() =>
+  externalDrafts.value.filter((d) => d.profile !== 'projection'),
+);
+
+function isExpandedRemoteDevice(deviceId: string): boolean {
+  return expandedRemoteDeviceId.value === deviceId;
+}
+
+function toggleRemoteScreenConfig(deviceId: string): void {
+  expandedRemoteDeviceId.value = isExpandedRemoteDevice(deviceId) ? null : deviceId;
+  if (expandedRemoteDeviceId.value !== null) {
+    const item = projectionRemoteDrafts.value.find((d) => d.deviceId === expandedRemoteDeviceId.value);
+    if (item) previewRemoteProjectorScreen(item);
+  }
+}
+
 async function loadExternalDevices() {
   try {
     const data = await fetchJson<{
@@ -86,6 +150,7 @@ async function loadExternalDevices() {
         profile: ExternalDisplayProfile;
         label: string | null;
         showChords: boolean;
+        screenSize?: DisplayScreenSize | null;
       }[];
     }>('/api/devices');
     const onlineIds = new Set(onlineDevices.value.map((d) => d.deviceId));
@@ -98,16 +163,19 @@ async function loadExternalDevices() {
         label: device.label ?? '',
         showChords: device.showChords,
         online: onlineIds.has(device.deviceId),
+        screenSize: normalizeScreenSize(device.screenSize ?? undefined),
       });
     }
 
     for (const device of onlineDevices.value) {
+      const prev = merged.get(device.deviceId);
       merged.set(device.deviceId, {
         deviceId: device.deviceId,
         profile: device.profile,
-        label: device.label ?? merged.get(device.deviceId)?.label ?? '',
+        label: device.label ?? prev?.label ?? '',
         showChords: device.showChords,
         online: true,
+        screenSize: prev?.screenSize ?? defaultScreenSize(),
       });
     }
 
@@ -117,6 +185,43 @@ async function loadExternalDevices() {
     });
   } catch (e) {
     error.value = e instanceof Error ? e.message : t('displays.external.errors.load');
+  }
+}
+
+function previewRemoteProjectorScreen(item: ExternalDeviceDraft): void {
+  const screen = ensureRemoteScreenSize(item);
+  if (!screen.livePreview) return;
+  sendAction('ajustarTela', buildAjustarTelaPayloadForDevice(item.deviceId, screen));
+}
+
+async function saveRemoteProjectorScreen(item: ExternalDeviceDraft) {
+  const screen = ensureRemoteScreenSize(item);
+  savingRemoteDeviceId.value = item.deviceId;
+  message.value = '';
+  error.value = '';
+  try {
+    await fetchJson(`/api/devices/${encodeURIComponent(item.deviceId)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        label: item.label.trim() || null,
+        screenSize: screen,
+      }),
+    });
+
+    const payload = buildAjustarTelaPayloadForDevice(item.deviceId, screen);
+    if (!sendAction('ajustarTela', payload)) {
+      error.value = t('displays.screenSize.errors.socket');
+      return;
+    }
+
+    message.value = t('displays.screenSize.savedFor', { label: remoteProjectorLabel(item) });
+    expandedRemoteDeviceId.value = null;
+    await loadExternalDevices();
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : t('displays.screenSize.errors.save');
+  } finally {
+    savingRemoteDeviceId.value = null;
   }
 }
 
@@ -154,7 +259,7 @@ async function load() {
     }>('/displays/config');
     assignments.value = (data.config?.assignments ?? []).map((item) => ({
       ...item,
-      screenSize: item.screenSize ?? defaultScreenSize(),
+      screenSize: normalizeScreenSize(item.screenSize),
     }));
   } catch (e) {
     error.value = e instanceof Error ? e.message : t('displays.errors.load');
@@ -184,8 +289,7 @@ async function saveDisplayScreen(item: DisplayAssignment) {
     await persistAssignments();
 
     if (isProjectionRole(item.role)) {
-      const valor = buildAjustarTelaValor(screen.preset, screen.largura, screen.altura);
-      const payload = encodeAjustarTelaForDisplay(item.displayId, valor);
+      const payload = buildAjustarTelaPayload(item.displayId, screen);
       if (!sendAction('ajustarTela', payload)) {
         error.value = t('displays.screenSize.errors.socket');
         return;
@@ -200,6 +304,67 @@ async function saveDisplayScreen(item: DisplayAssignment) {
     savingScreenId.value = null;
   }
 }
+
+function previewDisplayScreen(item: DisplayAssignment): void {
+  if (!isProjectionRole(item.role)) return;
+  const screen = ensureScreenSize(item);
+  if (!screen.livePreview) return;
+  const payload = buildAjustarTelaPayload(item.displayId, screen);
+  sendAction('ajustarTela', payload);
+}
+
+watch(
+  () => {
+    const id = expandedDisplayId.value;
+    if (id === null) return null;
+    const item = assignments.value.find((a) => a.displayId === id);
+    if (!item || !isProjectionRole(item.role)) return null;
+    const screen = item.screenSize;
+    if (!screen) return null;
+    return JSON.stringify({
+      preset: screen.preset,
+      largura: screen.largura,
+      altura: screen.altura,
+      position: screen.position,
+      offsetX: screen.offsetX,
+      offsetY: screen.offsetY,
+      livePreview: screen.livePreview,
+      contentFit: screen.contentFit,
+    });
+  },
+  () => {
+    const id = expandedDisplayId.value;
+    if (id === null) return;
+    const item = assignments.value.find((a) => a.displayId === id);
+    if (item) previewDisplayScreen(item);
+  },
+);
+
+watch(
+  () => {
+    const id = expandedRemoteDeviceId.value;
+    if (id === null) return null;
+    const item = projectionRemoteDrafts.value.find((d) => d.deviceId === id);
+    if (!item) return null;
+    const screen = item.screenSize;
+    return JSON.stringify({
+      preset: screen.preset,
+      largura: screen.largura,
+      altura: screen.altura,
+      position: screen.position,
+      offsetX: screen.offsetX,
+      offsetY: screen.offsetY,
+      livePreview: screen.livePreview,
+      contentFit: screen.contentFit,
+    });
+  },
+  () => {
+    const id = expandedRemoteDeviceId.value;
+    if (id === null) return;
+    const item = projectionRemoteDrafts.value.find((d) => d.deviceId === id);
+    if (item) previewRemoteProjectorScreen(item);
+  },
+);
 
 onMounted(() => {
   void load();
@@ -248,8 +413,8 @@ watch(onlineDevices, () => {
               class="rounded-md p-1.5 text-lp-muted transition hover:bg-lp-surface hover:text-lp-primary"
               :title="t('displays.screenSize.configure')"
               :aria-label="t('displays.screenSize.configure')"
-              :aria-expanded="expandedDisplayId === item.displayId"
-              @click="toggleScreenConfig(item.displayId)"
+              :aria-expanded="isExpandedDisplay(item.displayId)"
+              @click.stop="toggleScreenConfig(item.displayId)"
             >
               <Settings class="h-5 w-5" aria-hidden="true" />
             </button>
@@ -265,7 +430,7 @@ watch(onlineDevices, () => {
         </div>
 
         <div
-          v-if="expandedDisplayId === item.displayId && isProjectionRole(item.role)"
+          v-if="isExpandedDisplay(item.displayId) && isProjectionRole(item.role)"
           class="border-t border-lp-surface px-3 py-3"
         >
           <p class="mb-3 text-xs text-lp-muted">
@@ -305,6 +470,59 @@ watch(onlineDevices, () => {
                 :placeholder="t('displays.screenSize.heightPlaceholder')"
               />
             </label>
+            <label class="flex flex-col gap-1 text-sm sm:col-span-2">
+              <span class="text-lp-muted">{{ t('displays.screenSize.positionLabel') }}</span>
+              <select
+                v-model="ensureScreenSize(item).position"
+                class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+              >
+                <option v-for="opt in positionOptions" :key="opt.value" :value="opt.value">
+                  {{ opt.label }}
+                </option>
+              </select>
+            </label>
+            <label
+              v-if="ensureScreenSize(item).position === 'personalizado'"
+              class="flex flex-col gap-1 text-sm"
+            >
+              <span class="text-lp-muted">{{ t('displays.screenSize.offsetXLabel') }}</span>
+              <input
+                v-model="ensureScreenSize(item).offsetX"
+                type="text"
+                inputmode="numeric"
+                class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+                :placeholder="t('displays.screenSize.offsetXPlaceholder')"
+              />
+            </label>
+            <label
+              v-if="ensureScreenSize(item).position === 'personalizado'"
+              class="flex flex-col gap-1 text-sm"
+            >
+              <span class="text-lp-muted">{{ t('displays.screenSize.offsetYLabel') }}</span>
+              <input
+                v-model="ensureScreenSize(item).offsetY"
+                type="text"
+                inputmode="numeric"
+                class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+                :placeholder="t('displays.screenSize.offsetYPlaceholder')"
+              />
+            </label>
+            <label class="flex flex-col gap-1 text-sm sm:col-span-2">
+              <span class="text-lp-muted">{{ t('displays.screenSize.contentFitLabel') }}</span>
+              <select
+                v-model="ensureScreenSize(item).contentFit"
+                class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+              >
+                <option v-for="opt in contentFitOptions" :key="opt.value" :value="opt.value">
+                  {{ opt.label }}
+                </option>
+              </select>
+              <span class="text-xs text-lp-muted">{{ t('displays.screenSize.contentFitHint') }}</span>
+            </label>
+            <label class="inline-flex items-center gap-2 text-sm sm:col-span-2">
+              <input v-model="ensureScreenSize(item).livePreview" type="checkbox" />
+              <span>{{ t('displays.screenSize.livePreview') }}</span>
+            </label>
           </div>
           <button
             type="button"
@@ -335,12 +553,168 @@ watch(onlineDevices, () => {
     </button>
 
     <section class="mt-6 border-t border-lp-surface pt-4">
+      <h3 class="text-sm font-semibold text-lp-text">{{ t('displays.remoteProjection.title') }}</h3>
+      <p class="mt-1 text-sm text-lp-muted">{{ t('displays.remoteProjection.hint') }}</p>
+
+      <ul v-if="projectionRemoteDrafts.length" class="mt-3 space-y-2">
+        <li
+          v-for="item in projectionRemoteDrafts"
+          :key="item.deviceId"
+          class="rounded-lg border border-lp-primary/20 bg-lp-surface/60"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
+            <span class="text-sm text-lp-text">
+              {{ remoteProjectorLabel(item) }}
+              <span class="ml-1 text-xs text-lp-muted">{{ t('displays.external.profiles.projection') }}</span>
+              <span
+                v-if="item.online"
+                class="ml-2 rounded bg-emerald-900/50 px-1.5 py-0.5 text-xs text-emerald-300"
+              >
+                {{ t('displays.external.online') }}
+              </span>
+            </span>
+            <div class="flex items-center gap-1">
+              <button
+                type="button"
+                class="rounded-md p-1.5 text-lp-muted transition hover:bg-lp-surface hover:text-lp-primary"
+                :title="t('displays.screenSize.configure')"
+                :aria-label="t('displays.screenSize.configure')"
+                :aria-expanded="isExpandedRemoteDevice(item.deviceId)"
+                @click.stop="toggleRemoteScreenConfig(item.deviceId)"
+              >
+                <Settings class="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+
+          <div
+            v-if="isExpandedRemoteDevice(item.deviceId)"
+            class="border-t border-lp-surface px-3 py-3"
+          >
+            <label class="mb-3 flex flex-col gap-1 text-sm">
+              <span class="text-lp-muted">{{ t('displays.external.label') }}</span>
+              <input
+                v-model="item.label"
+                type="text"
+                class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+              />
+            </label>
+            <p class="mb-3 text-xs text-lp-muted">
+              {{ t('displays.screenSize.monitorTitle', { label: remoteProjectorLabel(item) }) }}
+            </p>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="flex flex-col gap-1 text-sm sm:col-span-2">
+                <span class="text-lp-muted">{{ t('displays.screenSize.presetLabel') }}</span>
+                <select
+                  v-model="ensureRemoteScreenSize(item).preset"
+                  class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+                >
+                  <option v-for="opt in presetOptions" :key="opt.value" :value="opt.value">
+                    {{ opt.label }}
+                  </option>
+                </select>
+              </label>
+              <label class="flex flex-col gap-1 text-sm">
+                <span class="text-lp-muted">{{ t('displays.screenSize.widthLabel') }}</span>
+                <input
+                  v-model="ensureRemoteScreenSize(item).largura"
+                  type="text"
+                  inputmode="numeric"
+                  class="lp-field w-full rounded-md px-2 py-1.5 text-sm disabled:opacity-50"
+                  :disabled="ensureRemoteScreenSize(item).preset !== 'personalizado'"
+                  :placeholder="t('displays.screenSize.widthPlaceholder')"
+                />
+              </label>
+              <label class="flex flex-col gap-1 text-sm">
+                <span class="text-lp-muted">{{ t('displays.screenSize.heightLabel') }}</span>
+                <input
+                  v-model="ensureRemoteScreenSize(item).altura"
+                  type="text"
+                  inputmode="numeric"
+                  class="lp-field w-full rounded-md px-2 py-1.5 text-sm disabled:opacity-50"
+                  :disabled="ensureRemoteScreenSize(item).preset !== 'personalizado'"
+                  :placeholder="t('displays.screenSize.heightPlaceholder')"
+                />
+              </label>
+              <label class="flex flex-col gap-1 text-sm sm:col-span-2">
+                <span class="text-lp-muted">{{ t('displays.screenSize.positionLabel') }}</span>
+                <select
+                  v-model="ensureRemoteScreenSize(item).position"
+                  class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+                >
+                  <option v-for="opt in positionOptions" :key="opt.value" :value="opt.value">
+                    {{ opt.label }}
+                  </option>
+                </select>
+              </label>
+              <label
+                v-if="ensureRemoteScreenSize(item).position === 'personalizado'"
+                class="flex flex-col gap-1 text-sm"
+              >
+                <span class="text-lp-muted">{{ t('displays.screenSize.offsetXLabel') }}</span>
+                <input
+                  v-model="ensureRemoteScreenSize(item).offsetX"
+                  type="text"
+                  inputmode="numeric"
+                  class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+                  :placeholder="t('displays.screenSize.offsetXPlaceholder')"
+                />
+              </label>
+              <label
+                v-if="ensureRemoteScreenSize(item).position === 'personalizado'"
+                class="flex flex-col gap-1 text-sm"
+              >
+                <span class="text-lp-muted">{{ t('displays.screenSize.offsetYLabel') }}</span>
+                <input
+                  v-model="ensureRemoteScreenSize(item).offsetY"
+                  type="text"
+                  inputmode="numeric"
+                  class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+                  :placeholder="t('displays.screenSize.offsetYPlaceholder')"
+                />
+              </label>
+              <label class="flex flex-col gap-1 text-sm sm:col-span-2">
+                <span class="text-lp-muted">{{ t('displays.screenSize.contentFitLabel') }}</span>
+                <select
+                  v-model="ensureRemoteScreenSize(item).contentFit"
+                  class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+                >
+                  <option v-for="opt in contentFitOptions" :key="opt.value" :value="opt.value">
+                    {{ opt.label }}
+                  </option>
+                </select>
+                <span class="text-xs text-lp-muted">{{ t('displays.screenSize.contentFitHint') }}</span>
+              </label>
+              <label class="inline-flex items-center gap-2 text-sm sm:col-span-2">
+                <input v-model="ensureRemoteScreenSize(item).livePreview" type="checkbox" />
+                <span>{{ t('displays.screenSize.livePreview') }}</span>
+              </label>
+            </div>
+            <button
+              type="button"
+              class="mt-3 rounded-lg bg-lp-primary px-4 py-2 text-sm font-medium text-lp-background transition hover:opacity-90 disabled:opacity-50"
+              :disabled="savingRemoteDeviceId === item.deviceId"
+              @click="saveRemoteProjectorScreen(item)"
+            >
+              {{
+                savingRemoteDeviceId === item.deviceId
+                  ? t('displays.screenSize.saving')
+                  : t('displays.screenSize.save')
+              }}
+            </button>
+          </div>
+        </li>
+      </ul>
+      <p v-else class="mt-2 text-sm text-lp-muted">{{ t('displays.remoteProjection.none') }}</p>
+    </section>
+
+    <section class="mt-6 border-t border-lp-surface pt-4">
       <h3 class="text-sm font-semibold text-lp-text">{{ t('displays.external.title') }}</h3>
       <p class="mt-1 text-sm text-lp-muted">{{ t('displays.external.hint') }}</p>
 
-      <ul v-if="externalDrafts.length" class="mt-3 space-y-2">
+      <ul v-if="otherExternalDrafts.length" class="mt-3 space-y-2">
         <li
-          v-for="item in externalDrafts"
+          v-for="item in otherExternalDrafts"
           :key="item.deviceId"
           class="rounded-lg border border-lp-primary/20 bg-lp-surface/60 px-3 py-3"
         >

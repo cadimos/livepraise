@@ -16,7 +16,7 @@ const APP_VERSION = '1.0.0-alpha.1';
 
 const { t } = useI18n();
 const { prefs } = usePreferences();
-const { connected } = useLiveSocket();
+const { connected, authRequired } = useLiveSocket();
 const { themes, applyTheme } = useTheme();
 const { availableLocales, changeLocale } = useLocale();
 const { localIp, networkOnline } = useLocalIp();
@@ -120,13 +120,19 @@ onMounted(() => {
 
     <span
       class="inline-flex items-center gap-1.5"
-      :class="connected ? 'text-emerald-400' : 'text-amber-400'"
+      :class="connected ? 'text-emerald-400' : authRequired ? 'text-rose-400' : 'text-amber-400'"
     >
       <span
         class="h-1.5 w-1.5 rounded-full"
-        :class="connected ? 'bg-emerald-400' : 'bg-amber-400'"
+        :class="connected ? 'bg-emerald-400' : authRequired ? 'bg-rose-400' : 'bg-amber-400'"
       />
-      {{ connected ? t('connection.connected') : t('connection.reconnecting') }}
+      {{
+        connected
+          ? t('connection.connected')
+          : authRequired
+            ? t('connection.authRequired')
+            : t('connection.reconnecting')
+      }}
     </span>
 
     <ExternalDeviceStatusMenu

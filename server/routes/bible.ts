@@ -8,7 +8,11 @@ import {
   isDbError,
   openDbAt,
 } from '../db/connection.js';
-import { resolveMediaRelativePath } from '../../core/security/media-file.js';
+import {
+  normalizeMediaRelativeRef,
+  resolveMediaRelativePath,
+  type MediaKind,
+} from '../../core/security/media-file.js';
 import { getLivepraiseHome } from '../config/paths.js';
 import { allowCors, jsonError } from '../middleware/common.js';
 import { requireOperatorAccess } from '../middleware/auth.js';
@@ -144,6 +148,24 @@ export function createBibleRouter(): Router {
   return api;
 }
 
+function parseQuickBackgroundId(value: unknown): number | null {
+  const id = typeof value === 'string' ? Number.parseInt(value, 10) : Number(value);
+  if (!Number.isInteger(id) || id < 1) return null;
+  return id;
+}
+
+function slotMatchesMediaRef(
+  slotUrl: string,
+  slotDiretorio: string,
+  targetUrl: string,
+  kind: MediaKind,
+): boolean {
+  if (slotUrl === targetUrl && slotDiretorio === kind) return true;
+  const slotNorm = normalizeMediaRelativeRef(slotUrl, kind);
+  const targetNorm = normalizeMediaRelativeRef(targetUrl, kind);
+  return Boolean(slotNorm && targetNorm && slotNorm === targetNorm);
+}
+
 export function createBackgroundRouter(): Router {
   const router = Router();
   const db = getMainDb();
@@ -162,6 +184,104 @@ export function createBackgroundRouter(): Router {
   });
 
   router.patch(
+    '/background-rapido/inicial',
+    requireOperatorAccess,
+    (req: Request, res: Response) => {
+      allowCors(req, res, () => {});
+      const body = req.body as { id?: number | string; url?: string; diretorio?: string };
+      const id = parseQuickBackgroundId(body.id);
+
+      if (id) {
+        const changes = dbRun(db, "UPDATE background_rapido SET inicial = 'N'");
+        if (isDbError(changes)) {
+          res.json(changes);
+          return;
+        }
+        const marked = dbRun(
+          db,
+          "UPDATE background_rapido SET inicial = 'S' WHERE id = ?",
+          [id],
+        );
+        if (isDbError(marked)) {
+          res.json(marked);
+          return;
+        }
+        if (marked === 0) {
+          jsonError(res, 404, 'Fundo rápido não encontrado');
+          return;
+        }
+        res.json({ status: 'Sucesso', id });
+        return;
+      }
+
+      const diretorio = String(body.diretorio ?? '');
+      const kind =
+        diretorio === 'videos' ? 'videos' : diretorio === 'imagens' ? 'imagens' : null;
+      if (!kind) {
+        jsonError(res, 400, 'diretorio inválido');
+        return;
+      }
+
+      const url = normalizeMediaRelativeRef(String(body.url ?? ''), kind);
+      if (!url) {
+        jsonError(res, 400, 'Informe id ou url com diretorio válido');
+        return;
+      }
+
+      const home = getLivepraiseHome();
+      const slots = dbAll<{ id: number; url: string; diretorio: string; inicial: string }>(
+        db,
+        'SELECT id, url, diretorio, inicial FROM background_rapido ORDER BY id ASC',
+      );
+      if (isDbError(slots)) {
+        res.json(slots);
+        return;
+      }
+      if (!slots.length) {
+        jsonError(res, 404, 'Nenhum fundo rápido configurado');
+        return;
+      }
+
+      const match = slots.find((slot) =>
+        slotMatchesMediaRef(slot.url, slot.diretorio, url, kind),
+      );
+      const onDisk = resolveMediaRelativePath(home, kind, url);
+      if (!onDisk && !match) {
+        jsonError(res, 400, 'Ficheiro de mídia inválido');
+        return;
+      }
+
+      const targetId = match?.id ?? slots.find((slot) => slot.inicial === 'S')?.id ?? slots[0]?.id;
+      if (!targetId) {
+        jsonError(res, 404, 'Fundo rápido não encontrado');
+        return;
+      }
+
+      const cleared = dbRun(db, "UPDATE background_rapido SET inicial = 'N'");
+      if (isDbError(cleared)) {
+        res.json(cleared);
+        return;
+      }
+
+      const updated = dbRun(
+        db,
+        "UPDATE background_rapido SET url = ?, diretorio = ?, inicial = 'S' WHERE id = ?",
+        [url, kind, targetId],
+      );
+      if (isDbError(updated)) {
+        res.json(updated);
+        return;
+      }
+      if (updated === 0) {
+        jsonError(res, 404, 'Fundo rápido não encontrado');
+        return;
+      }
+
+      res.json({ status: 'Sucesso', id: targetId, url, diretorio: kind });
+    },
+  );
+
+  router.patch(
     '/background-rapido/:id',
     requireOperatorAccess,
     (req: Request, res: Response) => {
@@ -173,21 +293,16 @@ export function createBackgroundRouter(): Router {
       }
 
       const body = req.body as { url?: string; diretorio?: string };
-      const url = String(body.url ?? '').replaceAll('\\', '/');
       const diretorio = String(body.diretorio ?? '');
-      if (!url || !diretorio) {
-        jsonError(res, 400, 'url e diretorio são obrigatórios');
-        return;
-      }
-
-      if (url.includes('base64')) {
-        jsonError(res, 400, 'Substituição por base64 não suportada');
-        return;
-      }
-
       const kind = diretorio === 'videos' ? 'videos' : diretorio === 'imagens' ? 'imagens' : null;
       if (!kind) {
         jsonError(res, 400, 'diretorio inválido');
+        return;
+      }
+
+      const url = normalizeMediaRelativeRef(String(body.url ?? ''), kind);
+      if (!url || url.includes('base64')) {
+        jsonError(res, 400, 'url e diretorio são obrigatórios');
         return;
       }
 
@@ -200,7 +315,7 @@ export function createBackgroundRouter(): Router {
       const changes = dbRun(
         db,
         'UPDATE background_rapido SET url = ?, diretorio = ? WHERE id = ?',
-        [url, diretorio, id],
+        [url, kind, id],
       );
       if (isDbError(changes)) {
         res.json(changes);

@@ -2,7 +2,7 @@
 
 | Papel (`role`) | Uso | Visualizações de monitor atribuíveis |
 |----------------|-----|--------------------------------------|
-| `admin` | Administrador local | `operator`, `projection`, `stage-return`, `off` |
+| `admin` | Administrador local (inclui envio remoto) | `operator`, `projection`, `stage-return`, `off` |
 | `operator` | Operador local | `operator`, `off` |
 | `remote` | Acesso remoto / aprovações | — (não gere monitores) |
 
@@ -14,12 +14,9 @@ O utilizador inicial `admin` (bootstrap) recebe papel **`admin`**, não `operato
 - `PUT /displays/config` com Bearer: valida que cada `assignment.role` está permitido para o papel da sessão.
 - Consola Electron em loopback (`127.0.0.1`) sem token mantém comportamento legado (sem validação por sessão).
 
-## Smoke
+## Regressão
 
-```bash
-npm run build
-node scripts/smoke-cad119.mjs
-```
+Papéis e `PUT /displays/config` entram na suite de release (`npm run smoke:release`). Durante o desenvolvimento use `npm run typecheck`.
 
 ## Legado
 

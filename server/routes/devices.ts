@@ -7,15 +7,28 @@ import {
   patchExternalDevice,
   touchExternalDevice,
 } from '../../core/devices/external-devices.js';
+import type { DisplayScreenSize } from '../../shared/types/live.js';
 import { getMainDb } from '../db/connection.js';
 import { jsonError } from '../middleware/common.js';
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+const PROFILE_HINT =
+  'profile inválido (live|vocal|stage|player|projection)';
+
 function parseDeviceId(raw: string): string | null {
   const id = raw.trim();
   return UUID_RE.test(id) ? id : null;
+}
+
+function parseScreenSizeBody(raw: unknown): DisplayScreenSize | null | undefined {
+  if (raw === undefined) return undefined;
+  if (raw === null) return null;
+  if (typeof raw !== 'object' || raw === null || !('preset' in raw)) {
+    return undefined;
+  }
+  return raw as DisplayScreenSize;
 }
 
 export function createDevicesRouter(): Router {
@@ -38,7 +51,7 @@ export function createDevicesRouter(): Router {
 
     if (!device && profileRaw) {
       if (!isExternalDisplayProfile(profileRaw)) {
-        jsonError(res, 400, 'profile inválido (live|vocal|stage|player)');
+        jsonError(res, 400, PROFILE_HINT);
         return;
       }
       device = touchExternalDevice(db, deviceId, profileRaw);
@@ -52,7 +65,11 @@ export function createDevicesRouter(): Router {
     }
 
     if (!device) {
-      jsonError(res, 404, 'Dispositivo não registado; envie ?profile=live|vocal|stage|player');
+      jsonError(
+        res,
+        404,
+        'Dispositivo não registado; envie ?profile=live|vocal|stage|player|projection',
+      );
       return;
     }
 
@@ -69,13 +86,17 @@ export function createDevicesRouter(): Router {
     const profileRaw = String(req.body.profile ?? req.query.profile ?? '').trim();
     if (profileRaw) {
       if (!isExternalDisplayProfile(profileRaw)) {
-        jsonError(res, 400, 'profile inválido (live|vocal|stage|player)');
+        jsonError(res, 400, PROFILE_HINT);
         return;
       }
       touchExternalDevice(db, deviceId, profileRaw);
     }
 
-    const patch: { showChords?: boolean; label?: string | null } = {};
+    const patch: {
+      showChords?: boolean;
+      label?: string | null;
+      screenSize?: DisplayScreenSize | null;
+    } = {};
     if (req.body.showChords !== undefined) {
       patch.showChords = Boolean(req.body.showChords);
     }
@@ -84,6 +105,14 @@ export function createDevicesRouter(): Router {
         req.body.label === null || req.body.label === ''
           ? null
           : String(req.body.label);
+    }
+    const screenSize = parseScreenSizeBody(req.body.screenSize);
+    if (screenSize === undefined && req.body.screenSize !== undefined) {
+      jsonError(res, 400, 'screenSize inválido');
+      return;
+    }
+    if (screenSize !== undefined) {
+      patch.screenSize = screenSize;
     }
 
     const updated = patchExternalDevice(db, deviceId, patch);

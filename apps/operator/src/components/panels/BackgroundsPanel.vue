@@ -3,31 +3,32 @@ import { ref, onMounted, watch } from 'vue';
 import {
   fetchJson,
   mediaUrl,
+  quickBackgroundDisplayUrl,
+  quickBackgroundProjectionUrl,
   type QuickBackground,
 } from '../../composables/useApi';
 import { usePreferences } from '../../composables/usePreferences';
-import { useLiveSocket } from '../../composables/useLiveSocket';
+import { useLiveSocket, whenLiveSocketReady } from '../../composables/useLiveSocket';
 import {
   projectQuickBackground,
   projectTabImageBackground,
 } from '../../utils/projection-actions';
+import {
+  isProjectionBackgroundAction,
+  projectionBackgroundPreviewUrl,
+} from '../../utils/projection-background';
 
 const emit = defineEmits<{
   previewBg: [url: string];
 }>();
 
 const { prefs, setImageCategory } = usePreferences();
-const { sendAction } = useLiveSocket();
+const { sendAction, lastAction } = useLiveSocket();
 
 const quickBackgrounds = ref<QuickBackground[]>([]);
 const imageCategories = ref<string[]>([]);
 const images = ref<string[]>([]);
 const error = ref('');
-
-function resolveBackgroundUrl(item: QuickBackground): string {
-  if (item.url.includes('base64')) return item.url;
-  return mediaUrl(item.url);
-}
 
 async function loadQuickBackgrounds() {
   try {
@@ -35,11 +36,18 @@ async function loadQuickBackgrounds() {
       '/background-rapido',
     );
     quickBackgrounds.value = data.items ?? [];
-    const initial = quickBackgrounds.value.find((b) => b.inicial === 'S');
-    if (initial) {
-      const url = resolveBackgroundUrl(initial);
-      emit('previewBg', url);
-    }
+    whenLiveSocketReady(() => {
+      const action = lastAction.value;
+      if (isProjectionBackgroundAction(action)) {
+        emit('previewBg', projectionBackgroundPreviewUrl(action));
+        return;
+      }
+      const initial = quickBackgrounds.value.find((b) => b.inicial === 'S');
+      if (initial) {
+        emit('previewBg', quickBackgroundDisplayUrl(initial));
+        projectQuickBackground(sendAction, quickBackgroundProjectionUrl(initial));
+      }
+    });
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Erro ao carregar fundos rápidos';
   }
@@ -80,9 +88,8 @@ function projectBackground(url: string) {
 }
 
 function projectQuick(item: QuickBackground) {
-  const url = resolveBackgroundUrl(item);
-  emit('previewBg', url);
-  projectQuickBackground(sendAction, url);
+  emit('previewBg', quickBackgroundDisplayUrl(item));
+  projectQuickBackground(sendAction, quickBackgroundProjectionUrl(item));
 }
 
 watch(
@@ -115,7 +122,7 @@ onMounted(() => {
           @click="projectQuick(item)"
         >
           <img
-            :src="resolveBackgroundUrl(item)"
+            :src="quickBackgroundDisplayUrl(item)"
             alt=""
             class="h-full w-full object-cover"
           />

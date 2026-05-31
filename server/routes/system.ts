@@ -4,6 +4,7 @@ import {
   clearErrorLogs,
   listErrorLogs,
 } from '../../core/error-log/store.js';
+import { listSystemFonts } from '../../core/fonts/system-fonts.js';
 import { getPrimaryLocalIpv4 } from '../../core/network/local-ipv4.js';
 import type { ErrorLogLevel } from '../../core/error-log/types.js';
 import { requireOperatorAccess } from '../middleware/auth.js';
@@ -22,6 +23,11 @@ export function createSystemRouter(): Router {
       status: 'successo',
       ipv4: getPrimaryLocalIpv4(),
     });
+  });
+
+  api.get('/fonts', requireOperatorAccess, async (_req: Request, res: Response) => {
+    const items = await listSystemFonts();
+    res.json({ status: 'successo', items });
   });
 
   api.get('/error-log', requireOperatorAccess, (req: Request, res: Response) => {

@@ -39,6 +39,12 @@ tags:
     description: Temas visuais
   - name: locales
     description: Traduções i18n
+  - name: queue
+    description: Importação de mídia para a fila (upload, YouTube, URL)
+  - name: playlist
+    description: Resolução de músicas para importação de playlist
+  - name: devices
+    description: Dispositivos externos (live, vocal, stage, player)
   - name: websocket
     description: Hub WebSocket `/ws/live`
 
@@ -60,7 +66,173 @@ paths:
                   value:
                     status: ok
                     phase: fase-8-release
+                    version: 1.0.0-alpha.1
                     websocket: /ws/live
+                    modules:
+                      - id: database
+                        name: Base de dados (SQLite)
+                        active: true
+                        mount: dsw.bd
+                      - id: websocket
+                        name: Hub WebSocket ao vivo
+                        active: true
+                        mount: /ws/live
+
+  /api/queue/import-url:
+    post:
+      tags: [queue]
+      summary: Importar imagem ou vídeo na fila a partir de URL HTTP(S)
+      operationId: postQueueImportUrl
+      description: |
+        Modo `download` (default): o servidor descarrega o ficheiro com validação SSRF,
+        limites de tamanho (50 MB imagem / 600 MB vídeo) e timeout (60 s).
+        Modo `reference`: devolve a URL HTTPS sem fetch server-side.
+        URLs YouTube devem usar `POST /api/queue/youtube`.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueueImportUrlRequest'
+      responses:
+        '200':
+          description: Item pronto para a fila
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueueImportUrlResponse'
+        '400':
+          description: URL inválida, SSRF, tipo não suportado ou YouTube
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: Ficheiro com o mesmo nome já existe na categoria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+
+  /video/importar/url:
+    post:
+      tags: [queue]
+      summary: Alias legado de import-url (vídeo)
+      operationId: postVideoImportUrl
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueueImportUrlRequest'
+      responses:
+        '200':
+          description: Ver POST /api/queue/import-url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueueImportUrlResponse'
+
+  /imagem/importar/url:
+    post:
+      tags: [queue]
+      summary: Alias legado de import-url (imagem)
+      operationId: postImageImportUrl
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueueImportUrlRequest'
+      responses:
+        '200':
+          description: Ver POST /api/queue/import-url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueueImportUrlResponse'
+
+  /fonts/{familia}/{fileName}:
+    get:
+      tags: [fonts]
+      summary: Ficheiro de fonte embutida (público na LAN)
+      description: |
+        Serve apenas ficheiros listados em `resources/fonts/manifest.json`.
+        Sem autenticação — necessário para `@font-face` em projetor e clientes `/live`.
+      operationId: getBundledFontFile
+      parameters:
+        - name: familia
+          in: path
+          required: true
+          schema:
+            type: string
+            example: roboto
+        - name: fileName
+          in: path
+          required: true
+          schema:
+            type: string
+            example: Roboto-Regular.woff2
+      responses:
+        '200':
+          description: Ficheiro de fonte
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+          content:
+            font/woff2:
+              schema:
+                type: string
+                format: binary
+            font/woff:
+              schema:
+                type: string
+                format: binary
+            font/ttf:
+              schema:
+                type: string
+                format: binary
+            font/otf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Família ou ficheiro não permitido
+
+  /api/system/fonts:
+    get:
+      tags: [system]
+      summary: Fontes instaladas no sistema operativo
+      operationId: listSystemFonts
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista deduplicada (sem paths absolutos)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, items]
+                properties:
+                  status:
+                    type: string
+                    example: successo
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required: [family, localizedName]
+                      properties:
+                        family:
+                          type: string
+                        localizedName:
+                          type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
   /api/system/local-ip:
     get:
@@ -94,6 +266,19 @@ paths:
           description: YAML OpenAPI 3.1
           content:
             application/yaml:
+              schema:
+                type: string
+
+  /api/docs:
+    get:
+      tags: [system]
+      summary: Swagger UI (documentação interactiva)
+      operationId: getOpenApiUi
+      responses:
+        '200':
+          description: Página HTML com Swagger UI
+          content:
+            text/html:
               schema:
                 type: string
 
@@ -514,6 +699,75 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/devices:
+    get:
+      tags: [devices]
+      summary: Listar dispositivos externos registados
+      operationId: listExternalDevices
+      responses:
+        '200':
+          description: Dispositivos ordenados por última actividade
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, devices]
+                properties:
+                  status:
+                    type: string
+                    example: successo
+                  devices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExternalDevice'
+
+  /api/devices/{deviceId}:
+    get:
+      tags: [devices]
+      summary: Obter ou registar dispositivo externo
+      description: |
+        Com `?profile=live|vocal|stage|player` cria ou actualiza o registo.
+        Sem profile, devolve o dispositivo existente (404 se nunca registado).
+      operationId: getExternalDevice
+      parameters:
+        - $ref: '#/components/parameters/deviceId'
+        - name: profile
+          in: query
+          schema:
+            type: string
+            enum: [live, vocal, stage, player]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalDeviceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [devices]
+      summary: Actualizar preferências do dispositivo
+      operationId: patchExternalDevice
+      parameters:
+        - $ref: '#/components/parameters/deviceId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalDevicePatch'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalDeviceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /musica/categoria:
     get:
       tags: [music]
@@ -668,6 +922,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/MusicWriteResponse'
 
+  /playlist/resolve:
+    post:
+      tags: [playlist]
+      summary: Verificar existência de músicas na BD local
+      description: Usado na importação cross-instalação de playlists (chrome tabs).
+      operationId: resolvePlaylistSongs
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaylistResolveRequest'
+            examples:
+              ids:
+                value:
+                  songIds: [1, 42, 99]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaylistResolveResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   /biblias:
     get:
       tags: [bible]
@@ -793,6 +1076,107 @@ paths:
               schema:
                 $ref: '#/components/schemas/SuccessItems'
 
+  /background-rapido/{id}:
+    patch:
+      tags: [bible]
+      summary: Actualizar fundo rápido
+      operationId: patchQuickBackground
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuickBackgroundPatch'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, id, url, diretorio]
+                properties:
+                  status:
+                    type: string
+                  id:
+                    type: integer
+                  url:
+                    type: string
+                  diretorio:
+                    type: string
+                    enum: [imagens, videos]
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /imagem:
+    delete:
+      tags: [media]
+      summary: Excluir imagem da biblioteca local
+      operationId: deleteImage
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaDeleteRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, path]
+                properties:
+                  status:
+                    type: string
+                  path:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Vídeo em processamento (apenas DELETE /video)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+
+  /imagem/propriedades:
+    get:
+      tags: [media]
+      summary: Metadados de um ficheiro de imagem
+      operationId: getImageProperties
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Caminho relativo (ex. `imagens/categoria/foto.jpg`)
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaPropertiesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
   /imagem/categoria:
     get:
       tags: [media]
@@ -811,6 +1195,34 @@ paths:
                     type: array
                     items:
                       type: string
+    patch:
+      tags: [media]
+      summary: Mover imagem para outra categoria
+      operationId: moveImageCategory
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaMoveRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, path]
+                properties:
+                  status:
+                    type: string
+                  path:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
   /imagem/categoria/{codigo}:
     get:
@@ -833,6 +1245,63 @@ paths:
                     items:
                       type: string
 
+  /video:
+    delete:
+      tags: [media]
+      summary: Excluir vídeo da biblioteca local
+      operationId: deleteVideo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaDeleteRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, path]
+                properties:
+                  status:
+                    type: string
+                  path:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Vídeo em processamento (pipeline activo)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+
+  /video/propriedades:
+    get:
+      tags: [media]
+      summary: Metadados de um ficheiro de vídeo
+      operationId: getVideoProperties
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Caminho relativo (ex. `videos/categoria/clip.mp4`)
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaPropertiesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
   /video/categoria:
     get:
       tags: [media]
@@ -851,6 +1320,34 @@ paths:
                     type: array
                     items:
                       type: string
+    patch:
+      tags: [media]
+      summary: Mover vídeo para outra categoria
+      operationId: moveVideoCategory
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaMoveRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, path]
+                properties:
+                  status:
+                    type: string
+                  path:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
   /video/categoria/{codigo}:
     get:
@@ -871,12 +1368,7 @@ paths:
                   videos:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        video:
-                          type: string
-                        thumb:
-                          type: string
+                      $ref: '#/components/schemas/VideoListEntry'
 
   /display:
     get:
@@ -1204,6 +1696,14 @@ components:
       required: true
       schema:
         type: string
+    deviceId:
+      name: deviceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: UUID v4 do dispositivo externo
 
   responses:
     BadRequest:
@@ -1249,16 +1749,89 @@ components:
           type: string
           example: Sucesso
 
+    HealthModuleStatus:
+      type: object
+      required: [id, name, active]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        active:
+          type: boolean
+        mount:
+          type: string
+
     HealthResponse:
       type: object
-      required: [status, phase, websocket]
+      required: [status, phase, version, websocket, modules]
       properties:
         status:
           type: string
+          enum: [ok, degraded]
         phase:
           type: string
+        version:
+          type: string
+          description: Versão da aplicação (package.json)
         websocket:
           type: string
+        features:
+          type: object
+          description: Capacidades do binário em execução
+          properties:
+            cad194:
+              type: boolean
+              description: Rotas CAD-194 (upload/YouTube para fila)
+            cad228:
+              type: boolean
+              description: POST /api/queue/import-url (CAD-228)
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/HealthModuleStatus'
+
+    QueueImportUrlRequest:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          example: https://cdn.exemplo.org/slide.png
+        category:
+          type: string
+          default: remoto
+          description: Pasta em imagens/ ou videos/; default remoto (não usa categoria dos painéis).
+        mode:
+          type: string
+          enum: [download, reference]
+          default: download
+
+    QueueImportUrlResponse:
+      type: object
+      required: [status, mode, item]
+      properties:
+        status:
+          type: string
+          example: successo
+        mode:
+          type: string
+          enum: [download, reference]
+        item:
+          type: object
+          required: [kind, label, mediaPath]
+          properties:
+            kind:
+              type: string
+              enum: [image, video]
+            label:
+              type: string
+            mediaPath:
+              type: string
+              description: Path relativo (download) ou URL absoluta (reference)
+            thumbPath:
+              type: string
 
     ErrorLogEntry:
       type: object
@@ -1536,6 +2109,152 @@ components:
             - type: object
             - type: string
             - type: integer
+
+    PlaylistResolveRequest:
+      type: object
+      required: [songIds]
+      properties:
+        songIds:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+
+    PlaylistResolveEntry:
+      type: object
+      required: [id, exists]
+      properties:
+        id:
+          type: integer
+        exists:
+          type: boolean
+        nome:
+          type: string
+        nome2:
+          type: string
+        artista:
+          type: string
+
+    PlaylistResolveResponse:
+      type: object
+      required: [status, items]
+      properties:
+        status:
+          type: string
+          example: Sucesso
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlaylistResolveEntry'
+
+    ExternalDevice:
+      type: object
+      required: [deviceId, profile, showChords, label, lastSeenAt]
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+        profile:
+          type: string
+          enum: [live, vocal, stage, player]
+        showChords:
+          type: boolean
+        label:
+          type: string
+          nullable: true
+        lastSeenAt:
+          type: string
+          format: date-time
+
+    ExternalDeviceResponse:
+      type: object
+      required: [status, device]
+      properties:
+        status:
+          type: string
+          example: successo
+        device:
+          $ref: '#/components/schemas/ExternalDevice'
+
+    ExternalDevicePatch:
+      type: object
+      properties:
+        profile:
+          type: string
+          enum: [live, vocal, stage, player]
+        showChords:
+          type: boolean
+        label:
+          type: string
+          nullable: true
+
+    MediaPropertiesResponse:
+      type: object
+      required: [status, path, name, category, sizeBytes, sizeLabel, modifiedAt, extension]
+      properties:
+        status:
+          type: string
+          example: successo
+        path:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        sizeBytes:
+          type: integer
+        sizeLabel:
+          type: string
+        modifiedAt:
+          type: string
+          format: date-time
+        extension:
+          type: string
+
+    MediaMoveRequest:
+      type: object
+      required: [path, toCategory]
+      properties:
+        path:
+          type: string
+        toCategory:
+          type: string
+
+    MediaDeleteRequest:
+      type: object
+      required: [path]
+      properties:
+        path:
+          type: string
+          description: Caminho relativo (ex. `imagens/slides/foto.jpg` ou `videos/clips/clip.mp4`)
+
+    QuickBackgroundPatch:
+      type: object
+      required: [url, diretorio]
+      properties:
+        url:
+          type: string
+        diretorio:
+          type: string
+          enum: [imagens, videos]
+
+    VideoListEntry:
+      type: object
+      required: [video, thumb, pipelineStatus, pipelinePercent]
+      properties:
+        video:
+          type: string
+        thumb:
+          type: string
+        pipelineStatus:
+          type: string
+          enum: [ready, processing, error]
+        pipelinePercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+        pipelineError:
+          type: string
 
   x-websocket:
     /ws/live:

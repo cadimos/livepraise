@@ -26,6 +26,7 @@ function onLocaleChange(event: Event) {
 function onFontScaleInput(event: Event) {
   setFontScalePercent(Number((event.target as HTMLInputElement).value));
 }
+
 </script>
 
 <template>

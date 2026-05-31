@@ -7,8 +7,18 @@ directories:
   buildResources: resources
 files:
   - dist/**/*
+  - web/**/*
+  - apps/projector/**/*
+  - shared/**/*
+  - themes/**/*
+  - resources/fonts/**/*
+  - locales/**/*
+  - openapi.yaml
   - electron/splash/**/*
+  - vendor/yt-dlp/**/*
   - package.json
+asarUnpack:
+  - vendor/yt-dlp/**
 extraResources:
   - from: install/
     to: install/
@@ -32,11 +42,65 @@ linux:
     - target: AppImage
       arch:
         - x64
-    - target: snap
+    - target: deb
+      arch:
+        - x64
+    - target: rpm
+      arch:
+        - x64
+    - target: pacman
       arch:
         - x64
   icon: resources/icon/livepraise.png
   category: AudioVideo
+  maintainer: Thiago de Lucena Sobrinho <thiagolucenaelvis@gmail.com>
+  vendor: Cadimos
+  synopsis: Software de projeção para igrejas
+  description: Live Praise — operador, projetor, fila de mídia e transmissão ao vivo.
+deb:
+  priority: optional
+  depends:
+    - libgtk-3-0 | libgtk-4-1
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libuuid1
+rpm:
+  depends:
+    - gtk3
+    - libnotify
+    - nss
+    - libXScrnSaver
+    - libXtst
+    - xdg-utils
+    - at-spi2-atk
+    - libuuid
+pacman:
+  depends:
+    - gtk3
+    - libnotify
+    - nss
+    - libxss
+    - libxtst
+    - xdg-utils
+    - at-spi2-core
+    - util-linux
+flatpak:
+  runtime: org.freedesktop.Platform
+  runtimeVersion: '24.08'
+  sdk: org.freedesktop.Sdk
+  finishArgs:
+    - --share=network
+    - --share=ipc
+    - --socket=pulseaudio
+    - --socket=x11
+    - --socket=wayland
+    - --device=dri
+    - --filesystem=home
+  license: MIT
 snap:
   confinement: strict
   grade: stable

@@ -3,8 +3,12 @@
 /** Paridade v0.0.8 monitor/projetor (Fase 3). */
 export const BASELINE_LIVE_ACTIONS = [
   'background',
+  /** CA-R21: /live não recebe `background`; o hub envia isto para limpar vídeo/fundo. */
+  'limparFundo',
   'texto',
   'video',
+  /** CAD-194: embed YouTube quando download local falha (valor = videoId 11 chars). */
+  'youtube',
   'viewMusica',
   'viewBiblia',
   'removeConteudo',
@@ -18,9 +22,21 @@ export const STAGE_RETURN_ACTIONS = [
   'viewBibliaRetorno',
 ] as const;
 
+/** Overlay contador/timer de culto — sync multi-monitor (CAD-187). */
+export const SERVICE_TIMER_ACTIONS = ['serviceTimer'] as const;
+
+/** Texto rolante de alerta no rodapé — sync multi-monitor (CAD-188). */
+export const FOOTER_ALERT_ACTIONS = ['footerAlert'] as const;
+
+export const OVERLAY_ACTIONS = [
+  ...SERVICE_TIMER_ACTIONS,
+  ...FOOTER_ALERT_ACTIONS,
+] as const;
+
 export const LIVE_ACTIONS = [
   ...BASELINE_LIVE_ACTIONS,
   ...STAGE_RETURN_ACTIONS,
+  ...OVERLAY_ACTIONS,
 ] as const;
 
 export type LiveActionName = (typeof LIVE_ACTIONS)[number];
@@ -37,7 +53,12 @@ export interface LiveState {
   revision: number;
 }
 
-export type ExternalDisplayProfile = 'live' | 'vocal' | 'stage' | 'player';
+export type ExternalDisplayProfile =
+  | 'live'
+  | 'vocal'
+  | 'stage'
+  | 'player'
+  | 'projection';
 
 export type ClientRole =
   | 'operator'
@@ -52,6 +73,7 @@ export interface ExternalDeviceInfo {
   profile: ExternalDisplayProfile;
   showChords: boolean;
   label: string | null;
+  screenSize?: DisplayScreenSize | null;
 }
 
 export type DisplayRole = 'operator' | 'projection' | 'stage-return' | 'off';
@@ -61,6 +83,14 @@ export interface DisplayScreenSize {
   preset: string;
   largura: string;
   altura: string;
+  /** Pré-visualizar no projetor enquanto edita (antes de guardar). */
+  livePreview?: boolean;
+  /** Posição da área útil: centro, topo ou deslocamento personalizado. */
+  position?: 'centro' | 'topo' | 'personalizado';
+  offsetX?: string;
+  offsetY?: string;
+  /** Comportamento quando o conteúdo é menor que a área de projeção. */
+  contentFit?: 'estender' | 'centralizar' | 'proporcional';
 }
 
 export interface DisplayAssignment {
@@ -172,6 +202,13 @@ export interface WsDevicePresenceMessage {
   device: ExternalDeviceInfo & { clientId: string; name: string };
 }
 
+/** Tipografia de projeção — sync ≤1s após guardar (CAD-313). */
+export interface WsProjectionTypographySyncMessage {
+  type: 'projection-typography-sync';
+  projectionTypography: Record<string, unknown>;
+  ts: number;
+}
+
 export type WsServerMessage =
   | WsJoinedMessage
   | WsLiveBroadcastMessage
@@ -181,4 +218,5 @@ export type WsServerMessage =
   | WsChromeTabAddedMessage
   | WsApprovalPendingMessage
   | WsApprovalResolvedMessage
-  | WsDevicePresenceMessage;
+  | WsDevicePresenceMessage
+  | WsProjectionTypographySyncMessage;

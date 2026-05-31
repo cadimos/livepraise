@@ -46,14 +46,105 @@ Se `npm run dev` falhar com erro de `chrome-sandbox` / SUID, o script `dev` já 
 npm install
 npm run dev          # compila server + electron e abre splash (Linux/NTFS: usa --no-sandbox em dev)
 npm run dev:server   # só o servidor HTTP (porta 3000)
-npm run smoke:fase2  # bootstrap + CRUD + persistência
-npm run smoke:fase3  # WebSocket live + paridade 8 ações + latência ≤500ms
-npm run smoke:fase4  # UI operador Vue 3 + /operator + projeção louvor
-npm run smoke:fase8  # instalação limpa + 6 ações socket + latência ≤500ms
 npm run typecheck
 npm run build        # server + electron + operator
-npm run smoke:cad112 # valida openapi.yaml + /api/docs
 ```
+
+Regressão **só entre versões** (release / CI): ver [`scripts/README.md`](scripts/README.md) — `npm run smoke:release`.
+
+## Instalação
+
+Baixe os instaladores na página **[GitHub Releases](https://github.com/cadimos/livepraise/releases)** (secção *Assets* da versão desejada). Os nomes dos ficheiros incluem a versão; substitua `<versão>` nos exemplos pelo nome real do download.
+
+Em builds empacotados, o **Live Praise** verifica actualizações no GitHub ao iniciar (`electron-updater`). A instalação manual abaixo aplica-se à primeira instalação ou quando preferir actualizar à mão.
+
+### Windows — instalador NSIS (`.exe`)
+
+1. Descarregue `Live Praise Setup <versão>.exe`.
+2. Execute o instalador (duplo clique). Se o Windows SmartScreen avisar, escolha **Mais informações** → **Executar mesmo assim** (builds sem assinatura de código).
+3. Siga o assistente (pasta de instalação, atalho no menu Iniciar).
+4. Abra **Live Praise** pelo menu Iniciar ou pelo atalho no ambiente de trabalho.
+
+Desinstalação: **Definições → Aplicações → Live Praise → Desinstalar**, ou **Adicionar ou remover programas**.
+
+### macOS — imagem de disco (`.dmg`)
+
+1. Descarregue o `.dmg` adequado ao seu Mac:
+   - **Apple Silicon (M1/M2/M3…):** ficheiro `arm64` ou *Apple Silicon*, se existir em separado.
+   - **Intel:** ficheiro `x64` ou *Intel*, se existir em separado.
+2. Abra o `.dmg` e arraste **Live Praise** para a pasta **Aplicações**.
+3. Na primeira execução, se o macOS bloquear: **Definições do Sistema → Privacidade e segurança → Abrir mesmo assim**.
+
+Desinstalação: mova **Live Praise** de **Aplicações** para o Lixo.
+
+### Linux — AppImage (qualquer distro recente)
+
+1. Descarregue `Live Praise-<versão>.AppImage`.
+2. Torne o ficheiro executável e execute:
+
+```bash
+chmod +x "Live Praise-<versão>.AppImage"
+./"Live Praise-<versão>.AppImage"
+```
+
+3. (Opcional) Integrar no menu de aplicações com [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) ou movendo o ficheiro para `~/Applications` / `~/.local/bin`.
+
+Requisito usual: `libfuse2` (Ubuntu/Debian: `sudo apt install libfuse2`).
+
+### Linux — Debian / Ubuntu / Mint (`.deb`)
+
+```bash
+sudo dpkg -i live-praise_<versão>_amd64.deb
+# Se faltar dependência:
+sudo apt-get install -f
+```
+
+Desinstalação: `sudo apt remove live-praise`
+
+### Linux — Fedora / RHEL / openSUSE (`.rpm`)
+
+```bash
+# Fedora / RHEL 8+
+sudo dnf install ./live-praise-<versão>.x86_64.rpm
+
+# openSUSE
+sudo zypper install ./live-praise-<versão>.x86_64.rpm
+```
+
+Desinstalação: `sudo dnf remove live-praise` ou equivalente no gestor de pacotes.
+
+### Linux — Arch / Manjaro (`.pacman`)
+
+```bash
+sudo pacman -U ./live-praise-<versão>.pacman
+```
+
+Actualizações posteriores: descarregue o novo `.pacman` e repita o comando, ou use `-U` sobre o pacote mais recente.
+
+### Linux — Flatpak (`.flatpak`)
+
+Requer [Flatpak](https://flatpak.org/setup/) instalado.
+
+```bash
+flatpak install --user "Live Praise-<versão>.flatpak"
+flatpak run com.cadimos.livepraise
+```
+
+Se o ficheiro tiver outro nome, use o caminho exacto do asset do release. Desinstalação: `flatpak uninstall com.cadimos.livepraise`.
+
+### Linux — Snap (`.snap`)
+
+Requer `snapd` instalado e activo.
+
+```bash
+sudo snap install live-praise_<versão>_amd64.snap --dangerous
+```
+
+O flag `--dangerous` é necessário para instalar um snap descarregado directamente (fora da Snap Store). Desinstalação: `sudo snap remove live-praise`.
+
+---
+
+**Dados da aplicação:** na primeira execução, o conteúdo (músicas, imagens, base de dados) é criado em `~/livepraise`. Consulte a wiki ou documentação interna para backup e migração.
 
 ## API HTTP (OpenAPI)
 
@@ -79,19 +170,24 @@ Autenticação: `Authorization: Bearer <token>` após `POST /api/auth/login`. Ro
 
 **Risco residual:** num PC partilhado na igreja, qualquer processo *local* pode gerir utilizadores via `http://127.0.0.1:<porta>/api/users` sem credenciais. Mitigação operacional: conta Windows/Linux dedicada ao operador, rede LAN confiável, trocar password bootstrap após instalação. Pedidos vindos da rede LAN **já exigem** token operador.
 
-Regressão: `npm run smoke:cad128`.
-
 ## Release (Fase 8 — CA-R02, CA-R03)
 
 Builds multi-plataforma via [electron-builder](https://www.electron.build/) (`electron-builder.yml`):
 
 | Comando | Artefacto |
 |---------|-----------|
+| `npm run dist:all` | **Um comando:** Win + Linux (AppImage, deb, rpm, pacman); no Mac inclui DMG; no Linux tenta snap/flatpak se as ferramentas existirem |
 | `npm run dist:win` | Instalador NSIS Windows x64 |
-| `npm run dist:linux` | AppImage Linux x64 |
+| `npm run dist:linux` | AppImage + `.deb` + `.rpm` + `.pacman` Linux x64 |
+| `npm run dist:linux-appimage` | Só AppImage |
+| `npm run dist:linux-deb` | Só `.deb` (Debian/Ubuntu) |
+| `npm run dist:linux-rpm` | Só `.rpm` (Fedora/RHEL/openSUSE) |
+| `npm run dist:linux-pacman` | Só `.pacman` (Arch/Manjaro) |
+| `npm run dist:flatpak` | Flatpak (requer `flatpak-builder`) |
 | `npm run dist:snap` | Snap Linux |
 | `npm run dist:mac` | DMG macOS (x64 + arm64) |
-| `npm run dist:all` | Win + Linux + macOS (CI) |
+
+> **Nota:** o DMG macOS só é gerado num **Mac** (`dist:mac` ou workflow `CA-R40 macOS`). Em Linux/Windows, `dist:all` produz NSIS + pacotes Linux. Para release completo nos três SO, use os três workflows GHA ou corre `dist:all` / `dist:mac` em cada plataforma.
 
 Saída em `release-builds/`. Ícones em `resources/icon/` (legado `v0.0.8/app/icon/`).
 
@@ -123,10 +219,10 @@ Publicação usa `publish` em `electron-builder.yml` (provider `github`). Versã
 ### Smoke de release
 
 ```bash
-npm run smoke:fase8
+npm run smoke:release
 ```
 
-Valida bootstrap (instalação limpa), health `fase-8-release`, 6 ações WebSocket e latência LAN ≤500 ms.
+Valida bootstrap, pipeline de vídeo (CA-R40), instalação limpa, health `fase-8-release`, acções WebSocket e latência LAN ≤500 ms. Detalhes em [`scripts/README.md`](scripts/README.md).
 
 ## Legado
 

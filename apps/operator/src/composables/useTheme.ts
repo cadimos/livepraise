@@ -1,30 +1,8 @@
 import { ref, watch } from 'vue';
+import { themeToCssVariables } from '@shared/theme-css-vars';
+import type { ThemeDefinition, ThemeSummary } from '@shared/types/theme';
 import { fetchJson } from './useApi';
 import { usePreferences } from './usePreferences';
-
-export interface ThemeSummary {
-  id: string;
-  label: string;
-  version: string;
-}
-
-export interface ThemeColors {
-  primary: string;
-  actionBar?: string;
-  background: string;
-  surface: string;
-  text: string;
-  muted?: string;
-  accent?: string;
-}
-
-export interface ThemeDefinition {
-  name: string;
-  label?: string;
-  version: string;
-  colors: ThemeColors;
-  typography?: { fontFamily?: string };
-}
 
 const themes = ref<ThemeSummary[]>([]);
 const activeTheme = ref<ThemeDefinition | null>(null);
@@ -33,18 +11,9 @@ const ready = ref(false);
 
 function applyThemeVariables(theme: ThemeDefinition): void {
   const root = document.documentElement;
-  root.style.setProperty('--lp-color-primary', theme.colors.primary);
-  root.style.setProperty('--lp-color-action-bar', theme.colors.actionBar ?? '#0369a1');
-  root.style.setProperty('--lp-color-background', theme.colors.background);
-  root.style.setProperty('--lp-color-surface', theme.colors.surface);
-  root.style.setProperty('--lp-color-text', theme.colors.text);
-  root.style.setProperty('--lp-color-muted', theme.colors.muted ?? '#94a3b8');
-  root.style.setProperty('--lp-color-accent', theme.colors.accent ?? theme.colors.primary);
-  root.style.setProperty(
-    '--lp-font-family',
-    theme.typography?.fontFamily ??
-      "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  );
+  for (const [key, value] of Object.entries(themeToCssVariables(theme))) {
+    root.style.setProperty(key, value);
+  }
   document.body.style.fontFamily = 'var(--lp-font-family)';
   document.body.style.backgroundColor = 'var(--lp-color-background)';
   document.body.style.color = 'var(--lp-color-text)';
@@ -92,3 +61,5 @@ export function useTheme() {
     applyTheme,
   };
 }
+
+export type { ThemeDefinition, ThemeSummary };

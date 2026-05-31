@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import {
   fetchJson,
   mediaUrl,
+  quickBackgroundDisplayUrl,
   type MediaFileProperties,
   type QuickBackground,
 } from '../composables/useApi';
@@ -14,6 +15,7 @@ import {
   projectTabImageBackground,
   projectTabVideoBackground,
 } from '../utils/projection-actions';
+import { summarizeLabel } from '@shared/queue-items';
 import { isVideoMediaUrl } from '../utils/projection-mode';
 
 const props = defineProps<{
@@ -21,6 +23,8 @@ const props = defineProps<{
   mediaKind: 'imagens' | 'videos';
   categories: string[];
   thumbPath?: string;
+  pipelineStatus?: 'ready' | 'processing' | 'error';
+  displayName?: string;
 }>();
 
 const emit = defineEmits<{
@@ -29,9 +33,13 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
-const { prefs } = usePreferences();
+const { prefs, addQueueItem } = usePreferences();
 const { sendAction } = useLiveSocket();
-const { quickBackgrounds, reload: reloadQuickBackgrounds } = useQuickBackgrounds();
+const { quickBackgrounds, reload: reloadQuickBackgrounds, setInitial: setInitialQuickBackground } =
+  useQuickBackgrounds();
+
+const setInitialBusy = ref(false);
+const setInitialError = ref('');
 
 const menuOpen = ref(false);
 const menuX = ref(0);
@@ -50,6 +58,8 @@ const targetCategory = ref('');
 const categoryBusy = ref(false);
 const categoryError = ref('');
 
+const deleteBusy = ref(false);
+
 const apiPrefix = computed(() => (props.mediaKind === 'imagens' ? '/imagem' : '/video'));
 
 const currentCategory = computed(() => {
@@ -63,8 +73,20 @@ const otherCategories = computed(() =>
 
 const hasActiveQueue = computed(() => {
   const tab = prefs.value.chromeTabs.find((item) => item.id === prefs.value.activeTabId);
-  return Boolean(tab && tab.verses.length > 0);
+  return Boolean(tab);
 });
+
+const mediaDisplayName = computed(() => {
+  if (props.displayName) return summarizeLabel(props.displayName, 48);
+  const parts = props.mediaPath.replaceAll('\\', '/').split('/');
+  return summarizeLabel(parts[parts.length - 1] ?? props.mediaPath, 48);
+});
+
+const deleteDisabled = computed(
+  () =>
+    deleteBusy.value ||
+    (props.mediaKind === 'videos' && props.pipelineStatus === 'processing'),
+);
 
 function closeMenu(): void {
   menuOpen.value = false;
@@ -72,7 +94,7 @@ function closeMenu(): void {
 
 function onContextMenu(event: MouseEvent): void {
   event.preventDefault();
-  menuX.value = event.clientX;
+  menuX.value = Math.min(event.clientX, window.innerWidth - 224);
   menuY.value = event.clientY;
   menuOpen.value = true;
 }
@@ -167,15 +189,45 @@ async function confirmChangeCategory(): Promise<void> {
   }
 }
 
+async function setAsInitialBackground(): Promise<void> {
+  closeMenu();
+  setInitialBusy.value = true;
+  setInitialError.value = '';
+  try {
+    await setInitialQuickBackground({
+      url: props.mediaPath.replaceAll('\\', '/'),
+      diretorio: props.mediaKind,
+    });
+  } catch (e) {
+    setInitialError.value =
+      e instanceof Error ? e.message : t('mediaContext.errors.setInitial');
+    window.alert(setInitialError.value);
+  } finally {
+    setInitialBusy.value = false;
+  }
+}
+
 function applyToQueue(): void {
   closeMenu();
-  if (!hasActiveQueue.value) {
+  const tabId = prefs.value.activeTabId;
+  if (!tabId || !hasActiveQueue.value) {
     window.alert(t('mediaContext.errors.noActiveQueue'));
     return;
   }
 
+  const parts = props.mediaPath.replaceAll('\\', '/').split('/');
+  const label = summarizeLabel(parts[parts.length - 1] ?? props.mediaPath, 32);
   const url = mediaUrl(props.mediaPath);
-  if (props.mediaKind === 'videos' || isVideoMediaUrl(url)) {
+  const isVideo = props.mediaKind === 'videos' || isVideoMediaUrl(url);
+
+  addQueueItem(tabId, {
+    kind: isVideo ? 'video' : 'image',
+    label,
+    mediaPath: props.mediaPath,
+    thumbPath: isVideo ? props.thumbPath : undefined,
+  });
+
+  if (isVideo) {
     if (props.thumbPath) emit('previewBg', mediaUrl(props.thumbPath));
     projectTabVideoBackground(sendAction, url);
   } else {
@@ -184,9 +236,39 @@ function applyToQueue(): void {
   }
 }
 
-function quickThumb(item: QuickBackground): string {
-  if (item.url.includes('base64')) return item.url;
-  return mediaUrl(item.url);
+function isDeleteProcessingError(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes('processamento') ||
+    normalized.includes('processing') ||
+    normalized.includes('409')
+  );
+}
+
+async function deleteFromLibrary(): Promise<void> {
+  closeMenu();
+  const name = mediaDisplayName.value;
+  const msg = `${t('mediaContext.deleteConfirm', { name })}\n\n${t('mediaContext.deleteConfirmQueueHint')}`;
+  if (!window.confirm(msg)) return;
+
+  deleteBusy.value = true;
+  try {
+    await fetchJson<{ status: string; path?: string }>(`${apiPrefix.value}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: props.mediaPath }),
+    });
+    await reloadQuickBackgrounds();
+    emit('refresh');
+  } catch (e) {
+    const raw = e instanceof Error ? e.message : t('mediaContext.errors.delete');
+    const message = isDeleteProcessingError(raw)
+      ? t('mediaContext.errors.deleteProcessing')
+      : raw || t('mediaContext.errors.delete');
+    window.alert(message);
+  } finally {
+    deleteBusy.value = false;
+  }
 }
 
 onMounted(() => {
@@ -212,6 +294,17 @@ onUnmounted(() => {
     role="menu"
     @click.stop
   >
+    <li>
+      <button
+        type="button"
+        class="w-full px-3 py-2 text-left hover:bg-lp-surface disabled:opacity-50"
+        role="menuitem"
+        :disabled="setInitialBusy"
+        @click="setAsInitialBackground"
+      >
+        {{ t('mediaContext.setInitial') }}
+      </button>
+    </li>
     <li>
       <button
         type="button"
@@ -251,6 +344,24 @@ onUnmounted(() => {
         @click="applyToQueue"
       >
         {{ t('mediaContext.applyToQueue') }}
+      </button>
+    </li>
+    <li role="separator" class="my-1 border-t border-lp-surface" aria-hidden="true" />
+    <li>
+      <button
+        type="button"
+        class="w-full px-3 py-2 text-left text-rose-400 transition hover:bg-rose-950/50 hover:text-rose-200 disabled:cursor-not-allowed disabled:opacity-50"
+        role="menuitem"
+        :disabled="deleteDisabled"
+        :title="
+          props.pipelineStatus === 'processing'
+            ? t('mediaContext.errors.deleteProcessing')
+            : undefined
+        "
+        :aria-label="t('mediaContext.deleteAria', { name: mediaDisplayName })"
+        @click="deleteFromLibrary"
+      >
+        {{ t('mediaContext.delete') }}
       </button>
     </li>
   </ul>
@@ -322,7 +433,7 @@ onUnmounted(() => {
           :disabled="replaceBusy || !slot.id"
           @click="confirmReplace(slot)"
         >
-          <img :src="quickThumb(slot)" alt="" class="h-full w-full object-cover" />
+          <img :src="quickBackgroundDisplayUrl(slot)" alt="" class="h-full w-full object-cover" />
         </button>
       </div>
       <div class="mt-4 flex justify-end">

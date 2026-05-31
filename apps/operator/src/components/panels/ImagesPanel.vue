@@ -5,6 +5,8 @@ import { fetchJson, mediaUrl } from '../../composables/useApi';
 import { usePreferences } from '../../composables/usePreferences';
 import { useLiveSocket } from '../../composables/useLiveSocket';
 import MediaTileContextMenu from '../MediaTileContextMenu.vue';
+import { summarizeLabel } from '@shared/queue-items';
+import { useQueueDrag } from '../../composables/useQueueDrag';
 import { projectTabImageBackground } from '../../utils/projection-actions';
 
 const emit = defineEmits<{
@@ -14,6 +16,12 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const { prefs, setImageCategory, setImageSearchQuery } = usePreferences();
 const { sendAction } = useLiveSocket();
+const { onDragStart } = useQueueDrag();
+
+function imageDragLabel(path: string): string {
+  const parts = path.replaceAll('\\', '/').split('/');
+  return summarizeLabel(parts[parts.length - 1] ?? path, 32);
+}
 
 const imageCategories = ref<string[]>([]);
 const images = ref<string[]>([]);
@@ -117,8 +125,17 @@ onMounted(() => {
         >
           <button
             type="button"
-            class="aspect-video w-full overflow-hidden rounded-lg border border-lp-surface transition hover:border-lp-primary"
+            draggable="true"
+            class="aspect-video w-full cursor-grab overflow-hidden rounded-lg border border-lp-surface transition hover:border-lp-primary active:cursor-grabbing"
+            :title="t('tabs.dragHint')"
             @click="projectBackground(mediaUrl(img))"
+            @dragstart="
+              onDragStart($event, {
+                kind: 'image',
+                label: imageDragLabel(img),
+                mediaPath: img,
+              })
+            "
           >
             <img :src="mediaUrl(img)" alt="" class="h-full w-full object-cover" />
           </button>

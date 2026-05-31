@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import { fetchJson, type QuickBackground } from './useApi';
+import { normalizeMediaPathForApi } from '../utils/media-path';
 
 const quickBackgrounds = ref<QuickBackground[]>([]);
 const loading = ref(false);
@@ -22,5 +23,23 @@ export function useQuickBackgrounds() {
     }
   }
 
-  return { quickBackgrounds, loading, error, reload };
+  async function setInitial(
+    payload: { id: number } | { url: string; diretorio: 'imagens' | 'videos' },
+  ): Promise<void> {
+    const body =
+      'id' in payload
+        ? payload
+        : {
+            url: normalizeMediaPathForApi(payload.url, payload.diretorio),
+            diretorio: payload.diretorio,
+          };
+    await fetchJson<{ status: string }>('/background-rapido/inicial', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    await reload();
+  }
+
+  return { quickBackgrounds, loading, error, reload, setInitial };
 }

@@ -78,6 +78,32 @@ export function buildBibleStageHtml(
 </div>`;
 }
 
+/** Path relativo `/imagens/...` ou `/videos/...` aceite por sanitizeLiveAction (A6). */
+export function toProjectionMediaPath(urlOrPath: string): string {
+  let path = urlOrPath.trim();
+  if (!path) return '';
+
+  if (/^https?:\/\//i.test(path)) {
+    try {
+      path = new URL(path).pathname;
+    } catch {
+      return '';
+    }
+  }
+
+  if (!path.startsWith('/')) {
+    path = `/${path.replace(/^\/+/, '')}`;
+  }
+
+  return path;
+}
+
+/** Valor codificado para live-action de imagem/vídeo de fundo. */
+export function toProjectionMediaValor(urlOrPath: string): string {
+  return encodeURIComponent(toProjectionMediaPath(urlOrPath));
+}
+
+/** @deprecated Use {@link toProjectionMediaValor}. */
 export function encodeBackgroundUrl(url: string): string {
-  return encodeURIComponent(url);
+  return toProjectionMediaValor(url);
 }
