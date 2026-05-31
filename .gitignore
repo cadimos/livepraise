@@ -103,13 +103,21 @@ dist
 # TernJS port file
 .tern-port
 
-#Electron Build
-electron-builder.yml
+# Build output
+dist/
 
-#Pasta de Dados e BD
+# yt-dlp embutido (descarregado no install/build)
+vendor/yt-dlp/yt-dlp
+vendor/yt-dlp/yt-dlp.exe
+
+# Legacy archived — keep node_modules local only
+v0.0.8/node_modules/
 Dados/
 release-builds/
 node_modules/
 wiki/
 dsw.db
 package-lock.json
+Escopos/
+.github/
+scripts/

@@ -1,0 +1,47 @@
+/**
+ * Viewport cheio — endpoints /live, /vocal, /stage (/player no mesmo shell).
+ */
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+#stage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+#bg-layer,
+#video-wrap,
+#text-scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#conteudo,
+.conteudo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}

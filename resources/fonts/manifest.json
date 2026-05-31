@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "families": [
+    {
+      "id": "roboto",
+      "label": "Roboto",
+      "cssFamily": "Roboto, sans-serif",
+      "files": [
+        "Roboto-Regular.woff2",
+        "Roboto-Bold.woff2",
+        "Roboto-Italic.woff2",
+        "Roboto-BoldItalic.woff2",
+        "Roboto-Light.woff2",
+        "Roboto-Medium.woff2"
+      ]
+    },
+    {
+      "id": "source-sans-3",
+      "label": "Source Sans 3",
+      "cssFamily": "'Source Sans 3', sans-serif",
+      "files": [
+        "SourceSans3-Regular.woff2",
+        "SourceSans3-Bold.woff2",
+        "SourceSans3-Italic.woff2",
+        "SourceSans3-BoldItalic.woff2"
+      ]
+    },
+    {
+      "id": "lato",
+      "label": "Lato",
+      "cssFamily": "Lato, sans-serif",
+      "files": [
+        "Lato-Regular.woff2",
+        "Lato-Bold.woff2",
+        "Lato-Italic.woff2",
+        "Lato-BoldItalic.woff2"
+      ]
+    },
+    {
+      "id": "open-sans",
+      "label": "Open Sans",
+      "cssFamily": "'Open Sans', sans-serif",
+      "files": [
+        "OpenSans-Regular.woff2",
+        "OpenSans-Bold.woff2",
+        "OpenSans-Italic.woff2",
+        "OpenSans-BoldItalic.woff2"
+      ]
+    },
+    {
+      "id": "noto-sans",
+      "label": "Noto Sans",
+      "cssFamily": "'Noto Sans', sans-serif",
+      "files": [
+        "NotoSans-Regular.woff2",
+        "NotoSans-Bold.woff2",
+        "NotoSans-Italic.woff2",
+        "NotoSans-BoldItalic.woff2"
+      ]
+    },
+    {
+      "id": "literata",
+      "label": "Literata",
+      "cssFamily": "Literata, serif",
+      "files": [
+        "Literata-Regular.woff2",
+        "Literata-Bold.woff2",
+        "Literata-Italic.woff2",
+        "Literata-BoldItalic.woff2"
+      ]
+    },
+    {
+      "id": "merriweather",
+      "label": "Merriweather",
+      "cssFamily": "Merriweather, serif",
+      "files": [
+        "Merriweather-Regular.woff2",
+        "Merriweather-Bold.woff2",
+        "Merriweather-Italic.woff2",
+        "Merriweather-BoldItalic.woff2"
+      ]
+    }
+  ]
+}

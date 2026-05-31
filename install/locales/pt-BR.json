@@ -1,0 +1,179 @@
+{
+  "app": {
+    "name": "Live Praise",
+    "tagline": "Software de projeção para igrejas",
+    "operator": "Operador"
+  },
+  "splash": {
+    "loading": "A iniciar…",
+    "monitorsDetected": "{count} monitor(es) detectado(s)"
+  },
+  "connection": {
+    "connected": "WebSocket conectado",
+    "reconnecting": "Reconectando…",
+    "authRequired": "Login necessário (portal)"
+  },
+  "panels": {
+    "worship": "Louvor",
+    "bible": "Bíblia",
+    "backgrounds": "Fundos",
+    "displays": "Monitores"
+  },
+  "settings": {
+    "theme": "Tema",
+    "locale": "Idioma",
+    "backup": {
+      "panelTitle": "Backup e restauro",
+      "panelIntro": "Exporte ou importe o ambiente Live Praise (base de dados, mídia, temas e preferências). Apenas administradores. Use ao mudar de computador ou recuperar após uma falha.",
+      "openBackup": "Gerar backup…",
+      "openRestore": "Restaurar de ficheiro…",
+      "backupModalTitle": "Gerar backup",
+      "restoreModalTitle": "Restaurar ambiente",
+      "backupIntro": "Escolha o que incluir no ficheiro .zip. Itens desmarcados não entram no backup.",
+      "restoreIntro": "Seleccione um backup (.zip) gerado por este sistema. Só pode restaurar grupos que existam nesse ficheiro.",
+      "restorePrivacyNote": "Restaurar substitui os dados seleccionados neste computador. Confirme que o ficheiro veio de uma fonte de confiança.",
+      "privacyTitle": "Dados sensíveis no backup",
+      "privacyBody": "Este ficheiro contém dados da sua igreja. Se incluir a base de dados, também leva nomes de utilizadores e credenciais (palavras-passe encriptadas). Guarde-o num local seguro, apenas em dispositivos de confiança, e elimine-o quando já não for necessário. Não envie por e-mail nem armazene em nuvem pública sem encriptação adicional.",
+      "privacyUnencryptedWarning": "Este backup não está protegido por palavra-passe. Qualquer pessoa com acesso ao ficheiro pode tentar recuperar contas de operador.",
+      "selectAll": "Seleccionar todos",
+      "selectNone": "Limpar selecção",
+      "generate": "Gerar backup",
+      "generating": "A gerar backup…",
+      "generatingGroup": "A processar: {group}",
+      "restoringGroup": "Grupo {current} de {total}: {group}",
+      "chooseZip": "Escolher ficheiro .zip…",
+      "continue": "Continuar",
+      "back": "Voltar",
+      "restoring": "A restaurar…",
+      "close": "Fechar",
+      "restartApp": "Reiniciar aplicação",
+      "successTitle": "Backup concluído",
+      "successMessage": "O ficheiro foi guardado com sucesso.",
+      "successSize": "Tamanho: {size} · Grupos: {groups}",
+      "restoreSuccessTitle": "Restauro concluído",
+      "restoreSuccessMessage": "Os grupos seleccionados foram aplicados.",
+      "manifestSummary": "Backup de {date} · Versão {appVersion} · {groupCount} grupos no ficheiro",
+      "groupNotInBackup": "Não incluído neste backup",
+      "databaseReloginWarning": "Após restaurar a base de dados, todos os operadores terão de iniciar sessão novamente.",
+      "overwriteTitle": "Substituir dados existentes?",
+      "overwriteBody": "Os seguintes grupos já existem neste computador e serão substituídos: {groups}.",
+      "overwriteAcknowledge": "Compreendo que os dados seleccionados serão substituídos",
+      "overwriteConfirm": "Substituir e restaurar",
+      "reloginRequired": "Por segurança, todas as sessões foram terminadas. Inicie sessão novamente antes de continuar a operar.",
+      "globalBanner": "Manutenção: backup ou restauro em curso. Algumas acções estão temporariamente indisponíveis.",
+      "groups": {
+        "database": "Base de dados (louvor, utilizadores, Bíblia, sistema)",
+        "databaseHint": "Inclui contas de operador e credenciais encriptadas.",
+        "mediaImages": "Imagens locais",
+        "mediaImagesHint": "Pode aumentar bastante o tamanho do ficheiro.",
+        "mediaVideos": "Vídeos locais",
+        "mediaVideosHint": "Ficheiros grandes — a geração pode demorar vários minutos.",
+        "themes": "Temas personalizados",
+        "locales": "Traduções personalizadas",
+        "displays": "Configuração de monitores",
+        "projectionState": "Fundo de projeção guardado",
+        "biblias": "Ficheiros de Bíblia",
+        "errorLog": "Registo local de erros",
+        "errorLogHint": "Pode conter detalhes técnicos sensíveis. Desmarcado por defeito.",
+        "operatorUi": "Preferências do operador (filas, painéis, atalhos)",
+        "operatorUiHint": "Estado guardado neste computador, não na pasta livepraise."
+      },
+      "errors": {
+        "failed": "Não foi possível concluir a operação. Tente novamente.",
+        "diskFull": "Espaço em disco insuficiente para criar o backup.",
+        "permissionDenied": "Sem permissão para escrever no destino escolhido.",
+        "invalidZip": "Ficheiro inválido ou manifesto em falta.",
+        "migrationNewer": "Este backup é de uma versão mais recente do Live Praise. Actualize a aplicação antes de restaurar.",
+        "confirmRequired": "Confirme a substituição dos dados existentes.",
+        "noGroupsSelected": "Seleccione pelo menos um grupo."
+      }
+    }
+  },
+  "preview": {
+    "local": "Prévia local",
+    "columnAria": "Pré-visualizações por saída de projeção",
+    "draft": "Rascunho",
+    "hint": "Fluxo sugerido: escolha a categoria, depois a música e o verso — em poucos cliques. As preferências são guardadas automaticamente neste computador.",
+    "empty": {
+      "waiting": "À espera do estado desta saída…"
+    },
+    "groups": {
+      "projection": "Projetor",
+      "projectionSecondary": "Projetor 2",
+      "stageReturn": "Retorno de palco",
+      "live": "Live",
+      "vocal": "Vocal",
+      "stage": "Palco",
+      "player": "Player"
+    }
+  },
+  "tabs": {
+    "empty": "Fila vazia — adicione músicas pelo painel Louvor (+)",
+    "close": "Fechar aba"
+  },
+  "worship": {
+    "category": "Categoria",
+    "songs": "Músicas",
+    "versatile": "Versos",
+    "loading": "Carregando…",
+    "selectSong": "Selecione uma música",
+    "addToQueue": "Adicionar à fila",
+    "errors": {
+      "categories": "Erro ao carregar categorias",
+      "songs": "Erro ao carregar músicas",
+      "verses": "Erro ao carregar versos"
+    }
+  },
+  "bible": {
+    "translation": "Tradução",
+    "books": "Livros",
+    "chapters": "Capítulos",
+    "verses": "Versículos",
+    "errors": {
+      "bibles": "Erro ao carregar bíblias",
+      "books": "Erro ao carregar livros",
+      "chapters": "Erro ao carregar capítulos",
+      "verses": "Erro ao carregar versículos"
+    }
+  },
+  "backgrounds": {
+    "quick": "Fundos rápidos",
+    "images": "Imagens",
+    "errors": {
+      "quick": "Erro ao carregar fundos rápidos",
+      "categories": "Erro ao carregar categorias de imagem",
+      "images": "Erro ao carregar imagens"
+    }
+  },
+  "displays": {
+    "intro": "Defina o papel de cada monitor: o operador usa o monitor principal; a projeção pública e o retorno de palco mostram conteúdos diferentes.",
+    "primary": "principal",
+    "none": "Nenhum monitor detectado. Execute o Live Praise neste computador para listar os ecrãs ligados.",
+    "save": "Guardar papéis",
+    "saving": "A guardar…",
+    "saved": "Configuração guardada. Reinicie o Live Praise para aplicar novos papéis nos monitores.",
+    "roles": {
+      "operator": "Operador",
+      "projection": "Projeção",
+      "stage-return": "Retorno de palco",
+      "off": "Desligado"
+    },
+    "errors": {
+      "load": "Erro ao carregar monitores",
+      "save": "Erro ao guardar"
+    }
+  },
+  "common": {
+    "loading": "Carregando…"
+  },
+  "mediaContext": {
+    "delete": "Excluir da biblioteca",
+    "deleteAria": "Excluir «{name}» da biblioteca",
+    "deleteConfirm": "Excluir «{name}»? Esta ação não pode ser desfeita.",
+    "deleteConfirmQueueHint": "Itens na fila que usam este ficheiro deixam de projectar até serem removidos ou substituídos.",
+    "errors": {
+      "delete": "Não foi possível excluir o ficheiro da biblioteca.",
+      "deleteProcessing": "Aguarde o processamento do vídeo terminar."
+    }
+  }
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Praise</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+        color: #f8fafc;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .splash {
+        text-align: center;
+        padding: 1.5rem 2rem;
+        width: 100%;
+        max-width: 480px;
+      }
+
+      .logo {
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        margin-bottom: 0.35rem;
+      }
+
+      .tagline {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .loader {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #334155;
+        border-top-color: #38bdf8;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        animation: spin 0.9s linear infinite;
+      }
+
+      .status {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+      }
+
+      .monitors {
+        list-style: none;
+        text-align: left;
+        border: 1px solid #334155;
+        border-radius: 0.5rem;
+        padding: 0.5rem 0;
+        background: rgba(15, 23, 42, 0.6);
+        max-height: 160px;
+        overflow-y: auto;
+      }
+
+      .monitors li {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.8rem;
+        color: #cbd5e1;
+      }
+
+      .monitors .role {
+        color: #38bdf8;
+        text-transform: capitalize;
+        white-space: nowrap;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="splash">
+      <div class="logo">Live Praise</div>
+      <p class="tagline">Software de projeção para igrejas</p>
+      <div class="loader" aria-hidden="true"></div>
+      <p class="status" id="status">A iniciar…</p>
+      <ul class="monitors" id="monitors" hidden></ul>
+    </div>
+    <script>
+      const status = document.getElementById('status');
+      const list = document.getElementById('monitors');
+
+      const roleLabels = {
+        operator: 'Operador',
+        projection: 'Projeção',
+        'stage-return': 'Retorno de palco',
+        off: 'Desligado',
+      };
+
+      if (window.livepraise) {
+        status.textContent = `Refactor ${window.livepraise.phase} — v${window.livepraise.version}`;
+        window.livepraise.onDisplays((displays) => {
+          list.hidden = false;
+          list.innerHTML = '';
+          for (const d of displays) {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>${d.label}${d.primary ? ' ★' : ''}</span><span class="role">${roleLabels[d.role] ?? d.role}</span>`;
+            list.appendChild(li);
+          }
+          status.textContent = `${displays.length} monitor(es) detectado(s)`;
+        });
+      }
+    </script>
+  </body>
+</html>

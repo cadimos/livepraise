@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Praise — Remoto</title>
+    <link rel="stylesheet" href="remote.css" />
+  </head>
+  <body>
+    <main class="card">
+      <header>
+        <p class="eyebrow">Live Praise</p>
+        <h1>Envio remoto</h1>
+      </header>
+
+      <section id="gate">
+        <p id="gate-message">Faça login no <a href="/">portal</a> com perfil remoto.</p>
+      </section>
+
+      <section id="panel" hidden>
+        <p class="session">Conectado: <strong id="user-name"></strong></p>
+
+        <form id="tab-form" class="block">
+          <h2>Chrome Tab (sem aprovação)</h2>
+          <label>
+            Rótulo
+            <input id="tab-label" required />
+          </label>
+          <label>
+            Música (opcional)
+            <input id="tab-song" />
+          </label>
+          <button type="submit">Adicionar à fila</button>
+        </form>
+
+        <form id="live-form" class="block">
+          <h2>Projeção ao vivo (com aprovação)</h2>
+          <label>
+            Tipo
+            <select id="live-kind">
+              <option value="live-music">Louvor</option>
+              <option value="live-bible">Bíblia</option>
+              <option value="live-video">Vídeo</option>
+            </select>
+          </label>
+          <label>
+            Conteúdo HTML ou URL
+            <textarea id="live-payload" rows="4" required></textarea>
+          </label>
+          <button type="submit">Enviar para aprovação</button>
+        </form>
+
+        <p id="status" class="status"></p>
+      </section>
+    </main>
+    <script type="module" src="remote.js"></script>
+  </body>
+</html>

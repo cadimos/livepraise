@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": false,
+    "outDir": "apps/projector",
+    "rootDir": "apps/projector/src",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": {
+      "/shared/display-debug-overlay.js": ["shared/display-debug-overlay.d.ts"],
+      "/shared/projection-media-url.js": ["shared/projection-media-url.d.ts"],
+      "/shared/service-timer-overlay.js": ["shared/service-timer-overlay.d.ts"],
+      "/shared/footer-alert-overlay.js": ["shared/footer-alert-overlay.d.ts"],
+      "/shared/youtube.js": ["shared/youtube.d.ts"],
+      "/shared/projection-video-player.js": ["shared/projection-video-player.d.ts"],
+      "/shared/screen-layout.js": ["shared/screen-layout.d.ts"],
+      "/shared/endpoint-device-id.js": ["shared/endpoint-device-id.d.ts"],
+      "/shared/projection-typography-runtime.js": ["shared/projection-typography-runtime.d.ts"]
+    }
+  },
+  "include": ["apps/projector/src/**/*.ts"]
+}

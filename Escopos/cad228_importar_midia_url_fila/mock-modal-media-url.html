@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CAD-231 — Mock modal URL de mídia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'lp-background': '#0f1419',
+            'lp-surface': '#1a2332',
+            'lp-text': '#e8edf4',
+            'lp-muted': '#8b9cb3',
+            'lp-primary': '#3b82f6',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; }
+    .viewport-label { position: fixed; top: 8px; left: 8px; z-index: 100; font-size: 11px; color: #8b9cb3; }
+  </style>
+</head>
+<body class="bg-zinc-900 min-h-screen">
+  <p class="viewport-label" id="vp">1440×900 — menu</p>
+
+  <!-- Estado: menu (3 opções) -->
+  <div id="screen-menu" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div class="flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-lp-surface bg-lp-background shadow-xl">
+      <header class="flex items-center justify-between border-b border-lp-surface px-4 py-3">
+        <h2 class="text-sm font-semibold text-lp-text">Adicionar à fila</h2>
+        <button type="button" class="rounded px-2 py-1 text-lp-muted">✕</button>
+      </header>
+      <div class="space-y-3 p-4">
+        <p class="text-sm text-lp-muted">Escolha como importar imagens ou vídeos para esta fila.</p>
+        <button type="button" class="flex w-full items-center gap-3 rounded-lg border border-lp-surface px-4 py-3 text-left text-sm text-lp-text hover:border-lp-primary/50 hover:bg-lp-surface/50">
+          <span class="text-lp-primary">📁</span>
+          <span>Imagens ou vídeos do computador</span>
+        </button>
+        <button type="button" class="flex w-full items-center gap-3 rounded-lg border border-lp-surface px-4 py-3 text-left text-sm text-lp-text hover:border-lp-primary/50 hover:bg-lp-surface/50">
+          <span class="text-lp-primary">▶</span>
+          <span>Importar vídeo do YouTube</span>
+        </button>
+        <button type="button" onclick="showMediaUrl()" class="flex w-full items-center gap-3 rounded-lg border border-lp-primary/50 bg-lp-surface/30 px-4 py-3 text-left text-sm text-lp-text ring-1 ring-lp-primary/30">
+          <span class="text-lp-primary">🔗</span>
+          <span>URL de imagem ou vídeo</span>
+        </button>
+      </div>
+      <footer class="flex justify-end border-t border-lp-surface px-4 py-3">
+        <button type="button" class="rounded-lg px-4 py-2 text-sm text-lp-muted">Cancelar</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Estado: passo URL -->
+  <div id="screen-media-url" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div class="flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-lp-surface bg-lp-background shadow-xl">
+      <header class="flex items-center justify-between border-b border-lp-surface px-4 py-3">
+        <h2 class="text-sm font-semibold text-lp-text">Adicionar à fila</h2>
+        <button type="button" class="rounded px-2 py-1 text-lp-muted">✕</button>
+      </header>
+      <div class="space-y-3 p-4">
+        <p class="text-sm text-lp-muted">Cole o link direto do ficheiro (PNG, JPG, MP4…). O servidor descarrega para a biblioteca local. Não use links com login ou páginas web. Evite URLs com palavras-passe ou tokens na query.</p>
+        <label class="block text-xs uppercase tracking-wider text-lp-muted">
+          URL da mídia
+          <input type="url" value="https://cdn.exemplo.org/slide.png" class="mt-1 w-full rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text" />
+        </label>
+        <div class="flex justify-end gap-2">
+          <button type="button" onclick="showMenu()" class="rounded-lg px-4 py-2 text-sm text-lp-muted">Voltar</button>
+          <button type="button" onclick="showSuccess()" class="rounded-lg bg-lp-primary px-4 py-2 text-sm font-medium text-white">Importar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado: sucesso + preview -->
+  <div id="screen-success" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div class="flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-lp-surface bg-lp-background shadow-xl">
+      <header class="flex items-center justify-between border-b border-lp-surface px-4 py-3">
+        <h2 class="text-sm font-semibold text-lp-text">Adicionar à fila</h2>
+        <button type="button" class="rounded px-2 py-1 text-lp-muted">✕</button>
+      </header>
+      <div class="space-y-3 p-4">
+        <p role="alert" class="rounded-lg border border-emerald-500/40 bg-emerald-950/40 px-3 py-2 text-sm text-emerald-100">Ficheiro importado para a biblioteca local. O item já está na fila.</p>
+        <div class="aspect-video max-h-40 w-full overflow-hidden rounded-lg border border-lp-surface bg-black">
+          <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900 text-xs text-lp-muted">preview slide.png</div>
+        </div>
+        <p class="text-sm text-lp-muted">O item foi adicionado à fila. Feche quando tiver lido o resultado acima.</p>
+        <div class="flex justify-end">
+          <button type="button" class="rounded-lg bg-lp-primary px-4 py-2 text-sm font-medium text-white">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function applyHash() {
+      const h = (location.hash || '#menu').slice(1);
+      showMenu();
+      if (h === 'mediaUrl') showMediaUrl();
+      if (h === 'success') { showMediaUrl(); showSuccess(); }
+    }
+    window.addEventListener('hashchange', applyHash);
+    applyHash();
+
+    function showMediaUrl() {
+      document.getElementById('screen-menu').classList.add('hidden');
+      document.getElementById('screen-media-url').classList.remove('hidden');
+      document.getElementById('vp').textContent = (window.innerWidth < 500 ? '390×844' : '1440×900') + ' — passo URL';
+    }
+    function showMenu() {
+      document.getElementById('screen-menu').classList.remove('hidden');
+      document.getElementById('screen-media-url').classList.add('hidden');
+      document.getElementById('screen-success').classList.add('hidden');
+      document.getElementById('vp').textContent = (window.innerWidth < 500 ? '390×844' : '1440×900') + ' — menu';
+    }
+    function showSuccess() {
+      document.getElementById('screen-media-url').classList.add('hidden');
+      document.getElementById('screen-success').classList.remove('hidden');
+      document.getElementById('vp').textContent = (window.innerWidth < 500 ? '390×844' : '1440×900') + ' — sucesso + preview';
+    }
+  </script>
+</body>
+</html>

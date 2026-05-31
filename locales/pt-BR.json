@@ -1,0 +1,685 @@
+{
+  "app": {
+    "name": "Live Praise",
+    "tagline": "Software de projeção para igrejas",
+    "operator": "Operador"
+  },
+  "splash": {
+    "loading": "A iniciar…",
+    "monitorsDetected": "{count} monitor(es) detectado(s)"
+  },
+  "connection": {
+    "connected": "WebSocket conectado",
+    "reconnecting": "Reconectando…",
+    "authRequired": "Login necessário (portal)"
+  },
+  "panels": {
+    "images": "Imagens",
+    "videos": "Vídeos",
+    "worship": "Músicas",
+    "bible": "Bíblias"
+  },
+  "settings": {
+    "theme": "Tema",
+    "locale": "Idioma",
+    "appearance": {
+      "title": "Tema e idioma",
+      "intro": "Preferências de aparência do operador (também disponíveis na barra de estado).",
+      "fontScale": "Tamanho da interface",
+      "fontScaleHint": "Escala tipográfica global do operador (100–125%).",
+      "fontScaleValue": "{percent} por cento"
+    },
+    "projectionTypography": {
+      "title": "Tipografia de projeção",
+      "menuLabel": "Tipografia de projeção",
+      "intro": "Configure fonte, tamanho e sombra do texto projectado para cada destino. Alterações aplicam-se aos clientes de projeção em cerca de um segundo.",
+      "profiles": {
+        "projector": "Projetor",
+        "stageReturn": "Retorno palco",
+        "live": "Live",
+        "vocal": "Vocal",
+        "stage": "Palco",
+        "player": "Player"
+      },
+      "sections": {
+        "font": "Fonte",
+        "size": "Tamanho",
+        "textfill": "Auto-ajuste",
+        "shadow": "Sombra no texto"
+      },
+      "fontSource": "Origem da fonte",
+      "fontSourceBundled": "Fontes do Live Praise",
+      "fontSourceSystem": "Fontes do sistema",
+      "fontSourceSystemWarning": "Fontes do sistema dependem do equipamento que projecta. Tablets ou PCs remotos podem não ter a mesma fonte instalada.",
+      "fontFamily": "Família tipográfica",
+      "fontFamilyBundledGroup": "Fontes do Live Praise",
+      "fontFamilySystemGroup": "Fontes do sistema",
+      "fontStyleGroup": "Estilo",
+      "fontStyle": {
+        "normal": "Normal",
+        "bold": "Negrito",
+        "italic": "Itálico",
+        "boldItalic": "Negrito itálico"
+      },
+      "minFontPx": "Tamanho mínimo",
+      "maxFontPx": "Tamanho máximo",
+      "minMaxUnit": "px",
+      "minMaxHint": "Na saída real o texto cresce até ao máximo que couber na área útil.",
+      "minMaxError": "O mínimo não pode ser maior que o máximo.",
+      "textfillEnabled": "Auto-ajustar texto para caber",
+      "textfillHint": "Reduz ou aumenta a fonte para evitar scroll e corte. Desligado usa o tamanho máximo fixo.",
+      "textShadowEnabled": "Usar sombra no texto",
+      "textShadowDisabledHint": "Texto plano, sem contorno ou sombra.",
+      "shadowLayersTitle": "Camadas de sombra",
+      "shadowLayer": "Camada {index}",
+      "shadowOffsetX": "Deslocamento horizontal",
+      "shadowOffsetY": "Deslocamento vertical",
+      "shadowBlur": "Desfoque",
+      "shadowColor": "Cor",
+      "shadowAddLayer": "Adicionar camada",
+      "shadowRemoveLayer": "Remover última camada",
+      "shadowRestoreDefault": "Restaurar padrão",
+      "shadowAdvancedTitle": "Modo avançado (CSS)",
+      "shadowAdvancedHint": "Apenas para utilizadores experientes. CSS inválido será ignorado.",
+      "shadowAdvancedError": "Não foi possível aplicar este CSS. Verifique a sintaxe.",
+      "preview": {
+        "title": "Prévia",
+        "sampleLabel": "Texto de exemplo",
+        "sampleWorship": "Louvor longo",
+        "sampleBible": "Bíblia",
+        "sampleNotes": "Notas curtas",
+        "footnote": "Prévia: o texto cabe nesta área. Em {destination} a fonte pode ser maior.",
+        "sample": {
+          "worshipLine": "Senhor, eu sei que Tu és fiel",
+          "worshipBody": "Em cada estação do meu caminho\nTu estás comigo, não me deixas só\nQuando a noite cai e o medo vem\nTua luz dissipa toda escuridão",
+          "worshipFooter": "Exemplo de louvor (Artista)",
+          "bibleTitle": "Salmos 23:1",
+          "bibleBody": "O Senhor é o meu pastor; nada me faltará.",
+          "notesBody": "Intervalo — 5 min"
+        }
+      },
+      "saved": "Tipografia guardada.",
+      "saveError": "Não foi possível guardar. Tente novamente."
+    },
+    "worship": {
+      "title": "Louvor e estofres",
+      "intro": "Como os versos longos são divididos na fila de projeção e na lista do painel Músicas.",
+      "maxEstofreLines": "Linhas máximas por estofre",
+      "maxEstofreLinesUnit": "linhas",
+      "maxEstofreLinesHint": "Versos com mais linhas são divididos em blocos (padrão 4). Ex.: 8 linhas → dois blocos de 4; 9 linhas → 4+5. Não altera a letra guardada na base de dados. Remova e volte a adicionar músicas já na fila para aplicar um novo valor."
+    },
+    "bible": {
+      "title": "Bíblia e pesquisa",
+      "intro": "Histórico de referências recentes no campo de pesquisa do painel Bíblia.",
+      "searchHistoryEnabled": "Guardar histórico de pesquisa",
+      "searchHistoryLimit": "Itens no histórico",
+      "searchHistoryLimitUnit": "referências",
+      "searchHistoryLimitHint": "Quantidade máxima de referências recentes mostradas como atalhos (padrão 5).",
+      "clearSearchHistory": "Limpar histórico"
+    },
+    "users": {
+      "title": "Utilizadores",
+      "intro": "Contas para acesso remoto e operador local. Alterações de senha ou papel invalidam sessões activas.",
+      "username": "Nome de utilizador",
+      "password": "Senha",
+      "newPassword": "Nova senha",
+      "passwordOptional": "Deixe em branco para manter",
+      "role": "Papel",
+      "active": "Conta activa",
+      "inactive": "inactivo",
+      "edit": "Editar",
+      "save": "Guardar",
+      "saving": "A guardar…",
+      "cancel": "Cancelar",
+      "create": "Criar utilizador",
+      "createTitle": "Novo utilizador",
+      "created": "Utilizador criado.",
+      "updated": "Utilizador actualizado.",
+      "empty": "Nenhum utilizador registado.",
+      "roles": {
+        "operator": "Operador",
+        "remote": "Remoto",
+        "admin": "Administrador"
+      },
+      "errors": {
+        "load": "Erro ao carregar utilizadores",
+        "save": "Erro ao guardar utilizador",
+        "required": "Utilizador e senha são obrigatórios"
+      }
+    },
+    "approvals": {
+      "title": "Fila de aprovação",
+      "intro": "Pedidos remotos aguardando confirmação do operador.",
+      "banner": "Fila de aprovação remota",
+      "empty": "Nenhum pedido pendente.",
+      "approve": "Aprovar",
+      "reject": "Rejeitar"
+    },
+    "backup": {
+      "panelTitle": "Backup e restauro",
+      "panelIntro": "Exporte ou importe o ambiente Live Praise (base de dados, mídia, temas e preferências). Apenas administradores. Use ao mudar de computador ou recuperar após uma falha.",
+      "openBackup": "Gerar backup…",
+      "openRestore": "Restaurar de ficheiro…",
+      "backupModalTitle": "Gerar backup",
+      "restoreModalTitle": "Restaurar ambiente",
+      "backupIntro": "Escolha o que incluir no ficheiro .zip. Itens desmarcados não entram no backup.",
+      "restoreIntro": "Seleccione um backup (.zip) gerado por este sistema. Só pode restaurar grupos que existam nesse ficheiro.",
+      "restorePrivacyNote": "Restaurar substitui os dados seleccionados neste computador. Confirme que o ficheiro veio de uma fonte de confiança.",
+      "privacyTitle": "Dados sensíveis no backup",
+      "privacyBody": "Este ficheiro contém dados da sua igreja. Se incluir a base de dados, também leva nomes de utilizadores e credenciais (palavras-passe encriptadas). Guarde-o num local seguro, apenas em dispositivos de confiança, e elimine-o quando já não for necessário. Não envie por e-mail nem armazene em nuvem pública sem encriptação adicional.",
+      "privacyUnencryptedWarning": "Este backup não está protegido por palavra-passe. Qualquer pessoa com acesso ao ficheiro pode tentar recuperar contas de operador.",
+      "selectAll": "Seleccionar todos",
+      "selectNone": "Limpar selecção",
+      "generate": "Gerar backup",
+      "generating": "A gerar backup…",
+      "generatingGroup": "A processar: {group}",
+      "restoringGroup": "Grupo {current} de {total}: {group}",
+      "chooseZip": "Escolher ficheiro .zip…",
+      "continue": "Continuar",
+      "back": "Voltar",
+      "restoring": "A restaurar…",
+      "close": "Fechar",
+      "restartApp": "Reiniciar aplicação",
+      "successTitle": "Backup concluído",
+      "successMessage": "O ficheiro foi guardado com sucesso.",
+      "successSize": "Tamanho: {size} · Grupos: {groups}",
+      "restoreSuccessTitle": "Restauro concluído",
+      "restoreSuccessMessage": "Os grupos seleccionados foram aplicados.",
+      "manifestSummary": "Backup de {date} · Versão {appVersion} · {groupCount} grupos no ficheiro",
+      "groupNotInBackup": "Não incluído neste backup",
+      "databaseReloginWarning": "Após restaurar a base de dados, todos os operadores terão de iniciar sessão novamente.",
+      "overwriteTitle": "Substituir dados existentes?",
+      "overwriteBody": "Os seguintes grupos já existem neste computador e serão substituídos: {groups}.",
+      "overwriteAcknowledge": "Compreendo que os dados seleccionados serão substituídos",
+      "overwriteConfirm": "Substituir e restaurar",
+      "reloginRequired": "Por segurança, todas as sessões foram terminadas. Inicie sessão novamente antes de continuar a operar.",
+      "globalBanner": "Manutenção: backup ou restauro em curso. Algumas acções estão temporariamente indisponíveis.",
+      "groups": {
+        "database": "Base de dados (louvor, utilizadores, Bíblia, sistema)",
+        "databaseHint": "Inclui contas de operador e credenciais encriptadas.",
+        "mediaImages": "Imagens locais",
+        "mediaImagesHint": "Pode aumentar bastante o tamanho do ficheiro.",
+        "mediaVideos": "Vídeos locais",
+        "mediaVideosHint": "Ficheiros grandes — a geração pode demorar vários minutos.",
+        "themes": "Temas personalizados",
+        "locales": "Traduções personalizadas",
+        "displays": "Configuração de monitores",
+        "projectionState": "Fundo de projeção guardado",
+        "biblias": "Ficheiros de Bíblia",
+        "errorLog": "Registo local de erros",
+        "errorLogHint": "Pode conter detalhes técnicos sensíveis. Desmarcado por defeito.",
+        "operatorUi": "Preferências do operador (filas, painéis, atalhos)",
+        "operatorUiHint": "Estado guardado neste computador, não na pasta livepraise."
+      },
+      "errors": {
+        "failed": "Não foi possível concluir a operação. Tente novamente.",
+        "diskFull": "Espaço em disco insuficiente para criar o backup.",
+        "permissionDenied": "Sem permissão para escrever no destino escolhido.",
+        "invalidZip": "Ficheiro inválido ou manifesto em falta.",
+        "migrationNewer": "Este backup é de uma versão mais recente do Live Praise. Actualize a aplicação antes de restaurar.",
+        "confirmRequired": "Confirme a substituição dos dados existentes.",
+        "noGroupsSelected": "Seleccione pelo menos um grupo."
+      }
+    },
+    "errorLog": {
+      "title": "Logs de erro",
+      "intro": "Erros recentes do servidor e falhas de API na interface do operador.",
+      "empty": "Nenhum erro registado.",
+      "refresh": "Actualizar",
+      "refreshing": "A actualizar…",
+      "clear": "Limpar logs",
+      "confirmClear": "Limpar todos os registos de erro? Esta acção não pode ser desfeita.",
+      "showDetail": "Ver detalhe",
+      "hideDetail": "Ocultar detalhe",
+      "displayDebugOverlay": "Overlay de debug nos monitores",
+      "displayDebugOverlayHint": "Quando activo, mostra no rodapé dos monitores de projeção e dos dispositivos ligados pela rede a última acção recebida (ex.: mudança de música às 17:08:38)."
+    },
+    "shortcuts": {
+      "title": "Atalhos de teclado",
+      "intro": "Redefina as combinações abaixo. Se duas ações usarem a mesma tecla, o sistema avisa na hora. As alterações ficam guardadas neste computador, como as outras preferências do operador.",
+      "colAction": "Ação",
+      "colContext": "Contexto",
+      "colCombo": "Combinação",
+      "colActions": "Ações",
+      "redefine": "Redefinir",
+      "clear": "Limpar",
+      "resetOne": "Padrão",
+      "resetAll": "Restaurar todos os padrões",
+      "listening": "Pressione a nova combinação…",
+      "cancelCapture": "Esc para cancelar",
+      "context": {
+        "global": "Global",
+        "bible": "Bíblia",
+        "worship": "Músicas",
+        "operator": "Operador"
+      },
+      "actions": {
+        "about": "Abrir Sobre",
+        "versePrev": "Versículo anterior",
+        "verseNext": "Próximo versículo",
+        "stanzaPrev": "Verso anterior (música)",
+        "stanzaNext": "Próximo verso (música)",
+        "clearScreen": "Limpar tela",
+        "freezeToggle": "Congelar / descongelar",
+        "reloadData": "Recarregar dados"
+      }
+    }
+  },
+  "preview": {
+    "local": "Prévia local",
+    "columnAria": "Pré-visualizações por saída de projeção",
+    "draft": "Rascunho",
+    "hint": "Fluxo sugerido: escolha a categoria, depois a música e o verso — em poucos cliques. As preferências são guardadas automaticamente neste computador.",
+    "empty": {
+      "waiting": "À espera do estado desta saída…"
+    },
+    "groups": {
+      "projection": "Projetor",
+      "projectionSecondary": "Projetor 2",
+      "stageReturn": "Retorno de palco",
+      "live": "Live",
+      "vocal": "Vocal",
+      "stage": "Palco",
+      "player": "Player"
+    }
+  },
+  "tabs": {
+    "playlist": "Playlist / fila de projeção",
+    "empty": "Fila vazia — arraste itens dos painéis ou crie uma fila em branco (+)",
+    "close": "Fechar aba",
+    "noVerses": "Sem itens nesta fila",
+    "importError": "Não foi possível importar a playlist.",
+    "missingSong": "Música não encontrada nesta base — letra do ficheiro mantida; pode remover a aba (×).",
+    "newBlank": "Nova fila",
+    "blankLabel": "Fila {n}",
+    "dropHint": "Arraste versos, Bíblia, imagens ou vídeos para esta fila — ou solte numa aba acima.",
+    "dragHint": "Arrastar para a fila de projeção",
+    "kindMusic": "Música",
+    "kindBible": "Bíblia",
+    "kindImage": "Imagem",
+    "kindVideo": "Vídeo",
+    "kindBlank": "Em branco"
+  },
+  "queueItem": {
+    "removeFromQueue": "Remover da fila",
+    "removeFromQueueAria": "Remover «{label}» da fila",
+    "online": "Online",
+    "youtubeDownloading": "A descarregar…",
+    "youtubeDownloadingAttempt": "Tentativa {attempt}/{max}…",
+    "youtubeProcessing": "A preparar vídeo…",
+    "youtubeFailedShort": "Download indisponível",
+    "youtubeRetry": "Tentar download de novo",
+    "youtubeDownloadLocal": "Descarregar para biblioteca local",
+    "youtubeUseOnline": "Usar online"
+  },
+  "queueAdd": {
+    "title": "Adicionar à fila",
+    "intro": "Escolha como importar imagens ou vídeos para esta fila.",
+    "optionLocal": "Imagens ou vídeos do computador",
+    "optionYoutube": "Importar vídeo do YouTube",
+    "optionMediaUrl": "URL de imagem ou vídeo",
+    "localHint": "Os ficheiros são copiados para a biblioteca local. Vídeos não-MP4 são convertidos automaticamente.",
+    "mediaUrlHint": "Cole o link direto do ficheiro (PNG, JPG, MP4…). O servidor descarrega para a biblioteca local. Não use links com login ou páginas web. Evite URLs com palavras-passe ou tokens na query.",
+    "mediaUrlLabel": "URL da mídia",
+    "mediaUrlPlaceholder": "https://cdn.exemplo.org/slide.png",
+    "mediaUrlResultDownload": "Ficheiro importado para a biblioteca local. O item já está na fila.",
+    "mediaUrlResultReference": "Item adicionado com link remoto. Se a projeção falhar, o servidor do ficheiro pode bloquear o browser (CORS) — prefira importação local quando possível.",
+    "mediaUrlDoneHint": "O item foi adicionado à fila. Feche quando tiver lido o resultado acima.",
+    "mediaUrlPreviewAlt": "Pré-visualização da mídia importada",
+    "pickFiles": "Escolher ficheiros",
+    "uploading": "A enviar…",
+    "youtubeHint": "O vídeo entra na fila de imediato. O download local tenta uma vez se o vídeo estiver protegido; se o download começar e for interrompido, repete até 3 vezes. Acompanhe o progresso no cartão da fila.",
+    "youtubeUrl": "URL do YouTube",
+    "youtubePlaceholder": "https://www.youtube.com/watch?v=…",
+    "import": "Importar",
+    "importing": "A importar…",
+    "resultLocal": "Vídeo descarregado para a biblioteca local (modo local). O item já está na fila.",
+    "resultOnline": "Não foi possível descarregar; o item será reproduzido online. Registo também em Configurações → Registo de erros (fonte youtube-import).",
+    "youtubeDoneHint": "O item foi adicionado à fila. Feche quando tiver lido o resultado acima.",
+    "done": "Fechar",
+    "back": "Voltar",
+    "cancel": "Cancelar",
+    "addCard": "Adicionar",
+    "errors": {
+      "uploadFailed": "Não foi possível enviar o ficheiro.",
+      "youtubeFailed": "Não foi possível importar o vídeo.",
+      "urlRequired": "Indique a URL do YouTube.",
+      "mediaUrlRequired": "Indique a URL da imagem ou vídeo.",
+      "mediaUrlFailed": "Não foi possível importar a partir da URL.",
+      "mediaUrlUseYoutube": "Este link é do YouTube. Use «Importar vídeo do YouTube» no menu anterior.",
+      "mediaUrlSsrf": "Endereço não permitido. Use um link público na internet (https://).",
+      "mediaUrlUnsupported": "O endereço não é uma imagem ou vídeo suportado.",
+      "mediaUrlTooLarge": "Ficheiro demasiado grande (máx. 50 MB imagem, 600 MB vídeo).",
+      "mediaUrlTimeout": "O download demorou demasiado. Tente outro link ou ficheiro mais pequeno.",
+      "mediaUrlSsl": "Ligação segura falhou. Confirme que o site usa HTTPS válido.",
+      "serverOutdated": "Importação indisponível no servidor (HTTP 404). Feche o Live Praise, libere a porta 3000 (processos node/electron antigos), execute npm run build com Node 22+ (nvm use) e npm run dev. Confirme GET /health → features.cad194:true e GET /video/importar/ping → cad194:true."
+    }
+  },
+  "newSong": {
+    "title": "Nova música",
+    "editTitle": "Editar música",
+    "loading": "A carregar…",
+    "name": "Nome",
+    "artist": "Artista",
+    "composer": "Compositor",
+    "lyrics": "Letra",
+    "lyricsHint": "Separe cada verso com uma linha em branco entre eles.",
+    "save": "Salvar",
+    "saving": "A guardar…",
+    "cancel": "Cancelar",
+    "errors": {
+      "nameRequired": "O nome da música é obrigatório.",
+      "artistRequired": "O artista é obrigatório.",
+      "lyricsRequired": "A letra é obrigatória.",
+      "saveFailed": "Não foi possível guardar a música.",
+      "loadFailed": "Não foi possível carregar a música."
+    }
+  },
+  "notepad": {
+    "title": "Bloco de notas",
+    "placeholder": "Texto livre para projeção…",
+    "project": "Projetar",
+    "close": "Fechar"
+  },
+  "actions": {
+    "freeze": "Congelar",
+    "unfreeze": "Descongelar",
+    "clearScreen": "Limpar tela",
+    "newSong": "Nova música",
+    "notepad": "Bloco de notas",
+    "reload": "Recarregar",
+    "settings": "Configurações",
+    "playlist": "Playlist",
+    "playlistExport": "Exportar playlist…",
+    "playlistImport": "Importar playlist…",
+    "playlistImporting": "A importar playlist…",
+    "playlistExportEmpty": "A fila está vazia — adicione músicas antes de exportar.",
+    "help": "Ajuda",
+    "projectorScreen": "Tela projetor",
+    "manageUsers": "Utilizadores",
+    "worshipSettings": "Louvor e estofres",
+    "bibleSettings": "Bíblia e pesquisa",
+    "appearance": "Tema e idioma",
+    "projectionTypography": "Tipografia de projeção",
+    "approvalQueue": "Fila de aprovação",
+    "errorLog": "Logs de erro",
+    "backupRestore": "Backup e restauro",
+    "keyboardShortcuts": "Atalhos de teclado",
+    "helpManual": "Manual",
+    "helpReport": "Informar problema",
+    "helpAbout": "Sobre",
+    "helpAboutShortcut": "F1",
+    "tools": "Ferramentas",
+    "serviceTimer": "Contador / Timer",
+    "footerAlert": "Alerta"
+  },
+  "serviceTimer": {
+    "title": "Contador / Timer de culto",
+    "intro": "Escolha em cada monitor se exibe contagem progressiva (contador) ou regressiva (timer). Pode ter contador no retorno de palco e timer no projetor ao mesmo tempo.",
+    "enable": "Activar ferramenta",
+    "durationMinutes": "Duração do timer (minutos)",
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "reset": "Repor",
+    "targetsTitle": "Monitores e dispositivos",
+    "targetsHint": "Marque os ecrãs que devem mostrar o overlay. Em cada linha escolha Contador (sobe desde zero) ou Timer (desce até zero).",
+    "loading": "A carregar monitores…",
+    "noTargets": "Nenhum monitor de projeção ou retorno configurado. Defina papéis em Configurações → Tela projetor.",
+    "modes": {
+      "counter": "Contador",
+      "timer": "Timer"
+    },
+    "externalProfiles": {
+      "live": "Dispositivo — transmissão",
+      "vocal": "Dispositivo — vocal",
+      "stage": "Dispositivo — retorno",
+      "player": "Dispositivo — player"
+    }
+  },
+  "footerAlert": {
+    "title": "Alerta no rodapé",
+    "intro": "Envia um texto rolante na barra inferior dos monitores seleccionados. O texto percorre o ecrã o número de vezes e na velocidade definidos.",
+    "text": "Texto do alerta",
+    "textPlaceholder": "Ex.: Culto de oração às 20h — sala 2",
+    "textRequired": "Escreva o texto do alerta antes de enviar.",
+    "repeatCount": "Vezes que o texto passa (padrão 3)",
+    "scrollDuration": "Segundos por passagem (padrão 3)",
+    "textColor": "Cor da letra",
+    "backgroundColor": "Cor de fundo",
+    "targetsTitle": "Monitores",
+    "targetsHint": "Todos marcados = envia para todos os ecrãs de projeção, retorno e dispositivos ligados. Desmarque para restringir.",
+    "loading": "A carregar monitores…",
+    "noTargets": "Nenhum monitor configurado. Defina papéis em Configurações → Tela projetor.",
+    "send": "Enviar alerta",
+    "stop": "Parar alerta",
+    "externalProfiles": {
+      "live": "Dispositivo — transmissão",
+      "vocal": "Dispositivo — vocal",
+      "stage": "Dispositivo — retorno",
+      "player": "Dispositivo — player"
+    }
+  },
+  "about": {
+    "title": "Sobre o Live Praise",
+    "whatIsTitle": "O que é",
+    "whatIsBody": "O Live Praise é um software de projeção para igrejas e cultos. Permite exibir letras de músicas, versículos bíblicos, imagens e vídeos no projetor, com controle em tempo real pelo operador e suporte a monitor remoto via rede.",
+    "licenseTitle": "Licença e permissões de uso",
+    "licenseBody": "Este software é distribuído sob a licença MIT. Você pode usar, copiar, modificar, mesclar, publicar, distribuir, sublicenciar e/ou vender cópias do software, desde que o aviso de copyright e a permissão acima sejam incluídos em todas as cópias ou partes relevantes.",
+    "licenseDisclaimer": "O software é fornecido \"como está\", sem garantias de qualquer tipo.",
+    "stackTitle": "Tecnologias principais",
+    "stackItems": [
+      "Vue 3, TypeScript e Vite (interface do operador)",
+      "Electron (aplicação desktop)",
+      "Node.js, Express 5 e WebSocket (ws) no servidor",
+      "SQLite (persistência local)",
+      "Tailwind CSS e vue-i18n"
+    ],
+    "runtime": "Runtime desta instalação: Node.js {node}, Chromium {chromium}, Electron {electron}.",
+    "version": "Versão do aplicativo: {version}",
+    "close": "Fechar"
+  },
+  "images": {
+    "category": "Categoria",
+    "errors": {
+      "categories": "Erro ao carregar categorias de imagem",
+      "images": "Erro ao carregar imagens"
+    }
+  },
+  "videos": {
+    "category": "Categoria",
+    "noThumb": "Vídeo",
+    "pipelineError": "Falha na conversão",
+    "errors": {
+      "categories": "Erro ao carregar categorias de vídeo",
+      "videos": "Erro ao carregar vídeos"
+    }
+  },
+  "mediaContext": {
+    "setInitial": "Definir como fundo inicial",
+    "replaceQuick": "Alterar fundo rápido",
+    "replaceQuickTitle": "Substituir fundo rápido",
+    "replaceQuickHint": "Escolha qual atalho de fundo rápido deve passar a usar este ficheiro.",
+    "properties": "Propriedades",
+    "changeCategory": "Mudar categoria",
+    "applyToQueue": "Aplicar na fila",
+    "delete": "Excluir da biblioteca",
+    "deleteAria": "Excluir «{name}» da biblioteca",
+    "deleteConfirm": "Excluir «{name}»? Esta ação não pode ser desfeita.",
+    "deleteConfirmQueueHint": "Itens na fila que usam este ficheiro deixam de projectar até serem removidos ou substituídos.",
+    "fields": {
+      "name": "Nome",
+      "category": "Categoria",
+      "size": "Tamanho",
+      "modified": "Modificado",
+      "path": "Caminho"
+    },
+    "errors": {
+      "properties": "Erro ao carregar propriedades do ficheiro",
+      "replaceQuick": "Erro ao substituir fundo rápido",
+      "setInitial": "Erro ao definir fundo inicial",
+      "changeCategory": "Erro ao mover ficheiro de categoria",
+      "noActiveQueue": "Seleccione ou crie uma fila (aba) antes de aplicar mídia.",
+      "delete": "Não foi possível excluir o ficheiro da biblioteca.",
+      "deleteProcessing": "Aguarde o processamento do vídeo terminar."
+    }
+  },
+  "status": {
+    "version": "v{version}",
+    "displays": "{total} monitor(es) · {projection} em projeção · {return} em retorno ({stageReturn} retorno palco)",
+    "localIp": "IP local: {ip}",
+    "noNetwork": "sem rede",
+    "externalDevices": {
+      "title": "Monitores e dispositivos",
+      "hint": "Ligue telemóveis, tablets ou outros computadores pelo browser. Os monitores ligados directamente ao computador configuram-se em Monitores.",
+      "noneOnline": "Nenhum dispositivo externo ligado neste momento.",
+      "openMonitors": "Abrir painel Monitores…"
+    }
+  },
+  "worship": {
+    "category": "Categoria",
+    "songs": "Músicas",
+    "verses": "Versos",
+    "loading": "Carregando…",
+    "selectSong": "Selecione uma música",
+    "addToQueue": "Adicionar à fila",
+    "edit": "Editar música",
+    "delete": "Excluir música",
+    "deleteConfirm": "Excluir «{name}»? Esta ação não pode ser desfeita.",
+    "errors": {
+      "categories": "Erro ao carregar categorias",
+      "songs": "Erro ao carregar músicas",
+      "verses": "Erro ao carregar versos",
+      "delete": "Não foi possível excluir a música."
+    }
+  },
+  "bible": {
+    "translation": "Tradução",
+    "books": "Livros",
+    "chapters": "Capítulos",
+    "verses": "Versículos",
+    "searchReferencePlaceholder": "Referência (ex.: mat 5 1, 1 jo 3 16) ou nome do livro",
+    "searchHistoryLabel": "Referências recentes",
+    "errors": {
+      "bibles": "Erro ao carregar bíblias",
+      "books": "Erro ao carregar livros",
+      "chapters": "Erro ao carregar capítulos",
+      "verses": "Erro ao carregar versículos",
+      "bookNotFound": "Livro não encontrado: {query}"
+    }
+  },
+  "backgrounds": {
+    "quick": "Fundos rápidos",
+    "initialBadge": "Inicial",
+    "setInitial": "Definir como fundo inicial",
+    "images": "Imagens",
+    "errors": {
+      "quick": "Erro ao carregar fundos rápidos",
+      "categories": "Erro ao carregar categorias de imagem",
+      "images": "Erro ao carregar imagens",
+      "setInitial": "Erro ao definir fundo inicial"
+    }
+  },
+  "displays": {
+    "intro": "Defina o papel de cada monitor: o operador usa o monitor principal; a projeção pública e o retorno de palco mostram conteúdos diferentes.",
+    "primary": "principal",
+    "monitorsTitle": "Monitores",
+    "none": "Nenhum monitor detectado. Execute o Live Praise neste computador para listar os ecrãs ligados.",
+    "save": "Guardar papéis",
+    "saving": "A guardar…",
+    "saved": "Configuração guardada. Reinicie o Live Praise para aplicar novos papéis nos monitores.",
+    "roles": {
+      "operator": "Operador",
+      "projection": "Projeção",
+      "stage-return": "Retorno de palco",
+      "off": "Desligado"
+    },
+    "screenSize": {
+      "title": "Tamanho da tela de projeção",
+      "hint": "Escolha a proporção ou as dimensões em pixels da área de projeção no ecrã.",
+      "perMonitorHint": "Cada monitor em «Projeção» pode ter tamanho diferente — use a engrenagem na linha do monitor. Computadores remotos em /projector aparecem na secção «Projetores remotos».",
+      "configure": "Configurar tamanho da projeção",
+      "monitorTitle": "Projeção — {label}",
+      "savedFor": "Tamanho aplicado em {label}.",
+      "presetLabel": "Tamanho da tela",
+      "widthLabel": "Largura (px)",
+      "heightLabel": "Altura (px)",
+      "widthPlaceholder": "ex.: 1920",
+      "heightPlaceholder": "ex.: 1080",
+      "positionLabel": "Posição na tela",
+      "positions": {
+        "centro": "Centro (padrão)",
+        "topo": "Topo",
+        "personalizado": "Personalizado (deslocamento)"
+      },
+      "offsetXLabel": "Deslocamento horizontal (px)",
+      "offsetYLabel": "Deslocamento vertical (px)",
+      "offsetXPlaceholder": "0",
+      "offsetYPlaceholder": "0",
+      "contentFitLabel": "Conteúdo menor que a área",
+      "contentFitHint": "Define o que fazer quando imagem ou vídeo têm resolução inferior à área de projeção.",
+      "contentFits": {
+        "estender": "Estender (preencher a área)",
+        "centralizar": "Centralizar (tamanho original)",
+        "proporcional": "Proporcional (ajustar sem distorcer)"
+      },
+      "livePreview": "Pré-visualizar no projetor enquanto altera (antes de aplicar)",
+      "save": "Aplicar tamanho",
+      "saving": "A aplicar…",
+      "saved": "Tamanho da tela guardado e enviado ao projetor.",
+      "presets": {
+        "16:9": "WideScreen (16:9)",
+        "4:3": "Clássico (4:3)",
+        "7:3": "Panorâmica (7:3)",
+        "5:3": "Cinema Europa (5:3)",
+        "13:7": "Cinema EUA (13:7)",
+        "personalizado": "Personalizado",
+        "padrao": "Padrão (ecrã completo)"
+      },
+      "errors": {
+        "save": "Erro ao guardar tamanho da tela",
+        "socket": "Não foi possível enviar ao projetor — verifique a ligação ao vivo."
+      }
+    },
+    "errors": {
+      "load": "Erro ao carregar monitores",
+      "save": "Erro ao guardar"
+    },
+    "remoteProjection": {
+      "title": "Projetores remotos (/projector)",
+      "hint": "Cada browser aberto em /projector num computador remoto aparece aqui com configuração de tela independente. Endpoints diferentes (/stage, /vocal, …) têm identificadores separados.",
+      "none": "Nenhum projetor remoto ligado. Abra http://servidor:porta/projector no computador remoto.",
+      "defaultLabel": "Projetor {id}"
+    },
+    "external": {
+      "title": "Dispositivos externos (browser)",
+      "hint": "Dispositivos ligados pela rede (transmissão, vocal, retorno de palco ou músicos) aparecem aqui e na barra de estado.",
+      "none": "Nenhum dispositivo externo ligado.",
+      "online": "Ligado",
+      "profile": "Perfil",
+      "label": "Etiqueta",
+      "showChords": "Mostrar cifras",
+      "save": "Guardar dispositivo",
+      "saving": "A guardar…",
+      "saved": "Preferências do dispositivo guardadas.",
+      "profiles": {
+        "live": "Transmissão (/live)",
+        "vocal": "Vocal (/vocal)",
+        "stage": "Retorno de palco (/stage)",
+        "player": "Músicos (/player)",
+        "projection": "Projetor (/projector)"
+      },
+      "errors": {
+        "load": "Erro ao carregar dispositivos",
+        "save": "Erro ao guardar dispositivo"
+      }
+    }
+  },
+  "common": {
+    "loading": "Carregando…",
+    "search": "Pesquisar",
+    "searchPlaceholder": "Pesquisar…",
+    "close": "Fechar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  }
+}

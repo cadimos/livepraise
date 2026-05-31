@@ -1,0 +1,231 @@
+/**
+ * Layout 3 zonas para projeção (#conteudo / .conteudo) — CAD-287 / CAD-286 / CAD-288.
+ * Importar após regras base de posição/cor em cada superfície.
+ *
+ * Zonas: .titulo (topo) | .content (centro) | .rodape (metadados)
+ * Modos inferidos por :empty — sem alterar HTML de projection.ts.
+ */
+
+#conteudo,
+.conteudo {
+  --projection-zone-gap: clamp(0.5rem, 1.2vw, 1.25rem);
+  --projection-title-size: clamp(1rem, 2.2vw, 1.75rem);
+  --projection-body-size: clamp(1.5rem, 4vw, 3rem);
+  --projection-footer-size: clamp(0.85rem, 1.65vw, 1.35rem);
+  --projection-footer-alert-reserve: clamp(3.25rem, 8vh, 5rem);
+
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  align-items: stretch;
+  justify-items: stretch;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  text-align: left;
+  font-size: var(--projection-body-size);
+  line-height: 1.35;
+}
+
+body.footer-alert-active #conteudo,
+.conteudo.footer-alert-active {
+  padding-bottom: calc(
+    clamp(1.25rem, 3vw, 2rem) + var(--projection-footer-alert-reserve)
+  );
+}
+
+#conteudo .titulo,
+#conteudo .content,
+#conteudo .rodape,
+.conteudo .titulo,
+.conteudo .content,
+.conteudo .rodape {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#conteudo .titulo:empty,
+#conteudo .rodape:empty,
+.conteudo .titulo:empty,
+.conteudo .rodape:empty {
+  display: none;
+}
+
+#conteudo .titulo,
+.conteudo .titulo {
+  grid-row: 1;
+  align-self: start;
+  justify-self: start;
+  margin: 0;
+  padding: 0;
+  font-size: var(--projection-title-size);
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+
+#conteudo .content,
+.conteudo .content {
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  /* Corpo: textfill define `.content > span`; evitar herdar --projection-body-size. */
+  font-size: unset;
+  text-align: left;
+}
+
+#conteudo .content > span,
+.conteudo .content > span {
+  display: block;
+  width: 100%;
+  font-size: inherit;
+}
+
+#conteudo .rodape,
+.conteudo .rodape {
+  grid-row: 3;
+  align-self: end;
+  justify-self: start;
+  margin: 0;
+  margin-top: var(--projection-zone-gap);
+  padding: 0;
+  font-size: var(--projection-footer-size);
+  line-height: 1.3;
+  text-align: left;
+  background: transparent;
+  border-radius: 0;
+}
+
+/* Louvor: .titulo vazio — corpo centrado H+V; rodapé inferior esquerdo */
+#conteudo:has(.titulo:empty) .content,
+.conteudo:has(.titulo:empty) .content {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#conteudo:has(.titulo:empty) .rodape:not(:empty),
+.conteudo:has(.titulo:empty) .rodape:not(:empty) {
+  margin-top: var(--projection-zone-gap);
+}
+
+/*
+ * Retorno de palco (.retorno-musica / .retorno-biblia) — não usar grid 3 zonas;
+ * o markup ocupa a área útil inteira (/vocal, /stage, prévia operador).
+ */
+#conteudo:has(> .retorno-musica),
+#conteudo:has(> .retorno-biblia),
+.conteudo:has(> .retorno-musica),
+.conteudo:has(> .retorno-biblia) {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  padding-top: max(clamp(0.5rem, 2.5vw, 2rem), env(safe-area-inset-top, 0px));
+  padding-right: max(clamp(0.5rem, 2.5vw, 2rem), env(safe-area-inset-right, 0px));
+  padding-bottom: max(clamp(0.5rem, 2.5vw, 2rem), env(safe-area-inset-bottom, 0px));
+  padding-left: max(clamp(0.5rem, 2.5vw, 2rem), env(safe-area-inset-left, 0px));
+  font-size: unset;
+}
+
+#conteudo:has(> .retorno-musica) > .retorno-musica,
+#conteudo:has(> .retorno-biblia) > .retorno-biblia,
+.conteudo:has(> .retorno-musica) > .retorno-musica,
+.conteudo:has(> .retorno-biblia) > .retorno-biblia {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Retorno de palco — faixas flexíveis para textfill em cada `.texto` */
+.retorno-musica,
+#conteudo:has(> .retorno-musica) > .retorno-musica,
+.conteudo:has(> .retorno-musica) > .retorno-musica {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  gap: clamp(0.35rem, 1.2vh, 1.5rem);
+}
+
+.retorno-musica .atual,
+.retorno-musica .proximo {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.retorno-musica .atual {
+  flex-grow: 3;
+}
+
+.retorno-musica .proximo {
+  flex-grow: 2;
+  padding-top: clamp(0.35rem, 1vh, 1rem);
+}
+
+.retorno-musica .label,
+.retorno-biblia .ref {
+  flex: 0 0 auto;
+}
+
+.retorno-musica .rodape {
+  flex: 0 0 auto;
+}
+
+.retorno-musica .texto,
+.retorno-biblia .texto {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  font-size: unset;
+  display: block;
+}
+
+.retorno-musica .texto > .texto-fill,
+.retorno-biblia .texto > .texto-fill {
+  display: block;
+  width: 100%;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.retorno-biblia,
+#conteudo:has(> .retorno-biblia) > .retorno-biblia,
+.conteudo:has(> .retorno-biblia) > .retorno-biblia {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.retorno-biblia .ref {
+  flex: 0 0 auto;
+}
+
+/* Prévia operador — escala proporcional no tile (CA-5) */
+.projection-preview-frame {
+  container-type: size;
+}
+
+.projection-preview-frame #conteudo,
+.projection-preview-frame .conteudo {
+  --projection-zone-gap: clamp(0.25rem, 2cqh, 0.75rem);
+  --projection-title-size: clamp(0.5rem, 5cqw, 1rem);
+  --projection-footer-size: clamp(0.45rem, 4cqw, 0.85rem);
+  --projection-footer-alert-reserve: clamp(1.5rem, 14cqh, 2.75rem);
+
+  padding: 5%;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+}
+
+.projection-preview-frame .conteudo.footer-alert-active {
+  padding-bottom: calc(5% + var(--projection-footer-alert-reserve));
+}

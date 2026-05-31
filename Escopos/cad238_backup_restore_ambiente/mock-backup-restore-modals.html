@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CAD-240 — Mock modais Backup / Restore</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'lp-background': '#0f1419',
+            'lp-surface': '#1a2332',
+            'lp-text': '#e8edf4',
+            'lp-muted': '#8b9cb3',
+            'lp-primary': '#3b82f6',
+            'lp-action-bar': '#1e3a5f',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; }
+    .viewport-label { position: fixed; top: 8px; left: 8px; z-index: 100; font-size: 11px; color: #8b9cb3; }
+    .screen { display: none; }
+    .screen.active { display: flex; }
+  </style>
+</head>
+<body class="bg-zinc-900 min-h-screen">
+  <p class="viewport-label" id="vp">1440×900 — backup</p>
+
+  <!-- Backup modal -->
+  <div id="screen-backup" class="screen active fixed inset-0 z-50 items-center justify-center bg-black/60 p-4">
+    <div class="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-lp-surface bg-lp-background shadow-xl">
+      <header class="flex items-center justify-between border-b border-lp-surface px-4 py-3">
+        <h2 class="text-sm font-semibold text-lp-text">Gerar backup</h2>
+        <button type="button" class="rounded px-2 py-1 text-lp-muted">✕</button>
+      </header>
+      <div class="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+        <p class="text-sm text-lp-muted">Escolha o que incluir no ficheiro .zip. Itens desmarcados não entram no backup.</p>
+
+        <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2">
+          <input type="checkbox" checked class="mt-0.5" />
+          <span class="flex flex-col gap-0.5">
+            <span class="font-medium text-lp-text">Base de dados (louvor, utilizadores, Bíblia, sistema)</span>
+            <span class="text-xs text-lp-muted">Inclui contas de operador e credenciais encriptadas.</span>
+          </span>
+        </label>
+        <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2">
+          <input type="checkbox" checked class="mt-0.5" />
+          <span class="flex flex-col gap-0.5">
+            <span class="font-medium text-lp-text">Imagens locais</span>
+            <span class="text-xs text-lp-muted">Pode aumentar bastante o tamanho do ficheiro.</span>
+          </span>
+        </label>
+        <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2">
+          <input type="checkbox" checked class="mt-0.5" />
+          <span class="flex flex-col gap-0.5">
+            <span class="font-medium text-lp-text">Vídeos locais</span>
+            <span class="text-xs text-lp-muted">Ficheiros grandes — a geração pode demorar vários minutos.</span>
+          </span>
+        </label>
+        <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2">
+          <input type="checkbox" checked class="mt-0.5" />
+          <span class="font-medium text-lp-text">Temas personalizados</span>
+        </label>
+        <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2">
+          <input type="checkbox" checked class="mt-0.5" />
+          <span class="font-medium text-lp-text">Preferências do operador (filas, painéis, atalhos)</span>
+        </label>
+        <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2 opacity-60">
+          <input type="checkbox" class="mt-0.5" />
+          <span class="flex flex-col gap-0.5">
+            <span class="font-medium text-lp-text">Registo local de erros</span>
+            <span class="text-xs text-lp-muted">Pode conter detalhes técnicos sensíveis. Desmarcado por defeito.</span>
+          </span>
+        </label>
+
+        <div class="rounded-lg border border-amber-500/40 bg-amber-950/40 px-3 py-2 text-sm text-amber-100">
+          <p class="font-medium">Dados sensíveis no backup</p>
+          <p class="mt-1">Este ficheiro contém dados da sua igreja. Se incluir a base de dados, também leva nomes de utilizadores e credenciais (palavras-passe encriptadas). Guarde-o num local seguro, apenas em dispositivos de confiança, e elimine-o quando já não for necessário.</p>
+          <p class="mt-2 text-amber-200/90">Este backup não está protegido por palavra-passe. Qualquer pessoa com acesso ao ficheiro pode tentar recuperar contas de operador.</p>
+        </div>
+      </div>
+      <footer class="flex justify-end gap-2 border-t border-lp-surface px-4 py-3">
+        <button type="button" class="rounded-lg px-4 py-2 text-sm text-lp-muted">Cancelar</button>
+        <button type="button" class="rounded-lg bg-lp-primary px-4 py-2 text-sm font-medium text-white">Gerar backup</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Restore modal -->
+  <div id="screen-restore" class="screen fixed inset-0 z-50 items-center justify-center bg-black/60 p-4">
+    <div class="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-lp-surface bg-lp-background shadow-xl">
+      <header class="flex items-center justify-between border-b border-lp-surface px-4 py-3">
+        <h2 class="text-sm font-semibold text-lp-text">Restaurar ambiente</h2>
+        <button type="button" class="rounded px-2 py-1 text-lp-muted">✕</button>
+      </header>
+      <div class="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+        <p class="text-xs text-lp-muted">Backup de 28/05/2026 · Versão 1.0.0-alpha.1 · 7 grupos no ficheiro</p>
+        <p class="text-sm text-lp-muted">Restaurar substitui os dados seleccionados neste computador. Confirme que o ficheiro veio de uma fonte de confiança.</p>
+
+        <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2">
+          <input type="checkbox" checked class="mt-0.5" />
+          <span class="font-medium text-lp-text">Base de dados (louvor, utilizadores, Bíblia, sistema)</span>
+        </label>
+        <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2">
+          <input type="checkbox" checked class="mt-0.5" />
+          <span class="font-medium text-lp-text">Imagens locais</span>
+        </label>
+        <label class="flex items-start gap-2 cursor-not-allowed rounded border border-lp-surface px-3 py-2 opacity-50">
+          <input type="checkbox" disabled class="mt-0.5" />
+          <span class="flex flex-col gap-0.5">
+            <span class="font-medium text-lp-text">Vídeos locais</span>
+            <span class="text-xs text-lp-muted">Não incluído neste backup</span>
+          </span>
+        </label>
+        <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2">
+          <input type="checkbox" checked class="mt-0.5" />
+          <span class="font-medium text-lp-text">Temas personalizados</span>
+        </label>
+
+        <div class="rounded-lg border border-amber-500/40 bg-amber-950/40 px-3 py-2 text-sm text-amber-100">
+          Após restaurar a base de dados, todos os operadores terão de iniciar sessão novamente.
+        </div>
+      </div>
+      <footer class="flex justify-end gap-2 border-t border-lp-surface px-4 py-3">
+        <button type="button" class="rounded-lg px-4 py-2 text-sm text-lp-muted">Voltar</button>
+        <button type="button" class="rounded-lg bg-lp-primary px-4 py-2 text-sm font-medium text-white">Continuar</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const screens = { backup: 'screen-backup', restore: 'screen-restore' };
+    function show(name) {
+      Object.values(screens).forEach(id => document.getElementById(id).classList.remove('active'));
+      document.getElementById(screens[name] || screens.backup).classList.add('active');
+      document.getElementById('vp').textContent = (window.innerWidth + '×' + window.innerHeight + ' — ' + (name || 'backup'));
+    }
+    const hash = location.hash.replace('#', '') || 'backup';
+    show(hash);
+    window.addEventListener('hashchange', () => show(location.hash.replace('#', '') || 'backup'));
+  </script>
+</body>
+</html>
