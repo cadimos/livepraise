@@ -12,12 +12,8 @@ O utilizador inicial `admin` (bootstrap) recebe papel **`admin`**, não `operato
 
 - `POST /api/auth/login` e `GET /api/auth/me` devolvem `displayRoles` conforme o papel.
 - `PUT /displays/config` com Bearer: valida que cada `assignment.role` está permitido para o papel da sessão.
-- Consola Electron em loopback (`127.0.0.1`) sem token mantém comportamento legado (sem validação por sessão).
+- Consola Electron em loopback (`127.0.0.1`) sem token mantém bypass local (sem validação por sessão).
 
 ## Regressão
 
 Papéis e `PUT /displays/config` entram na suite de release (`npm run smoke:release`). Durante o desenvolvimento use `npm run typecheck`.
-
-## Legado
-
-A pasta `v0.0.8/` é apenas referência da refatoração — **não** recebe novas funcionalidades.

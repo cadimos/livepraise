@@ -1,39 +1,45 @@
-# Live Praise (refatoração)
+# Live Praise
 
 ![version](https://shields.io/github/package-json/v/cadimos/livepraise)
 
-Software desktop open-source (MIT) para projeção de louvores, passagens bíblicas, imagens e vídeos em cultos — operador local com pré-visualização e saída multi-monitor.
+Software desktop open-source (MIT) para projeção de louvores, passagens bíblicas, imagens e vídeos em cultos — operador local com pré-visualização multi-saída, retorno de palco, ecrãs externos e controlo remoto.
 
-## Estado do repositório
+**Versão actual:** `1.0.0-alpha.1` — ver [`CHANGELOG.md`](CHANGELOG.md) para novidades e migração.
 
-| Área | Localização | Notas |
-|------|-------------|-------|
-| **Código activo** | Raiz (`/`) | Refactor Electron 42 + TypeScript + Vite + Tailwind |
-| **Legado v0.0.9** | `v0.0.8/` | Arquivo histórico; executável independente (CA-R07) |
+## Funcionalidades
 
-## Estrutura (sec. 10.13 do escopo)
+- Fila de projeção com abas (louvor, Bíblia, imagens, vídeos, slides em branco) e drag-and-drop.
+- Multi-monitor: operador, projetor, retorno de palco; papéis configuráveis por ecrã.
+- Pré-visualização por destino de saída (projetor, retorno, live, vocal, stage, player).
+- Tipografia de projeção configurável por perfil (fonte, textfill, sombra).
+- Fundos rápidos, congelar ecrã, timer de culto e alerta no rodapé.
+- Importação para fila: ficheiro local, YouTube e URL HTTP(S).
+- Autenticação local, utilizadores com papéis, controlo remoto web e fila de aprovações.
+- Backup e restore selectivo do ambiente (`~/livepraise`).
+- Auto-update via GitHub Releases em builds empacotados.
+
+## Estrutura do repositório
 
 ```
 livepraise/
-├── electron/          # Processo principal Electron 42 (splash, monitores)
-├── server/            # HTTP + WebSocket (Fase 2+)
-├── core/              # Lógica de sistema (projeção, live-state, parsers)
+├── electron/          # Processo principal Electron (splash, monitores)
+├── server/            # HTTP + WebSocket
+├── core/              # Lógica de sistema (projeção, auth, temas, segurança)
 ├── apps/
-│   ├── operator/      # Vue 3 + Vite + Tailwind (Fase 4)
-│   ├── projector/     # Projeção pública (Fase 5)
-│   └── stage-return/  # Retorno de palco (Fase 5)
-├── web/               # Vistas browser /live, portal (Fase 7)
-├── themes/            # Aparência (theme.json + assets)
-├── locales/           # i18n do sistema
-├── install/           # Payload primeira instalação → ~/livepraise
-├── shared/            # Tipos TS partilhados
-├── resources/         # Ícones e assets de build
-└── v0.0.8/            # Legado completo (sem evolução)
+│   ├── operator/      # Vue 3 + Vite + Tailwind
+│   ├── projector/     # Projeção pública
+│   └── stage-return/  # Retorno de palco
+├── web/               # Portal, /live, /remote, ecrãs externos
+├── themes/            # Temas (theme.json + assets)
+├── locales/           # Traduções
+├── install/           # Payload da primeira instalação → ~/livepraise
+├── shared/            # Tipos e utilitários TS partilhados
+└── resources/         # Ícones e assets de build
 ```
 
 ## Requisitos
 
-- **Node.js** ≥ 22.5 (SQLite via módulo built-in `node:sqlite`, alinhado ao Electron 42)
+- **Node.js** ≥ 22.5 (`node:sqlite` built-in, alinhado ao Electron 42)
 - **npm** 10+
 
 ### Linux (partição NTFS / externa)
@@ -44,19 +50,19 @@ Se `npm run dev` falhar com erro de `chrome-sandbox` / SUID, o script `dev` já 
 
 ```bash
 npm install
-npm run dev          # compila server + electron e abre splash (Linux/NTFS: usa --no-sandbox em dev)
+npm run dev          # compila e abre o Electron (Linux/NTFS: --no-sandbox em dev)
 npm run dev:server   # só o servidor HTTP (porta 3000)
 npm run typecheck
-npm run build        # server + electron + operator
+npm run build        # server + electron + operator + projetor + stage-return
 ```
 
-Regressão **só entre versões** (release / CI): ver [`scripts/README.md`](scripts/README.md) — `npm run smoke:release`.
+Regressão entre versões (release / CI): [`scripts/README.md`](scripts/README.md) — `npm run smoke:release`.
 
 ## Instalação
 
 Baixe os instaladores na página **[GitHub Releases](https://github.com/cadimos/livepraise/releases)** (secção *Assets* da versão desejada). Os nomes dos ficheiros incluem a versão; substitua `<versão>` nos exemplos pelo nome real do download.
 
-Em builds empacotados, o **Live Praise** verifica actualizações no GitHub ao iniciar (`electron-updater`). A instalação manual abaixo aplica-se à primeira instalação ou quando preferir actualizar à mão.
+Em builds empacotados, o Live Praise verifica actualizações no GitHub ao iniciar (`electron-updater`). A instalação manual abaixo aplica-se à primeira instalação ou quando preferir actualizar à mão.
 
 ### Windows — instalador NSIS (`.exe`)
 
@@ -144,7 +150,7 @@ O flag `--dangerous` é necessário para instalar um snap descarregado directame
 
 ---
 
-**Dados da aplicação:** na primeira execução, o conteúdo (músicas, imagens, base de dados) é criado em `~/livepraise`. Consulte a wiki ou documentação interna para backup e migração.
+**Dados da aplicação:** na primeira execução, o conteúdo (músicas, imagens, base de dados, temas) é criado em `~/livepraise`. Backup e restore estão em Configurações → Backup / Restore (admin).
 
 ## API HTTP (OpenAPI)
 
@@ -154,44 +160,45 @@ O flag `--dangerous` é necessário para instalar um snap descarregado directame
 | YAML servido | `GET /api/docs/openapi.yaml` |
 | Swagger UI | `GET /api/docs` (CDN unpkg) |
 | WebSocket | `ws://localhost:3000/ws/live` (ver `x-websocket` na spec) |
+| Health | `GET /health` |
 
 Autenticação: `Authorization: Bearer <token>` após `POST /api/auth/login`. Rotas de operador aceitam sessão ou pedidos de `localhost` sem token.
 
-### Segurança — `/api/users` e bypass loopback (M13)
+### Segurança — `/api/users` e bypass loopback
 
-`/api/users` (listar, criar, editar utilizadores) usa o mesmo middleware `requireOperatorAccess` que aprovações e chrome-tabs:
+`/api/users` usa o middleware `requireOperatorAccess`:
 
 | Origem do pedido | Autenticação |
 |------------------|--------------|
-| Socket **loopback** (`127.0.0.1`, `::1`) | Sem token — UI Electron local (`UsersPanel`) |
-| **LAN** ou remoto (IP não loopback) | Bearer com papel `operator` obrigatório |
+| Socket **loopback** (`127.0.0.1`, `::1`) | Sem token — UI Electron local |
+| **LAN** ou remoto | Bearer com papel `operator` ou `admin` |
 
-**Decisão (CAD-128):** manter bypass só no Electron/loopback; não exigir token em `127.0.0.1` (quebra bootstrap e menu Configurações → Utilizadores).
+**Risco residual:** num PC partilhado, qualquer processo local pode gerir utilizadores via `http://127.0.0.1:<porta>/api/users` sem credenciais. Mitigação: conta dedicada ao operador, rede LAN confiável, trocar password bootstrap após instalação.
 
-**Risco residual:** num PC partilhado na igreja, qualquer processo *local* pode gerir utilizadores via `http://127.0.0.1:<porta>/api/users` sem credenciais. Mitigação operacional: conta Windows/Linux dedicada ao operador, rede LAN confiável, trocar password bootstrap após instalação. Pedidos vindos da rede LAN **já exigem** token operador.
+Papéis detalhados: [`docs/auth-roles.md`](docs/auth-roles.md).
 
-## Release (Fase 8 — CA-R02, CA-R03)
+## Release
 
 Builds multi-plataforma via [electron-builder](https://www.electron.build/) (`electron-builder.yml`):
 
 | Comando | Artefacto |
 |---------|-----------|
-| `npm run dist:all` | **Um comando:** Win + Linux (AppImage, deb, rpm, pacman); no Mac inclui DMG; no Linux tenta snap/flatpak se as ferramentas existirem |
+| `npm run dist:all` | Win + Linux (+ DMG no Mac; snap/flatpak no Linux se instalados) |
 | `npm run dist:win` | Instalador NSIS Windows x64 |
 | `npm run dist:linux` | AppImage + `.deb` + `.rpm` + `.pacman` Linux x64 |
 | `npm run dist:linux-appimage` | Só AppImage |
-| `npm run dist:linux-deb` | Só `.deb` (Debian/Ubuntu) |
-| `npm run dist:linux-rpm` | Só `.rpm` (Fedora/RHEL/openSUSE) |
-| `npm run dist:linux-pacman` | Só `.pacman` (Arch/Manjaro) |
+| `npm run dist:linux-deb` | Só `.deb` |
+| `npm run dist:linux-rpm` | Só `.rpm` |
+| `npm run dist:linux-pacman` | Só `.pacman` |
 | `npm run dist:flatpak` | Flatpak (requer `flatpak-builder`) |
 | `npm run dist:snap` | Snap Linux |
 | `npm run dist:mac` | DMG macOS (x64 + arm64) |
 
-> **Nota:** o DMG macOS só é gerado num **Mac** (`dist:mac` ou workflow `CA-R40 macOS`). Em Linux/Windows, `dist:all` produz NSIS + pacotes Linux. Para release completo nos três SO, use os três workflows GHA ou corre `dist:all` / `dist:mac` em cada plataforma.
+> O DMG macOS só é gerado num **Mac** (`dist:mac` ou workflow CA-R40 macOS). Para release completo nos três SO, use os workflows GHA ou `dist:all` / `dist:mac` em cada plataforma.
 
-Saída em `release-builds/`. Ícones em `resources/icon/` (legado `v0.0.8/app/icon/`).
+Saída em `release-builds/`. Ícones em `resources/icon/`.
 
-### Auto-update (CA-R03)
+### Auto-update
 
 Em builds empacotados (`app.isPackaged`):
 
@@ -199,22 +206,21 @@ Em builds empacotados (`app.isPackaged`):
 2. Download e instalação em **segundo plano** (`autoDownload`, `autoInstallOnAppQuit`).
 3. **Fallback:** em erro de rede/download, notificação nativa orienta instalação manual a partir do release.
 
-Em desenvolvimento (`npm run dev`), o updater fica inactivo. API exposta no preload: `livepraise.onUpdateStatus`, `checkForUpdates`, `installUpdate`.
+Em desenvolvimento (`npm run dev`), o updater fica inactivo.
 
 ### Persistência SQLite
 
-O servidor usa **`node:sqlite`** (`DatabaseSync`) — módulo nativo do Node 22+, sem dependências nativas npm. Compatível com Electron 42; `electron-builder` não precisa de `electron-rebuild` para SQLite.
+O servidor usa **`node:sqlite`** (`DatabaseSync`) — módulo nativo do Node 22+, sem `electron-rebuild` para SQLite.
 
 ### Publicar release
 
 ```bash
-# Token GitHub com permissão repo (releases)
 export GH_TOKEN=...
 npm run build
 npm run dist:linux -- --publish always   # ou dist:win / dist:mac
 ```
 
-Publicação usa `publish` em `electron-builder.yml` (provider `github`). Versão segue `package.json`.
+Versão e notas seguem `package.json` e [`CHANGELOG.md`](CHANGELOG.md).
 
 ### Smoke de release
 
@@ -222,22 +228,14 @@ Publicação usa `publish` em `electron-builder.yml` (provider `github`). Versã
 npm run smoke:release
 ```
 
-Valida bootstrap, pipeline de vídeo (CA-R40), instalação limpa, health `fase-8-release`, acções WebSocket e latência LAN ≤500 ms. Detalhes em [`scripts/README.md`](scripts/README.md).
-
-## Legado
-
-Para executar a versão histórica:
-
-```bash
-cd v0.0.8
-npm install
-npm start
-```
+Valida bootstrap, pipeline de vídeo, health, acções WebSocket e latência LAN. Detalhes em [`scripts/README.md`](scripts/README.md).
 
 ## Documentação
 
-- Escopo: `Escopos/livepraise/escopo.md` (Cadimos)
-- Wiki histórica: [GitHub Wiki](https://github.com/cadimos/livepraise/wiki)
+- [`CHANGELOG.md`](CHANGELOG.md) — histórico de versões
+- [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md) — backlog conhecido
+- [`docs/auth-roles.md`](docs/auth-roles.md) — papéis de utilizador
+- [GitHub Wiki](https://github.com/cadimos/livepraise/wiki)
 
 ## Licença
 

@@ -10,7 +10,6 @@ export type UpdateStatus =
 
 contextBridge.exposeInMainWorld('livepraise', {
   version: '1.0.0-alpha.1',
-  phase: 'fase-8-release',
   runtime: {
     node: process.versions.node,
     chrome: process.versions.chrome,
