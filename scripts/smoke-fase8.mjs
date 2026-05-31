@@ -80,7 +80,7 @@ try {
   assert(fs.existsSync(dbPath), 'CA-05: bootstrap criou dsw.bd em instalação limpa');
 
   const health = await fetch(`${base}/health`).then((r) => r.json());
-  assert(health.phase === 'fase-8-release', 'health phase fase-8-release');
+  assert(health.phase === 'release', 'health phase release');
   assert(health.status === 'ok', 'health ok');
 
   const operator = await connectClient(port, 'operator', 'Operador');

@@ -14,7 +14,7 @@ const appRoot = process.env.LIVEPRAISE_APP_ROOT
   ? path.resolve(process.env.LIVEPRAISE_APP_ROOT)
   : path.resolve(moduleDir, '../..');
 
-export const HEALTH_PHASE = 'fase-8-release';
+export const HEALTH_PHASE = 'release';
 
 export interface HealthModuleStatus {
   id: string;

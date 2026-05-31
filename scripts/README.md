@@ -2,7 +2,7 @@
 
 Esta pasta contém **smokes de release** — validação manual ou em CI **antes de publicar uma versão**, não durante o desenvolvimento diário.
 
-Durante o refactor activo não há regressão por issue/ticket; novos smokes pontuais não devem ser adicionados aqui.
+Smokes pontuais por feature existem para validação manual; o gate de release continua a ser `smoke:release`.
 
 ## Comandos
 

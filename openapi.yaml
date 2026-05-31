@@ -65,7 +65,7 @@ paths:
                 ok:
                   value:
                     status: ok
-                    phase: fase-8-release
+                    phase: release
                     version: 1.0.0-alpha.1
                     websocket: /ws/live
                     modules:
