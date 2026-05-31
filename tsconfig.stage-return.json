@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": false,
+    "outDir": "apps/stage-return",
+    "rootDir": "apps/stage-return/src",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  "include": ["apps/stage-return/src/**/*.ts"]
+}

@@ -1,0 +1,71 @@
+{
+  "name": "livepraise",
+  "version": "0.0.9",
+  "main": "main.js",
+  "author": {
+    "name": "Thiago de Lucena Sobrinho",
+    "email": "thiagolucenaelvis@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "Kerolen Lucena",
+      "email": "kerolen@teraidc.com.br"
+    },
+    {
+      "name": "Sabrina Santos",
+      "email": "sabrina@teraidc.com.br"
+    }
+  ],
+  "description": "Live Praise (Software de Projeção para Igrejas)",
+  "keywords": [
+    "Live Praise",
+    "Projeção",
+    "DataShow",
+    "Igreja"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/cadimos/livepraise#readme",
+  "bugs": {
+    "url": "https://github.com/cadimos/livepraise/issues",
+    "email": "livepraise@teraidc.com.br"
+  },
+  "scripts": {
+    "start": "electron main.js",
+    "win32": "electron-packager . LivePraise --platform=win32 --arch=ia32 --icon=app/icon/livepraise.ico --prune=true --out=release-builds  --overwrite",
+    "win64": "electron-packager . LivePraise --platform=win32 --arch=x64 --icon=app/icon/livepraise.ico --prune=true --out=release-builds  --overwrite",
+    "linux32": "electron-packager . LivePraise --platform=linux --arch=ia32 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
+    "linux64": "electron-packager . LivePraise --platform=linux --arch=x64 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
+    "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/livepraise.icns --prune=true --out=release-builds  --overwrite",
+    "snap": "electron-builder build --linux snap",
+    "win": "electron-builder build --win --publish always",
+    "linux": "electron-builder build --linux",
+    "linux2": "electron-builder build --linux --publish always",
+    "rebuild": "electron-rebuild -f -w sqlite3",
+    "dev": "nodemon ./server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cadimos/livepraise.git"
+  },
+  "private": true,
+  "devDependencies": {
+    "electron": "^29.2.0",
+    "electron-builder": "^24.13.3",
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "@electron/rebuild": "^3.6.0",
+    "compression": "^1.7.4",
+    "consign": "^0.1.6",
+    "dotenv": "^16.4.5",
+    "electron-updater": "^6.1.8",
+    "express": "^4.19.2",
+    "ffmpeg-static": "^5.2.0",
+    "fs-extra": "^11.2.0",
+    "node-abi": "^3.57.0",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
+    "sqlite3": "^5.1.7",
+    "systeminformation": "^5.22.7"
+  }
+}

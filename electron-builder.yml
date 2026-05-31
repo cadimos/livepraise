@@ -1,0 +1,50 @@
+appId: com.cadimos.livepraise
+productName: Live Praise
+copyright: Copyright © Cadimos
+npmRebuild: false
+directories:
+  output: release-builds
+  buildResources: resources
+files:
+  - dist/**/*
+  - electron/splash/**/*
+  - package.json
+extraResources:
+  - from: install/
+    to: install/
+    filter:
+      - '**/*'
+publish:
+  - provider: github
+    owner: cadimos
+    repo: livepraise
+    releaseType: release
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: resources/icon/livepraise.ico
+  # rcedit via wine32 falha em runners Linux sem i386; NSIS não depende disso.
+  signAndEditExecutable: false
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: snap
+      arch:
+        - x64
+  icon: resources/icon/livepraise.png
+  category: AudioVideo
+snap:
+  confinement: strict
+  grade: stable
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  icon: resources/icon/livepraise.icns
+  category: public.app-category.music

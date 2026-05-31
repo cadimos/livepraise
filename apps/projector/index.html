@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Praise — Projetor</title>
+    <link rel="stylesheet" href="projector.css" />
+  </head>
+  <body>
+    <div id="stage">
+      <div id="bg-layer">
+        <img id="bg-image" alt="" hidden />
+        <div id="video-wrap" hidden>
+          <video id="player" muted loop autoplay playsinline></video>
+        </div>
+      </div>
+      <div id="text-scrim" aria-hidden="true"></div>
+      <div id="conteudo" class="conteudo"></div>
+    </div>
+    <footer id="last-action" aria-live="polite"></footer>
+    <script type="module" src="projector.js"></script>
+  </body>
+</html>

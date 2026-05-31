@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --lp-color-primary: #38bdf8;
+  --lp-color-action-bar: #0369a1;
+  --lp-color-background: #020617;
+  --lp-color-surface: #0f172a;
+  --lp-color-text: #f8fafc;
+  --lp-color-muted: #94a3b8;
+  --lp-color-accent: #38bdf8;
+  --lp-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --lp-ui-scale: 1;
+}
+
+html {
+  font-size: calc(100% * var(--lp-ui-scale));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--lp-font-family);
+  background-color: var(--lp-color-background);
+  color: var(--lp-color-text);
+  min-height: 100vh;
+  color-scheme: dark;
+}
+
+/* A2 (CAD-134): indicador de foco visível por teclado em controles interactivos */
+button:focus-visible,
+a:focus-visible,
+[role='tab']:focus-visible,
+[role='menuitem']:focus-visible,
+.playlist-verse-tile:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--lp-color-accent);
+  outline-offset: 2px;
+}
+
+/* Campos nativos — contraste legível em modais/painéis (CAD-116) */
+select,
+input[type='text'],
+input[type='number'],
+input[type='email'],
+input[type='password'],
+textarea {
+  color-scheme: dark;
+  background-color: var(--lp-color-surface);
+  color: var(--lp-color-text);
+  border: 1px solid color-mix(in srgb, var(--lp-color-muted) 45%, transparent);
+}
+
+select option {
+  background-color: var(--lp-color-surface);
+  color: var(--lp-color-text);
+}
+
+select:disabled,
+input:disabled,
+textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--lp-color-muted);
+  opacity: 1;
+}
+
+.lp-field {
+  color-scheme: dark;
+  background-color: var(--lp-color-surface);
+  color: var(--lp-color-text);
+  border: 1px solid color-mix(in srgb, var(--lp-color-primary) 35%, var(--lp-color-muted));
+}
+
+/* Faixa da playlist: altura fixa (paridade v0.0.8), só scroll horizontal */
+.playlist-verses-track {
+  scrollbar-gutter: stable;
+  overflow-y: hidden;
+  align-items: stretch;
+}
+
+/* Rótulos de secção nos painéis (CAD-135 B2) */
+.lp-panel-label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--lp-color-muted);
+}
+
+.playlist-verse-tile {
+  /* CAD-116: 60% da altura anterior (35vh → 21vh) */
+  height: 21vh;
+  min-height: 21vh;
+  max-height: 21vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.playlist-verse-text {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.playlist-verses-track::-webkit-scrollbar {
+  height: 10px;
+}
+
+.playlist-verses-track::-webkit-scrollbar-track {
+  margin-top: 4px;
+  background: transparent;
+}
+
+.playlist-verses-track::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--lp-color-muted) 45%, transparent);
+  border-radius: 5px;
+}
+
+/* C1 (CAD-136): respeitar preferência de movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "app": {
+    "name": "Live Praise",
+    "tagline": "Software de projeção para igrejas",
+    "operator": "Operador"
+  },
+  "splash": {
+    "loading": "A iniciar…",
+    "monitorsDetected": "{count} monitor(es) detectado(s)"
+  },
+  "connection": {
+    "connected": "WebSocket conectado",
+    "reconnecting": "Reconectando…"
+  },
+  "panels": {
+    "worship": "Louvor",
+    "bible": "Bíblia",
+    "backgrounds": "Fundos",
+    "displays": "Monitores"
+  },
+  "settings": {
+    "theme": "Tema",
+    "locale": "Idioma"
+  },
+  "preview": {
+    "local": "Prévia local",
+    "hint": "Fluxo louvor: categoria (memorizada) → música → verso = ≤3 cliques (CA-R09). Preferências persistidas em localStorage."
+  },
+  "tabs": {
+    "empty": "Fila vazia — adicione músicas pelo painel Louvor (+)",
+    "close": "Fechar aba"
+  },
+  "worship": {
+    "category": "Categoria",
+    "songs": "Músicas",
+    "versatile": "Versos",
+    "loading": "Carregando…",
+    "selectSong": "Selecione uma música",
+    "addToQueue": "Adicionar à fila",
+    "errors": {
+      "categories": "Erro ao carregar categorias",
+      "songs": "Erro ao carregar músicas",
+      "verses": "Erro ao carregar versos"
+    }
+  },
+  "bible": {
+    "translation": "Tradução",
+    "books": "Livros",
+    "chapters": "Capítulos",
+    "verses": "Versículos",
+    "errors": {
+      "bibles": "Erro ao carregar bíblias",
+      "books": "Erro ao carregar livros",
+      "chapters": "Erro ao carregar capítulos",
+      "verses": "Erro ao carregar versículos"
+    }
+  },
+  "backgrounds": {
+    "quick": "Fundos rápidos",
+    "images": "Imagens",
+    "errors": {
+      "quick": "Erro ao carregar fundos rápidos",
+      "categories": "Erro ao carregar categorias de imagem",
+      "images": "Erro ao carregar imagens"
+    }
+  },
+  "displays": {
+    "intro": "Defina o papel de cada monitor (CA-R17). O operador abre no monitor principal; projeção e retorno de palco usam visões distintas.",
+    "primary": "principal",
+    "none": "Nenhum monitor configurado. Inicie pelo Electron para detectar ecrãs.",
+    "save": "Guardar papéis",
+    "saving": "A guardar…",
+    "saved": "Configuração guardada. Reinicie o Electron para aplicar novos papéis.",
+    "roles": {
+      "operator": "Operador",
+      "projection": "Projeção",
+      "stage-return": "Retorno de palco",
+      "off": "Desligado"
+    },
+    "errors": {
+      "load": "Erro ao carregar monitores",
+      "save": "Erro ao guardar"
+    }
+  },
+  "common": {
+    "loading": "Carregando…"
+  }
+}

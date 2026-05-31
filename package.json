@@ -1,71 +1,116 @@
 {
   "name": "livepraise",
-  "version": "0.0.9",
-  "main": "main.js",
+  "version": "1.0.0-alpha.1",
+  "description": "Live Praise — Software de Projeção para Igrejas (refatoração)",
+  "main": "dist/electron/main.js",
   "author": {
     "name": "Thiago de Lucena Sobrinho",
     "email": "thiagolucenaelvis@gmail.com"
   },
-  "contributors": [
-    {
-      "name": "Kerolen Lucena",
-      "email": "kerolen@teraidc.com.br"
-    },
-    {
-      "name": "Sabrina Santos",
-      "email": "sabrina@teraidc.com.br"
-    }
-  ],
-  "description": "Live Praise (Software de Projeção para Igrejas)",
-  "keywords": [
-    "Live Praise",
-    "Projeção",
-    "DataShow",
-    "Igreja"
-  ],
   "license": "MIT",
-  "homepage": "https://github.com/cadimos/livepraise#readme",
-  "bugs": {
-    "url": "https://github.com/cadimos/livepraise/issues",
-    "email": "livepraise@teraidc.com.br"
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
   },
   "scripts": {
-    "start": "electron main.js",
-    "win32": "electron-packager . LivePraise --platform=win32 --arch=ia32 --icon=app/icon/livepraise.ico --prune=true --out=release-builds  --overwrite",
-    "win64": "electron-packager . LivePraise --platform=win32 --arch=x64 --icon=app/icon/livepraise.ico --prune=true --out=release-builds  --overwrite",
-    "linux32": "electron-packager . LivePraise --platform=linux --arch=ia32 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
-    "linux64": "electron-packager . LivePraise --platform=linux --arch=x64 --icon=app/icon/livepraise.png --prune=true --out=release-builds  --overwrite",
-    "osx": "electron-packager . LivePraise --platform=darwin --arch=x64 --icon=app/icon/livepraise.icns --prune=true --out=release-builds  --overwrite",
-    "snap": "electron-builder build --linux snap",
-    "win": "electron-builder build --win --publish always",
-    "linux": "electron-builder build --linux",
-    "linux2": "electron-builder build --linux --publish always",
-    "rebuild": "electron-rebuild -f -w sqlite3",
-    "dev": "nodemon ./server.js"
+    "dev": "npm run build && ELECTRON_DISABLE_SANDBOX=1 electron . --no-sandbox",
+    "start": "npm run dev",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "build:server": "tsc -p tsconfig.server.json && node -e \"const fs=require('fs');const p='dist/server/db/migrations';fs.mkdirSync(p,{recursive:true});for(const f of fs.readdirSync('server/db/migrations')) fs.copyFileSync('server/db/migrations/'+f,p+'/'+f);\"",
+    "build:projector": "tsc -p tsconfig.projector.json",
+    "build:stage-return": "tsc -p tsconfig.stage-return.json",
+    "build:operator": "vite build --config vite.config.ts",
+    "build": "npm run build:server && npm run build:projector && npm run build:stage-return && npm run build:electron && npm run build:operator",
+    "dev:server": "npm run build:server && node dist/server/index.js",
+    "smoke:fase2": "npm run build:server && node scripts/smoke-fase2.mjs",
+    "smoke:fase3": "npm run build:server && npm run build:projector && node scripts/smoke-fase3.mjs",
+    "smoke:fase4": "npm run build:server && npm run build:operator && node scripts/smoke-fase4.mjs",
+    "smoke:fase5": "npm run build:server && npm run build:projector && npm run build:stage-return && node scripts/smoke-fase5.mjs",
+    "smoke:fase7": "npm run build:server && npm run build:operator && node scripts/smoke-fase7.mjs",
+    "smoke:fase7-security": "npm run build:server && node scripts/smoke-fase7-security.mjs",
+    "smoke:cad124": "npm run smoke:fase7-security",
+    "smoke:fase8": "npm run build:server && node scripts/smoke-fase8.mjs",
+    "smoke:cad99": "npm run build:server && node scripts/smoke-cad99.mjs",
+    "smoke:cad104": "npm run build:server && node scripts/smoke-cad104.mjs",
+    "smoke:cad100": "npm run build:server && node scripts/smoke-cad100.mjs",
+    "smoke:cad102": "npm run build:server && npm run build:operator && node scripts/smoke-cad102.mjs",
+    "smoke:cad106": "npm run build:server && node scripts/smoke-cad106.mjs",
+    "smoke:cad107": "node scripts/smoke-cad107.mjs",
+    "smoke:cad113": "node scripts/smoke-cad113.mjs",
+    "smoke:cad122": "npm run build:server && npm run build:operator && node scripts/smoke-cad122.mjs",
+    "smoke:cad110": "npm run build:server && node scripts/smoke-cad110.mjs",
+    "smoke:cad103": "node scripts/smoke-cad103.mjs",
+    "smoke:cad105": "npm run build:server && npm run build:operator && node scripts/smoke-cad105.mjs",
+    "smoke:cad109": "node scripts/smoke-cad109.mjs",
+    "smoke:cad108": "node scripts/smoke-cad108.mjs",
+    "smoke:cad112": "npm run build:server && node scripts/smoke-cad112.mjs",
+    "smoke:cad120": "npm run build:server && node scripts/smoke-cad120.mjs",
+    "smoke:cad119": "npm run build:server && node scripts/smoke-cad119.mjs",
+    "smoke:cad128": "npm run build:server && node scripts/smoke-cad128.mjs",
+    "smoke:cad94-residual": "npm run build:server && node scripts/smoke-cad94-residual.mjs",
+    "smoke:cad129": "npm run build:server && node scripts/smoke-cad129.mjs",
+    "smoke:cad136": "npm run build:projector && npm run build:operator && node scripts/smoke-cad136.mjs",
+    "smoke:cad132": "npm run build:server && node scripts/smoke-cad132.mjs",
+    "smoke:cad137": "npm run build:server && node scripts/smoke-cad137.mjs",
+    "smoke:cad138": "npm run build:server && npm run build:operator && node scripts/smoke-cad138.mjs",
+    "test:video-pipeline": "npm run build:server && node scripts/smoke-car40.mjs",
+    "smoke:car40": "npm run test:video-pipeline",
+    "smoke:bootstrap": "npm run build:server && node scripts/smoke-fase2.mjs",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit && tsc -p tsconfig.server.json --noEmit",
+    "dist:win": "npm run build && electron-builder --win --x64",
+    "dist:linux": "npm run build && electron-builder --linux --x64",
+    "dist:snap": "npm run build && electron-builder --linux snap",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:all": "npm run build && electron-builder -mwl"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.16.0",
+    "compression": "^1.8.0",
+    "cors": "^2.8.5",
+    "electron-updater": "^6.8.3",
+    "express": "^5.1.0",
+    "ffmpeg-static": "^5.3.0",
+    "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.21",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-vue": "^5.0.2",
+    "autoprefixer": "^10.4.21",
+    "axe-core": "^4.11.4",
+    "electron": "42.2.0",
+    "electron-builder": "^26.0.12",
+    "jsdom": "^26.1.0",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vue": "^3.4.0",
+    "vue-i18n": "^9.14.5"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cadimos/livepraise.git"
   },
-  "private": true,
-  "devDependencies": {
-    "electron": "^29.2.0",
-    "electron-builder": "^24.13.3",
-    "nodemon": "^3.1.0"
-  },
-  "dependencies": {
-    "@electron/rebuild": "^3.6.0",
-    "compression": "^1.7.4",
-    "consign": "^0.1.6",
-    "dotenv": "^16.4.5",
-    "electron-updater": "^6.1.8",
-    "express": "^4.19.2",
-    "ffmpeg-static": "^5.2.0",
-    "fs-extra": "^11.2.0",
-    "node-abi": "^3.57.0",
-    "socket.io": "^4.7.5",
-    "socket.io-client": "^4.7.5",
-    "sqlite3": "^5.1.7",
-    "systeminformation": "^5.22.7"
+  "homepage": "https://github.com/cadimos/livepraise#readme",
+  "depcheck": {
+    "ignoreMatches": [
+      "autoprefixer",
+      "postcss",
+      "tailwindcss"
+    ],
+    "ignorePatterns": [
+      "v0.0.8/**",
+      "dist/**",
+      "release-builds/**"
+    ],
+    "skipMissing": [
+      "node:sqlite",
+      "@shared/types"
+    ]
   }
 }

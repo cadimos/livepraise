@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Praise — Portal</title>
+    <link rel="stylesheet" href="portal.css" />
+  </head>
+  <body>
+    <main class="card">
+      <header>
+        <p class="eyebrow">Live Praise</p>
+        <h1>Portal</h1>
+        <p class="lead">Escolha a visão ou entre como operador remoto.</p>
+      </header>
+
+      <section id="login-section">
+        <h2>Operador (browser)</h2>
+        <form id="login-form">
+          <label>
+            Usuário
+            <input id="username" name="username" autocomplete="username" required />
+          </label>
+          <label>
+            Senha
+            <input id="password" name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit">Entrar</button>
+          <p id="login-error" class="error" hidden></p>
+        </form>
+      </section>
+
+      <section id="views-section" hidden>
+        <p class="session">Sessão: <strong id="session-user"></strong></p>
+        <nav class="views">
+          <a class="view-link" href="/live/">Transmissão (/live)</a>
+          <a class="view-link" href="/vocal/">Vocal (/vocal)</a>
+          <a class="view-link" href="/stage/">Palco (/stage)</a>
+          <a class="view-link" href="/player/">Músicos (/player)</a>
+          <a class="view-link" href="/operator/" id="operator-link">Operador</a>
+          <a class="view-link" href="/remote/" id="remote-link">Envio remoto</a>
+        </nav>
+        <button type="button" id="logout-btn" class="secondary">Sair</button>
+      </section>
+
+      <section class="public-links">
+        <h2>Sem login</h2>
+        <a class="view-link" href="/live/">Transmissão — saída live (/live)</a>
+        <a class="view-link" href="/vocal/">Cantores — letra sem cifras (/vocal)</a>
+        <a class="view-link" href="/stage/">Retorno de palco (/stage)</a>
+        <a class="view-link" href="/player/">Músicos — cifra/letra (/player)</a>
+        <p class="hint">Redirect legado: <a href="/stage-return/">/stage-return</a> → /stage</p>
+      </section>
+    </main>
+    <script type="module" src="portal.js"></script>
+  </body>
+</html>

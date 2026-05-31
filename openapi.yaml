@@ -1,0 +1,1580 @@
+openapi: 3.1.0
+info:
+  title: Livepraise API
+  version: 1.0.0-alpha.1
+  description: |
+    API HTTP do servidor Livepraise (Electron + Express).
+
+    - **Autenticação:** `Authorization: Bearer <token>` (sessão criada em `POST /api/auth/login`).
+    - **Operador local:** requisições de `localhost` podem aceder a rotas `requireOperatorAccess` sem token.
+    - **WebSocket ao vivo:** `ws://{host}/ws/live` — ver tag `websocket`.
+  contact:
+    name: Cadimos
+    url: https://github.com/cadimos/livepraise
+
+servers:
+  - url: http://localhost:3000
+    description: Desenvolvimento local (porta padrão)
+
+tags:
+  - name: system
+    description: Saúde e metadados
+  - name: auth
+    description: Sessões e login
+  - name: users
+    description: Gestão de utilizadores (operador)
+  - name: remote
+    description: Remoto — Chrome tabs e fila de aprovação
+  - name: music
+    description: Catálogo de louvores
+  - name: bible
+    description: Bíblias instaladas (SQLite por ficheiro)
+  - name: media
+    description: Imagens e vídeos locais
+  - name: display
+    description: Configuração de ecrã (tabela `tela`)
+  - name: displays
+    description: Atribuição de monitores (Electron)
+  - name: themes
+    description: Temas visuais
+  - name: locales
+    description: Traduções i18n
+  - name: websocket
+    description: Hub WebSocket `/ws/live`
+
+paths:
+  /health:
+    get:
+      tags: [system]
+      summary: Estado do servidor
+      operationId: getHealth
+      responses:
+        '200':
+          description: Servidor activo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                ok:
+                  value:
+                    status: ok
+                    phase: fase-8-release
+                    websocket: /ws/live
+
+  /api/system/local-ip:
+    get:
+      tags: [system]
+      summary: IPv4 local principal da máquina
+      operationId: getLocalIp
+      responses:
+        '200':
+          description: Endereço IPv4 não-loopback (ou null se indisponível)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, ipv4]
+                properties:
+                  status:
+                    type: string
+                    example: successo
+                  ipv4:
+                    type: string
+                    nullable: true
+                    example: 192.168.1.42
+
+  /api/docs/openapi.yaml:
+    get:
+      tags: [system]
+      summary: Especificação OpenAPI (este ficheiro)
+      operationId: getOpenApiSpec
+      responses:
+        '200':
+          description: YAML OpenAPI 3.1
+          content:
+            application/yaml:
+              schema:
+                type: string
+
+  /api/auth/login:
+    post:
+      tags: [auth]
+      summary: Iniciar sessão
+      operationId: authLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              operator:
+                value:
+                  username: admin
+                  password: changeme
+      responses:
+        '200':
+          description: Sessão criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              examples:
+                success:
+                  value:
+                    status: Sucesso
+                    token: 7f3c2a1b9e8d4f6a0c1b2e3d4f5a6b7
+                    user:
+                      id: 1
+                      username: admin
+                      role: operator
+                      active: true
+                      createdAt: '2026-01-01T00:00:00.000Z'
+                      updatedAt: '2026-01-01T00:00:00.000Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          description: Rate limit (20 tentativas / minuto por IP)
+
+  /api/auth/logout:
+    post:
+      tags: [auth]
+      summary: Terminar sessão
+      operationId: authLogout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Sessão revogada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusOk'
+              examples:
+                success:
+                  value:
+                    status: Sucesso
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/me:
+    get:
+      tags: [auth]
+      summary: Utilizador da sessão actual
+      operationId: authMe
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Perfil público
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, user]
+                properties:
+                  status:
+                    type: string
+                    example: Sucesso
+                  user:
+                    $ref: '#/components/schemas/PublicUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/auth/session:
+    get:
+      tags: [auth]
+      summary: Validar token Bearer
+      operationId: authSession
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token válido
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, user]
+                properties:
+                  status:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/PublicUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/users:
+    get:
+      tags: [users]
+      summary: Listar utilizadores
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de utilizadores
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, users]
+                properties:
+                  status:
+                    type: string
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PublicUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [users]
+      summary: Criar utilizador
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+            examples:
+              remote:
+                value:
+                  username: celular1
+                  password: segredo123
+                  role: remote
+      responses:
+        '201':
+          description: Utilizador criado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, user]
+                properties:
+                  status:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/PublicUser'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Utilizador já existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+
+  /api/users/{id}:
+    patch:
+      tags: [users]
+      summary: Actualizar utilizador
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/numericId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+            examples:
+              deactivate:
+                value:
+                  active: false
+      responses:
+        '200':
+          description: Utilizador actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, user]
+                properties:
+                  status:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/PublicUser'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/remote/chrome-tab:
+    post:
+      tags: [remote]
+      summary: Registar separador Chrome (remoto)
+      operationId: remoteChromeTab
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChromeTabRequest'
+            examples:
+              tab:
+                value:
+                  label: Louvor — Grande é o Senhor
+                  songId: 42
+                  songName: Grande é o Senhor
+      responses:
+        '201':
+          description: Separador registado (broadcast WS `chrome-tab-added`)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, tab]
+                properties:
+                  status:
+                    type: string
+                  tab:
+                    $ref: '#/components/schemas/ChromeTab'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/remote/live-request:
+    post:
+      tags: [remote]
+      summary: Pedido ao vivo para aprovação do operador
+      operationId: remoteLiveRequest
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiveRequestBody'
+            examples:
+              music:
+                value:
+                  kind: live-music
+                  payload:
+                    songId: 10
+                    verseIndex: 0
+      responses:
+        '202':
+          description: Pedido enfileirado (broadcast WS `approval-pending`)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, approval]
+                properties:
+                  status:
+                    type: string
+                  approval:
+                    $ref: '#/components/schemas/ApprovalItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/remote/chrome-tabs:
+    get:
+      tags: [remote]
+      summary: Separadores Chrome pendentes (operador)
+      operationId: listChromeTabs
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de tabs não consumidas
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, tabs]
+                properties:
+                  status:
+                    type: string
+                  tabs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChromeTab'
+
+  /api/remote/chrome-tabs/{id}/consume:
+    post:
+      tags: [remote]
+      summary: Consumir separador Chrome
+      operationId: consumeChromeTab
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tab consumida
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, tab]
+                properties:
+                  status:
+                    type: string
+                  tab:
+                    $ref: '#/components/schemas/ChromeTab'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/remote/approvals/pending:
+    get:
+      tags: [remote]
+      summary: Pedidos ao vivo pendentes
+      operationId: listPendingApprovals
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Fila de aprovação
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, items]
+                properties:
+                  status:
+                    type: string
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApprovalItem'
+
+  /api/remote/approvals/{id}/approve:
+    post:
+      tags: [remote]
+      summary: Aprovar pedido remoto
+      operationId: approveRemoteRequest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Aprovado e aplicado no hub (se aplicável)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  approval:
+                    $ref: '#/components/schemas/ApprovalItem'
+                  liveAction:
+                    $ref: '#/components/schemas/LiveAction'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/remote/approvals/{id}/reject:
+    post:
+      tags: [remote]
+      summary: Rejeitar pedido remoto
+      operationId: rejectRemoteRequest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rejeitado
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, approval]
+                properties:
+                  status:
+                    type: string
+                  approval:
+                    $ref: '#/components/schemas/ApprovalItem'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /musica/categoria:
+    get:
+      tags: [music]
+      summary: Categorias de música
+      operationId: listMusicCategories
+      responses:
+        '200':
+          description: Categorias
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessItems'
+              examples:
+                categories:
+                  value:
+                    status: Sucesso
+                    items:
+                      - id: 1
+                        nome: Adoração
+
+  /musica/categoria/{codigo}:
+    get:
+      tags: [music]
+      summary: Músicas por categoria
+      operationId: listMusicByCategory
+      parameters:
+        - $ref: '#/components/parameters/codigo'
+      responses:
+        '200':
+          description: Lista de músicas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessItems'
+
+  /musica/verso/{codigo}:
+    get:
+      tags: [music]
+      summary: Versos de uma música
+      operationId: listMusicVerses
+      parameters:
+        - $ref: '#/components/parameters/codigo'
+      responses:
+        '200':
+          description: Versos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessItems'
+
+  /musica/{codigo}:
+    get:
+      tags: [music]
+      summary: Música por ID
+      operationId: getMusicById
+      parameters:
+        - $ref: '#/components/parameters/codigo'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessItems'
+    post:
+      tags: [music]
+      summary: Actualizar música
+      operationId: updateMusic
+      parameters:
+        - $ref: '#/components/parameters/codigo'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MusicWriteBody'
+      responses:
+        '200':
+          description: Música actualizada (versos antigos removidos)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MusicWriteResponse'
+    delete:
+      tags: [music]
+      summary: Eliminar música e versos
+      operationId: deleteMusic
+      parameters:
+        - $ref: '#/components/parameters/codigo'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  id:
+                    type: string
+
+  /musica:
+    post:
+      tags: [music]
+      summary: Criar música
+      operationId: createMusic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MusicWriteBody'
+            examples:
+              newSong:
+                value:
+                  cat: '1'
+                  nome: Novo louvor
+                  artista: Autor
+                  compositor: ''
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MusicWriteResponse'
+
+  /musica/verso:
+    post:
+      tags: [music]
+      summary: Adicionar verso
+      operationId: createMusicVerse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [musica, verso]
+              properties:
+                musica:
+                  type: string
+                verso:
+                  type: string
+            examples:
+              verse:
+                value:
+                  musica: '42'
+                  verso: 'Linha 1 do coro'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MusicWriteResponse'
+
+  /biblias:
+    get:
+      tags: [bible]
+      summary: Bíblias instaladas
+      operationId: listBibles
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  biblias:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nome:
+                          type: string
+                        arquivo:
+                          type: string
+              examples:
+                list:
+                  value:
+                    status: successo
+                    biblias:
+                      - nome: Almeida Revista e Atualizada
+                        arquivo: ara.sqlite
+
+  /biblias/livros/{biblia}:
+    get:
+      tags: [bible]
+      summary: Livros de uma bíblia
+      operationId: listBibleBooks
+      parameters:
+        - name: biblia
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Nome do ficheiro SQLite (ex. `ara.sqlite`)
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessItems'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /biblias/capitulo/{biblia}/{livro}:
+    get:
+      tags: [bible]
+      summary: Contagem de capítulos
+      operationId: listBibleChapters
+      parameters:
+        - name: biblia
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: livro
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessItems'
+
+  /biblias/versiculo/{biblia}/{livro}/{capitulo}:
+    get:
+      tags: [bible]
+      summary: Versículos de um capítulo
+      operationId: listBibleVerses
+      parameters:
+        - name: biblia
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: livro
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: capitulo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  livro:
+                    type: string
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+
+  /background-rapido:
+    get:
+      tags: [bible]
+      summary: Fundos rápidos (tabela principal)
+      operationId: listQuickBackgrounds
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessItems'
+
+  /imagem/categoria:
+    get:
+      tags: [media]
+      summary: Categorias de imagens
+      operationId: listImageCategories
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  imagens:
+                    type: array
+                    items:
+                      type: string
+
+  /imagem/categoria/{codigo}:
+    get:
+      tags: [media]
+      summary: Ficheiros numa categoria de imagem
+      operationId: listImagesInCategory
+      parameters:
+        - $ref: '#/components/parameters/codigo'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  imagens:
+                    type: array
+                    items:
+                      type: string
+
+  /video/categoria:
+    get:
+      tags: [media]
+      summary: Categorias de vídeo
+      operationId: listVideoCategories
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  videos:
+                    type: array
+                    items:
+                      type: string
+
+  /video/categoria/{codigo}:
+    get:
+      tags: [media]
+      summary: Vídeos numa categoria
+      operationId: listVideosInCategory
+      parameters:
+        - $ref: '#/components/parameters/codigo'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  videos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        video:
+                          type: string
+                        thumb:
+                          type: string
+
+  /display:
+    get:
+      tags: [display]
+      summary: Estado da tabela `tela`
+      operationId: getDisplayConfig
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+
+  /display/{tipo}/{largura}/{altura}:
+    get:
+      tags: [display]
+      summary: Actualizar dimensões da tela e devolver estado
+      operationId: updateDisplayDimensions
+      parameters:
+        - name: tipo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: largura
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: altura
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+
+  /displays/config:
+    get:
+      tags: [displays]
+      summary: Configuração de monitores (Electron)
+      operationId: getDisplaysConfig
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, config]
+                properties:
+                  status:
+                    type: string
+                  config:
+                    $ref: '#/components/schemas/DisplaysConfig'
+    put:
+      tags: [displays]
+      summary: Persistir atribuição de monitores
+      operationId: putDisplaysConfig
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisplaysConfig'
+            examples:
+              dual:
+                value:
+                  assignments:
+                    - displayId: 1
+                      label: HDMI-1
+                      role: projection
+                      bounds:
+                        x: 1920
+                        y: 0
+                        width: 1920
+                        height: 1080
+                      primary: false
+                  updatedAt: '2026-05-25T12:00:00.000Z'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, config]
+                properties:
+                  status:
+                    type: string
+                  config:
+                    $ref: '#/components/schemas/DisplaysConfig'
+        '400':
+          description: assignments inválido ou papel desconhecido
+
+  /themes:
+    get:
+      tags: [themes]
+      summary: Listar temas
+      operationId: listThemes
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  items:
+                    type: array
+                    items:
+                      type: string
+
+  /themes/{themeId}/theme.json:
+    get:
+      tags: [themes]
+      summary: Metadados do tema
+      operationId: getThemeJson
+      parameters:
+        - $ref: '#/components/parameters/themeId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Tema não encontrado
+
+  /themes/{themeId}/variables.css:
+    get:
+      tags: [themes]
+      summary: Variáveis CSS do tema
+      operationId: getThemeCss
+      parameters:
+        - $ref: '#/components/parameters/themeId'
+      responses:
+        '200':
+          content:
+            text/css:
+              schema:
+                type: string
+
+  /themes/{themeId}/assets/{filename}:
+    get:
+      tags: [themes]
+      summary: Asset estático do tema
+      operationId: getThemeAsset
+      parameters:
+        - $ref: '#/components/parameters/themeId'
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ficheiro binário
+        '403':
+          description: Path traversal bloqueado
+        '404':
+          description: Asset não encontrado
+
+  /locales:
+    get:
+      tags: [locales]
+      summary: Locales disponíveis
+      operationId: listLocales
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  items:
+                    type: array
+                    items:
+                      type: string
+                  default:
+                    type: string
+                    example: pt-BR
+
+  /locales/{locale}.json:
+    get:
+      tags: [locales]
+      summary: Mensagens i18n
+      operationId: getLocaleMessages
+      parameters:
+        - name: locale
+          in: path
+          required: true
+          schema:
+            type: string
+          example: pt-BR
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '404':
+          description: Locale não encontrado
+
+  /api/system/error-log:
+    get:
+      tags: [system]
+      summary: Listar entradas recentes do log de erros
+      operationId: listErrorLog
+      security:
+        - bearerAuth: []
+      description: |
+        Requer acesso de operador (`requireOperatorAccess`).
+        Em localhost o token é opcional; remoto exige sessão operator.
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 200
+      responses:
+        '200':
+          description: Entradas mais recentes primeiro
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorLogListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [system]
+      summary: Registar erro (cliente ou smoke)
+      operationId: appendErrorLog
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorLogAppendRequest'
+            examples:
+              client:
+                value:
+                  level: error
+                  source: client
+                  message: Falha ao carregar playlist
+                  detail: GET /playlist → HTTP 500
+      responses:
+        '201':
+          description: Entrada criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorLogAppendResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [system]
+      summary: Limpar log de erros
+      operationId: clearErrorLog
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Arquivo zerado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusOk'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: session-token
+      description: Token devolvido por POST /api/auth/login
+
+  parameters:
+    numericId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    codigo:
+      name: codigo
+      in: path
+      required: true
+      schema:
+        type: string
+    themeId:
+      name: themeId
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Pedido inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    Unauthorized:
+      description: Autenticação obrigatória ou sessão inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    Forbidden:
+      description: Papel insuficiente
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorBody'
+
+  schemas:
+    ErrorBody:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+      example:
+        error: Credenciais inválidas
+
+    StatusOk:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: Sucesso
+
+    HealthResponse:
+      type: object
+      required: [status, phase, websocket]
+      properties:
+        status:
+          type: string
+        phase:
+          type: string
+        websocket:
+          type: string
+
+    ErrorLogEntry:
+      type: object
+      required: [id, ts, level, source, message]
+      properties:
+        id:
+          type: string
+          format: uuid
+        ts:
+          type: string
+          format: date-time
+        level:
+          type: string
+          enum: [error, warn]
+        source:
+          type: string
+          example: api
+        message:
+          type: string
+        detail:
+          type: string
+
+    ErrorLogListResponse:
+      type: object
+      required: [status, items]
+      properties:
+        status:
+          type: string
+          example: Sucesso
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorLogEntry'
+
+    ErrorLogAppendRequest:
+      type: object
+      required: [message]
+      properties:
+        level:
+          type: string
+          enum: [error, warn]
+          default: error
+        source:
+          type: string
+          default: client
+        message:
+          type: string
+        detail:
+          type: string
+
+    ErrorLogAppendResponse:
+      type: object
+      required: [status, entry]
+      properties:
+        status:
+          type: string
+          example: Sucesso
+        entry:
+          $ref: '#/components/schemas/ErrorLogEntry'
+
+    PublicUser:
+      type: object
+      required: [id, username, role, active, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+          enum: [operator, remote, admin]
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+
+    LoginResponse:
+      type: object
+      required: [status, token, user]
+      properties:
+        status:
+          type: string
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/PublicUser'
+
+    CreateUserRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [operator, remote, admin]
+          default: remote
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        password:
+          type: string
+        role:
+          type: string
+          enum: [operator, remote, admin]
+        active:
+          type: boolean
+
+    ChromeTabRequest:
+      type: object
+      required: [label]
+      properties:
+        label:
+          type: string
+        songId:
+          type: integer
+        songName:
+          type: string
+
+    ChromeTab:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        songId:
+          type: integer
+          nullable: true
+        songName:
+          type: string
+          nullable: true
+        userId:
+          type: integer
+        userName:
+          type: string
+
+    LiveRequestBody:
+      type: object
+      required: [kind, payload]
+      properties:
+        kind:
+          type: string
+          enum: [live-music, live-bible, live-video]
+        payload:
+          type: object
+          additionalProperties: true
+
+    ApprovalItem:
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+        userName:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+
+    LiveAction:
+      type: object
+      required: [acao, valor]
+      properties:
+        acao:
+          type: string
+          enum:
+            - background
+            - texto
+            - video
+            - viewMusica
+            - viewBiblia
+            - removeConteudo
+            - atualizar
+            - ajustarTela
+            - viewMusicaRetorno
+            - viewBibliaRetorno
+        valor:
+          type: string
+
+    DisplaysConfig:
+      type: object
+      required: [assignments, updatedAt]
+      properties:
+        assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/DisplayAssignment'
+        updatedAt:
+          type: string
+          format: date-time
+
+    DisplayAssignment:
+      type: object
+      required: [displayId, label, role, bounds, primary]
+      properties:
+        displayId:
+          type: integer
+        label:
+          type: string
+        role:
+          type: string
+          enum: [operator, projection, stage-return, off]
+        bounds:
+          type: object
+          required: [x, y, width, height]
+          properties:
+            x:
+              type: number
+            y:
+              type: number
+            width:
+              type: number
+            height:
+              type: number
+        primary:
+          type: boolean
+
+    SuccessItems:
+      type: object
+      properties:
+        status:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+
+    MusicWriteBody:
+      type: object
+      required: [cat, nome, artista]
+      properties:
+        cat:
+          type: string
+        nome:
+          type: string
+        artista:
+          type: string
+        compositor:
+          type: string
+
+    MusicWriteResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          $ref: '#/components/schemas/MusicWriteBody'
+        id:
+          oneOf:
+            - type: object
+            - type: string
+            - type: integer
+
+  x-websocket:
+    /ws/live:
+      summary: Hub de projeção ao vivo
+      description: |
+        Protocolo JSON sobre WebSocket (`ws` library). Após `connect`, o cliente deve enviar `join`.
+
+        **Papéis (`role`):** `operator`, `projector`, `stage-return`, `remote-operator`, `live-viewer`.
+
+        **Mensagens cliente → servidor:**
+        - `{ "type": "join", "role": "...", "name": "...", "token": "..." }`
+        - `{ "type": "live-action", "action": { "acao": "background", "valor": "..." } }` (operador local)
+        - `{ "type": "set-frozen", "frozen": true }`
+        - `{ "type": "ping" }`
+
+        **Mensagens servidor → cliente:**
+        - `joined`, `live-action`, `state-sync`, `pong`, `error`
+        - `chrome-tab-added`, `approval-pending`, `approval-resolved` (integração remota)
+
+        Remotos não enviam `live-action` directamente — usar `POST /api/remote/live-request`.
+      examples:
+        joinOperator:
+          value:
+            type: join
+            role: operator
+            name: operador
+        liveAction:
+          value:
+            type: live-action
+            action:
+              acao: viewMusica
+              valor: '10|0'
+        joinedResponse:
+          value:
+            type: joined
+            clientId: c1
+            role: projector
+            state:
+              frozen: false
+              lastAction: null
+              lastStageAction: null
+              revision: 0

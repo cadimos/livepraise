@@ -1,0 +1,24 @@
+@import url('../portal/portal.css');
+
+.block {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #334155;
+}
+
+textarea,
+select {
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #475569;
+  background: #0f172a;
+  color: inherit;
+  font: inherit;
+}
+
+.status {
+  min-height: 1.25rem;
+  color: #86efac;
+}

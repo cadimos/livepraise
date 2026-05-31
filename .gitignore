@@ -103,10 +103,11 @@ dist
 # TernJS port file
 .tern-port
 
-#Electron Build
-electron-builder.yml
+# Build output
+dist/
 
-#Pasta de Dados e BD
+# Legacy archived — keep node_modules local only
+v0.0.8/node_modules/
 Dados/
 release-builds/
 node_modules/

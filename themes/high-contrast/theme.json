@@ -1,0 +1,16 @@
+{
+  "name": "high-contrast",
+  "label": "Alto contraste (escuro)",
+  "version": "1.0.0",
+  "colors": {
+    "primary": "#0284c7",
+    "background": "#000000",
+    "surface": "#171717",
+    "text": "#ffffff",
+    "muted": "#cbd5e1",
+    "accent": "#fbbf24"
+  },
+  "typography": {
+    "fontFamily": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+  }
+}
