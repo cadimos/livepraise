@@ -14,10 +14,10 @@
     "node": ">=22.5.0"
   },
   "scripts": {
-    "dev": "npm run build && ELECTRON_DISABLE_SANDBOX=1 electron . --no-sandbox",
+    "dev": "npm run build && node scripts/dev-electron.mjs",
     "start": "npm run dev",
     "build:electron": "tsc -p tsconfig.electron.json",
-    "build:server": "node scripts/check-node-version.mjs && node scripts/install-yt-dlp.mjs && tsc -p tsconfig.server.json && node -e \"const fs=require('fs');const p='dist/server/db/migrations';fs.mkdirSync(p,{recursive:true});for(const f of fs.readdirSync('server/db/migrations')) fs.copyFileSync('server/db/migrations/'+f,p+'/'+f);\"",
+    "build:server": "node scripts/check-node-version.mjs && node scripts/install-yt-dlp.mjs && node scripts/install-ffmpeg.mjs && tsc -p tsconfig.server.json && node -e \"const fs=require('fs');const p='dist/server/db/migrations';fs.mkdirSync(p,{recursive:true});for(const f of fs.readdirSync('server/db/migrations')) fs.copyFileSync('server/db/migrations/'+f,p+'/'+f);\"",
     "build:projector": "tsc -p tsconfig.projector.json",
     "build:stage-return": "tsc -p tsconfig.stage-return.json",
     "build:operator": "vite build --config vite.config.ts",
@@ -61,7 +61,7 @@
     "dist:snap": "npm run build && electron-builder --linux snap --x64",
     "dist:mac": "npm run build && electron-builder --mac",
     "dist:all": "node scripts/dist-all.mjs",
-    "postinstall": "node scripts/install-yt-dlp.mjs"
+    "postinstall": "node scripts/install-yt-dlp.mjs && node scripts/install-ffmpeg.mjs"
   },
   "dependencies": {
     "@lucide/vue": "^1.16.0",

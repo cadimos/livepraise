@@ -1,10 +1,11 @@
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import ffmpegStatic from 'ffmpeg-static';
-
-const ffmpegPath =
-  typeof ffmpegStatic === 'string' ? ffmpegStatic : (ffmpegStatic as { default?: string }).default;
+import {
+  ffmpegDebugEnabled,
+  logFfmpeg,
+  resolveFfmpegBinary,
+} from './ffmpegBinary.js';
 
 export type VideoPipelineStatus = 'ready' | 'processing' | 'error';
 
@@ -30,10 +31,11 @@ function jobKey(relativePath: string): string {
 }
 
 function ffmpegBinary(): string {
-  if (!ffmpegPath) {
-    throw new Error('ffmpeg-static não disponível nesta plataforma');
-  }
-  return ffmpegPath;
+  return resolveFfmpegBinary();
+}
+
+function logPipeline(message: string, detail?: string): void {
+  console.info(`[video-pipeline] ${message}${detail ? ` ${detail}` : ''}`);
 }
 
 export function thumbRelPath(relativeVideo: string): string {
@@ -55,18 +57,31 @@ function parseFfmpegPercent(stderrChunk: string): number | null {
 }
 
 function runFfmpeg(args: string[], onProgress?: (percent: number) => void): Promise<void> {
+  const bin = ffmpegBinary();
+  if (ffmpegDebugEnabled()) {
+    logFfmpeg('exec', `${bin} ${args.join(' ')}`);
+  }
   return new Promise((resolve, reject) => {
-    const proc = spawn(ffmpegBinary(), args, { stdio: ['ignore', 'ignore', 'pipe'] });
+    const proc = spawn(bin, args, { stdio: ['ignore', 'ignore', 'pipe'], windowsHide: true });
     let stderr = '';
     proc.stderr?.on('data', (chunk: Buffer) => {
       stderr += chunk.toString();
       const pct = parseFfmpegPercent(stderr);
       if (pct !== null && onProgress) onProgress(pct);
     });
-    proc.on('error', reject);
+    proc.on('error', (err) => {
+      logFfmpeg('spawn error', err.message);
+      reject(err);
+    });
     proc.on('close', (code) => {
-      if (code === 0) resolve();
-      else reject(new Error(stderr.trim() || `ffmpeg exit ${code}`));
+      if (code === 0) {
+        if (ffmpegDebugEnabled()) logFfmpeg('done', `exit 0`);
+        resolve();
+        return;
+      }
+      const tail = stderr.trim().split('\n').slice(-8).join('\n');
+      logFfmpeg('failed', `exit ${code}\n${tail}`);
+      reject(new Error(tail || `ffmpeg exit ${code}`));
     });
   });
 }
@@ -157,6 +172,8 @@ export function scheduleVideoPipeline(
   setJob(rel, { status: 'processing', percent: 0 });
   running.add(key);
 
+  logPipeline('início', `${rel} mp4=${needsMp4} thumb=${needsThumb} ffmpeg=${ffmpegBinary()}`);
+
   void (async () => {
     try {
       let workingRel = rel;
@@ -165,6 +182,7 @@ export function scheduleVideoPipeline(
       if (needsMp4) {
         const mp4Rel = rel.replace(/\.[^.]+$/i, '.mp4');
         const mp4Abs = path.join(home, mp4Rel);
+        logPipeline('convertendo', `${workingRel} → ${mp4Rel}`);
         await convertToMp4(workingAbs, mp4Abs, (pct) => {
           setJob(workingRel, { status: 'processing', percent: Math.floor(pct * 0.7) });
         });
@@ -175,6 +193,7 @@ export function scheduleVideoPipeline(
       }
 
       if (!fs.existsSync(thumbAbs)) {
+        logPipeline('miniatura', `${workingRel} → ${thumbRel}`);
         await ensureThumb(workingAbs, thumbAbs, (pct) => {
           setJob(workingRel, {
             status: 'processing',
@@ -184,9 +203,11 @@ export function scheduleVideoPipeline(
       }
 
       setJob(workingRel, { status: 'ready', percent: 100 });
+      logPipeline('concluído', workingRel);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setJob(rel, { status: 'error', percent: 0, error: message });
+      logPipeline('erro', `${rel}: ${message}`);
     } finally {
       running.delete(key);
     }

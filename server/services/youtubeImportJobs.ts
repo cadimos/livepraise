@@ -188,6 +188,9 @@ async function runJobAttempt(job: YoutubeImportJob): Promise<JobAttemptOutcome> 
 
   job.phase = 'processing';
   job.progress = 82;
+  console.info(
+    `[youtube-import] job ${job.jobId}: download OK (${downloaded.rel}), a preparar com ffmpeg…`,
+  );
 
   try {
     await waitForVideoPipeline(job.home, downloaded.rel, (pct) => {
@@ -197,6 +200,9 @@ async function runJobAttempt(job: YoutubeImportJob): Promise<JobAttemptOutcome> 
   } catch (err) {
     job.error = err instanceof Error ? err.message : String(err);
     job.maxAttempts = YOUTUBE_IMPORT_MAX_INTERRUPTED_ATTEMPTS;
+    console.error(
+      `[youtube-import] job ${job.jobId}: falha ao preparar (${downloaded.rel}): ${job.error}`,
+    );
     return 'processing_failed';
   }
 

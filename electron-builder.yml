@@ -12,6 +12,7 @@ files:
   - shared/**/*
   - themes/**/*
   - resources/fonts/**/*
+  - resources/icon/**/*
   - locales/**/*
   - openapi.yaml
   - electron/splash/**/*

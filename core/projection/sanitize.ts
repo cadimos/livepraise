@@ -22,26 +22,44 @@ const YOUTUBE_ACTIONS = new Set<LiveActionName>(['youtube']);
 
 /** Paths servidos por express.static em server/index.ts */
 const ALLOWED_MEDIA_PATH = /^\/(imagens|videos)\/[^?#]+$/;
+/** Legado `background_rapido` — imagens embutidas em SQLite (data URL). */
+const MAX_LEGACY_DATA_IMAGE_LEN = 600_000;
+
+function normalizeProjectionMediaPath(path: string): string {
+  return path.trim().replaceAll('\\', '/');
+}
 
 function decodeMediaPath(valor: string): string | null {
   try {
-    return decodeURIComponent(valor);
+    return normalizeProjectionMediaPath(decodeURIComponent(valor));
   } catch {
-    const trimmed = valor.trim();
-    return trimmed.startsWith('/') ? trimmed : null;
+    const trimmed = normalizeProjectionMediaPath(valor);
+    if (trimmed.startsWith('/') || trimmed.startsWith('data:')) return trimmed;
+    return null;
   }
 }
 
-/** A6 — rejeita URLs arbitrárias; aceita só /imagens e /videos (path relativo seguro). */
+function isAllowedLegacyDataImageUrl(path: string): boolean {
+  if (!path.startsWith('data:image/')) return false;
+  if (!/^data:image\/(?:jpeg|jpg|png|gif|webp|bmp);base64,/i.test(path)) return false;
+  return path.length <= MAX_LEGACY_DATA_IMAGE_LEN;
+}
+
+/** A6 — rejeita URLs arbitrárias; aceita /imagens, /videos ou data:image legado. */
 export function isAllowedProjectionMediaPath(path: string): boolean {
-  const trimmed = path.trim();
-  if (!trimmed || !trimmed.startsWith('/')) return false;
+  const trimmed = normalizeProjectionMediaPath(path);
+  if (!trimmed) return false;
+
+  if (trimmed.startsWith('data:')) {
+    return isAllowedLegacyDataImageUrl(trimmed);
+  }
+
+  if (!trimmed.startsWith('/')) return false;
   const lower = trimmed.toLowerCase();
   if (
     lower.includes('://') ||
     lower.startsWith('//') ||
-    lower.startsWith('javascript:') ||
-    lower.startsWith('data:')
+    lower.startsWith('javascript:')
   ) {
     return false;
   }

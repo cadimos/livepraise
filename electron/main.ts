@@ -5,11 +5,13 @@ import { fileURLToPath } from 'node:url';
 import { DisplayManager } from './displays/manager.js';
 import { loadOrCreateConfig } from './displays/config.js';
 import { setupAutoUpdater } from './updater.js';
+import { resolveAppIcon } from './app-icon.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SERVER_PORT = Number(process.env.LIVEPRAISE_PORT ?? process.env.APP_PORT ?? 3000);
 const SERVER_WAIT_MS = Number(process.env.LIVEPRAISE_SERVER_WAIT_MS ?? 60_000);
 const APP_ROOT = app.isPackaged ? app.getAppPath() : process.cwd();
+const APP_ICON = resolveAppIcon(APP_ROOT);
 
 let splashWindow: BrowserWindow | null = null;
 let serverProcess: ChildProcess | null = null;
@@ -91,6 +93,7 @@ function createSplashWindow(): BrowserWindow {
     resizable: false,
     show: false,
     backgroundColor: '#0f172a',
+    ...(APP_ICON ? { icon: APP_ICON } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -119,6 +122,7 @@ async function launchWorkspace(): Promise<void> {
   displayManager = new DisplayManager({
     serverPort: SERVER_PORT,
     preloadPath,
+    appRoot: APP_ROOT,
     onOperatorClosed: shutdownLivepraise,
   });
 

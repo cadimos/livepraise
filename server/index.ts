@@ -79,6 +79,15 @@ export async function createLivepraiseApp(
   app.use(backupModeGuard);
 
   const home = getLivepraiseHome();
+  const iconRoot = path.join(appRoot, 'resources', 'icon');
+
+  app.get('/favicon.ico', (_req, res) => {
+    res.sendFile(path.join(iconRoot, 'livepraise.ico'));
+  });
+  app.get(['/icon.png', '/apple-touch-icon.png'], (_req, res) => {
+    res.type('png').sendFile(path.join(iconRoot, 'livepraise.png'));
+  });
+
   app.use('/fonts', createFontsRouter());
   app.use('/imagens', express.static(path.join(home, 'imagens')));
   app.use('/videos', express.static(path.join(home, 'videos')));
@@ -144,7 +153,11 @@ export async function createLivepraiseApp(
   ] as const;
 
   for (const { mount, root } of publicViewerRoutes) {
-    app.get([mount, `${mount}/`], (_req, res) => {
+    app.get([mount, `${mount}/`], (req, res) => {
+      if (!req.path.endsWith('/')) {
+        res.redirect(302, `${mount}/`);
+        return;
+      }
       res.setHeader('Cache-Control', 'no-store');
       res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
       res.sendFile(path.join(root, 'index.html'));
@@ -290,9 +303,8 @@ export async function stopLivepraiseServer(): Promise<void> {
 }
 
 const isDirectRun =
-  process.argv[1] &&
-  (process.argv[1].endsWith('server/index.js') ||
-    process.argv[1].endsWith('server/index.ts'));
+  process.argv[1] != null &&
+  path.resolve(process.argv[1]) === path.join(moduleDir, 'index.js');
 
 if (isDirectRun) {
   startLivepraiseServer()
