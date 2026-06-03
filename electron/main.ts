@@ -40,6 +40,7 @@ function startServerProcess(): void {
       ELECTRON_RUN_AS_NODE: '1',
       LIVEPRAISE_PORT: String(SERVER_PORT),
       LIVEPRAISE_APP_ROOT: APP_ROOT,
+      LIVEPRAISE_RESOURCES_PATH: process.resourcesPath,
     },
   });
 
@@ -101,7 +102,7 @@ function createSplashWindow(): BrowserWindow {
     },
   });
 
-  const splashPath = path.join(process.cwd(), 'electron', 'splash', 'splash.html');
+  const splashPath = path.join(APP_ROOT, 'electron', 'splash', 'splash.html');
   void win.loadFile(splashPath);
 
   win.once('ready-to-show', () => {
@@ -133,7 +134,12 @@ async function launchWorkspace(): Promise<void> {
 }
 
 app.whenReady().then(async () => {
-  void setupAutoUpdater();
+  void setupAutoUpdater().catch((err) => {
+    console.warn(
+      '[livepraise-updater] falha ao iniciar:',
+      err instanceof Error ? err.message : err,
+    );
+  });
   startServerProcess();
   splashWindow = createSplashWindow();
 
