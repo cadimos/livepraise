@@ -105,7 +105,7 @@ O Electron em `node_modules/electron/dist` é **por SO**. Após clonar ou copiar
 | Formato | Extra no SO de build |
 |---------|----------------------|
 | **Windows** (`npm run dist:win`) | Windows x64 |
-| **Linux** (`npm run dist:linux`) | Linux x64; para Snap/Flatpak: `snapcraft` / `flatpak-builder` |
+| **Linux** (`npm run dist:linux`) | Linux x64; ver tabela abaixo em [Release → Dependências Linux](#dependências-de-build-no-linux-ubuntudebian) |
 | **macOS** (`npm run dist:mac`) | macOS (DMG só se gera no Mac) |
 
 ## Desenvolvimento
@@ -257,6 +257,27 @@ Builds multi-plataforma via [electron-builder](https://www.electron.build/) (`el
 | `npm run dist:mac` | DMG macOS (x64 + arm64) |
 
 > O DMG macOS só é gerado num **Mac** (`dist:mac` ou workflow CA-R40 macOS). Para release completo nos três SO, use os workflows GHA ou `dist:all` / `dist:mac` em cada plataforma.
+
+### Dependências de build no Linux (Ubuntu/Debian)
+
+O `npm run dist:linux` gera **AppImage, `.deb`, `.rpm` e `.pacman`** na mesma execução. O [electron-builder](https://www.electron.build/) usa `fpm`, que para **RPM** exige o executável `rpmbuild` no sistema — **não vem instalado por defeito** no Ubuntu/Debian.
+
+| Pacote alvo | Ferramenta no host de build | Instalação (Ubuntu/Debian) |
+|-------------|----------------------------|----------------------------|
+| `.rpm` | `rpmbuild` | `sudo apt-get install rpm` |
+| `.deb` / AppImage / `.pacman` | `fpm` (cache do electron-builder) | Normalmente sem pacotes extra |
+| Snap | `snapcraft` | `sudo snap install snapcraft --classic` |
+| Flatpak | `flatpak-builder` | `sudo apt-get install flatpak-builder` |
+
+Se o build falhar com `Need executable 'rpmbuild'`, instale `rpm` e volte a correr o comando. Alternativa: gerar só os formatos que precisa, sem RPM:
+
+```bash
+npm run build
+npm run dist:linux-deb          # só .deb
+npm run dist:linux-appimage     # só AppImage
+# ou, após instalar rpm:
+npm run dist:linux-rpm          # só .rpm
+```
 
 Saída em `release-builds/`. Ícones em `resources/icon/`.
 
