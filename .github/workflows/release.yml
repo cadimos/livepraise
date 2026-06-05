@@ -35,6 +35,9 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Garantir package-lock.json
+        run: test -f package-lock.json || npm install --package-lock-only --ignore-scripts
+
       - name: Calcular versão (nova ou reutilizar draft)
         id: resolve
         run: node scripts/resolve-release-version.mjs
@@ -54,6 +57,7 @@ jobs:
           path: |
             package.json
             package-lock.json
+          if-no-files-found: error
           retention-days: 1
 
   prepare-release:
@@ -104,6 +108,9 @@ jobs:
         with:
           name: release-meta
 
+      - name: Verificar package-lock.json
+        run: test -f package-lock.json
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -147,6 +154,9 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: release-meta
+
+      - name: Verificar package-lock.json
+        run: test -f package-lock.json
 
       - uses: actions/setup-node@v4
         with:
@@ -194,6 +204,9 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: release-meta
+
+      - name: Verificar package-lock.json
+        run: test -f package-lock.json
 
       - uses: actions/setup-node@v4
         with:

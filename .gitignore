@@ -117,5 +117,4 @@ release-builds/
 node_modules/
 wiki/
 dsw.db
-package-lock.json
 Escopos/
