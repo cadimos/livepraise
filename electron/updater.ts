@@ -1,4 +1,7 @@
+import { createRequire } from 'node:module';
 import { app, BrowserWindow, Notification, ipcMain } from 'electron';
+
+const require = createRequire(import.meta.url);
 
 export type UpdateStatus =
   | { kind: 'idle' }
@@ -11,6 +14,19 @@ export type UpdateStatus =
 type AutoUpdaterModule = typeof import('electron-updater');
 
 let autoUpdater: AutoUpdaterModule['autoUpdater'] | null = null;
+
+function loadAutoUpdater(): AutoUpdaterModule['autoUpdater'] | null {
+  try {
+    const mod = require('electron-updater') as AutoUpdaterModule;
+    return mod.autoUpdater ?? null;
+  } catch (err) {
+    console.warn(
+      '[livepraise-updater] electron-updater indisponível:',
+      err instanceof Error ? err.message : err,
+    );
+    return null;
+  }
+}
 
 function broadcast(status: UpdateStatus): void {
   for (const win of BrowserWindow.getAllWindows()) {
@@ -35,8 +51,8 @@ function notifyUser(title: string, body: string): void {
 export async function setupAutoUpdater(): Promise<void> {
   if (!app.isPackaged) return;
 
-  const mod = await import('electron-updater');
-  autoUpdater = mod.autoUpdater;
+  autoUpdater = loadAutoUpdater();
+  if (!autoUpdater) return;
 
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
@@ -92,5 +108,10 @@ export async function setupAutoUpdater(): Promise<void> {
     return { ok: true };
   });
 
-  void autoUpdater.checkForUpdatesAndNotify();
+  void autoUpdater.checkForUpdatesAndNotify().catch((err: unknown) => {
+    const message =
+      err instanceof Error ? err.message : String(err ?? 'erro desconhecido');
+    console.warn('[livepraise-updater] Verificação de atualização falhou:', message);
+    broadcast({ kind: 'error', message, fallback: true });
+  });
 }

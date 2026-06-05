@@ -25,11 +25,13 @@ export function getDatabasePath(): string {
 /** Origem do payload de primeira instalação. */
 export function resolveInstallSource(): string {
   const root = getAppRoot();
+  const resourcesPath = process.env.LIVEPRAISE_RESOURCES_PATH?.trim();
   const candidates = [
+    ...(resourcesPath ? [path.join(resourcesPath, 'install', 'livepraise')] : []),
+    path.join(root, '..', 'install', 'livepraise'),
     path.join(root, 'install', 'livepraise'),
     path.join(root, 'resources', 'install', 'livepraise'),
     path.join(moduleDir, '..', '..', 'install', 'livepraise'),
-    path.join(root, 'v0.0.8', 'install', 'livepraise'),
   ];
 
   for (const candidate of candidates) {

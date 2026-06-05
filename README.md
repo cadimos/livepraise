@@ -39,12 +39,81 @@ livepraise/
 
 ## Requisitos
 
-- **Node.js** ≥ 22.5 (`node:sqlite` built-in, alinhado ao Electron 42)
+### Para uso (após instalação)
+
+Requisitos para correr o **instalador** (NSIS, `.deb`, AppImage, DMG, etc.) — não precisa de Node.js nem npm.
+
+| Recurso | Mínimo | Recomendado |
+|---------|--------|-------------|
+| **Processador** | 64 bits, 2 núcleos | 4+ núcleos (conversão de vídeo com ffmpeg é pesada) |
+| **Memória RAM** | 4 GB | 8 GB ou mais |
+| **Disco livre** | 2 GB (app + dados iniciais em `~/livepraise`) | 10 GB+ se usar muitos vídeos/imagens locais |
+| **Ecrã** | 1 monitor (só operador) | 2+ monitores (operador + projetor/retorno) |
+| **Resolução** | 1280×720 no monitor do operador | 1920×1080 ou superior |
+| **Rede** | Opcional (uso só local) | LAN estável se usar `/remote`, ecrãs externos ou importação por URL |
+
+**Sistemas operativos suportados (builds oficiais):**
+
+| SO | Versão mínima | Arquitectura |
+|----|---------------|--------------|
+| **Windows** | 10 ou 11 | x64 (64 bits) |
+| **macOS** | 11 (Big Sur) | Intel x64 ou Apple Silicon (M1+) |
+| **Linux** | Distro recente com glibc 2.31+ (ex.: Ubuntu 20.04+, Fedora 34+, Debian 11+) | x64 |
+
+**Linux — dependências extra (consoante o formato):**
+
+- **AppImage:** `libfuse2` (Ubuntu/Debian: `sudo apt install libfuse2`).
+- **`.deb` / `.rpm` / `.pacman`:** o gestor de pacotes instala dependências GTK/NSS (ver `electron-builder.yml`).
+- **Snap / Flatpak:** `snapd` ou [Flatpak](https://flatpak.org/setup/) instalados.
+
+**Notas de uso:**
+
+- O servidor HTTP/WebSocket corre em **localhost** (porta 3000 por defeito); dispositivos na mesma rede podem aceder a `/live`, `/remote` e ecrãs externos se a firewall o permitir.
+- Importação de vídeos (ficheiro, YouTube, URL) e geração de miniaturas usam **ffmpeg** já incluído no pacote — não é preciso instalar ffmpeg à parte.
+- Para culto com projeção ao vivo, use SSD e evite disco quase cheio; backups em Configurações → Backup / Restore.
+
+### Para desenvolvimento
+
+Requisitos para clonar o repositório, compilar e correr `npm run dev` / `npm run build`.
+
+| Recurso | Mínimo | Recomendado |
+|---------|--------|-------------|
+| **Processador** | 64 bits, 4 núcleos | 6+ núcleos |
+| **Memória RAM** | 8 GB | 16 GB |
+| **Disco livre** | ~5 GB (`node_modules`, `dist`, Electron, ffmpeg/yt-dlp em `vendor/`) | 15 GB+ (inclui `release-builds/` se gerar instaladores) |
+| **SO** | Windows 10+, macOS 11+ ou Linux x64 (mesma família que o destino de teste) | Igual ao SO onde vai empacotar/distribuir |
+
+**Software obrigatório:**
+
+- **Node.js** ≥ 22.12 (`engines` em `package.json`; `node:sqlite` built-in)
 - **npm** 10+
+- **Git**
 
-### Linux (partição NTFS / externa)
+O `postinstall` descarrega automaticamente o binário **Electron 42**, **ffmpeg** e **yt-dlp** para o SO actual (`scripts/install-electron.mjs`, `install-ffmpeg.mjs`, `install-yt-dlp.mjs`). Use `nvm use` com o `.nvmrc` do repositório.
 
-Se `npm run dev` falhar com erro de `chrome-sandbox` / SUID, o script `dev` já define `ELECTRON_DISABLE_SANDBOX=1` e `--no-sandbox` (apenas desenvolvimento). Em ext4 nativo com sandbox configurado (`chmod 4755` no `chrome-sandbox`), pode remover esses flags localmente.
+**Linux (desenvolvimento):**
+
+- Ferramentas de compilação se algum módulo nativo pedir rebuild (`build-essential` no Debian/Ubuntu).
+- **Partição NTFS / disco externo:** se `npm run dev` falhar com `chrome-sandbox` / SUID, o script de dev usa `--no-sandbox` só em desenvolvimento. Em ext4 com sandbox correcto (`chmod 4755` no `chrome-sandbox` do Electron), pode dispensar esse modo.
+
+**Alternar entre Windows e Linux:**
+
+O Electron em `node_modules/electron/dist` é **por SO**. Após clonar ou copiar o projeto de outra máquina, execute `npm install` de novo para obter o binário correcto.
+
+**Upgrade de v0.0.8 → 1.x (dados de utilizador):**
+
+1. Feche o Live Praise antigo antes de copiar ficheiros.
+2. Copie `~/livepraise/` incluindo `dsw.bd` e, se existirem, `dsw.bd-wal` / `dsw.bd-shm`.
+3. No primeiro arranque de 1.x: backup automático em `~/livepraise/backup/auto-upgrade/` e migrations incrementais.
+4. Base corrompida: o app isola `dsw.bd.corrupt-*` e cria uma base nova — restaure um `dsw.bd` íntegro ou use Backup/Restore.
+
+**Empacotamento opcional (maintainers):**
+
+| Formato | Extra no SO de build |
+|---------|----------------------|
+| **Windows** (`npm run dist:win`) | Windows x64 |
+| **Linux** (`npm run dist:linux`) | Linux x64; ver tabela abaixo em [Release → Dependências Linux](#dependências-de-build-no-linux-ubuntudebian) |
+| **macOS** (`npm run dist:mac`) | macOS (DMG só se gera no Mac) |
 
 ## Desenvolvimento
 
@@ -195,6 +264,42 @@ Builds multi-plataforma via [electron-builder](https://www.electron.build/) (`el
 | `npm run dist:mac` | DMG macOS (x64 + arm64) |
 
 > O DMG macOS só é gerado num **Mac** (`dist:mac` ou workflow CA-R40 macOS). Para release completo nos três SO, use os workflows GHA ou `dist:all` / `dist:mac` em cada plataforma.
+
+### Dependências de build no Linux (Ubuntu/Debian)
+
+O `npm run dist:linux` gera **AppImage, `.deb`, `.rpm` e `.pacman`** na mesma execução. O [electron-builder](https://www.electron.build/) usa `fpm`, que no Ubuntu/Debian **não traz** todas as ferramentas nativas — é preciso instalá-las no host de build:
+
+| Pacote alvo | Ferramenta no host de build | Instalação (Ubuntu/Debian) |
+|-------------|----------------------------|----------------------------|
+| `.rpm` | `rpmbuild` | `sudo apt-get install rpm` |
+| `.pacman` | `bsdtar` | `sudo apt-get install libarchive-tools` |
+| `.deb` / AppImage | `fpm` (cache do electron-builder) | Normalmente sem pacotes extra |
+| Snap | `snapcraft` | `sudo snap install snapcraft --classic` |
+| Flatpak | `flatpak-builder` | `sudo apt-get install flatpak-builder` |
+
+**Instalação recomendada** antes de `npm run dist:linux` no Ubuntu/Debian:
+
+```bash
+sudo apt-get install -y rpm libarchive-tools
+which rpmbuild bsdtar   # ambos devem existir
+```
+
+Erros típicos:
+
+| Mensagem | Solução |
+|----------|---------|
+| `Need executable 'rpmbuild'` | `sudo apt-get install rpm` |
+| `bsdtar -czf .MTREE` / exit code **127** | `sudo apt-get install libarchive-tools` |
+
+Alternativa: gerar só os formatos que precisa:
+
+```bash
+npm run build
+npm run dist:linux-deb          # só .deb
+npm run dist:linux-appimage     # só AppImage
+npm run dist:linux-rpm          # só .rpm (requer rpm)
+npm run dist:linux-pacman       # só .pacman (requer libarchive-tools)
+```
 
 Saída em `release-builds/`. Ícones em `resources/icon/`.
 

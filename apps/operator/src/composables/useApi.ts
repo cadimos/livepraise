@@ -37,7 +37,8 @@ export function mediaUrl(relativePath: string): string {
   if (relativePath.startsWith('data:') || relativePath.startsWith('http')) {
     return relativePath;
   }
-  return `${apiBase()}/${relativePath.replace(/^\//, '')}`;
+  const normalized = relativePath.replaceAll('\\', '/');
+  return `${apiBase()}/${normalized.replace(/^\//, '')}`;
 }
 
 export interface MusicCategory {

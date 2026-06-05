@@ -80,8 +80,9 @@ export function buildBibleStageHtml(
 
 /** Path relativo `/imagens/...` ou `/videos/...` aceite por sanitizeLiveAction (A6). */
 export function toProjectionMediaPath(urlOrPath: string): string {
-  let path = urlOrPath.trim();
+  let path = urlOrPath.trim().replaceAll('\\', '/');
   if (!path) return '';
+  if (path.startsWith('data:')) return path;
 
   if (/^https?:\/\//i.test(path)) {
     try {

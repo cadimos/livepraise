@@ -8,9 +8,13 @@ import { ensureDefaultAdmin } from '../core/auth/users.js';
 import { ensureLivepraiseDataDir } from './bootstrap.js';
 import { syncBundledFontsToHome } from '../core/fonts/sync.js';
 import { syncBundledThemesToHome } from '../core/themes/sync.js';
-import { DEFAULT_PORT, getLivepraiseHome } from './config/paths.js';
+import { DEFAULT_PORT, getDatabasePath, getLivepraiseHome } from './config/paths.js';
 import { closeMainDb, getMainDb } from './db/connection.js';
-import { runMigrations } from './db/migrate.js';
+import {
+  databaseWasQuarantined,
+  prepareLegacyDatabaseFile,
+} from './db/legacy-upgrade.js';
+import { bootstrapEmptyDatabase, runMigrations } from './db/migrate.js';
 import { createBackgroundRouter, createBibleRouter } from './routes/bible.js';
 import { createDisplayRouter } from './routes/display.js';
 import { createDisplaysConfigRouter } from './routes/displays-config.js';
@@ -52,6 +56,10 @@ let activeServer: LivepraiseServer | null = null;
 
 export async function prepareDatabase(): Promise<number> {
   await ensureLivepraiseDataDir();
+  prepareLegacyDatabaseFile();
+  if (databaseWasQuarantined()) {
+    bootstrapEmptyDatabase(getDatabasePath());
+  }
   await syncBundledThemesToHome();
   await syncBundledFontsToHome();
   const applied = runMigrations();
@@ -79,6 +87,15 @@ export async function createLivepraiseApp(
   app.use(backupModeGuard);
 
   const home = getLivepraiseHome();
+  const iconRoot = path.join(appRoot, 'resources', 'icon');
+
+  app.get('/favicon.ico', (_req, res) => {
+    res.sendFile(path.join(iconRoot, 'livepraise.ico'));
+  });
+  app.get(['/icon.png', '/apple-touch-icon.png'], (_req, res) => {
+    res.type('png').sendFile(path.join(iconRoot, 'livepraise.png'));
+  });
+
   app.use('/fonts', createFontsRouter());
   app.use('/imagens', express.static(path.join(home, 'imagens')));
   app.use('/videos', express.static(path.join(home, 'videos')));
@@ -144,7 +161,11 @@ export async function createLivepraiseApp(
   ] as const;
 
   for (const { mount, root } of publicViewerRoutes) {
-    app.get([mount, `${mount}/`], (_req, res) => {
+    app.get([mount, `${mount}/`], (req, res) => {
+      if (!req.path.endsWith('/')) {
+        res.redirect(302, `${mount}/`);
+        return;
+      }
       res.setHeader('Cache-Control', 'no-store');
       res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
       res.sendFile(path.join(root, 'index.html'));
@@ -290,9 +311,8 @@ export async function stopLivepraiseServer(): Promise<void> {
 }
 
 const isDirectRun =
-  process.argv[1] &&
-  (process.argv[1].endsWith('server/index.js') ||
-    process.argv[1].endsWith('server/index.ts'));
+  process.argv[1] != null &&
+  path.resolve(process.argv[1]) === path.join(moduleDir, 'index.js');
 
 if (isDirectRun) {
   startLivepraiseServer()

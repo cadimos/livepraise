@@ -1,0 +1,41 @@
+# CI leve: smokes em PR (sem gerar instaladores)
+name: CI
+
+on:
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  smoke:
+    name: smoke tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run test:video-pipeline
+      - run: npm run smoke:bootstrap
+      - run: npm run smoke:fase8
+
+  resolve-version-dry:
+    name: validar incremento de versão
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Simular próxima versão (sem alterar ficheiros)
+        run: npm run resolve:version:dry
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

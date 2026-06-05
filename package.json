@@ -11,13 +11,18 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.5.0"
+    "node": ">=22.12.0"
+  },
+  "overrides": {
+    "tailwindcss": {
+      "jiti": "1.21.7"
+    }
   },
   "scripts": {
-    "dev": "npm run build && ELECTRON_DISABLE_SANDBOX=1 electron . --no-sandbox",
+    "dev": "npm run build && node scripts/dev-electron.mjs",
     "start": "npm run dev",
     "build:electron": "tsc -p tsconfig.electron.json",
-    "build:server": "node scripts/check-node-version.mjs && node scripts/install-yt-dlp.mjs && tsc -p tsconfig.server.json && node -e \"const fs=require('fs');const p='dist/server/db/migrations';fs.mkdirSync(p,{recursive:true});for(const f of fs.readdirSync('server/db/migrations')) fs.copyFileSync('server/db/migrations/'+f,p+'/'+f);\"",
+    "build:server": "node scripts/check-node-version.mjs && node scripts/install-yt-dlp.mjs && node scripts/install-ffmpeg.mjs && tsc -p tsconfig.server.json && node -e \"const fs=require('fs');const p='dist/server/db/migrations';fs.mkdirSync(p,{recursive:true});for(const f of fs.readdirSync('server/db/migrations')) fs.copyFileSync('server/db/migrations/'+f,p+'/'+f);\"",
     "build:projector": "tsc -p tsconfig.projector.json",
     "build:stage-return": "tsc -p tsconfig.stage-return.json",
     "build:operator": "vite build --config vite.config.ts",
@@ -43,6 +48,7 @@
     "smoke:cad311": "npm run build:server && node scripts/smoke-cad311.mjs",
     "smoke:cad313": "npm run build:server && node scripts/smoke-cad313.mjs",
     "smoke:cad314": "npm run build:server && node scripts/smoke-cad314.mjs",
+    "smoke:legacy-upgrade": "npm run build:server && node scripts/smoke-legacy-upgrade.mjs",
     "test:cad228": "npm run build:server && node tests/security/remote-fetch.test.mjs && node tests/security/remote-fetch-content-type.test.mjs && node tests/error-log/redact-url.test.mjs",
     "verify:cad194-dev": "node scripts/verify-cad194-dev.mjs",
     "test:video-pipeline": "npm run build:server && node scripts/smoke-car40.mjs",
@@ -51,17 +57,19 @@
     "smoke:release": "npm run smoke:bootstrap && npm run test:video-pipeline && npm run smoke:fase8",
     "verify:openapi": "node scripts/verify-openapi-coverage.mjs",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit && tsc -p tsconfig.server.json --noEmit",
-    "dist:win": "npm run build && electron-builder --win --x64",
-    "dist:linux": "npm run build && electron-builder --linux AppImage deb rpm pacman --x64",
+    "resolve:version": "node scripts/resolve-release-version.mjs",
+    "resolve:version:dry": "node scripts/resolve-release-version.mjs --dry-run",
+    "dist:win": "npm run build && node scripts/dist-win.mjs",
+    "dist:linux": "npm run build && node scripts/dist-linux.mjs",
     "dist:linux-appimage": "npm run build && electron-builder --linux AppImage --x64",
     "dist:linux-deb": "npm run build && electron-builder --linux deb --x64",
     "dist:linux-rpm": "npm run build && electron-builder --linux rpm --x64",
     "dist:linux-pacman": "npm run build && electron-builder --linux pacman --x64",
     "dist:flatpak": "npm run build && electron-builder --linux flatpak --x64",
     "dist:snap": "npm run build && electron-builder --linux snap --x64",
-    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:mac": "npm run build && node scripts/dist-mac.mjs",
     "dist:all": "node scripts/dist-all.mjs",
-    "postinstall": "node scripts/install-yt-dlp.mjs"
+    "postinstall": "node scripts/install-yt-dlp.mjs && node scripts/install-ffmpeg.mjs && node scripts/install-electron.mjs"
   },
   "dependencies": {
     "@lucide/vue": "^1.16.0",
@@ -92,6 +100,7 @@
     "electron-builder": "^26.0.12",
     "jsdom": "^26.1.0",
     "postcss": "^8.5.4",
+    "rcedit": "^5.0.2",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",

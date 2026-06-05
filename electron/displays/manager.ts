@@ -2,6 +2,7 @@ import { BrowserWindow, screen, type Display } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applyChromiumUserAgent } from '../chromium-user-agent.js';
+import { resolveAppIcon } from '../app-icon.js';
 import type { DisplayAssignment, DisplaysConfig } from './types.js';
 import { loadOrCreateConfig, saveAssignments } from './config.js';
 
@@ -10,6 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export interface DisplayManagerOptions {
   serverPort: number;
   preloadPath: string;
+  appRoot: string;
   /** Fechar a janela do operador encerra todo o sistema (CAD-101). */
   onOperatorClosed?: () => void;
 }
@@ -19,9 +21,11 @@ export class DisplayManager {
   private config: DisplaysConfig;
   private shuttingDown = false;
   private hotplugAttached = false;
+  private readonly appIcon: string | undefined;
 
   constructor(private readonly options: DisplayManagerOptions) {
     this.config = loadOrCreateConfig();
+    this.appIcon = resolveAppIcon(options.appRoot);
   }
 
   getConfig(): DisplaysConfig {
@@ -146,6 +150,7 @@ export class DisplayManager {
             ? 'Live Praise — Retorno'
             : 'Live Praise — Projetor',
       backgroundColor: '#000',
+      ...(this.appIcon ? { icon: this.appIcon } : {}),
       webPreferences: {
         preload: this.options.preloadPath,
         contextIsolation: true,

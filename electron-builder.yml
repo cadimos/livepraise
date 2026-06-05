@@ -2,6 +2,8 @@ appId: com.cadimos.livepraise
 productName: Live Praise
 copyright: Copyright © Cadimos
 npmRebuild: false
+# Sem ASAR: binários nativos (ffmpeg-static, yt-dlp) e paths de ficheiro funcionam de forma fiável no Windows.
+asar: false
 directories:
   output: release-builds
   buildResources: resources
@@ -12,13 +14,13 @@ files:
   - shared/**/*
   - themes/**/*
   - resources/fonts/**/*
+  - resources/icon/**/*
   - locales/**/*
   - openapi.yaml
   - electron/splash/**/*
   - vendor/yt-dlp/**/*
+  - node_modules/ffmpeg-static/**/*
   - package.json
-asarUnpack:
-  - vendor/yt-dlp/**
 extraResources:
   - from: install/
     to: install/
@@ -29,14 +31,19 @@ publish:
     owner: cadimos
     repo: livepraise
     releaseType: release
+nsis:
+  installerIcon: resources/icon/livepraise.ico
+  uninstallerIcon: resources/icon/livepraise.ico
+  installerHeaderIcon: resources/icon/livepraise.ico
 win:
   target:
     - target: nsis
       arch:
         - x64
   icon: resources/icon/livepraise.ico
-  # rcedit via wine32 falha em runners Linux sem i386; NSIS não depende disso.
+  # Evita winCodeSign (symlinks no Windows sem privilégio de admin). Ícone do .exe via afterPack.
   signAndEditExecutable: false
+afterPack: scripts/electron-after-pack.mjs
 linux:
   target:
     - target: AppImage

@@ -1,0 +1,266 @@
+# Release multi-plataforma em draft: build → instaladores no GitHub → publicação manual
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_sync_version:
+        description: 'Não commitar package.json com a versão do draft'
+        type: boolean
+        default: false
+  push:
+    branches: [master, main]
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  resolve-version:
+    name: Resolver versão
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      tag: ${{ steps.resolve.outputs.tag }}
+      mode: ${{ steps.resolve.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Calcular versão (nova ou reutilizar draft)
+        id: resolve
+        run: node scripts/resolve-release-version.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resumo
+        run: |
+          echo "Modo: ${{ steps.resolve.outputs.mode }}"
+          echo "Versão do draft: ${{ steps.resolve.outputs.version }}"
+          echo "Tag: ${{ steps.resolve.outputs.tag }}"
+
+      - name: Guardar package.json resolvido
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-meta
+          path: |
+            package.json
+            package-lock.json
+          retention-days: 1
+
+  prepare-release:
+    name: Preparar draft no GitHub
+    needs: resolve-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Criar ou preparar draft para rebuild
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${{ needs.resolve-version.outputs.tag }}"
+          version="${{ needs.resolve-version.outputs.version }}"
+          mode="${{ needs.resolve-version.outputs.mode }}"
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            is_draft=$(gh release view "$tag" --json isDraft -q .isDraft)
+            if [ "$is_draft" != "true" ]; then
+              echo "A release $tag já está publicada. Publique um draft pendente ou aguarde o próximo incremento."
+              exit 1
+            fi
+            echo "Reutilizando draft $tag (modo: $mode) — removendo artefactos antigos."
+            mapfile -t assets < <(gh release view "$tag" --json assets -q '.assets[].name')
+            for asset in "${assets[@]}"; do
+              [ -n "$asset" ] && gh release delete-asset "$tag" "$asset" -y
+            done
+          else
+            gh release create "$tag" \
+              --draft \
+              --title "Live Praise $version" \
+              --notes "Draft gerado pelo CI. Edite as notas e publique manualmente quando os instaladores estiverem validados."
+          fi
+
+  build-windows:
+    name: Windows (NSIS)
+    needs: [resolve-version, prepare-release]
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-meta
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run test:video-pipeline
+      - run: npm run smoke:bootstrap
+
+      - name: Build e anexar ao draft (Windows)
+        run: npm run dist:win
+        env:
+          LIVEPRAISE_PUBLISH: '1'
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verificar artefactos Windows
+        shell: pwsh
+        run: |
+          $version = '${{ needs.resolve-version.outputs.version }}'
+          $yml = Get-ChildItem release-builds/latest*.yml -ErrorAction SilentlyContinue
+          if (-not $yml) { throw 'missing latest*.yml (electron-updater metadata)' }
+          $exe = Get-ChildItem "release-builds/Live Praise Setup $version.exe" -ErrorAction SilentlyContinue
+          if (-not $exe) {
+            $exe = Get-ChildItem 'release-builds/Live Praise Setup *.exe' | Select-Object -First 1
+          }
+          if (-not $exe) { throw 'missing NSIS installer' }
+          if ($exe.Length -lt 50MB) { throw "NSIS too small: $($exe.Length) bytes" }
+          $ff = 'release-builds/win-unpacked/resources/app/node_modules/ffmpeg-static/ffmpeg.exe'
+          if (-not (Test-Path $ff)) { throw "missing $ff" }
+          Get-ChildItem release-builds/*.exe, release-builds/latest*.yml | Format-Table Name, Length
+
+  build-linux:
+    name: Linux (AppImage/deb/rpm/pacman)
+    needs: [resolve-version, prepare-release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-meta
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar rpm
+        run: sudo apt-get update && sudo apt-get install -y rpm
+
+      - run: npm ci
+      - run: npm run test:video-pipeline
+      - run: npm run smoke:bootstrap
+      - run: npm run smoke:fase8
+
+      - name: Build e anexar ao draft (Linux)
+        run: npm run dist:linux
+        env:
+          LIVEPRAISE_PUBLISH: '1'
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CI: true
+
+      - name: Verificar artefactos Linux
+        run: |
+          set -euo pipefail
+          ls -la release-builds/
+          test -n "$(find release-builds -maxdepth 1 -name '*.AppImage' -print -quit)"
+          test -n "$(find release-builds -maxdepth 1 -name '*.deb' -print -quit)"
+          test -n "$(find release-builds -maxdepth 1 -name '*.rpm' -print -quit)"
+          test -n "$(find release-builds -maxdepth 1 -name '*.pacman' -print -quit)" \
+            || test -n "$(find release-builds -maxdepth 1 -name '*.pkg.tar.*' -print -quit)"
+          ff='release-builds/linux-unpacked/resources/app/node_modules/ffmpeg-static/ffmpeg'
+          if [ ! -f "$ff" ]; then
+            echo "missing $ff"
+            exit 1
+          fi
+
+  build-macos:
+    name: macOS (DMG x64 + arm64)
+    needs: [resolve-version, prepare-release]
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-meta
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run test:video-pipeline
+      - run: npm run smoke:bootstrap
+      - run: npm run smoke:fase8
+
+      - name: Build e anexar ao draft (macOS)
+        run: npm run dist:mac
+        env:
+          LIVEPRAISE_PUBLISH: '1'
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CI: true
+
+      - name: Verificar artefactos macOS
+        run: |
+          set -euo pipefail
+          ls -la release-builds/
+          test -n "$(find release-builds -maxdepth 1 -name '*.dmg' -print -quit)"
+
+  release-summary:
+    name: Resumo do draft
+    needs: [resolve-version, build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Instruções de publicação
+        run: |
+          {
+            echo "## Draft pronto para validação"
+            echo ""
+            echo "- **Versão:** \`${{ needs.resolve-version.outputs.version }}\`"
+            echo "- **Tag:** \`${{ needs.resolve-version.outputs.tag }}\`"
+            echo "- **Modo:** \`${{ needs.resolve-version.outputs.mode }}\`"
+            echo ""
+            echo "### Próximos passos"
+            echo "1. Baixe e teste os instaladores no [draft da release](https://github.com/${{ github.repository }}/releases)."
+            echo "2. Se houver problema, corrija o código e faça merge — o CI **rebuilda a mesma versão** no draft."
+            echo "3. Edite as notas da release (changelog) no GitHub."
+            echo "4. Clique em **Publish release** quando estiver estável."
+            echo "5. O próximo push gerará automaticamente a versão seguinte (ex.: \`1.0.2\`)."
+            echo ""
+            echo "> O auto-update só entrega esta versão aos utilizadores **depois** de publicar o draft."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  sync-version:
+    name: Sincronizar versão no repositório
+    needs: [resolve-version, release-summary]
+    if: github.event_name != 'workflow_dispatch' || inputs.skip_sync_version != true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-meta
+
+      - name: Commit versão do draft
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git diff --staged --quiet && echo "Sem alterações de versão." && exit 0
+          git commit -m "chore(release): v${{ needs.resolve-version.outputs.version }} [skip ci]"
+          git push

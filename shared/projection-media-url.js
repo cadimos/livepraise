@@ -9,7 +9,10 @@ export function resolveProjectionMediaUrl(valor) {
   } catch {
     path = String(valor ?? '').trim();
   }
+  path = path.replaceAll('\\', '/');
   if (!path) return '';
+
+  if (path.startsWith('data:')) return path;
 
   const origin =
     typeof location !== 'undefined' && location.origin ? location.origin : '';
