@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { getDatabasePath, getLivepraiseHome } from '../config/paths.js';
 import { Database } from './sqlite.js';
+import { getOpenMainDb } from './connection.js';
 
 function quarantinePath(filePath: string): string {
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -65,8 +66,15 @@ function checkpointWal(dbPath: string): void {
   const walPath = `${dbPath}-wal`;
   if (!fs.existsSync(walPath)) return;
   let db: Database | null = null;
+  let ownsConnection = false;
   try {
-    db = new Database(dbPath);
+    const open = getOpenMainDb();
+    if (open && getDatabasePath() === dbPath) {
+      db = open;
+    } else {
+      db = new Database(dbPath);
+      ownsConnection = true;
+    }
     db.exec('PRAGMA wal_checkpoint(TRUNCATE)');
   } catch (err) {
     console.warn(
@@ -75,7 +83,7 @@ function checkpointWal(dbPath: string): void {
     );
     quarantineSidecars(dbPath);
   } finally {
-    db?.close();
+    if (ownsConnection) db?.close();
   }
 }
 

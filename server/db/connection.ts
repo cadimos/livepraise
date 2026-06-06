@@ -27,6 +27,10 @@ export function resetMainDb(): void {
   }
 }
 
+export function getOpenMainDb(): Database | null {
+  return mainDb;
+}
+
 export function getMainDb(): Database {
   if (!mainDb) {
     mainDb = new Database(getDatabasePath());
