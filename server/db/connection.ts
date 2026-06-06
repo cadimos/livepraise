@@ -7,11 +7,30 @@ export type DbRow = Record<string, unknown>;
 
 let mainDb: Database | null = null;
 
+export function configureDatabasePragmas(db: Database): void {
+  try {
+    db.pragma('journal_mode = WAL');
+  } catch (err) {
+    console.warn(
+      '[livepraise-db] WAL indisponível; a usar journal_mode DELETE:',
+      err instanceof Error ? err.message : err,
+    );
+    db.pragma('journal_mode = DELETE');
+  }
+  db.pragma('foreign_keys = ON');
+}
+
+export function resetMainDb(): void {
+  if (mainDb) {
+    mainDb.close();
+    mainDb = null;
+  }
+}
+
 export function getMainDb(): Database {
   if (!mainDb) {
     mainDb = new Database(getDatabasePath());
-    mainDb.pragma('journal_mode = WAL');
-    mainDb.pragma('foreign_keys = ON');
+    configureDatabasePragmas(mainDb);
   }
   return mainDb;
 }
@@ -23,10 +42,7 @@ export function openDbAt(filePath: string): Database {
 }
 
 export function closeMainDb(): void {
-  if (mainDb) {
-    mainDb.close();
-    mainDb = null;
-  }
+  resetMainDb();
 }
 
 export function dbAll<T extends DbRow = DbRow>(

@@ -48,6 +48,7 @@
     "smoke:cad311": "npm run build:server && node scripts/smoke-cad311.mjs",
     "smoke:cad313": "npm run build:server && node scripts/smoke-cad313.mjs",
     "smoke:cad314": "npm run build:server && node scripts/smoke-cad314.mjs",
+    "smoke:legacy-upgrade": "npm run build:server && node scripts/smoke-legacy-upgrade.mjs",
     "test:cad228": "npm run build:server && node tests/security/remote-fetch.test.mjs && node tests/security/remote-fetch-content-type.test.mjs && node tests/error-log/redact-url.test.mjs",
     "verify:cad194-dev": "node scripts/verify-cad194-dev.mjs",
     "test:video-pipeline": "npm run build:server && node scripts/smoke-car40.mjs",

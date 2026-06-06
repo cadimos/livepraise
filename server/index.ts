@@ -8,9 +8,13 @@ import { ensureDefaultAdmin } from '../core/auth/users.js';
 import { ensureLivepraiseDataDir } from './bootstrap.js';
 import { syncBundledFontsToHome } from '../core/fonts/sync.js';
 import { syncBundledThemesToHome } from '../core/themes/sync.js';
-import { DEFAULT_PORT, getLivepraiseHome } from './config/paths.js';
+import { DEFAULT_PORT, getDatabasePath, getLivepraiseHome } from './config/paths.js';
 import { closeMainDb, getMainDb } from './db/connection.js';
-import { runMigrations } from './db/migrate.js';
+import {
+  databaseWasQuarantined,
+  prepareLegacyDatabaseFile,
+} from './db/legacy-upgrade.js';
+import { bootstrapEmptyDatabase, runMigrations } from './db/migrate.js';
 import { createBackgroundRouter, createBibleRouter } from './routes/bible.js';
 import { createDisplayRouter } from './routes/display.js';
 import { createDisplaysConfigRouter } from './routes/displays-config.js';
@@ -52,6 +56,10 @@ let activeServer: LivepraiseServer | null = null;
 
 export async function prepareDatabase(): Promise<number> {
   await ensureLivepraiseDataDir();
+  prepareLegacyDatabaseFile();
+  if (databaseWasQuarantined()) {
+    bootstrapEmptyDatabase(getDatabasePath());
+  }
   await syncBundledThemesToHome();
   await syncBundledFontsToHome();
   const applied = runMigrations();

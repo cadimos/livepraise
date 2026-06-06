@@ -204,11 +204,14 @@ Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md):
 
 ### Migração a partir de v0.0.8
 
-1. Copiar `~/livepraise/` (imagens, vídeos, `dsw.bd`, temas) — schema SQLite compatível.
-2. Primeiro arranque: utilizador `admin` bootstrap com password na consola.
-3. Reconfigurar monitores em Configurações → Ecrãs.
-4. Actualizar clientes browser/remotos para novas rotas REST e WebSocket (ver [`openapi.yaml`](openapi.yaml)).
-5. Validar instalador com `npm run smoke:release` antes de publicar.
+1. **Encerre** o Live Praise antigo antes de copiar ficheiros.
+2. Copiar `~/livepraise/` (imagens, vídeos, `dsw.bd`, temas). Se existirem, copie também `dsw.bd-wal` e `dsw.bd-shm` (modo WAL).
+3. Primeiro arranque em 1.x: backup automático da base legada em `~/livepraise/backup/auto-upgrade/`, depois migrations incrementais (repertório preservado).
+4. Utilizador `admin` bootstrap com password na consola (se ainda não existir conta).
+5. Reconfigurar monitores em Configurações → Ecrãs.
+6. Se a base estiver corrompida, o app isola `dsw.bd.corrupt-*` e cria uma base nova; restaure um `dsw.bd` íntegro ou use Backup/Restore.
+7. Actualizar clientes browser/remotos para novas rotas REST e WebSocket (ver [`openapi.yaml`](openapi.yaml)).
+8. Validar upgrade com `npm run smoke:legacy-upgrade` e `npm run smoke:release` antes de publicar.
 
 ---
 

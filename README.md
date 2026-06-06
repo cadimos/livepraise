@@ -100,6 +100,13 @@ O `postinstall` descarrega automaticamente o binário **Electron 42**, **ffmpeg*
 
 O Electron em `node_modules/electron/dist` é **por SO**. Após clonar ou copiar o projeto de outra máquina, execute `npm install` de novo para obter o binário correcto.
 
+**Upgrade de v0.0.8 → 1.x (dados de utilizador):**
+
+1. Feche o Live Praise antigo antes de copiar ficheiros.
+2. Copie `~/livepraise/` incluindo `dsw.bd` e, se existirem, `dsw.bd-wal` / `dsw.bd-shm`.
+3. No primeiro arranque de 1.x: backup automático em `~/livepraise/backup/auto-upgrade/` e migrations incrementais.
+4. Base corrompida: o app isola `dsw.bd.corrupt-*` e cria uma base nova — restaure um `dsw.bd` íntegro ou use Backup/Restore.
+
 **Empacotamento opcional (maintainers):**
 
 | Formato | Extra no SO de build |
@@ -260,23 +267,38 @@ Builds multi-plataforma via [electron-builder](https://www.electron.build/) (`el
 
 ### Dependências de build no Linux (Ubuntu/Debian)
 
-O `npm run dist:linux` gera **AppImage, `.deb`, `.rpm` e `.pacman`** na mesma execução. O [electron-builder](https://www.electron.build/) usa `fpm`, que para **RPM** exige o executável `rpmbuild` no sistema — **não vem instalado por defeito** no Ubuntu/Debian.
+O `npm run dist:linux` gera **AppImage, `.deb`, `.rpm` e `.pacman`** na mesma execução. O [electron-builder](https://www.electron.build/) usa `fpm`, que no Ubuntu/Debian **não traz** todas as ferramentas nativas — é preciso instalá-las no host de build:
 
 | Pacote alvo | Ferramenta no host de build | Instalação (Ubuntu/Debian) |
 |-------------|----------------------------|----------------------------|
 | `.rpm` | `rpmbuild` | `sudo apt-get install rpm` |
-| `.deb` / AppImage / `.pacman` | `fpm` (cache do electron-builder) | Normalmente sem pacotes extra |
+| `.pacman` | `bsdtar` | `sudo apt-get install libarchive-tools` |
+| `.deb` / AppImage | `fpm` (cache do electron-builder) | Normalmente sem pacotes extra |
 | Snap | `snapcraft` | `sudo snap install snapcraft --classic` |
 | Flatpak | `flatpak-builder` | `sudo apt-get install flatpak-builder` |
 
-Se o build falhar com `Need executable 'rpmbuild'`, instale `rpm` e volte a correr o comando. Alternativa: gerar só os formatos que precisa, sem RPM:
+**Instalação recomendada** antes de `npm run dist:linux` no Ubuntu/Debian:
+
+```bash
+sudo apt-get install -y rpm libarchive-tools
+which rpmbuild bsdtar   # ambos devem existir
+```
+
+Erros típicos:
+
+| Mensagem | Solução |
+|----------|---------|
+| `Need executable 'rpmbuild'` | `sudo apt-get install rpm` |
+| `bsdtar -czf .MTREE` / exit code **127** | `sudo apt-get install libarchive-tools` |
+
+Alternativa: gerar só os formatos que precisa:
 
 ```bash
 npm run build
 npm run dist:linux-deb          # só .deb
 npm run dist:linux-appimage     # só AppImage
-# ou, após instalar rpm:
-npm run dist:linux-rpm          # só .rpm
+npm run dist:linux-rpm          # só .rpm (requer rpm)
+npm run dist:linux-pacman       # só .pacman (requer libarchive-tools)
 ```
 
 Saída em `release-builds/`. Ícones em `resources/icon/`.

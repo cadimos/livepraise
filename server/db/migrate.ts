@@ -2,7 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Database } from './connection.js';
-import { getMainDb } from './connection.js';
+import { configureDatabasePragmas, getMainDb, resetMainDb } from './connection.js';
+import { Database as SqliteDatabase } from './sqlite.js';
+import {
+  recordSkippedMigration,
+  shouldSkipMigration,
+} from './migration-skip.js';
 
 import { getAppRoot } from '../config/paths.js';
 
@@ -57,9 +62,7 @@ function getAppliedVersions(db: Database): Set<number> {
   return new Set(rows.map((r) => r.version));
 }
 
-/** Aplica migrations pendentes (CA-R04). */
-export function runMigrations(): number {
-  const db = getMainDb();
+function applyPendingMigrations(db: Database): number {
   const applied = getAppliedVersions(db);
   const migrations = loadMigrations();
   let count = 0;
@@ -67,14 +70,50 @@ export function runMigrations(): number {
   for (const migration of migrations) {
     if (applied.has(migration.version)) continue;
 
-    db.exec(migration.sql);
-    db.prepare(
-      'INSERT INTO schema_migrations (version, name) VALUES (?, ?)',
-    ).run(migration.version, migration.name);
-    count += 1;
+    if (shouldSkipMigration(db, migration.version)) {
+      recordSkippedMigration(db, migration.version, migration.name);
+      count += 1;
+      continue;
+    }
+
+    db.exec('BEGIN IMMEDIATE');
+    try {
+      db.exec(migration.sql);
+      db.prepare(
+        'INSERT INTO schema_migrations (version, name) VALUES (?, ?)',
+      ).run(migration.version, migration.name);
+      db.exec('COMMIT');
+      count += 1;
+    } catch (err) {
+      try {
+        db.exec('ROLLBACK');
+      } catch {
+        // ignore rollback failure on corrupt state
+      }
+      throw err;
+    }
   }
 
   return count;
+}
+
+/** Aplica migrations pendentes (CA-R04). */
+export function runMigrations(): number {
+  return applyPendingMigrations(getMainDb());
+}
+
+/** Cria `dsw.bd` novo (após quarentena ou install sem payload SQL). */
+export function bootstrapEmptyDatabase(dbPath: string): number {
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  resetMainDb();
+  const db = new SqliteDatabase(dbPath);
+  try {
+    configureDatabasePragmas(db);
+    return applyPendingMigrations(db);
+  } finally {
+    db.close();
+    resetMainDb();
+  }
 }
 
 /** Maior versão de migration embarcada na app (validação restore CAD-238). */

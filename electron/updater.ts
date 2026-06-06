@@ -108,5 +108,10 @@ export async function setupAutoUpdater(): Promise<void> {
     return { ok: true };
   });
 
-  void autoUpdater.checkForUpdatesAndNotify();
+  void autoUpdater.checkForUpdatesAndNotify().catch((err: unknown) => {
+    const message =
+      err instanceof Error ? err.message : String(err ?? 'erro desconhecido');
+    console.warn('[livepraise-updater] Verificação de atualização falhou:', message);
+    broadcast({ kind: 'error', message, fallback: true });
+  });
 }
