@@ -163,8 +163,8 @@ jobs:
           node-version: '22'
           cache: npm
 
-      - name: Instalar rpm
-        run: sudo apt-get update && sudo apt-get install -y rpm
+      - name: Instalar ferramentas de empacotamento (rpm + pacman)
+        run: sudo apt-get update && sudo apt-get install -y rpm libarchive-tools
 
       - run: npm ci
       - run: npm run test:video-pipeline
