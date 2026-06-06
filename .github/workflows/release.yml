@@ -169,7 +169,9 @@ jobs:
       - run: npm ci
       - run: npm run test:video-pipeline
       - run: npm run smoke:bootstrap
-      - run: npm run smoke:fase8
+      - name: Release smoke (socket + bootstrap limpo)
+        run: npm run smoke:fase8
+        timeout-minutes: 10
 
       - name: Build e anexar ao draft (Linux)
         run: npm run dist:linux
@@ -216,7 +218,9 @@ jobs:
       - run: npm ci
       - run: npm run test:video-pipeline
       - run: npm run smoke:bootstrap
-      - run: npm run smoke:fase8
+      - name: Release smoke (socket + bootstrap limpo)
+        run: npm run smoke:fase8
+        timeout-minutes: 10
 
       - name: Build e anexar ao draft (macOS)
         run: npm run dist:mac

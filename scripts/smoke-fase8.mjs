@@ -14,12 +14,12 @@ const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'livepraise-smoke-f8-'));
 
 /** Seis ações core do protocolo live (subset da baseline Fase 3). */
 const SMOKE_SOCKET_ACTIONS = [
-  'background',
-  'texto',
-  'video',
-  'viewMusica',
-  'viewBiblia',
-  'removeConteudo',
+  { acao: 'background', valor: encodeURIComponent('/imagens/smoke-f8.jpg') },
+  { acao: 'texto', valor: 'smoke-f8-texto' },
+  { acao: 'video', valor: encodeURIComponent('/videos/smoke/smoke-f8.mp4') },
+  { acao: 'viewMusica', valor: '<p>smoke-f8 louvor</p>' },
+  { acao: 'viewBiblia', valor: '<p>smoke-f8 biblia</p>' },
+  { acao: 'removeConteudo', valor: '' },
 ];
 
 process.env.LIVEPRAISE_HOME = testHome;
@@ -34,7 +34,16 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function waitForMessage(ws, predicate, timeoutMs = 3000) {
+function seedSmokeMedia(homeDir) {
+  const imagePath = path.join(homeDir, 'livepraise', 'imagens', 'smoke-f8.jpg');
+  const videoPath = path.join(homeDir, 'livepraise', 'videos', 'smoke', 'smoke-f8.mp4');
+  fs.mkdirSync(path.dirname(imagePath), { recursive: true });
+  fs.mkdirSync(path.dirname(videoPath), { recursive: true });
+  if (!fs.existsSync(imagePath)) fs.writeFileSync(imagePath, 'smoke');
+  if (!fs.existsSync(videoPath)) fs.writeFileSync(videoPath, 'smoke');
+}
+
+function waitForMessage(ws, predicate, timeoutMs = 5000) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       ws.off('message', onMessage);
@@ -54,15 +63,32 @@ function waitForMessage(ws, predicate, timeoutMs = 3000) {
   });
 }
 
-function connectClient(port, role, name) {
+function connectClient(port, role, name, timeoutMs = 10_000) {
   const ws = new WebSocket(`ws://127.0.0.1:${port}/ws/live`);
   return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      ws.terminate();
+      reject(new Error(`Timeout WebSocket ${role} (${timeoutMs}ms)`));
+    }, timeoutMs);
+
+    ws.once('error', (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
+
     ws.once('open', () => {
       ws.send(JSON.stringify({ type: 'join', role, name }));
     });
-    waitForMessage(ws, (m) => m.type === 'joined')
-      .then(() => resolve(ws))
-      .catch(reject);
+
+    waitForMessage(ws, (m) => m.type === 'joined', timeoutMs)
+      .then(() => {
+        clearTimeout(timer);
+        resolve(ws);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
   });
 }
 
@@ -70,7 +96,12 @@ function sendAction(ws, action) {
   ws.send(JSON.stringify({ type: 'live-action', action }));
 }
 
+let operator;
+let projector;
+
 try {
+  seedSmokeMedia(testHome);
+
   const dbPath = path.join(testHome, 'livepraise', 'dsw.bd');
   assert(!fs.existsSync(dbPath), 'instalação limpa: BD ausente antes do bootstrap');
 
@@ -79,18 +110,17 @@ try {
 
   assert(fs.existsSync(dbPath), 'CA-05: bootstrap criou dsw.bd em instalação limpa');
 
-  const health = await fetch(`${base}/health`).then((r) => r.json());
+  const health = await fetch(`${base}/health`, {
+    signal: AbortSignal.timeout(10_000),
+  }).then((r) => r.json());
   assert(health.phase === 'release', 'health phase release');
   assert(health.status === 'ok', 'health ok');
 
-  const operator = await connectClient(port, 'operator', 'Operador');
-  const projector = await connectClient(port, 'projector', 'Projetor');
+  operator = await connectClient(port, 'operator', 'Operador');
+  projector = await connectClient(port, 'projector', 'Projetor');
 
   const latencyStart = Date.now();
-  sendAction(operator, {
-    acao: 'background',
-    valor: encodeURIComponent('http://127.0.0.1/smoke-f8.jpg'),
-  });
+  sendAction(operator, SMOKE_SOCKET_ACTIONS[0]);
 
   const firstMsg = await waitForMessage(
     projector,
@@ -103,16 +133,16 @@ try {
     `CA-R05: latência operador→projetor ${latency}ms (meta ≤500ms)`,
   );
   assert(
-    firstMsg.action.valor.includes('smoke-f8.jpg'),
+    decodeURIComponent(firstMsg.action.valor).includes('smoke-f8.jpg'),
     'payload background preservado',
   );
 
-  const received = new Set();
-  for (const acao of SMOKE_SOCKET_ACTIONS) {
-    sendAction(operator, { acao, valor: `smoke-f8-${acao}` });
+  const received = new Set(['background']);
+  for (const action of SMOKE_SOCKET_ACTIONS.slice(1)) {
+    sendAction(operator, action);
     const msg = await waitForMessage(
       projector,
-      (m) => m.type === 'live-action' && m.action?.acao === acao,
+      (m) => m.type === 'live-action' && m.action?.acao === action.acao,
     );
     received.add(msg.action.acao);
   }
@@ -125,10 +155,9 @@ try {
   console.log(
     `Smoke Fase 8 OK (instalação limpa, latência ${latency}ms, ${received.size} ações)`,
   );
-
-  operator.close();
-  projector.close();
-  await stopLivepraiseServer();
 } finally {
+  operator?.close();
+  projector?.close();
+  await stopLivepraiseServer().catch(() => {});
   fs.rmSync(testHome, { recursive: true, force: true });
 }

@@ -75,8 +75,6 @@ export async function prepareDatabase(): Promise<number> {
 export async function createLivepraiseApp(
   liveHub?: LiveWebSocketHub,
 ): Promise<Express> {
-  await prepareDatabase();
-
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', 1);
