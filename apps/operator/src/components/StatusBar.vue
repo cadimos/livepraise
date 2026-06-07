@@ -12,7 +12,7 @@ import ExternalDeviceStatusMenu from './ExternalDeviceStatusMenu.vue';
 
 defineEmits<{ openDisplays: [] }>();
 
-const APP_VERSION = '1.0.0-alpha.1';
+const APP_VERSION = '1.0.0-alpha.2';
 
 const { t } = useI18n();
 const { prefs } = usePreferences();

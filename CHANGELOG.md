@@ -4,6 +4,82 @@ Todas as alterações relevantes do Live Praise são documentadas neste ficheiro
 
 O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.0.0-alpha.2] — 2026-06-07
+
+Segunda release alpha — estabilização pós-lançamento inicial: migração legada v0.0.8, correcções no instalador Windows, refactor do servidor e melhorias no pipeline de release/CI.
+
+> **Rascunho:** secções abaixo reflectem o trabalho desde `v1.0.0-alpha.1`. Itens adicionais desta release serão acrescentados conforme instruções de produto.
+
+### Resumo
+
+| | 1.0.0-alpha.1 | 1.0.0-alpha.2 |
+|---|---|---|
+| **Foco** | Primeira alpha (reescrita 1.x) | Estabilização, Windows, migração legada, CI/release |
+| **Migração v0.0.8** | Parcial | Fluxo dedicado `legacy-upgrade` + smoke |
+| **Instalador Windows** | Problemas conhecidos | Correcções de instalação e modo dev |
+| **electron-builder** | 26.x anterior | 26.8.1 |
+| **CI Linux packaging** | AppImage/deb base | rpm + pacman no workflow de release |
+
+---
+
+### Adicionado
+
+- Caminho de **upgrade legado v0.0.8 → 1.x** (`server/db/legacy-upgrade.ts`): detecção de base sem `schema_migrations`, backup automático, quarentena de BD corrompida.
+- Smoke **`npm run smoke:legacy-upgrade`** para validar migração antes de release.
+- Script **`scripts/smoke-win-installer.mjs`** — validação do instalador NSIS no Windows.
+- Script **`scripts/test-electron-server-boot.mjs`** — arranque servidor dentro do Electron empacotado.
+- Serviço **`server/services/ffmpegBinary.ts`** — resolução centralizada do binário ffmpeg.
+- Helper **`server/db/migration-skip.ts`** — casos limite em migrations incrementais.
+- Workflow de release: instalação de ferramentas **rpm** e **pacman** no job Linux.
+- Pipeline **release unificado** (`release.yml`): draft único no GitHub, builds Win/Linux/macOS em paralelo — **validado manualmente** (instaladores gerados e executados com sucesso).
+
+### Alterado
+
+- Refactor de **`server/index.ts`** e **`server/bootstrap.ts`** (arranque modular, gestão de BD).
+- Melhorias na **ligação WebSocket** (`ws`) e gestão de sessões de base de dados.
+- Refactor do **pipeline de vídeo** (`server/services/videoPipeline.ts`).
+- Ajustes em **`server/config/paths.ts`** (paths do home dir e binários).
+- Formatação e legibilidade dos **scripts** (`scripts/*.mjs`).
+- **README:** requisitos mínimos e instruções Windows/Linux actualizadas.
+- **electron-builder** actualizado para **26.8.1**.
+
+### Corrigido
+
+- Instalação no **Windows** (NSIS) e uso incorrecto do modo dev como migração.
+- Migração **v0.0.8 → 1.0.0-alpha.1** (repertório e sidecars WAL/SHM).
+- Action de deploy Windows e resolução de versão no workflow de release.
+- Vulnerabilidade na dependência **`tmp`**.
+- `.gitignore` e workflows GHA (artefactos e paths de build).
+
+### Removido
+
+- Workflow **CodeQL** (desactivado nesta linha de release).
+
+### Planeado (escopo confirmado alpha.2)
+
+- **Auditoria e retenção de dados** — tabela `audit_logs`, registo de acções sensíveis (`auth`, `users`, `devices`), jobs de retenção (contas 30 d, logs 90 d, dispositivos inactivos 180 d) além de `purgeExpiredSessions`, smoke dedicado. Ver secção 1 de [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md).
+- **Locales adicionais** — primeiro idioma `en-US` com paridade de chaves a `pt-BR`; **`pt-BR` permanece idioma padrão** (fallback, instalação nova, API `default`). Ver secção 4.
+- **Flash textfill ao trocar verso** — corrigir piscar da projeção (texto pequeno visível antes do tamanho final) em louvor/Bíblia. Ver secção 14.
+- **Watcher de vídeos** — detectar ficheiros copiados/movidos para `~/livepraise/videos/{categoria}/` com painel Vídeos aberto; pipeline ffmpeg + notificação WS ao operador. Ver secção 5.
+- **Versão única no build** — script `bump-version` propagando `package.json` para preload, UI e OpenAPI. Ver secção 9.
+- **Import/export repertório** — export/import JSON de louvores no painel Músicas (distinto do backup ZIP). Ver secção 11.
+
+### Fora do escopo alpha.2
+
+- **Vitest + Playwright** (secção 3) — adiado para versão futura; smokes e testes Node em `tests/` mantêm-se como gate actual.
+- **Busca online de louvores** (secção 6) — Fuse.js local mantém-se; API online numa versão futura.
+- **Editor visual de temas** (secção 7) — temas bundled + sync; editor na UI numa versão futura.
+- **Telemetria opt-in** (secção 8) — log local mantém-se; envio remoto opt-in numa versão futura.
+- **Acessibilidade WCAG** (secção 12) — tema alto contraste mantém-se; auditoria sistemática numa versão futura.
+
+### Pendente (continua em [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md))
+
+Outros itens planeados para alpha.2 ou seguintes — a confirmar:
+
+<!-- Espaço reservado para itens adicionais desta release -->
+
+---
+
 ## [1.0.0-alpha.1] — 2026-05-28
 
 Primeira release alpha do **Live Praise 1.x** — reescrita completa do produto com arquitetura modular (Electron 42 + TypeScript + Vue 3). Inclui notas de migração a partir da linha **v0.0.8** (`0.0.9`).
@@ -221,4 +297,5 @@ Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md):
 - **Contribuidores da linha anterior:** Kerolen Lucena, Sabrina Santos
 - **Licença:** MIT
 
+[1.0.0-alpha.2]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.2
 [1.0.0-alpha.1]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.1
