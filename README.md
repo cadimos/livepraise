@@ -49,7 +49,8 @@ Requisitos para correr o **instalador** (NSIS, `.deb`, AppImage, DMG, etc.) — 
 | **Memória RAM** | 4 GB | 8 GB ou mais |
 | **Disco livre** | 2 GB (app + dados iniciais em `~/livepraise`) | 10 GB+ se usar muitos vídeos/imagens locais |
 | **Ecrã** | 1 monitor (só operador) | 2+ monitores (operador + projetor/retorno) |
-| **Resolução** | 1280×720 no monitor do operador | 1920×1080 ou superior |
+| **Resolução (operador)** | 1024×768 (ver [detalhe abaixo](#resolução-do-monitor-do-operador)) | 1366×768 ou 1920×1080 |
+| **Resolução (projetor)** | 800×600 (ver [detalhe abaixo](#resolução-do-monitor-do-projetor)) | 1024×768, 1280×720 ou 1920×1080 |
 | **Rede** | Opcional (uso só local) | LAN estável se usar `/remote`, ecrãs externos ou importação por URL |
 
 **Sistemas operativos suportados (builds oficiais):**
@@ -65,6 +66,55 @@ Requisitos para correr o **instalador** (NSIS, `.deb`, AppImage, DMG, etc.) — 
 - **AppImage:** `libfuse2` (Ubuntu/Debian: `sudo apt install libfuse2`).
 - **`.deb` / `.rpm` / `.pacman`:** o gestor de pacotes instala dependências GTK/NSS (ver `electron-builder.yml`).
 - **Snap / Flatpak:** `snapd` ou [Flatpak](https://flatpak.org/setup/) instalados.
+
+### Resolução do monitor do operador
+
+A interface do operador (barra de ferramentas, painéis, coluna de pré-visualização, tabs e fila da playlist) foi optimizada para portáteis com ecrãs mais baixos. A coluna de prévias ocupa **320 px** de largura fixa (`20rem`); a fila de versos usa **21% da altura** do ecrã (`21vh`).
+
+| Classificação | Resolução | Experiência |
+|---------------|-----------|-------------|
+| **Recomendada** | **1366×768** | Melhor equilíbrio em PCs antigos: painéis legíveis, barra de ferramentas numa linha na maioria dos casos |
+| Aceitável | 1280×720 | Utilizável; a barra de ferramentas pode passar a duas linhas (rótulos longos em português) |
+| Mínima funcional | 1024×768 | Possível com compromissos: painel Bíblia (3 colunas) apertado, mais scroll; manter escala de fonte em **100%** (Configurações → Aparência) |
+| Confortável | ≥ 1440×900 | Barra numa linha, listas e pré-visualizações folgadas |
+| Não recomendada | Abaixo de 1024×600 | Fila da playlist e painéis ficam demasiado comprimidos |
+
+**Distribuição vertical aproximada (ex.: 768 px de altura):**
+
+| Área | Altura |
+|------|--------|
+| Barra de ferramentas | ~32 px |
+| Painéis + pré-visualizações | ~500 px |
+| Tabs da playlist | ~28 px |
+| Fila de versos (`21vh`) | ~161 px |
+| Barra de estado | ~32 px |
+
+**Dicas em ecrãs pequenos:** escala de interface **100%** (evitar 125% em alturas abaixo de 800 px); maximizar a janela do operador; usar scroll nos painéis e na coluna de prévias quando necessário. Não há tamanho mínimo de janela imposto pelo Electron — reduzir abaixo de 1024×768 degrada a legibilidade.
+
+### Resolução do monitor do projetor
+
+A saída de projeção (`/projector`, janela Electron ou browser no monitor atribuído) adapta-se ao tamanho físico do ecrã. O tamanho da **área útil** (letras, Bíblia, imagens, vídeo) configura-se em **Configurações → Ecrã do projetor** por monitor.
+
+| Classificação | Resolução | Experiência |
+|---------------|-----------|-------------|
+| **Recomendada** | **1024×768** ou superior | Boa legibilidade para louvor e Bíblia na maioria dos perfis de tipografia |
+| Aceitável | 1280×720 (16:9) | Área útil ampla; ideal para projetores widescreen |
+| Mínima funcional | **800×600** (SVGA, 4:3) | Viável em equipamento antigo; atenção a estrofes longas (ver abaixo) |
+| Confortável | ≥ 1920×1080 | Máximo de área para textfill e fundos em alta resolução |
+| Não recomendada | Abaixo de 800×600 | Não testada; tipografia e vídeo podem ficar ilegíveis |
+
+**Presets de tamanho em 800×600:**
+
+| Preset | Área útil aproximada | Notas |
+|--------|----------------------|-------|
+| **Padrão** (`padrao`) | 800×600 (ecrã inteiro) | Opção mais simples em monitor SVGA |
+| **4:3** | 800×600 | Encaixa exactamente na largura do monitor |
+| **16:9** | 800×450 | Barras em cima/baixo; menos altura para letras |
+| **Personalizado** `800×600` | 800×600 fixos | Útil quando o monitor é maior e quer área centrada |
+
+**Louvor com muito texto:** com o auto-ajuste activo, a fonte no projetor **não desce abaixo do tamanho mínimo** do perfil (por defeito **24 px**). Em 800×600, versos muito longos podem ser cortados na zona central. Reduza o mínimo em **Configurações → Tipografia de projeção → Projetor** (ex.: 16–18 px) ou divida o verso em slides menores.
+
+**Dicas:** atribua o monitor de projeção em **Configurações → Ecrã do projetor**; use preset **4:3** ou **padrão** em projetores SVGA; imagens e vídeo escalam à área configurada. A janela do projetor no Electron ocupa sempre o monitor completo — não há tamanho mínimo imposto pelo aplicativo.
 
 **Notas de uso:**
 
