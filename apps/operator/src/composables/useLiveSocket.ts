@@ -27,6 +27,9 @@ export type LiveSocketEvent = {
   type: string;
   action?: LiveAction;
   state?: LiveState;
+  kind?: 'videos';
+  category?: string;
+  path?: string;
 };
 
 const socketEventListeners = new Set<(event: LiveSocketEvent) => void>();
@@ -114,6 +117,20 @@ function handleMessage(raw: string): void {
 
   if (message.type === 'device-presence') {
     handleDevicePresence(message as WsDevicePresenceMessage);
+  }
+
+  if (message.type === 'media-updated') {
+    const media = message as {
+      kind?: 'videos';
+      category?: string;
+      path?: string;
+    };
+    notifySocketEvent({
+      type: 'media-updated',
+      kind: media.kind,
+      category: media.category,
+      path: media.path,
+    });
   }
 }
 

@@ -29,6 +29,9 @@ import { createUsersRouter } from './routes/users.js';
 import { createRemoteRouter } from './routes/remote.js';
 import { createDevicesRouter } from './routes/devices.js';
 import { createBackupRouter, createRestoreRouter } from './routes/backup.js';
+import { createAuditRouter } from './routes/audit.js';
+import { startRetentionScheduler, stopRetentionScheduler } from './retention-scheduler.js';
+import { startVideoWatcher, stopVideoWatcher } from './services/videoWatcher.js';
 import { backupModeGuard } from './middleware/backup-mode.js';
 import { createFontsRouter } from './routes/fonts.js';
 import { createProjectionTypographyRouter } from './routes/projection-typography.js';
@@ -121,6 +124,7 @@ export async function createLivepraiseApp(
   app.use('/api/devices', createDevicesRouter());
   app.use('/api/backup', createBackupRouter());
   app.use('/api/restore', createRestoreRouter());
+  app.use('/api/audit', createAuditRouter());
 
   app.get('/api/health', (_req, res) => {
     res.json(buildHealthReport(Boolean(liveHub)));
@@ -261,10 +265,12 @@ export async function startLivepraiseServer(
 
   registerProcessErrorHandlers();
   await prepareDatabase();
+  startRetentionScheduler();
 
   const bootstrapApp = express();
   const httpServer = createServer(bootstrapApp);
   const liveHub = attachLiveWebSocket(httpServer);
+  startVideoWatcher(liveHub);
   const app = await createLivepraiseApp(liveHub);
 
   bootstrapApp.use(app);
@@ -295,6 +301,8 @@ export async function startLivepraiseServer(
 export async function stopLivepraiseServer(): Promise<void> {
   if (!activeServer) return;
 
+  stopRetentionScheduler();
+  stopVideoWatcher();
   await activeServer.liveHub.close();
 
   await new Promise<void>((resolve, reject) => {

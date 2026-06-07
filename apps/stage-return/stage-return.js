@@ -42,6 +42,7 @@ function applyAction(action) {
     switch (action.acao) {
         case 'viewMusicaRetorno':
         case 'viewBibliaRetorno':
+            content.style.visibility = 'hidden';
             content.innerHTML = action.valor;
             break;
         case 'removeConteudo':

@@ -16,8 +16,10 @@ import {
   type BackupGroupId,
 } from '../backup/index.js';
 import { getLivepraiseHome } from '../config/paths.js';
+import { getMainDb } from '../db/connection.js';
 import { requireAdminAccess } from '../middleware/auth.js';
 import { allowCors, jsonError } from '../middleware/common.js';
+import { auditFromRequest } from '../audit/request.js';
 
 const upload = multer({
   dest: os.tmpdir(),
@@ -62,6 +64,7 @@ function writeOperatorUiDir(
 
 export function createBackupRouter(): Router {
   const api = Router();
+  const db = getMainDb();
   api.use(requireAdminAccess);
 
   api.post('/preview', (req: Request, res: Response) => {
@@ -112,6 +115,11 @@ export function createBackupRouter(): Router {
         outputStream: res,
         operatorUiDir,
       });
+      auditFromRequest(db, req, {
+        action: 'backup.export',
+        resource: 'backup',
+        details: { groups: result.groups, bytes: result.bytes },
+      });
       res.setHeader('X-Livepraise-Backup-Groups', result.groups.join(','));
       res.setHeader('X-Livepraise-Backup-Bytes', String(result.bytes));
     } catch (err) {
@@ -126,6 +134,7 @@ export function createBackupRouter(): Router {
 
 export function createRestoreRouter(): Router {
   const api = Router();
+  const db = getMainDb();
   api.use(requireAdminAccess);
 
   api.post('/inspect', upload.single('file'), async (req: Request, res: Response) => {
@@ -187,6 +196,14 @@ export function createRestoreRouter(): Router {
           : undefined,
       });
       fs.unlink(zipPath, () => {});
+      auditFromRequest(db, req, {
+        action: 'backup.restore',
+        resource: 'restore',
+        details: {
+          groups: result.restoredGroups,
+          databaseRestored: result.databaseRestored,
+        },
+      });
       res.json({
         status: 'Sucesso',
         appliedGroups: result.restoredGroups,

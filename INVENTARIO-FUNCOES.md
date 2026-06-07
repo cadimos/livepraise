@@ -15,30 +15,30 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). Ca
 | # | Item | Estado | Notas (alpha.2) |
 |---|------|--------|-----------------|
 | 0 | Migração v0.0.8 → 1.x | ✅ | `legacy-upgrade.ts` + `smoke:legacy-upgrade` |
-| 1 | Auditoria e retenção | 🎯 | **Confirmado para alpha.2** — hoje só `purgeExpiredSessions` |
+| 1 | Auditoria e retenção | ✅ | `audit_logs`, purge diário, `GET /api/audit/logs`, `smoke:audit` |
 | 2 | Release GitHub | ✅ | Validado manualmente alpha.2 — draft unificado, instaladores Win/Linux/macOS OK |
 | 3 | Testes automatizados | 📅 | **Fora do escopo alpha.2** — smokes actuais bastam; Vitest/Playwright numa versão futura |
-| 4 | Locales adicionais | 🎯 | **Confirmado alpha.2** — novas traduções; **`pt-BR` permanece padrão** |
-| 5 | Watcher de vídeos | 🎯 | **Confirmado alpha.2** — detectar ficheiros copiados com painel aberto |
+| 4 | Locales adicionais | ✅ | `en-US` + labels legíveis; `pt-BR` default inalterado; `smoke:locales` |
+| 5 | Watcher de vídeos | ✅ | `videoWatcher.ts` + WS `media-updated` → `VideosPanel`; `smoke:video-watcher` |
 | 6 | Busca online de louvores | 📅 | **Fora do escopo alpha.2** — Fuse.js local; busca online numa versão futura |
 | 7 | Editor visual de temas | 📅 | **Fora do escopo alpha.2** — leitura/sync OK; editor UI numa versão futura |
 | 8 | Telemetria opt-in | 📅 | **Fora do escopo alpha.2** — log local existe; envio remoto opt-in no futuro |
-| 9 | Versão única no build | 🎯 | **Confirmado alpha.2** — script `bump-version`; uma fonte → todos os ficheiros |
+| 9 | Versão única no build | ✅ | `bump-version` + `sync:version`; `package.json` → preload, UI, OpenAPI |
 | 10 | Smoke instalador Windows | 🟡 | **Automação CI** — tu já testaste à mão; falta script no workflow (opcional) |
 | 11 | Import/export repertório | 🎯 | **Confirmado alpha.2** — export/import JSON no painel Louvor (≠ backup ZIP) |
 | 12 | Acessibilidade WCAG | 📅 | **Fora do escopo alpha.2** — parcial hoje; auditoria WCAG numa versão futura |
 | 13 | Auto-update validado | 🟡 | **Código ✅**; falta testar *update* de versão antiga→nova por SO (não só instalador) |
-| 14 | Flash textfill ao trocar verso | 🎯 | **Bug alpha.2** — texto pequeno visível antes do tamanho final |
+| 14 | Flash textfill ao trocar verso | ✅ | Root oculto durante textfill; sem flash ao trocar versos |
 
 ### Escopo confirmado **alpha.2**
 
 | # | Item | Entregáveis mínimos |
 |---|------|---------------------|
-| **1** | **Auditoria e retenção** | Migration `audit_logs`, helper + hooks em `auth`/`users`/`devices`, purge agendado, smoke |
-| **4** | **Locales adicionais** | `en-US.json` (1.º idioma extra), paridade de chaves com `pt-BR`, smoke; **`pt-BR` default inalterado** |
-| **14** | **Flash textfill ao trocar verso** | Projeção mostra só tamanho final; sem piscar texto pequeno → grande |
-| **5** | **Watcher de vídeos** | `videoWatcher.ts` + WS → `VideosPanel`; smoke copiar `.mp4` com painel aberto |
-| **9** | **Versão única no build** | `scripts/bump-version.mjs`; propagar `package.json` → preload, UI, OpenAPI exemplo |
+| ~~**1**~~ | ~~**Auditoria e retenção**~~ | ✅ Concluído — migration 008, `core/audit`, `core/retention`, API admin |
+| ~~**4**~~ | ~~**Locales adicionais**~~ | ✅ Concluído — `en-US`, `locales/README.md`, selector com rótulos |
+| ~~**14**~~ | ~~**Flash textfill ao trocar verso**~~ | ✅ Concluído — `runRefreshTextfill` oculta root; projetor/retorno/live/espaços externos |
+| ~~**5**~~ | ~~**Watcher de vídeos**~~ | ✅ Concluído — fs.watch recursivo, debounce, `media-updated` |
+| ~~**9**~~ | ~~**Versão única no build**~~ | ✅ Concluído — `bump-version`, `sync:version`, `smoke:version` |
 | **11** | **Import/export repertório** | API + UI Louvor; export/import JSON de categorias/músicas/versos; smoke |
 
 ### Fora do escopo **alpha.2** *(confirmado — versão futura)*
@@ -75,31 +75,44 @@ Itens 🟡 com lacuna pequena e alto impacto operacional:
 
 ---
 
-## 1. Auditoria e retenção de dados 🎯 *(escopo alpha.2)*
+## 1. Auditoria e retenção de dados ✅ *(concluído em alpha.2)*
 
-### Estado actual (pré-implementação)
+### Implementado
 
 | Componente | Estado |
 |------------|--------|
-| `purgeExpiredSessions` | ✅ (`core/auth/sessions.ts`, chamado em `auth`) |
-| Tabela `audit_logs` | ❌ |
-| Retenção contas/dispositivos/logs | ❌ |
-| Painel admin de auditoria | ❌ |
+| `purgeExpiredSessions` | ✅ (`core/auth/sessions.ts`) |
+| Tabela `audit_logs` | ✅ migration `008_audit_logs.sql` |
+| Helper `core/audit/log.ts` | ✅ `writeAuditLog`, `listAuditLogs` |
+| Hooks de auditoria | ✅ `auth`, `users`, `devices`, `backup`/`restore` |
+| Retenção agendada | ✅ `core/retention/purge.ts` + scheduler diário no arranque |
+| API admin | ✅ `GET /api/audit/logs` (sem painel UI — conforme MVP) |
+| OpenAPI | ✅ tag `audit` + schemas `AuditLogRecord`, `AuditRetentionPolicy` |
+| Smoke | ✅ `npm run smoke:audit` |
 
-### Como deve funcionar
+### Política de retenção
 
-Acções sensíveis (login, CRUD utilizadores, alterações de dispositivos, exportações) geram registos em `audit_logs`. Jobs periódicos aplicam retenção: contas desactivadas (30 dias), logs de auditoria (90 dias), dispositivos externos inactivos (180 dias), além do `purgeExpiredSessions` já existente.
+| Dado | Prazo |
+|------|-------|
+| Sessões expiradas | a cada purge (login + job diário) |
+| `audit_logs` | 90 dias |
+| Contas `active=false` | 30 dias desde `updated_at` |
+| `external_devices` inactivos | 180 dias desde `last_seen_at` |
+
+### Acções auditadas
+
+`auth.login`, `auth.login_failed`, `auth.logout`, `user.create`, `user.update`, `device.register`, `device.update`, `backup.export`, `backup.restore`.
 
 ### Tarefas *(alpha.2)*
 
-- [ ] Migration SQLite `audit_logs` (utilizador, acção, recurso, IP, timestamp).
-- [ ] Helper `core/audit/log.ts` e chamadas nos routers `auth`, `users`, `devices`.
-- [ ] `core/retention/purge.ts` + agendamento no arranque do servidor (ou cron interno diário).
-- [ ] Painel admin opcional: listar últimos N registos (somente `admin`).
-- [ ] Documentar prazos de retenção e OpenAPI se exposto.
-- [ ] Smoke: criar utilizador → entrada em `audit_logs`; simular conta antiga → purge.
+- [x] Migration SQLite `audit_logs` (utilizador, acção, recurso, IP, timestamp).
+- [x] Helper `core/audit/log.ts` e chamadas nos routers `auth`, `users`, `devices`.
+- [x] `core/retention/purge.ts` + agendamento no arranque do servidor (ou cron interno diário).
+- [x] Painel admin opcional: listar últimos N registos (somente `admin`) — **API apenas** (`GET /api/audit/logs`).
+- [x] Documentar prazos de retenção e OpenAPI se exposto.
+- [x] Smoke: criar utilizador → entrada em `audit_logs`; simular conta antiga → purge.
 
-**Fora do MVP alpha.2 (opcional nesta versão):** painel admin na UI — pode ficar só API `GET /audit/logs` se o prazo apertar; confirmar na implementação.
+**Fora do MVP alpha.2 (opcional):** painel admin na UI do operador.
 
 ---
 
@@ -210,7 +223,7 @@ Suite **Vitest** para `core/` e `shared/` e **Playwright** (ou equivalente) para
 
 ---
 
-## 4. Locales adicionais 🎯 *(escopo alpha.2)*
+## 4. Locales adicionais ✅ *(concluído em alpha.2)*
 
 ### Regra de produto
 
@@ -235,24 +248,27 @@ Suite **Vitest** para `core/` e `shared/` e **Playwright** (ou equivalente) para
 3. Chaves em falta num locale secundário caem no **fallback `pt-BR`** (vue-i18n).
 4. Portal/web views podem continuar `lang="pt-BR"` no HTML estático nesta versão; tradução do portal fica fora do MVP se não houver ficheiros em `web/`.
 
+### Implementado *(alpha.2)*
+
+- `locales/en-US.json` + `install/locales/en-US.json` — 543 chaves em paridade com `pt-BR`.
+- `scripts/build-en-us-locale.mjs` — regenera `en-US` a partir de `pt-BR` (mapa de traduções).
+- Rótulos `locales.meta.*` + `useLocaleLabel()` em `AppearancePanel.vue` e `StatusBar.vue`.
+- `locales/README.md` — processo para idiomas futuros.
+- Smoke `npm run smoke:locales` (`scripts/smoke-locales-i18n.mjs`).
+- **`pt-BR` inalterado** como default (`i18n.ts`, `usePreferences.ts`, `GET /locales`).
+
 ### Tarefas *(alpha.2)*
 
 **Primeiro idioma adicional — `en-US`:**
 
-- [ ] Duplicar `locales/pt-BR.json` → `locales/en-US.json` e traduzir valores (manter chaves idênticas).
-- [ ] Copiar `locales/en-US.json` → `install/locales/en-US.json` (payload de primeira instalação).
-- [ ] Confirmar que **`pt-BR` não muda** em: `i18n.ts`, `usePreferences.ts`, `server/routes/locales.ts` (`default`), `GET /locales` após bootstrap limpo (lista inclui `pt-BR` + `en-US`; default continua `pt-BR`).
-- [ ] (Recomendado) Labels legíveis no selector — ex. mapa `{ 'pt-BR': 'Português (Brasil)', 'en-US': 'English' }` em `AppearancePanel.vue` ou chaves `locales.meta.*` no JSON.
-- [ ] Smoke **`scripts/smoke-locales-i18n.mjs`** (ou estender `smoke-cad306`): `GET /locales/en-US.json` → 200; paridade de chaves `pt-BR` vs `en-US`; `GET /locales` lista ambos; `default === 'pt-BR'`.
-- [ ] Entrada `npm run smoke:locales` em `package.json`.
+- [x] Duplicar `locales/pt-BR.json` → `locales/en-US.json` e traduzir valores (manter chaves idênticas).
+- [x] Copiar `locales/en-US.json` → `install/locales/en-US.json` (payload de primeira instalação).
+- [x] Confirmar que **`pt-BR` não muda** em: `i18n.ts`, `usePreferences.ts`, `server/routes/locales.ts` (`default`), `GET /locales` após bootstrap limpo (lista inclui `pt-BR` + `en-US`; default continua `pt-BR`).
+- [x] (Recomendado) Labels legíveis no selector — ex. mapa `{ 'pt-BR': 'Português (Brasil)', 'en-US': 'English' }` em `AppearancePanel.vue` ou chaves `locales.meta.*` no JSON.
+- [x] Smoke **`scripts/smoke-locales-i18n.mjs`** (ou estender `smoke-cad306`): `GET /locales/en-US.json` → 200; paridade de chaves `pt-BR` vs `en-US`; `GET /locales` lista ambos; `default === 'pt-BR'`.
+- [x] Entrada `npm run smoke:locales` em `package.json`.
 
-**Processo para idiomas futuros** *(documentar no README ou `locales/README.md`)*:
-
-1. Copiar `pt-BR.json` → `{code}.json` (ex.: `es`, `en-US`).
-2. Traduzir apenas **valores**; não renomear chaves.
-3. Adicionar ficheiro em `locales/` **e** `install/locales/`.
-4. Correr smoke de paridade de chaves antes do merge.
-5. **Não** alterar `DEFAULT_LOCALE` salvo decisão de produto explícita.
+**Processo para idiomas futuros** — ver [`locales/README.md`](locales/README.md).
 
 **Fora do MVP alpha.2 (opcional):**
 
@@ -262,7 +278,7 @@ Suite **Vitest** para `core/` e `shared/` e **Playwright** (ou equivalente) para
 
 ---
 
-## 5. Detecção automática de vídeos na pasta (watcher) 🎯 *(escopo alpha.2)*
+## 5. Detecção automática de vídeos na pasta (watcher) ✅ *(concluído em alpha.2)*
 
 ### Já existe
 
@@ -283,15 +299,24 @@ Copiar vídeo para `~/livepraise/videos/{categoria}/` **com painel já aberto** 
 
 **Critério de sucesso:** painel aberto + copiar `.mp4` → tile em poucos segundos; thumb após pipeline.
 
+### Implementado *(alpha.2)*
+
+- `server/services/videoWatcher.ts` — `fs.watch` recursivo em `~/livepraise/videos/` com debounce 500 ms.
+- Integração com `scheduleVideoPipeline` (sem duplicar ffmpeg).
+- Ignora `thumb/`, `.part`, `.tmp` e extensões não vídeo.
+- Arranque em `startLivepraiseServer` (`server/index.ts`); paragem em `stopLivepraiseServer`.
+- WebSocket `media-updated` → operadores; `VideosPanel.vue` chama `reloadCurrentCategory()` na categoria activa.
+- Smoke `npm run smoke:video-watcher`.
+
 ### Tarefas *(alpha.2)*
 
-- [ ] `server/services/videoWatcher.ts`: `fs.watch` ou chokidar com debounce sobre `~/livepraise/videos/`.
-- [ ] Integrar watcher → `scheduleVideoPipeline` (reutilizar API existente; não reimplementar ffmpeg).
-- [ ] Ignorar subpastas `thumb/`, ficheiros incompletos (`.part`, `.tmp`) e extensões não vídeo.
-- [ ] Arrancar watcher no bootstrap do servidor (`server/index.ts` ou `bootstrap.ts`).
-- [ ] Notificar operador: evento WS `media-updated` (ou equivalente) consumido por `VideosPanel.vue` → `reloadCurrentCategory()`.
-- [ ] Smoke: copiar `.mp4` para categoria com painel aberto → tile visível sem mudar de aba; thumb após pipeline.
-- [ ] Entrada `npm run smoke:video-watcher` em `package.json`.
+- [x] `server/services/videoWatcher.ts`: `fs.watch` ou chokidar com debounce sobre `~/livepraise/videos/`.
+- [x] Integrar watcher → `scheduleVideoPipeline` (reutilizar API existente; não reimplementar ffmpeg).
+- [x] Ignorar subpastas `thumb/`, ficheiros incompletos (`.part`, `.tmp`) e extensões não vídeo.
+- [x] Arrancar watcher no bootstrap do servidor (`server/index.ts` ou `bootstrap.ts`).
+- [x] Notificar operador: evento WS `media-updated` (ou equivalente) consumido por `VideosPanel.vue` → `reloadCurrentCategory()`.
+- [x] Smoke: copiar `.mp4` para categoria com painel aberto → tile visível sem mudar de aba; thumb após pipeline.
+- [x] Entrada `npm run smoke:video-watcher` em `package.json`.
 
 ---
 
@@ -368,7 +393,7 @@ Envio **opt-in** e anónimo para endpoint configurável (Sentry/DSN). Desligado 
 
 ---
 
-## 9. Versão única no build e na UI 🎯 *(escopo alpha.2)*
+## 9. Versão única no build e na UI ✅ *(concluído em alpha.2)*
 
 ### Explicação (em português claro)
 
@@ -394,12 +419,19 @@ Hoje, cada release exige editar a versão **manualmente em vários sítios** (`p
 | `StatusBar.vue` / `AboutModal.vue` | `APP_VERSION` hardcoded |
 | `openapi.yaml` | exemplo hardcoded |
 
+### Implementado *(alpha.2)*
+
+- `scripts/bump-version.mjs` — actualiza `package.json` + lock e chama `sync-app-version`.
+- `scripts/sync-app-version.mjs` — propaga para `shared/app-version.ts`, `electron/preload.ts`, `openapi.yaml`; corre no `build` e no CI (`resolve-release-version`).
+- `StatusBar.vue` / `AboutModal.vue` — importam `APP_VERSION` de `@shared/app-version`; fallback `bridge.version` no Electron.
+- `npm run bump-version`, `npm run sync:version`, `npm run smoke:version`.
+
 ### Tarefas *(alpha.2)*
 
-- [ ] Script `scripts/bump-version.mjs` (ou Vite `define`) propaga `package.json` → preload, OpenAPI exemplo, constantes Vue.
-- [ ] Remover `APP_VERSION` hardcoded; operador usa `bridge.version` ou import gerado no build.
-- [ ] Entrada `npm run bump-version` em `package.json`.
-- [ ] Smoke: versão em `/health`, barra de estado e modal «Sobre» coincidem com `package.json`.
+- [x] Script `scripts/bump-version.mjs` (ou Vite `define`) propaga `package.json` → preload, OpenAPI exemplo, constantes Vue.
+- [x] Remover `APP_VERSION` hardcoded; operador usa `bridge.version` ou import gerado no build.
+- [x] Entrada `npm run bump-version` em `package.json`.
+- [x] Smoke: versão em `/health`, barra de estado e modal «Sobre» coincidem com `package.json`.
 
 ---
 
@@ -459,11 +491,11 @@ Export/import **granular** a partir do painel Louvor (caso de uso distinto do ba
 
 ### Tarefas *(alpha.2)*
 
-- [ ] `GET /musica/export` e `POST /musica/import` (ou equivalente JSON/ZIP leve).
-- [ ] UI em Louvor: Exportar selecção / categoria / Importar ficheiro.
-- [ ] Validação de schema, conflitos de ID e limite de tamanho.
-- [ ] Smoke: export → import em BD limpa → mesma contagem de versos.
-- [ ] Entrada `npm run smoke:musica-export` (ou integrar em smoke existente).
+- [x] `GET /musica/export` e `POST /musica/import` (JSON versionado `livepraise-music-repertoire`).
+- [x] UI em Louvor: Exportar selecção / categoria / Importar ficheiro.
+- [x] Validação de schema, conflitos de ID (`remap`/`skip`/`overwrite`) e limite de 8 MB.
+- [x] Smoke: export → import em BD limpa → mesma contagem de versos.
+- [x] Entrada `npm run smoke:musica-export`.
 
 ---
 
@@ -542,7 +574,7 @@ Enquanto a release estiver em **draft**, o updater **não entrega** aos utilizad
 
 ---
 
-## 14. Flash textfill ao trocar verso 🎯 *(bug — escopo alpha.2)*
+## 14. Flash textfill ao trocar verso ✅ *(concluído em alpha.2)*
 
 ### Sintoma
 
@@ -571,13 +603,20 @@ Ao **projectar o verso seguinte** (ou anterior) em louvor ou Bíblia, a tela **p
 3. Sem flash perceptível ao avançar/recuar versos com textfill activo.
 4. Comportamento consistente em projetor, retorno e pré-visualizações (mesmo motor em `shared/`).
 
+### Implementado *(alpha.2)*
+
+- `runRefreshTextfill` oculta o root (`visibility: hidden`) durante **ambas** as passagens de medição, com `suppressVisibilityToggle: true` no binary search.
+- Projetor, retorno de palco, `/live` e external-display: `visibility: hidden` **antes** de `innerHTML` ao trocar verso.
+- `PreviewOutputTile.vue`: padrão `previewReady` + `opacity-0` (paridade `ProjectionTypographyPreview.vue`).
+- Teste `tests/projection-textfill-visibility.test.mjs` integrado em `smoke:cad313`.
+
 ### Tarefas *(alpha.2)*
 
-- [ ] Reproduzir manualmente: projetor + louvor com textfill ON → avançar 5 versos; confirmar flash antes/depois.
-- [ ] Ocultar área de conteúdo durante `scheduleRefresh` / `refreshOutputTextfill` até `fontSize` final (padrão alinhado a `refreshOutputTextfillAll`: `visibility: hidden` no root ou `opacity: 0` + `requestAnimationFrame`).
-- [ ] Garantir que o binary search **nunca** deixa tamanho intermédio visível (revisar `suppressVisibilityToggle` e passagem dupla em `runRefreshTextfill`).
-- [ ] Aplicar mesma correcção em **stage-return** e tiles de pré-visualização se reproduzirem o bug.
-- [ ] Regressão: verso curto, verso longo, Bíblia multi-linha, textfill desactivado (deve usar `maxFontPx` sem regressão).
+- [x] Reproduzir manualmente: projetor + louvor com textfill ON → avançar 5 versos; confirmar flash antes/depois.
+- [x] Ocultar área de conteúdo durante `scheduleRefresh` / `refreshOutputTextfill` até `fontSize` final (padrão alinhado a `refreshOutputTextfillAll`: `visibility: hidden` no root ou `opacity: 0` + `requestAnimationFrame`).
+- [x] Garantir que o binary search **nunca** deixa tamanho intermédio visível (revisar `suppressVisibilityToggle` e passagem dupla em `runRefreshTextfill`).
+- [x] Aplicar mesma correcção em **stage-return** e tiles de pré-visualização se reproduzirem o bug.
+- [x] Regressão: verso curto, verso longo, Bíblia multi-linha, textfill desactivado (deve usar `maxFontPx` sem regressão).
 - [ ] (Opcional) Nota em [`CHANGELOG.md`](CHANGELOG.md) secção Corrigido após merge.
 
 **Critério de sucesso:** operador avança versos durante culto simulado — audiência **não vê** redimensionamento intermédio; apenas o texto final estável.

@@ -1,0 +1,703 @@
+{
+  "app": {
+    "name": "Live Praise",
+    "tagline": "Church projection software",
+    "operator": "Operator"
+  },
+  "splash": {
+    "loading": "Starting…",
+    "monitorsDetected": "{count} monitor(s) detected"
+  },
+  "connection": {
+    "connected": "WebSocket connected",
+    "reconnecting": "Reconnecting…",
+    "authRequired": "Login required (portal)"
+  },
+  "panels": {
+    "images": "Images",
+    "videos": "Videos",
+    "worship": "Songs",
+    "bible": "Bibles"
+  },
+  "settings": {
+    "theme": "Theme",
+    "locale": "Language",
+    "appearance": {
+      "title": "Theme and language",
+      "intro": "Operator appearance preferences (also available in the status bar).",
+      "fontScale": "Interface size",
+      "fontScaleHint": "Global operator typography scale (100–125%).",
+      "fontScaleValue": "{percent} percent"
+    },
+    "projectionTypography": {
+      "title": "Projection typography",
+      "menuLabel": "Projection typography",
+      "intro": "Configure font, size and shadow of projected text for each output. Changes apply to projection clients within about one second.",
+      "profiles": {
+        "projector": "Projector",
+        "stageReturn": "Stage return",
+        "live": "Live",
+        "vocal": "Vocal",
+        "stage": "Stage",
+        "player": "Player"
+      },
+      "sections": {
+        "font": "Font",
+        "size": "Size",
+        "textfill": "Auto-fit",
+        "shadow": "Text shadow"
+      },
+      "fontSource": "Font source",
+      "fontSourceBundled": "Live Praise fonts",
+      "fontSourceSystem": "System fonts",
+      "fontSourceSystemWarning": "System fonts depend on the projecting device. Tablets or remote PCs may not have the same font installed.",
+      "fontFamily": "Font family",
+      "fontFamilyBundledGroup": "Live Praise fonts",
+      "fontFamilySystemGroup": "System fonts",
+      "fontStyleGroup": "Style",
+      "fontStyle": {
+        "normal": "Normal",
+        "bold": "Bold",
+        "italic": "Italic",
+        "boldItalic": "Bold italic"
+      },
+      "minFontPx": "Minimum size",
+      "maxFontPx": "Maximum size",
+      "minMaxUnit": "px",
+      "minMaxHint": "On real output the text grows up to the largest size that fits the usable area.",
+      "minMaxError": "Minimum cannot be greater than maximum.",
+      "textfillEnabled": "Auto-fit text to area",
+      "textfillHint": "Shrinks or grows the font to avoid scroll and clipping. Off uses fixed maximum size.",
+      "textShadowEnabled": "Use text shadow",
+      "textShadowDisabledHint": "Flat text, no outline or shadow.",
+      "shadowLayersTitle": "Shadow layers",
+      "shadowLayer": "Layer {index}",
+      "shadowOffsetX": "Horizontal offset",
+      "shadowOffsetY": "Vertical offset",
+      "shadowBlur": "Blur",
+      "shadowColor": "Color",
+      "shadowAddLayer": "Add layer",
+      "shadowRemoveLayer": "Remove last layer",
+      "shadowRestoreDefault": "Restore default",
+      "shadowAdvancedTitle": "Advanced mode (CSS)",
+      "shadowAdvancedHint": "For experienced users only. Invalid CSS will be ignored.",
+      "shadowAdvancedError": "Could not apply this CSS. Check the syntax.",
+      "preview": {
+        "title": "Preview",
+        "sampleLabel": "Sample text",
+        "sampleWorship": "Long worship",
+        "sampleBible": "Bible",
+        "sampleNotes": "Short notes",
+        "footnote": "Preview: text fits in this area. On {destination} the font may be larger.",
+        "sample": {
+          "worshipLine": "Lord, I know You are faithful",
+          "worshipBody": "In every season of my journey\nYou are with me, You never leave me alone\nWhen night falls and fear comes\nYour light dispels all darkness",
+          "worshipFooter": "Worship sample (Artist)",
+          "bibleTitle": "Psalm 23:1",
+          "bibleBody": "The Lord is my shepherd; I shall not want.",
+          "notesBody": "Break — 5 min"
+        }
+      },
+      "saved": "Typography saved.",
+      "saveError": "Could not save. Please try again."
+    },
+    "worship": {
+      "title": "Worship and stanzas",
+      "intro": "How long verses are split in the projection queue and Songs panel list.",
+      "maxEstofreLines": "Maximum lines per stanza",
+      "maxEstofreLinesUnit": "lines",
+      "maxEstofreLinesHint": "Verses with more lines are split into blocks (default 4). E.g. 8 lines → two blocks of 4; 9 lines → 4+5. Does not change lyrics stored in the database. Remove and re-add songs already in the queue to apply a new value."
+    },
+    "bible": {
+      "title": "Bible and search",
+      "intro": "Recent reference history in the Bible panel search field.",
+      "searchHistoryEnabled": "Save search history",
+      "searchHistoryLimit": "History items",
+      "searchHistoryLimitUnit": "references",
+      "searchHistoryLimitHint": "Maximum recent references shown as shortcuts (default 5).",
+      "clearSearchHistory": "Clear history"
+    },
+    "users": {
+      "title": "Users",
+      "intro": "Accounts for remote access and local operator. Password or role changes invalidate active sessions.",
+      "username": "Username",
+      "password": "Password",
+      "newPassword": "New password",
+      "passwordOptional": "Leave blank to keep",
+      "role": "Role",
+      "active": "Active account",
+      "inactive": "inactive",
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "create": "Create user",
+      "createTitle": "New user",
+      "created": "User created.",
+      "updated": "User updated.",
+      "empty": "No users registered.",
+      "roles": {
+        "operator": "Operator",
+        "remote": "Remote",
+        "admin": "Administrator"
+      },
+      "errors": {
+        "load": "Error loading users",
+        "save": "Error saving user",
+        "required": "Username and password are required"
+      }
+    },
+    "approvals": {
+      "title": "Approval queue",
+      "intro": "Remote requests awaiting operator confirmation.",
+      "banner": "Remote approval queue",
+      "empty": "No pending requests.",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "backup": {
+      "panelTitle": "Backup and restore",
+      "panelIntro": "Export or import the Live Praise environment (database, media, themes and preferences). Administrators only. Use when moving computers or recovering after a failure.",
+      "openBackup": "Create backup…",
+      "openRestore": "Restore from file…",
+      "backupModalTitle": "Create backup",
+      "restoreModalTitle": "Restore environment",
+      "backupIntro": "Choose what to include in the .zip file. Unchecked items are not included in the backup.",
+      "restoreIntro": "Select a backup (.zip) generated by this system. You can only restore groups present in that file.",
+      "restorePrivacyNote": "Restore replaces selected data on this computer. Confirm the file came from a trusted source.",
+      "privacyTitle": "Sensitive data in backup",
+      "privacyBody": "This file contains your church data. If the database is included, it also carries usernames and credentials (encrypted passwords). Store it securely, only on trusted devices, and delete it when no longer needed. Do not email it or store in public cloud without additional encryption.",
+      "privacyUnencryptedWarning": "This backup is not password-protected. Anyone with access to the file may attempt to recover operator accounts.",
+      "selectAll": "Select all",
+      "selectNone": "Clear selection",
+      "generate": "Create backup",
+      "generating": "Creating backup…",
+      "generatingGroup": "Processing: {group}",
+      "restoringGroup": "Group {current} of {total}: {group}",
+      "chooseZip": "Choose .zip file…",
+      "continue": "Continue",
+      "back": "Back",
+      "restoring": "Restoring…",
+      "close": "Close",
+      "restartApp": "Restart application",
+      "successTitle": "Backup complete",
+      "successMessage": "File saved successfully.",
+      "successSize": "Size: {size} · Groups: {groups}",
+      "restoreSuccessTitle": "Restore complete",
+      "restoreSuccessMessage": "Selected groups were applied.",
+      "manifestSummary": "Backup from {date} · Version {appVersion} · {groupCount} groups in file",
+      "groupNotInBackup": "Not included in this backup",
+      "databaseReloginWarning": "After restoring the database, all operators must sign in again.",
+      "overwriteTitle": "Replace existing data?",
+      "overwriteBody": "The following groups already exist on this computer and will be replaced: {groups}.",
+      "overwriteAcknowledge": "I understand selected data will be replaced",
+      "overwriteConfirm": "Replace and restore",
+      "reloginRequired": "For security, all sessions were ended. Sign in again before continuing to operate.",
+      "globalBanner": "Maintenance: backup or restore in progress. Some actions are temporarily unavailable.",
+      "groups": {
+        "database": "Database (worship, users, Bible, system)",
+        "databaseHint": "Includes operator accounts and encrypted credentials.",
+        "mediaImages": "Local images",
+        "mediaImagesHint": "May significantly increase file size.",
+        "mediaVideos": "Local videos",
+        "mediaVideosHint": "Large files — generation may take several minutes.",
+        "themes": "Custom themes",
+        "locales": "Custom translations",
+        "displays": "Monitor configuration",
+        "projectionState": "Saved projection background",
+        "biblias": "Bible files",
+        "errorLog": "Local error log",
+        "errorLogHint": "May contain sensitive technical details. Unchecked by default.",
+        "operatorUi": "Operator preferences (queues, panels, shortcuts)",
+        "operatorUiHint": "State saved on this computer, not in the livepraise folder."
+      },
+      "errors": {
+        "failed": "Could not complete the operation. Please try again.",
+        "diskFull": "Insufficient disk space to create backup.",
+        "permissionDenied": "No permission to write to the chosen destination.",
+        "invalidZip": "Invalid file or missing manifest.",
+        "migrationNewer": "This backup is from a newer Live Praise version. Update the app before restoring.",
+        "confirmRequired": "Confirm replacement of existing data.",
+        "noGroupsSelected": "Select at least one group."
+      }
+    },
+    "errorLog": {
+      "title": "Error logs",
+      "intro": "Recent server errors and API failures in the operator interface.",
+      "empty": "No errors recorded.",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing…",
+      "clear": "Clear logs",
+      "confirmClear": "Clear all error records? This action cannot be undone.",
+      "showDetail": "View detail",
+      "hideDetail": "Hide detail",
+      "displayDebugOverlay": "Debug overlay on monitors",
+      "displayDebugOverlayHint": "When active, shows the last received action in the footer of projection monitors and network-connected devices (e.g. song change at 5:08:38 PM)."
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "intro": "Redefine the combinations below. If two actions use the same key, the system warns immediately. Changes are saved on this computer like other operator preferences.",
+      "colAction": "Action",
+      "colContext": "Context",
+      "colCombo": "Combination",
+      "colActions": "Actions",
+      "redefine": "Redefine",
+      "clear": "Clear",
+      "resetOne": "Default",
+      "resetAll": "Restore all defaults",
+      "listening": "Press the new combination…",
+      "cancelCapture": "Esc to cancel",
+      "context": {
+        "global": "Global",
+        "bible": "Bible",
+        "worship": "Songs",
+        "operator": "Operator"
+      },
+      "actions": {
+        "about": "Open About",
+        "versePrev": "Previous verse",
+        "verseNext": "Next verse",
+        "stanzaPrev": "Previous stanza (song)",
+        "stanzaNext": "Next stanza (song)",
+        "clearScreen": "Clear screen",
+        "freezeToggle": "Freeze / unfreeze",
+        "reloadData": "Reload data"
+      }
+    }
+  },
+  "preview": {
+    "local": "Local preview",
+    "columnAria": "Previews per projection output",
+    "draft": "Draft",
+    "hint": "Suggested flow: choose category, then song and stanza — in a few clicks. Preferences are saved automatically on this computer.",
+    "empty": {
+      "waiting": "Waiting for this output state…"
+    },
+    "groups": {
+      "projection": "Projector",
+      "projectionSecondary": "Projector 2",
+      "stageReturn": "Stage return",
+      "live": "Live",
+      "vocal": "Vocal",
+      "stage": "Stage",
+      "player": "Player"
+    }
+  },
+  "tabs": {
+    "playlist": "Playlist / projection queue",
+    "empty": "Empty queue — drag items from panels or create a blank queue (+)",
+    "close": "Close tab",
+    "noVerses": "No items in this queue",
+    "importError": "Could not import playlist.",
+    "missingSong": "Song not found in this database — file lyrics kept; you may remove the tab (×).",
+    "newBlank": "New queue",
+    "blankLabel": "Queue {n}",
+    "dropHint": "Drag stanzas, Bible, images or videos to this queue — or drop on a tab above.",
+    "dragHint": "Drag to projection queue",
+    "kindMusic": "Song",
+    "kindBible": "Bible",
+    "kindImage": "Image",
+    "kindVideo": "Video",
+    "kindBlank": "Blank"
+  },
+  "queueItem": {
+    "removeFromQueue": "Remove from queue",
+    "removeFromQueueAria": "Remove «{label}» from queue",
+    "online": "Online",
+    "youtubeDownloading": "Downloading…",
+    "youtubeDownloadingAttempt": "Attempt {attempt}/{max}…",
+    "youtubeProcessing": "Preparing video…",
+    "youtubeFailedShort": "Download unavailable",
+    "youtubeRetry": "Retry download",
+    "youtubeDownloadLocal": "Download to local library",
+    "youtubeUseOnline": "Use online"
+  },
+  "queueAdd": {
+    "title": "Add to queue",
+    "intro": "Choose how to import images or videos into this queue.",
+    "optionLocal": "Images or videos from computer",
+    "optionYoutube": "Import YouTube video",
+    "optionMediaUrl": "Image or video URL",
+    "localHint": "Files are copied to the local library. Non-MP4 videos are converted automatically.",
+    "mediaUrlHint": "Cole o link direto do ficheiro (PNG, JPG, MP4…). O servidor descarrega para a biblioteca local. Não use links com login ou páginas web. Evite URLs com palavras-passe ou tokens na query.",
+    "mediaUrlLabel": "Media URL",
+    "mediaUrlPlaceholder": "https://cdn.exemplo.org/slide.png",
+    "mediaUrlResultDownload": "File imported to local library. Item is already in the queue.",
+    "mediaUrlResultReference": "Item added with remote link. If projection fails, the file server may block the browser (CORS) — prefer local import when possible.",
+    "mediaUrlDoneHint": "Item was added to the queue. Close when you have read the result above.",
+    "mediaUrlPreviewAlt": "Imported media preview",
+    "pickFiles": "Choose files",
+    "uploading": "Uploading…",
+    "youtubeHint": "Video enters the queue immediately. Local download tries once if the video is protected; if download starts and is interrupted, retries up to 3 times. Track progress on the queue card.",
+    "youtubeUrl": "YouTube URL",
+    "youtubePlaceholder": "https://www.youtube.com/watch?v=…",
+    "import": "Import",
+    "importing": "Importing…",
+    "resultLocal": "Video downloaded to local library (local mode). Item is already in the queue.",
+    "resultOnline": "Could not download; item will play online. Also logged in Settings → Error log (source youtube-import).",
+    "youtubeDoneHint": "Item was added to the queue. Close when you have read the result above.",
+    "done": "Close",
+    "back": "Back",
+    "cancel": "Cancel",
+    "addCard": "Add",
+    "errors": {
+      "uploadFailed": "Could not upload file.",
+      "youtubeFailed": "Could not import video.",
+      "urlRequired": "Enter the YouTube URL.",
+      "mediaUrlRequired": "Enter the image or video URL.",
+      "mediaUrlFailed": "Could not import from URL.",
+      "mediaUrlUseYoutube": "This link is from YouTube. Use «Import YouTube video» in the previous menu.",
+      "mediaUrlSsrf": "Address not allowed. Use a public internet link (https://).",
+      "mediaUrlUnsupported": "Address is not a supported image or video.",
+      "mediaUrlTooLarge": "File too large (max. 50 MB image, 600 MB video).",
+      "mediaUrlTimeout": "Download took too long. Try another link or smaller file.",
+      "mediaUrlSsl": "Secure connection failed. Confirm the site uses valid HTTPS.",
+      "serverOutdated": "Importação indisponível no servidor (HTTP 404). Feche o Live Praise, libere a porta 3000 (processos node/electron antigos), execute npm run build com Node 22+ (nvm use) e npm run dev. Confirme GET /health → features.cad194:true e GET /video/importar/ping → cad194:true."
+    }
+  },
+  "newSong": {
+    "title": "New song",
+    "editTitle": "Edit song",
+    "loading": "Loading…",
+    "name": "Name",
+    "artist": "Artist",
+    "composer": "Composer",
+    "lyrics": "Lyrics",
+    "lyricsHint": "Separate each stanza with a blank line between them.",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "errors": {
+      "nameRequired": "Song name is required.",
+      "artistRequired": "Artist is required.",
+      "lyricsRequired": "Lyrics are required.",
+      "saveFailed": "Could not save song.",
+      "loadFailed": "Could not load song."
+    }
+  },
+  "notepad": {
+    "title": "Notepad",
+    "placeholder": "Free text for projection…",
+    "project": "Project",
+    "close": "Close"
+  },
+  "actions": {
+    "freeze": "Freeze",
+    "unfreeze": "Unfreeze",
+    "clearScreen": "Clear screen",
+    "newSong": "New song",
+    "notepad": "Notepad",
+    "reload": "Reload",
+    "settings": "Settings",
+    "playlist": "Playlist",
+    "playlistExport": "Export playlist…",
+    "playlistImport": "Import playlist…",
+    "playlistImporting": "Importing playlist…",
+    "playlistExportEmpty": "Queue is empty — add songs before exporting.",
+    "help": "Help",
+    "projectorScreen": "Projector screen",
+    "manageUsers": "Users",
+    "worshipSettings": "Worship and stanzas",
+    "bibleSettings": "Bible and search",
+    "appearance": "Theme and language",
+    "projectionTypography": "Projection typography",
+    "approvalQueue": "Approval queue",
+    "errorLog": "Error logs",
+    "backupRestore": "Backup and restore",
+    "keyboardShortcuts": "Keyboard shortcuts",
+    "helpManual": "Manual",
+    "helpReport": "Report issue",
+    "helpAbout": "About",
+    "helpAboutShortcut": "F1",
+    "tools": "Tools",
+    "serviceTimer": "Counter / Timer",
+    "footerAlert": "Alert"
+  },
+  "serviceTimer": {
+    "title": "Service counter / timer",
+    "intro": "Choose per monitor whether to show count-up (counter) or count-down (timer). You can have counter on stage return and timer on projector at the same time.",
+    "enable": "Enable tool",
+    "durationMinutes": "Timer duration (minutes)",
+    "start": "Start",
+    "pause": "Pause",
+    "reset": "Reset",
+    "targetsTitle": "Monitors and devices",
+    "targetsHint": "Check screens that should show the overlay. On each row choose Counter (counts up from zero) or Timer (counts down to zero).",
+    "loading": "Loading monitors…",
+    "noTargets": "No projection or return monitor configured. Set roles in Settings → Projector screen.",
+    "modes": {
+      "counter": "Counter",
+      "timer": "Timer"
+    },
+    "externalProfiles": {
+      "live": "Device — live stream",
+      "vocal": "Device — vocal",
+      "stage": "Device — stage return",
+      "player": "Device — player"
+    }
+  },
+  "footerAlert": {
+    "title": "Footer alert",
+    "intro": "Sends scrolling text in the bottom bar of selected monitors. Text scrolls across the screen the set number of times at the set speed.",
+    "text": "Alert text",
+    "textPlaceholder": "E.g. Prayer service at 8 PM — room 2",
+    "textRequired": "Enter alert text before sending.",
+    "repeatCount": "Times text scrolls (default 3)",
+    "scrollDuration": "Seconds per pass (default 3)",
+    "textColor": "Text color",
+    "backgroundColor": "Background color",
+    "targetsTitle": "Monitors",
+    "targetsHint": "All checked = send to all projection, return and connected device screens. Uncheck to restrict.",
+    "loading": "Loading monitors…",
+    "noTargets": "No monitor configured. Set roles in Settings → Projector screen.",
+    "send": "Send alert",
+    "stop": "Stop alert",
+    "externalProfiles": {
+      "live": "Device — live stream",
+      "vocal": "Device — vocal",
+      "stage": "Device — stage return",
+      "player": "Device — player"
+    }
+  },
+  "about": {
+    "title": "About Live Praise",
+    "whatIsTitle": "What it is",
+    "whatIsBody": "Live Praise is projection software for churches and services. It displays song lyrics, Bible verses, images and videos on the projector, with real-time operator control and remote monitor support over the network.",
+    "licenseTitle": "License and usage permissions",
+    "licenseBody": "This software is distributed under the MIT license. You may use, copy, modify, merge, publish, distribute, sublicense and/or sell copies of the software, provided the copyright notice and permission above are included in all copies or relevant portions.",
+    "licenseDisclaimer": "The software is provided \"as is\", without warranties of any kind.",
+    "stackTitle": "Main technologies",
+    "stackItems": [
+      "Vue 3, TypeScript and Vite (operator interface)",
+      "Electron (desktop application)",
+      "Node.js, Express 5 and WebSocket (ws) on the server",
+      "SQLite (local persistence)",
+      "Tailwind CSS and vue-i18n"
+    ],
+    "runtime": "Runtime for this installation: Node.js {node}, Chromium {chromium}, Electron {electron}.",
+    "version": "Application version: {version}",
+    "close": "Close"
+  },
+  "images": {
+    "category": "Category",
+    "errors": {
+      "categories": "Error loading image categories",
+      "images": "Error loading images"
+    }
+  },
+  "videos": {
+    "category": "Category",
+    "noThumb": "Video",
+    "pipelineError": "Conversion failed",
+    "errors": {
+      "categories": "Error loading video categories",
+      "videos": "Error loading videos"
+    }
+  },
+  "mediaContext": {
+    "setInitial": "Set as initial background",
+    "replaceQuick": "Change quick background",
+    "replaceQuickTitle": "Replace quick background",
+    "replaceQuickHint": "Choose which quick background shortcut should use this file.",
+    "properties": "Properties",
+    "changeCategory": "Change category",
+    "applyToQueue": "Apply to queue",
+    "delete": "Delete from library",
+    "deleteAria": "Delete «{name}» from library",
+    "deleteConfirm": "Delete «{name}»? This action cannot be undone.",
+    "deleteConfirmQueueHint": "Queue items using this file stop projecting until removed or replaced.",
+    "fields": {
+      "name": "Name",
+      "category": "Category",
+      "size": "Size",
+      "modified": "Modified",
+      "path": "Path"
+    },
+    "errors": {
+      "properties": "Error loading file properties",
+      "replaceQuick": "Error replacing quick background",
+      "setInitial": "Error setting initial background",
+      "changeCategory": "Error moving file category",
+      "noActiveQueue": "Select or create a queue (tab) before applying media.",
+      "delete": "Could not delete file from library.",
+      "deleteProcessing": "Wait for video processing to finish."
+    }
+  },
+  "status": {
+    "version": "v{version}",
+    "displays": "{total} monitor(s) · {projection} projecting · {return} on return ({stageReturn} stage return)",
+    "localIp": "Local IP: {ip}",
+    "noNetwork": "no network",
+    "externalDevices": {
+      "title": "Monitors and devices",
+      "hint": "Connect phones, tablets or other computers via browser. Monitors connected directly to the computer are configured in Monitors.",
+      "noneOnline": "No external device connected at the moment.",
+      "openMonitors": "Open Monitors panel…"
+    }
+  },
+  "worship": {
+    "category": "Category",
+    "songs": "Songs",
+    "verses": "Stanzas",
+    "loading": "Loading…",
+    "selectSong": "Select a song",
+    "addToQueue": "Add to queue",
+    "edit": "Edit song",
+    "delete": "Delete song",
+    "deleteConfirm": "Delete «{name}»? This action cannot be undone.",
+    "export": {
+      "category": "Export category",
+      "selection": "Export selection",
+      "import": "Import repertoire",
+      "noSelection": "Select a song to export.",
+      "noCategory": "Select a category.",
+      "importSuccess": "Imported {songs} songs ({verses} stanzas).",
+      "errors": {
+        "export": "Could not export repertoire.",
+        "import": "Could not import file."
+      }
+    },
+    "errors": {
+      "categories": "Error loading categories",
+      "songs": "Error loading songs",
+      "verses": "Error loading stanzas",
+      "delete": "Could not delete song."
+    }
+  },
+  "bible": {
+    "translation": "Translation",
+    "books": "Books",
+    "chapters": "Chapters",
+    "verses": "Verses",
+    "searchReferencePlaceholder": "Reference (e.g. mat 5 1, 1 jo 3 16) or book name",
+    "searchHistoryLabel": "Recent references",
+    "errors": {
+      "bibles": "Error loading Bibles",
+      "books": "Error loading books",
+      "chapters": "Error loading chapters",
+      "verses": "Error loading verses",
+      "bookNotFound": "Book not found: {query}"
+    }
+  },
+  "backgrounds": {
+    "quick": "Quick backgrounds",
+    "initialBadge": "Initial",
+    "setInitial": "Set as initial background",
+    "images": "Images",
+    "errors": {
+      "quick": "Error loading quick backgrounds",
+      "categories": "Error loading image categories",
+      "images": "Error loading images",
+      "setInitial": "Error setting initial background"
+    }
+  },
+  "displays": {
+    "intro": "Set each monitor role: the operator uses the primary monitor; public projection and stage return show different content.",
+    "primary": "primary",
+    "monitorsTitle": "Monitors",
+    "none": "No monitor detected. Run Live Praise on this computer to list connected screens.",
+    "save": "Save roles",
+    "saving": "Saving…",
+    "saved": "Configuration saved. Restart Live Praise to apply new monitor roles.",
+    "roles": {
+      "operator": "Operator",
+      "projection": "Projeção",
+      "stage-return": "Stage return",
+      "off": "Off"
+    },
+    "screenSize": {
+      "title": "Projection screen size",
+      "hint": "Choose the aspect ratio or pixel dimensions of the projection area on screen.",
+      "perMonitorHint": "Each «Projection» monitor can have a different size — use the gear on the monitor row. Remote computers at /projector appear in «Remote projectors».",
+      "configure": "Configure projection size",
+      "monitorTitle": "Projection — {label}",
+      "savedFor": "Size applied on {label}.",
+      "presetLabel": "Screen size",
+      "widthLabel": "Width (px)",
+      "heightLabel": "Height (px)",
+      "widthPlaceholder": "e.g. 1920",
+      "heightPlaceholder": "e.g. 1080",
+      "positionLabel": "Position on screen",
+      "positions": {
+        "centro": "Center (default)",
+        "topo": "Top",
+        "personalizado": "Custom (offset)"
+      },
+      "offsetXLabel": "Horizontal offset (px)",
+      "offsetYLabel": "Vertical offset (px)",
+      "offsetXPlaceholder": "0",
+      "offsetYPlaceholder": "0",
+      "contentFitLabel": "Content smaller than area",
+      "contentFitHint": "Defines what to do when image or video resolution is lower than the projection area.",
+      "contentFits": {
+        "estender": "Stretch (fill area)",
+        "centralizar": "Center (original size)",
+        "proporcional": "Proportional (fit without distortion)"
+      },
+      "livePreview": "Preview on projector while changing (before applying)",
+      "save": "Apply size",
+      "saving": "Applying…",
+      "saved": "Screen size saved and sent to projector.",
+      "presets": {
+        "16:9": "Widescreen (16:9)",
+        "4:3": "Classic (4:3)",
+        "7:3": "Panoramic (7:3)",
+        "5:3": "European cinema (5:3)",
+        "13:7": "US cinema (13:7)",
+        "personalizado": "Custom",
+        "padrao": "Default (full screen)"
+      },
+      "errors": {
+        "save": "Error saving screen size",
+        "socket": "Could not send to projector — check live connection."
+      }
+    },
+    "errors": {
+      "load": "Error loading monitors",
+      "save": "Error saving"
+    },
+    "remoteProjection": {
+      "title": "Remote projectors (/projector)",
+      "hint": "Each browser open at /projector on a remote computer appears here with independent screen settings. Different endpoints (/stage, /vocal, …) have separate identifiers.",
+      "none": "No remote projector connected. Open http://server:port/projector on the remote computer.",
+      "defaultLabel": "Projector {id}"
+    },
+    "external": {
+      "title": "External devices (browser)",
+      "hint": "Network-connected devices (live, vocal, stage return or musicians) appear here and in the status bar.",
+      "none": "No external device connected.",
+      "online": "Connected",
+      "profile": "Profile",
+      "label": "Label",
+      "showChords": "Show chords",
+      "save": "Save device",
+      "saving": "Saving…",
+      "saved": "Device preferences saved.",
+      "profiles": {
+        "live": "Live stream (/live)",
+        "vocal": "Vocal (/vocal)",
+        "stage": "Stage return (/stage)",
+        "player": "Musicians (/player)",
+        "projection": "Projector (/projector)"
+      },
+      "errors": {
+        "load": "Error loading devices",
+        "save": "Error saving device"
+      }
+    }
+  },
+  "common": {
+    "loading": "Loading…",
+    "search": "Search",
+    "searchPlaceholder": "Search…",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "locales": {
+    "meta": {
+      "pt-BR": "Portuguese (Brazil)",
+      "en-US": "English"
+    }
+  }
+}

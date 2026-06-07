@@ -3,7 +3,7 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchJson, mediaUrl } from '../../composables/useApi';
 import { usePreferences } from '../../composables/usePreferences';
-import { useLiveSocket } from '../../composables/useLiveSocket';
+import { subscribeLiveSocket, useLiveSocket } from '../../composables/useLiveSocket';
 import MediaTileContextMenu from '../MediaTileContextMenu.vue';
 import { summarizeLabel } from '@shared/queue-items';
 import { useQueueDrag } from '../../composables/useQueueDrag';
@@ -50,6 +50,7 @@ const hasProcessingVideos = computed(() =>
 );
 
 let pollTimer: ReturnType<typeof setInterval> | null = null;
+let unsubscribeMediaUpdated: (() => void) | null = null;
 
 function clearPollTimer(): void {
   if (pollTimer) {
@@ -120,9 +121,16 @@ watch(
 
 onMounted(() => {
   void loadVideoCategories();
+  unsubscribeMediaUpdated = subscribeLiveSocket((event) => {
+    if (event.type !== 'media-updated' || event.kind !== 'videos') return;
+    if (event.category && event.category !== prefs.value.videoCategory) return;
+    reloadCurrentCategory();
+  });
 });
 
 onUnmounted(() => {
+  unsubscribeMediaUpdated?.();
+  unsubscribeMediaUpdated = null;
   clearPollTimer();
 });
 </script>

@@ -545,6 +545,18 @@
     "edit": "Editar música",
     "delete": "Excluir música",
     "deleteConfirm": "Excluir «{name}»? Esta ação não pode ser desfeita.",
+    "export": {
+      "category": "Exportar categoria",
+      "selection": "Exportar seleção",
+      "import": "Importar repertório",
+      "noSelection": "Selecione uma música para exportar.",
+      "noCategory": "Selecione uma categoria.",
+      "importSuccess": "Importadas {songs} músicas ({verses} versos).",
+      "errors": {
+        "export": "Não foi possível exportar o repertório.",
+        "import": "Não foi possível importar o ficheiro."
+      }
+    },
     "errors": {
       "categories": "Erro ao carregar categorias",
       "songs": "Erro ao carregar músicas",
@@ -681,5 +693,11 @@
     "close": "Fechar",
     "cancel": "Cancelar",
     "confirm": "Confirmar"
+  },
+  "locales": {
+    "meta": {
+      "pt-BR": "Português (Brasil)",
+      "en-US": "English"
+    }
   }
 }

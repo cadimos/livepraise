@@ -167,6 +167,7 @@ function applyAction(action) {
     case 'viewMusica':
     case 'viewBiblia':
       if (usesStageReturnLayout) return;
+      content.style.visibility = 'hidden';
       content.innerHTML = filterHtml(action.valor);
       break;
     case 'viewMusicaRetorno':

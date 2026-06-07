@@ -9,6 +9,7 @@ import type { UserRole } from '../../core/auth/types.js';
 import { getMainDb } from '../db/connection.js';
 import { requireOperatorAccess } from '../middleware/auth.js';
 import { allowCors, jsonError } from '../middleware/common.js';
+import { auditFromRequest } from '../audit/request.js';
 
 /**
  * Gestão de utilizadores (M13 / CAD-128).
@@ -47,6 +48,11 @@ export function createUsersRouter(): Router {
       jsonError(res, 409, created.error);
       return;
     }
+    auditFromRequest(db, req, {
+      action: 'user.create',
+      resource: `users/${created.id}`,
+      details: { username: created.username, role: created.role },
+    });
     res.status(201).json({ status: 'Sucesso', user: created });
   });
 
@@ -80,6 +86,15 @@ export function createUsersRouter(): Router {
       jsonError(res, 404, updated.error);
       return;
     }
+    auditFromRequest(db, req, {
+      action: 'user.update',
+      resource: `users/${id}`,
+      details: {
+        role: input.role,
+        active: input.active,
+        passwordChanged: Boolean(input.password),
+      },
+    });
     res.json({ status: 'Sucesso', user: updated });
   });
 

@@ -2,8 +2,7 @@
 import { computed, onUnmounted, watch } from 'vue';
 import { X } from '@lucide/vue';
 import { useI18n } from 'vue-i18n';
-
-const APP_VERSION = '1.0.0-alpha.2';
+import { APP_VERSION } from '@shared/app-version';
 
 const open = defineModel<boolean>('open', { default: false });
 

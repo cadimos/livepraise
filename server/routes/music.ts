@@ -1,5 +1,9 @@
 import { Router, type Request, type Response } from 'express';
 import {
+  buildMusicRepertoireExport,
+  importMusicRepertoire,
+} from '../../core/music/repertoire.js';
+import {
   dbAll,
   dbRun,
   getMainDb,
@@ -7,6 +11,12 @@ import {
 } from '../db/connection.js';
 import { requireOperatorAccess } from '../middleware/auth.js';
 import { allowCors, jsonError } from '../middleware/common.js';
+import {
+  MusicRepertoireValidationError,
+  parseMusicRepertoireJson,
+  parseMusicRepertoireObject,
+  type MusicRepertoireIdConflict,
+} from '../../shared/music-repertoire.js';
 
 export function createMusicRouter(): Router {
   const api = Router();
@@ -56,6 +66,71 @@ export function createMusicRouter(): Router {
       return;
     }
     res.json({ status: 'Sucesso', items });
+  });
+
+  api.get('/export', requireOperatorAccess, (req: Request, res: Response) => {
+    allowCors(req, res, () => {});
+    const categoryRaw = req.query.categoryId;
+    const songIdsRaw = req.query.songIds;
+    const categoryId =
+      typeof categoryRaw === 'string' && categoryRaw.trim()
+        ? Number(categoryRaw)
+        : undefined;
+    const songIds =
+      typeof songIdsRaw === 'string' && songIdsRaw.trim()
+        ? songIdsRaw
+            .split(',')
+            .map((part) => Number(part.trim()))
+            .filter((id) => Number.isFinite(id) && id > 0)
+        : undefined;
+
+    const payload = buildMusicRepertoireExport(db, {
+      categoryId:
+        categoryId != null && Number.isFinite(categoryId) && categoryId > 0
+          ? categoryId
+          : undefined,
+      songIds,
+    });
+    if (isDbError(payload)) {
+      jsonError(res, 400, String(payload.mensagem));
+      return;
+    }
+    res.json({ status: 'Sucesso', file: payload });
+  });
+
+  api.post('/import', requireOperatorAccess, (req: Request, res: Response) => {
+    allowCors(req, res, () => {});
+    const conflictRaw = req.query.idConflict ?? req.body?.idConflict;
+    const idConflict: MusicRepertoireIdConflict =
+      conflictRaw === 'skip' || conflictRaw === 'overwrite' ? conflictRaw : 'remap';
+
+    let file;
+    try {
+      if (typeof req.body === 'string') {
+        file = parseMusicRepertoireJson(req.body);
+      } else if (req.body?.format === 'livepraise-music-repertoire') {
+        file = parseMusicRepertoireObject(req.body);
+      } else if (req.body?.file) {
+        file = parseMusicRepertoireObject(req.body.file);
+      } else {
+        jsonError(res, 400, 'Corpo de importação inválido');
+        return;
+      }
+    } catch (err) {
+      const message =
+        err instanceof MusicRepertoireValidationError
+          ? err.message
+          : 'Ficheiro de repertório inválido';
+      jsonError(res, 400, message);
+      return;
+    }
+
+    const result = importMusicRepertoire(db, file, idConflict);
+    if (isDbError(result)) {
+      jsonError(res, 400, String(result.mensagem));
+      return;
+    }
+    res.json({ status: 'successo', result });
   });
 
   api.get('/:codigo', (req: Request, res: Response) => {

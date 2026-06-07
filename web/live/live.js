@@ -133,6 +133,7 @@ function applyAction(action) {
       break;
     case 'viewMusica':
     case 'viewBiblia':
+      content.style.visibility = 'hidden';
       content.innerHTML = stripChordsFromHtml(action.valor);
       break;
     case 'removeConteudo':

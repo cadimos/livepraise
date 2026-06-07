@@ -209,6 +209,15 @@ export interface WsProjectionTypographySyncMessage {
   ts: number;
 }
 
+/** Biblioteca de mídia local — novo ficheiro detectado pelo watcher (tarefa 5). */
+export interface WsMediaUpdatedMessage {
+  type: 'media-updated';
+  kind: 'videos';
+  category: string;
+  path: string;
+  ts: number;
+}
+
 export type WsServerMessage =
   | WsJoinedMessage
   | WsLiveBroadcastMessage
@@ -219,4 +228,5 @@ export type WsServerMessage =
   | WsApprovalPendingMessage
   | WsApprovalResolvedMessage
   | WsDevicePresenceMessage
-  | WsProjectionTypographySyncMessage;
+  | WsProjectionTypographySyncMessage
+  | WsMediaUpdatedMessage;

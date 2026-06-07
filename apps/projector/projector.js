@@ -219,6 +219,7 @@ function applyAction(action) {
         }
         case 'viewMusica':
         case 'viewBiblia': {
+            content.style.visibility = 'hidden';
             content.innerHTML = action.valor;
             break;
         }

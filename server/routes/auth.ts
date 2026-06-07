@@ -12,6 +12,8 @@ import { allowedDisplayRolesForUser } from '../../core/auth/roles.js';
 import { requireAuth } from '../middleware/auth.js';
 import { consumeRateLimit } from '../middleware/rate-limit.js';
 import { allowCors, jsonError } from '../middleware/common.js';
+import { auditFromRequest, clientIpFromRequest } from '../audit/request.js';
+import { writeAuditLog } from '../../core/audit/log.js';
 
 export function createAuthRouter(): Router {
   const api = Router();
@@ -36,6 +38,12 @@ export function createAuthRouter(): Router {
 
     const user = findUserByUsername(db, username);
     if (!user || user.active !== 1 || !verifyPassword(password, user.password_hash)) {
+      writeAuditLog(db, {
+        username,
+        action: 'auth.login_failed',
+        resource: `users/${username}`,
+        ip: clientIpFromRequest(req),
+      });
       jsonError(res, 401, 'Credenciais inválidas');
       return;
     }
@@ -45,6 +53,13 @@ export function createAuthRouter(): Router {
       jsonError(res, 500, 'Falha ao criar sessão');
       return;
     }
+
+    auditFromRequest(db, req, {
+      userId: user.id,
+      username: user.username,
+      action: 'auth.login',
+      resource: `users/${user.id}`,
+    });
 
     res.json({
       status: 'Sucesso',
@@ -56,7 +71,13 @@ export function createAuthRouter(): Router {
 
   api.post('/logout', requireAuth, (req: Request, res: Response) => {
     allowCors(req, res, () => {});
-    if (req.auth) revokeSession(db, req.auth.token);
+    if (req.auth) {
+      auditFromRequest(db, req, {
+        action: 'auth.logout',
+        resource: `users/${req.auth.user.id}`,
+      });
+      revokeSession(db, req.auth.token);
+    }
     res.json({ status: 'Sucesso' });
   });
 

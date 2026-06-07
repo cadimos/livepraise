@@ -4,8 +4,10 @@ import { useI18n } from 'vue-i18n';
 import { usePreferences } from '../../composables/usePreferences';
 import { useTheme } from '../../composables/useTheme';
 import { useLocale } from '../../composables/useLocale';
+import { useLocaleLabel } from '../../utils/locale-label';
 
 const { t } = useI18n();
+const localeLabel = useLocaleLabel();
 const { prefs, setFontScalePercent } = usePreferences();
 const { themes, applyTheme } = useTheme();
 const { availableLocales, changeLocale } = useLocale();
@@ -74,7 +76,7 @@ function onFontScaleInput(event: Event) {
         @change="onLocaleChange"
       >
         <option v-for="locale in localeOptions" :key="locale" :value="locale">
-          {{ locale }}
+          {{ localeLabel(locale) }}
         </option>
       </select>
     </label>

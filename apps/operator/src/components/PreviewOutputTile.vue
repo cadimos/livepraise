@@ -88,6 +88,7 @@ const marqueeStyle = computed(() => {
 const contentRef = ref<HTMLElement | null>(null);
 const frameRef = ref<HTMLElement | null>(null);
 const fontFaceStyleRef = ref<HTMLStyleElement | null>(null);
+const previewReady = ref(false);
 
 let resizeObserver: ResizeObserver | null = null;
 let refreshGeneration = 0;
@@ -95,12 +96,14 @@ let loadedContentHtml = '';
 let resizeDebounce: ReturnType<typeof setTimeout> | null = null;
 let refreshDebounce: ReturnType<typeof setTimeout> | null = null;
 
-function ensureContentMarkup(root: HTMLElement): void {
+function ensureContentMarkup(root: HTMLElement): boolean {
   if (loadedContentHtml === props.contentHtml && root.querySelector('.content')) {
-    return;
+    return false;
   }
+  root.style.visibility = 'hidden';
   root.innerHTML = props.contentHtml;
   loadedContentHtml = props.contentHtml;
+  return true;
 }
 
 async function applyTypography(remeasure = false): Promise<void> {
@@ -109,7 +112,10 @@ async function applyTypography(remeasure = false): Promise<void> {
   const root = contentRef.value;
   if (!root || props.empty) return;
 
-  ensureContentMarkup(root);
+  const contentChanged = ensureContentMarkup(root);
+  if (contentChanged) {
+    previewReady.value = false;
+  }
 
   if (!root.querySelector('.content span, .content, .texto')) {
     return;
@@ -136,6 +142,7 @@ async function applyTypography(remeasure = false): Promise<void> {
   );
 
   if (generation !== refreshGeneration) return;
+  previewReady.value = true;
 }
 
 function scheduleApplyTypography(remeasure = false): void {
@@ -236,8 +243,11 @@ onBeforeUnmount(() => {
         <style ref="fontFaceStyleRef" />
         <div
           ref="contentRef"
-          class="conteudo absolute inset-0 z-[2] text-white"
-          :class="{ 'footer-alert-active': footerAlertPreview?.active }"
+          class="conteudo absolute inset-0 z-[2] text-white transition-opacity duration-75"
+          :class="[
+            previewReady ? 'opacity-100' : 'opacity-0',
+            { 'footer-alert-active': footerAlertPreview?.active },
+          ]"
         />
         <footer
           v-if="footerAlertPreview?.active && footerAlertPreview.text"
