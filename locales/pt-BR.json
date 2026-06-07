@@ -156,7 +156,7 @@
       "reject": "Rejeitar"
     },
     "backup": {
-      "panelTitle": "Backup e restauro",
+      "panelTitle": "Backup e restauração",
       "panelIntro": "Exporte ou importe o ambiente Live Praise (base de dados, mídia, temas e preferências). Apenas administradores. Use ao mudar de computador ou recuperar após uma falha.",
       "openBackup": "Gerar backup…",
       "openRestore": "Restaurar de ficheiro…",
@@ -194,6 +194,21 @@
       "overwriteConfirm": "Substituir e restaurar",
       "reloginRequired": "Por segurança, todas as sessões foram terminadas. Inicie sessão novamente antes de continuar a operar.",
       "globalBanner": "Manutenção: backup ou restauro em curso. Algumas acções estão temporariamente indisponíveis.",
+      "repertoire": {
+        "title": "Repertório de louvores (JSON)",
+        "intro": "Exporte ou importe só músicas, categorias e versos em ficheiro JSON — útil para partilhar repertório entre igrejas. Isto é independente do backup .zip do ambiente completo.",
+        "category": "Categoria",
+        "exportCategory": "Exportar categoria",
+        "exportAll": "Exportar tudo",
+        "import": "Importar repertório",
+        "noCategory": "Selecione uma categoria.",
+        "importSuccess": "Importadas {songs} músicas ({verses} versos).",
+        "errors": {
+          "categories": "Erro ao carregar categorias",
+          "export": "Não foi possível exportar o repertório.",
+          "import": "Não foi possível importar o ficheiro."
+        }
+      },
       "groups": {
         "database": "Base de dados (louvor, utilizadores, Bíblia, sistema)",
         "databaseHint": "Inclui contas de operador e credenciais encriptadas.",
@@ -403,7 +418,7 @@
     "projectionTypography": "Tipografia de projeção",
     "approvalQueue": "Fila de aprovação",
     "errorLog": "Logs de erro",
-    "backupRestore": "Backup e restauro",
+    "backupRestore": "Backup e restauração",
     "keyboardShortcuts": "Atalhos de teclado",
     "helpManual": "Manual",
     "helpReport": "Informar problema",
@@ -681,5 +696,13 @@
     "close": "Fechar",
     "cancel": "Cancelar",
     "confirm": "Confirmar"
+  },
+  "locales": {
+    "meta": {
+      "pt-BR": "Português (Brasil)",
+      "en-US": "English",
+      "pt-PT": "Português (Portugal)",
+      "es-ES": "Español"
+    }
   }
 }

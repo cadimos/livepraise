@@ -95,24 +95,30 @@ onMounted(() => {
       {{ error }}
     </div>
 
-    <label class="text-xs uppercase tracking-wider text-lp-muted">{{ t('images.category') }}</label>
-    <select
-      :value="prefs.imageCategory"
-      class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
-      @change="loadImages(($event.target as HTMLSelectElement).value)"
-    >
-      <option v-for="cat in imageCategories" :key="cat" :value="cat">
-        {{ cat }}
-      </option>
-    </select>
+    <div class="lp-panel-field-row">
+      <label class="lp-panel-label" for="images-category">{{ t('images.category') }}</label>
+      <select
+        id="images-category"
+        :value="prefs.imageCategory"
+        class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
+        @change="loadImages(($event.target as HTMLSelectElement).value)"
+      >
+        <option v-for="cat in imageCategories" :key="cat" :value="cat">
+          {{ cat }}
+        </option>
+      </select>
+    </div>
 
-    <label class="text-xs uppercase tracking-wider text-lp-muted">{{ t('common.search') }}</label>
-    <input
-      v-model="searchQuery"
-      type="search"
-      class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
-      :placeholder="t('common.searchPlaceholder')"
-    />
+    <div class="lp-panel-field-row">
+      <label class="lp-panel-label" for="images-search">{{ t('common.search') }}</label>
+      <input
+        id="images-search"
+        v-model="searchQuery"
+        type="search"
+        class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
+        :placeholder="t('common.searchPlaceholder')"
+      />
+    </div>
 
     <ul class="grid min-h-0 flex-1 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4">
       <li v-for="img in filteredImages" :key="img">

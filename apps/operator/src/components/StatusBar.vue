@@ -9,10 +9,16 @@ import { useTheme } from '../composables/useTheme';
 import { useLocale } from '../composables/useLocale';
 import { useLocalIp } from '../composables/useLocalIp';
 import ExternalDeviceStatusMenu from './ExternalDeviceStatusMenu.vue';
+import { APP_VERSION } from '@shared/app-version';
+import { useLocaleLabel } from '../utils/locale-label';
 
 defineEmits<{ openDisplays: [] }>();
 
-const APP_VERSION = '1.0.0-alpha.1';
+type LivepraiseBridge = { version?: string };
+
+const bridge = (window as Window & { livepraise?: LivepraiseBridge }).livepraise;
+const appVersion = computed(() => bridge?.version ?? APP_VERSION);
+const localeLabel = useLocaleLabel();
 
 const { t } = useI18n();
 const { prefs } = usePreferences();
@@ -90,7 +96,7 @@ onMounted(() => {
     class="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-lp-surface bg-lp-surface/90 px-4 py-2 text-xs text-lp-muted"
   >
     <span class="font-semibold text-lp-text">{{ t('app.name') }}</span>
-    <span>{{ t('status.version', { version: APP_VERSION }) }}</span>
+    <span>{{ t('status.version', { version: appVersion }) }}</span>
 
     <label class="inline-flex items-center gap-1.5">
       <span>{{ t('settings.theme') }}</span>
@@ -113,7 +119,7 @@ onMounted(() => {
         @change="onLocaleChange"
       >
         <option v-for="locale in localeOptions" :key="locale" :value="locale">
-          {{ locale }}
+          {{ localeLabel(locale) }}
         </option>
       </select>
     </label>

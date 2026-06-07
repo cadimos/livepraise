@@ -31,7 +31,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick));
   <div ref="root" class="relative">
     <button
       type="button"
-      class="inline-flex items-center gap-1 rounded-md px-3 py-2 font-medium transition hover:bg-white/15"
+      class="inline-flex items-center gap-1 rounded-md px-2 py-1 font-medium transition hover:bg-white/15"
       :aria-expanded="open"
       @click.stop="toggle"
     >

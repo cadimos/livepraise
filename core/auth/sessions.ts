@@ -107,6 +107,11 @@ export function resolveSession(
   };
 }
 
-export function purgeExpiredSessions(db: Database): void {
-  dbRun(db, "DELETE FROM auth_sessions WHERE expires_at < datetime('now')");
+export function purgeExpiredSessions(db: Database): number {
+  const result = dbRun(
+    db,
+    "DELETE FROM auth_sessions WHERE expires_at < datetime('now')",
+  );
+  if (isDbError(result)) return 0;
+  return result;
 }

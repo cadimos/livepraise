@@ -4,6 +4,95 @@ Todas as alterações relevantes do Live Praise são documentadas neste ficheiro
 
 O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [1.0.0-alpha.2] — 2026-06-07
+
+Segunda release alpha — estabilização pós-`alpha.1`: migração legada, pipeline de release unificado, correcções Windows, e entregáveis de produto (auditoria, i18n, watcher de vídeos, export de louvores, sync de versão, textfill sem flash).
+
+### Resumo
+
+| | 1.0.0-alpha.1 | 1.0.0-alpha.2 |
+|---|---|---|
+| **Foco** | Primeira alpha (reescrita 1.x) | Estabilização + funcionalidades de produto |
+| **Migração v0.0.8** | Parcial | `legacy-upgrade` + `smoke:legacy-upgrade` |
+| **Release CI** | Workflows separados | Draft único Win/Linux/macOS (validado manualmente) |
+| **Auditoria** | — | `audit_logs` + retenção + `GET /api/audit/logs` |
+| **Idiomas** | Só `pt-BR` | `pt-BR` (default) + `en-US` |
+| **Vídeos** | Pipeline + polling | Watcher de pasta + evento WS `media-updated` |
+| **Louvor** | CRUD local | Export/import JSON (`livepraise-music-repertoire`) |
+| **Projeção** | Flash ao trocar verso | Textfill oculta root até tamanho final |
+| **Versão** | Bump manual em vários ficheiros | `bump-version` + `shared/app-version.ts` |
+| **OpenAPI** | 64 endpoints | **67** endpoints |
+
+---
+
+### Adicionado
+
+#### Infraestrutura e release (desde alpha.1)
+
+- Caminho de **upgrade legado v0.0.8 → 1.x** (`server/db/legacy-upgrade.ts`) com backup automático e quarentena de BD corrompida.
+- Smoke **`npm run smoke:legacy-upgrade`**.
+- Script **`scripts/smoke-win-installer.mjs`** — validação do instalador NSIS no Windows.
+- Serviço **`server/services/ffmpegBinary.ts`**; helper **`server/db/migration-skip.ts`**.
+- Workflow **`release.yml`**: draft único no GitHub, builds Win/Linux/macOS em paralelo, `resolve-release-version.mjs`, rpm + pacman no job Linux — **validado manualmente**.
+
+#### Alpha.2 — produto
+
+- **Auditoria e retenção** — migration `008_audit_logs.sql`, `core/audit/log.ts`, hooks em `auth`, `users`, `devices`, `backup`/`restore`; `core/retention/purge.ts` + scheduler diário (contas 30 d, logs 90 d, dispositivos 180 d); **`GET /api/audit/logs`** (admin); smoke **`npm run smoke:audit`**.
+- **Locales** — `locales/en-US.json` + `install/locales/en-US.json` (paridade de chaves com `pt-BR`); rótulos legíveis no selector; **`pt-BR` permanece default**; `locales/README.md`; smoke **`npm run smoke:locales`**.
+- **Watcher de vídeos** — `server/services/videoWatcher.ts` (`fs.watch` recursivo, debounce); integração com `scheduleVideoPipeline`; WebSocket **`media-updated`** → `VideosPanel.vue`; smoke **`npm run smoke:video-watcher`**.
+- **Import/export repertório** — formato JSON **`livepraise-music-repertoire`**; **`GET /musica/export`**, **`POST /musica/import`** (conflitos `remap`/`skip`/`overwrite`); UI no painel Louvor; smoke **`npm run smoke:musica-export`**.
+- **Versão única** — `scripts/bump-version.mjs`, `scripts/sync-app-version.mjs`, `shared/app-version.ts`; sync no `build`; **`npm run bump-version`**, **`npm run smoke:version`**.
+
+---
+
+### Alterado
+
+- Refactor de **`server/index.ts`** e **`server/bootstrap.ts`** (arranque modular, watcher, retention scheduler).
+- Melhorias na **ligação WebSocket** e gestão de sessões de base de dados.
+- Refactor do **pipeline de vídeo** (`server/services/videoPipeline.ts`).
+- **`shared/projection-textfill`** — root oculto durante medição; `suppressVisibilityToggle` na passagem dupla; projetor/retorno/live ocultam conteúdo **antes** de `innerHTML` ao trocar verso.
+- **`PreviewOutputTile.vue`** — padrão `previewReady` alinhado a `ProjectionTypographyPreview.vue`.
+- **README** — requisitos e instruções Windows/Linux.
+- **electron-builder** actualizado para **26.8.1**.
+
+---
+
+### Corrigido
+
+- Instalação no **Windows** (NSIS) e uso incorrecto do modo dev como migração.
+- Migração **v0.0.8 → 1.0.0-alpha.1** (repertório e sidecars WAL/SHM).
+- **Flash textfill** ao trocar verso em louvor/Bíblia — público deixa de ver texto pequeno antes do tamanho final.
+- Action de deploy Windows e resolução de versão no workflow de release.
+- Vulnerabilidade na dependência **`tmp`**.
+- `.gitignore` e workflows GHA.
+
+---
+
+### Removido
+
+- Workflow **CodeQL** (desactivado nesta linha de release).
+- Três workflows **CA-R40** separados — substituídos por **`release.yml`** unificado.
+
+---
+
+### Fora do escopo alpha.2
+
+Adiado para versão futura (ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md)):
+
+- Vitest + Playwright (secção 3)
+- Busca online de louvores (secção 6)
+- Editor visual de temas (secção 7)
+- Telemetria opt-in remota (secção 8)
+- Auditoria WCAG sistemática (secção 12)
+
+### Pendente / opcional pós-alpha.2
+
+- Smoke **`smoke-win-installer`** no CI Windows (secção 10) — validação manual já feita.
+- Teste de **auto-update in-app** alpha.1 → alpha.2 após **Publish release** (secção 13).
+- Painel UI para logs de auditoria (API admin já existe).
+
+---
+
 ## [1.0.0-alpha.1] — 2026-05-28
 
 Primeira release alpha do **Live Praise 1.x** — reescrita completa do produto com arquitetura modular (Electron 42 + TypeScript + Vue 3). Inclui notas de migração a partir da linha **v0.0.8** (`0.0.9`).
@@ -185,20 +274,19 @@ Reescrita completa com arquitetura modular (Electron 42 + TypeScript + Vue 3), p
 
 ---
 
-### Pendente (não incluído nesta release)
+### Pendente (não incluído em alpha.1; ver alpha.2 para itens já entregues)
 
-Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md):
+Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md) — **entregue em alpha.2:** auditoria, locales `en-US`, watcher de vídeos, export/import louvor, sync de versão, flash textfill, release unificado.
 
-1. Auditoria e retenção de dados (`audit_logs`).
-2. Checklist operacional completo de release multi-OS (CI existe; falta gate humano por tag).
-3. Suite Vitest + Playwright além dos smokes.
-4. Locales adicionais (`en-US`, `es`, …).
-5. Import/export do repertório completo.
-6. Watcher de pasta de vídeos (detecção em tempo real com painel aberto).
-7. Busca online de louvores (nova fonte — decisão de produto).
-8. Editor visual de temas (color pickers; normalização já existe).
-9. Telemetria opt-in de crashes.
-10. Sincronização multi-estação (fora de escopo).
+**Ainda pendente (alpha.3+ ou opcional):**
+
+1. Suite Vitest + Playwright além dos smokes.
+2. Busca online de louvores (nova fonte — decisão de produto).
+3. Editor visual de temas (color pickers).
+4. Telemetria opt-in de crashes (envio remoto).
+5. Acessibilidade WCAG sistemática.
+6. Smoke instalador Windows no CI; teste auto-update in-app por SO.
+7. Sincronização multi-estação (fora de escopo).
 
 ---
 
@@ -221,4 +309,5 @@ Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md):
 - **Contribuidores da linha anterior:** Kerolen Lucena, Sabrina Santos
 - **Licença:** MIT
 
+[1.0.0-alpha.2]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.2
 [1.0.0-alpha.1]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.1

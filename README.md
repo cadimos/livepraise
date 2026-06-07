@@ -4,7 +4,7 @@
 
 Software desktop open-source (MIT) para projeção de louvores, passagens bíblicas, imagens e vídeos em cultos — operador local com pré-visualização multi-saída, retorno de palco, ecrãs externos e controlo remoto.
 
-**Versão actual:** `1.0.0-alpha.1` — ver [`CHANGELOG.md`](CHANGELOG.md) para novidades e migração.
+**Versão actual:** `1.0.0-alpha.2` — ver [`CHANGELOG.md`](CHANGELOG.md) para novidades e migração.
 
 ## Funcionalidades
 

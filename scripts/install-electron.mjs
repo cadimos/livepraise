@@ -19,66 +19,80 @@ if (!fs.existsSync(path.join(electronDir, 'package.json'))) {
   process.exit(0);
 }
 
-const { version } = JSON.parse(fs.readFileSync(path.join(electronDir, 'package.json'), 'utf8'));
-const extract = require('extract-zip');
-const { downloadArtifact } = await import('@electron/get');
-
-const platformPath = getPlatformPath();
-
-if (isInstalled()) {
-  console.log('install-electron: binário já presente para esta plataforma.');
-  process.exit(0);
-}
-
-const platform =
-  process.env.ELECTRON_INSTALL_PLATFORM || process.env.npm_config_platform || process.platform;
-let arch = process.env.ELECTRON_INSTALL_ARCH || process.env.npm_config_arch || process.arch;
-
-if (
-  platform === 'darwin' &&
-  process.platform === 'darwin' &&
-  arch === 'x64' &&
-  process.env.npm_config_arch === undefined
-) {
-  try {
-    const output = execSync('sysctl -in sysctl.proc_translated', { encoding: 'utf8' });
-    if (output.trim() === '1') arch = 'arm64';
-  } catch {
-    // ignore
-  }
-}
-
-console.log(`install-electron: a descarregar Electron ${version} (${platform}/${arch})…`);
-
-const checksums = JSON.parse(
-  fs.readFileSync(path.join(electronDir, 'checksums.json'), 'utf8'),
-);
-
-const zipPath = await downloadArtifact({
-  version,
-  artifactName: 'electron',
-  force: process.env.force_no_cache === 'true',
-  cacheRoot: process.env.electron_config_cache,
-  checksums:
-    process.env.electron_use_remote_checksums ||
-    process.env.npm_config_electron_use_remote_checksums
-      ? undefined
-      : checksums,
-  platform,
-  arch,
+main().catch((err) => {
+  console.error('install-electron:', err instanceof Error ? err.message : err);
+  if (err instanceof Error && err.stack) console.error(err.stack);
+  process.exit(1);
 });
 
-await extract(zipPath, { dir: path.join(electronDir, 'dist') });
+async function main() {
+  const { version } = JSON.parse(fs.readFileSync(path.join(electronDir, 'package.json'), 'utf8'));
+  const extract = require('extract-zip');
+  const { downloadArtifact } = await import('@electron/get');
 
-const distPath = process.env.ELECTRON_OVERRIDE_DIST_PATH || path.join(electronDir, 'dist');
-const srcTypeDefPath = path.join(distPath, 'electron.d.ts');
-const targetTypeDefPath = path.join(electronDir, 'electron.d.ts');
-if (fs.existsSync(srcTypeDefPath)) {
-  fs.renameSync(srcTypeDefPath, targetTypeDefPath);
+  const platformPath = getPlatformPath();
+
+  if (isInstalled(version, platformPath)) {
+    console.log('install-electron: binário já presente para esta plataforma.');
+    return;
+  }
+
+  const platform =
+    process.env.ELECTRON_INSTALL_PLATFORM || process.env.npm_config_platform || process.platform;
+  let arch = process.env.ELECTRON_INSTALL_ARCH || process.env.npm_config_arch || process.arch;
+
+  if (
+    platform === 'darwin' &&
+    process.platform === 'darwin' &&
+    arch === 'x64' &&
+    process.env.npm_config_arch === undefined
+  ) {
+    try {
+      const output = execSync('sysctl -in sysctl.proc_translated', { encoding: 'utf8' });
+      if (output.trim() === '1') arch = 'arm64';
+    } catch {
+      // ignore
+    }
+  }
+
+  const distDir = path.join(electronDir, 'dist');
+  if (hasStaleDist(distDir, platformPath)) {
+    console.log('install-electron: a limpar dist de outra plataforma…');
+    fs.rmSync(distDir, { recursive: true, force: true });
+  }
+
+  console.log(`install-electron: a descarregar Electron ${version} (${platform}/${arch})…`);
+
+  const checksums = JSON.parse(
+    fs.readFileSync(path.join(electronDir, 'checksums.json'), 'utf8'),
+  );
+
+  const zipPath = await downloadArtifact({
+    version,
+    artifactName: 'electron',
+    force: process.env.force_no_cache === 'true',
+    cacheRoot: process.env.electron_config_cache,
+    checksums:
+      process.env.electron_use_remote_checksums ||
+      process.env.npm_config_electron_use_remote_checksums
+        ? undefined
+        : checksums,
+    platform,
+    arch,
+  });
+
+  await extract(zipPath, { dir: distDir });
+
+  const distPath = process.env.ELECTRON_OVERRIDE_DIST_PATH || distDir;
+  const srcTypeDefPath = path.join(distPath, 'electron.d.ts');
+  const targetTypeDefPath = path.join(electronDir, 'electron.d.ts');
+  if (fs.existsSync(srcTypeDefPath)) {
+    fs.renameSync(srcTypeDefPath, targetTypeDefPath);
+  }
+
+  await fs.promises.writeFile(path.join(electronDir, 'path.txt'), platformPath);
+  console.log('install-electron: concluído.');
 }
-
-await fs.promises.writeFile(path.join(electronDir, 'path.txt'), platformPath);
-console.log('install-electron: concluído.');
 
 function getPlatformPath() {
   const p =
@@ -98,7 +112,7 @@ function getPlatformPath() {
   }
 }
 
-function isInstalled() {
+function isInstalled(version, platformPath) {
   try {
     const installedVersion = fs
       .readFileSync(path.join(electronDir, 'dist', 'version'), 'utf8')
@@ -106,7 +120,7 @@ function isInstalled() {
     if (installedVersion !== version) return false;
 
     const pathTxt = fs.readFileSync(path.join(electronDir, 'path.txt'), 'utf8');
-    if (pathTxt !== platformPath) return false;
+    if (pathTxt.trim() !== platformPath) return false;
   } catch {
     return false;
   }
@@ -115,4 +129,15 @@ function isInstalled() {
     process.env.ELECTRON_OVERRIDE_DIST_PATH ||
     path.join(electronDir, 'dist', platformPath);
   return fs.existsSync(electronPath);
+}
+
+function hasStaleDist(distDir, platformPath) {
+  if (!fs.existsSync(distDir)) return false;
+  const electronPath = path.join(distDir, platformPath);
+  if (fs.existsSync(electronPath)) return false;
+  try {
+    return fs.readdirSync(distDir).length > 0;
+  } catch {
+    return false;
+  }
 }

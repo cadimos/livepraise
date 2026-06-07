@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { syncAppVersion } from './sync-app-version.mjs';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PKG_PATH = path.join(ROOT, 'package.json');
@@ -190,7 +191,10 @@ async function main() {
   );
 
   const apply = !process.argv.includes('--dry-run');
-  if (apply) writePackageVersion(version);
+  if (apply) {
+    writePackageVersion(version);
+    syncAppVersion(version);
+  }
 
   console.log(`base=${baseVersion}`);
   console.log(`published=${publishedVersions.length}`);

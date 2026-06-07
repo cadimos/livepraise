@@ -97,6 +97,24 @@ textarea::placeholder {
   color: var(--lp-color-muted);
 }
 
+/* Label + select/input na mesma linha (economiza altura vertical) */
+.lp-panel-field-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lp-panel-field-row > .lp-panel-label {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.lp-panel-field-row > select,
+.lp-panel-field-row > input {
+  min-width: 0;
+  flex: 1 1 0%;
+}
+
 .playlist-verse-tile {
   /* CAD-116: 60% da altura anterior (35vh → 21vh) */
   height: 21vh;

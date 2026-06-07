@@ -3,7 +3,7 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchJson, mediaUrl } from '../../composables/useApi';
 import { usePreferences } from '../../composables/usePreferences';
-import { useLiveSocket } from '../../composables/useLiveSocket';
+import { subscribeLiveSocket, useLiveSocket } from '../../composables/useLiveSocket';
 import MediaTileContextMenu from '../MediaTileContextMenu.vue';
 import { summarizeLabel } from '@shared/queue-items';
 import { useQueueDrag } from '../../composables/useQueueDrag';
@@ -50,6 +50,7 @@ const hasProcessingVideos = computed(() =>
 );
 
 let pollTimer: ReturnType<typeof setInterval> | null = null;
+let unsubscribeMediaUpdated: (() => void) | null = null;
 
 function clearPollTimer(): void {
   if (pollTimer) {
@@ -120,9 +121,16 @@ watch(
 
 onMounted(() => {
   void loadVideoCategories();
+  unsubscribeMediaUpdated = subscribeLiveSocket((event) => {
+    if (event.type !== 'media-updated' || event.kind !== 'videos') return;
+    if (event.category && event.category !== prefs.value.videoCategory) return;
+    reloadCurrentCategory();
+  });
 });
 
 onUnmounted(() => {
+  unsubscribeMediaUpdated?.();
+  unsubscribeMediaUpdated = null;
   clearPollTimer();
 });
 </script>
@@ -133,24 +141,30 @@ onUnmounted(() => {
       {{ error }}
     </div>
 
-    <label class="text-xs uppercase tracking-wider text-lp-muted">{{ t('videos.category') }}</label>
-    <select
-      :value="prefs.videoCategory"
-      class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
-      @change="loadVideos(($event.target as HTMLSelectElement).value)"
-    >
-      <option v-for="cat in videoCategories" :key="cat" :value="cat">
-        {{ cat }}
-      </option>
-    </select>
+    <div class="lp-panel-field-row">
+      <label class="lp-panel-label" for="videos-category">{{ t('videos.category') }}</label>
+      <select
+        id="videos-category"
+        :value="prefs.videoCategory"
+        class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
+        @change="loadVideos(($event.target as HTMLSelectElement).value)"
+      >
+        <option v-for="cat in videoCategories" :key="cat" :value="cat">
+          {{ cat }}
+        </option>
+      </select>
+    </div>
 
-    <label class="text-xs uppercase tracking-wider text-lp-muted">{{ t('common.search') }}</label>
-    <input
-      v-model="searchQuery"
-      type="search"
-      class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
-      :placeholder="t('common.searchPlaceholder')"
-    />
+    <div class="lp-panel-field-row">
+      <label class="lp-panel-label" for="videos-search">{{ t('common.search') }}</label>
+      <input
+        id="videos-search"
+        v-model="searchQuery"
+        type="search"
+        class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
+        :placeholder="t('common.searchPlaceholder')"
+      />
+    </div>
 
     <ul class="grid min-h-0 flex-1 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4">
       <li v-for="item in filteredVideos" :key="item.video">

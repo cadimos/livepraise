@@ -10,6 +10,7 @@ import {
 import type { DisplayScreenSize } from '../../shared/types/live.js';
 import { getMainDb } from '../db/connection.js';
 import { jsonError } from '../middleware/common.js';
+import { auditFromRequest } from '../audit/request.js';
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -55,6 +56,11 @@ export function createDevicesRouter(): Router {
         return;
       }
       device = touchExternalDevice(db, deviceId, profileRaw);
+      auditFromRequest(db, req, {
+        action: 'device.register',
+        resource: `devices/${deviceId}`,
+        details: { profile: profileRaw },
+      });
     } else if (device && profileRaw && isExternalDisplayProfile(profileRaw)) {
       device = touchExternalDevice(db, deviceId, profileRaw);
     } else if (device) {
@@ -124,6 +130,17 @@ export function createDevicesRouter(): Router {
       );
       return;
     }
+
+    auditFromRequest(db, req, {
+      action: 'device.update',
+      resource: `devices/${deviceId}`,
+      details: {
+        profile: profileRaw || undefined,
+        showChords: patch.showChords,
+        label: patch.label,
+        screenSize: patch.screenSize !== undefined,
+      },
+    });
 
     res.json({ status: 'successo', device: updated });
   });

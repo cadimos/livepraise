@@ -53,6 +53,11 @@ export interface LiveWebSocketHub {
   path: string;
   broadcast(message: WsServerMessage): void;
   broadcastProjectionTypography(projectionTypography: ProjectionTypographyPrefs): void;
+  broadcastMediaUpdated(update: {
+    kind: 'videos';
+    category: string;
+    path: string;
+  }): void;
   applyOperatorAction(action: LiveAction, from: string): void;
   close(): Promise<void>;
 }
@@ -141,6 +146,20 @@ export function attachLiveWebSocket(
       if (meta.role !== 'operator' && meta.role !== 'remote-operator') continue;
       send(socket, message);
     }
+  }
+
+  function broadcastMediaUpdated(update: {
+    kind: 'videos';
+    category: string;
+    path: string;
+  }): void {
+    emitOperators({
+      type: 'media-updated',
+      kind: update.kind,
+      category: update.category,
+      path: update.path,
+      ts: Date.now(),
+    });
   }
 
   function broadcastDevicePresence(
@@ -384,6 +403,7 @@ export function attachLiveWebSocket(
     path,
     broadcast: (message) => emitAll(message),
     broadcastProjectionTypography,
+    broadcastMediaUpdated,
     applyOperatorAction,
     close: () =>
       new Promise((resolve, reject) => {

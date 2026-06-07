@@ -65,6 +65,9 @@ try {
   assert(typeof applyOutputTextfill === 'function', 'applyOutputTextfill export');
   pass('CA-1', 'helpers textfill exportados');
 
+  await import('../tests/projection-textfill-visibility.test.mjs');
+  pass('CA-1b', 'textfill oculta root durante refresh (sem flash)');
+
   const { createProjectionTypographyController } = await import(
     '../shared/projection-typography-runtime.js'
   );

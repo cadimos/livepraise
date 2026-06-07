@@ -254,26 +254,32 @@ onUnmounted(() => {
       {{ error }}
     </div>
 
-    <label class="lp-panel-label">{{ t('worship.category') }}</label>
-    <select
-      :value="prefs.musicCategoryId"
-      class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
-      @change="loadSongs(($event.target as HTMLSelectElement).value)"
-    >
-      <option v-for="cat in categories" :key="cat.id" :value="String(cat.id)">
-        {{ cat.descricao ?? cat.nome ?? `Categoria ${cat.id}` }}
-      </option>
-    </select>
+    <div class="lp-panel-field-row">
+      <label class="lp-panel-label" for="worship-category">{{ t('worship.category') }}</label>
+      <select
+        id="worship-category"
+        :value="prefs.musicCategoryId"
+        class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
+        @change="loadSongs(($event.target as HTMLSelectElement).value)"
+      >
+        <option v-for="cat in categories" :key="cat.id" :value="String(cat.id)">
+          {{ cat.descricao ?? cat.nome ?? `Categoria ${cat.id}` }}
+        </option>
+      </select>
+    </div>
 
-    <label class="lp-panel-label">{{ t('common.search') }}</label>
-    <input
-      :value="searchInput"
-      type="search"
-      class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
-      :placeholder="t('common.searchPlaceholder')"
-      @input="onSearchInput(($event.target as HTMLInputElement).value)"
-      @keydown.enter.prevent="onSearchEnter"
-    />
+    <div class="lp-panel-field-row">
+      <label class="lp-panel-label" for="worship-search">{{ t('common.search') }}</label>
+      <input
+        id="worship-search"
+        :value="searchInput"
+        type="search"
+        class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
+        :placeholder="t('common.searchPlaceholder')"
+        @input="onSearchInput(($event.target as HTMLInputElement).value)"
+        @keydown.enter.prevent="onSearchEnter"
+      />
+    </div>
 
     <div class="grid min-h-0 flex-1 grid-cols-2 gap-3">
       <div class="flex min-h-0 flex-col">

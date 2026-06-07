@@ -390,11 +390,22 @@ async function runRefreshTextfill(
   await ensureMeasurableBox(contentEl, mode);
 
   const applyFn = mode === 'preview' ? applyPreviewTextfill : applyOutputTextfill;
-  applyFn(contentEl, minPx, maxPx, enabled, textfillOptions);
+  const fillOptions: ProjectionTextfillOptions = {
+    ...textfillOptions,
+    suppressVisibilityToggle: true,
+  };
 
-  /* Segunda passagem após o grid (topo/rodapé fixos) estabilizar a área de `.content`. */
-  await waitForLayoutFrames();
-  applyFn(contentEl, minPx, maxPx, enabled, textfillOptions);
+  /* Ocultar o root durante ambas as passagens — evita flash entre frames e entre medições. */
+  contentEl.style.visibility = 'hidden';
+  try {
+    applyFn(contentEl, minPx, maxPx, enabled, fillOptions);
+
+    /* Segunda passagem após o grid (topo/rodapé fixos) estabilizar a área de `.content`. */
+    await waitForLayoutFrames();
+    applyFn(contentEl, minPx, maxPx, enabled, fillOptions);
+  } finally {
+    contentEl.style.visibility = '';
+  }
 }
 
 /** Aguarda fontes/layout e aplica textfill — prévias do operador (CAD-313). */

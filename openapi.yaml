@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Livepraise API
-  version: 1.0.0-alpha.1
+  version: 1.0.0-alpha.2
   description: |
     API HTTP do servidor Livepraise (Electron + Express).
 
@@ -23,6 +23,10 @@ tags:
     description: Sessões e login
   - name: users
     description: Gestão de utilizadores (operador)
+  - name: audit
+    description: |
+      Auditoria de acções sensíveis (admin). Retenção automática:
+      logs 90 dias; contas desactivadas 30 dias; dispositivos inactivos 180 dias.
   - name: remote
     description: Remoto — Chrome tabs e fila de aprovação
   - name: music
@@ -66,7 +70,7 @@ paths:
                   value:
                     status: ok
                     phase: release
-                    version: 1.0.0-alpha.1
+                    version: 1.0.0-alpha.2
                     websocket: /ws/live
                     modules:
                       - id: database
@@ -492,6 +496,49 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /api/audit/logs:
+    get:
+      tags: [audit]
+      summary: Listar registos de auditoria
+      operationId: listAuditLogs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Últimos registos (mais recentes primeiro)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, retention, logs]
+                properties:
+                  status:
+                    type: string
+                  retention:
+                    $ref: '#/components/schemas/AuditRetentionPolicy'
+                  logs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditLogRecord'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
   /api/remote/chrome-tab:
     post:
       tags: [remote]
@@ -817,6 +864,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessItems'
+
+  /musica/export:
+    get:
+      tags: [music]
+      summary: Exportar repertório (JSON)
+      operationId: exportMusicRepertoire
+      parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+          description: Exportar só músicas desta categoria
+        - name: songIds
+          in: query
+          schema:
+            type: string
+          description: IDs de músicas separados por vírgula
+      responses:
+        '200':
+          description: Ficheiro JSON de repertório
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  file:
+                    $ref: '#/components/schemas/MusicRepertoireFile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /musica/import:
+    post:
+      tags: [music]
+      summary: Importar repertório (JSON)
+      operationId: importMusicRepertoire
+      parameters:
+        - name: idConflict
+          in: query
+          schema:
+            type: string
+            enum: [remap, skip, overwrite]
+            default: remap
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MusicRepertoireFile'
+      responses:
+        '200':
+          description: Estatísticas de importação
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  result:
+                    $ref: '#/components/schemas/MusicRepertoireImportResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
 
   /musica/{codigo}:
     get:
@@ -1892,6 +2003,52 @@ components:
         entry:
           $ref: '#/components/schemas/ErrorLogEntry'
 
+    AuditRetentionPolicy:
+      type: object
+      required: [deactivatedUserDays, auditLogDays, inactiveDeviceDays]
+      properties:
+        deactivatedUserDays:
+          type: integer
+          description: Contas com active=false removidas após este prazo (dias)
+          example: 30
+        auditLogDays:
+          type: integer
+          description: Registos em audit_logs removidos após este prazo (dias)
+          example: 90
+        inactiveDeviceDays:
+          type: integer
+          description: external_devices sem last_seen recente removidos após este prazo (dias)
+          example: 180
+
+    AuditLogRecord:
+      type: object
+      required: [id, action, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        action:
+          type: string
+          example: user.create
+        resource:
+          type: string
+          nullable: true
+        ip:
+          type: string
+          nullable: true
+        details:
+          type: object
+          additionalProperties: true
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
     PublicUser:
       type: object
       required: [id, username, role, active, createdAt, updatedAt]
@@ -2109,6 +2266,74 @@ components:
             - type: object
             - type: string
             - type: integer
+
+    MusicRepertoireCategory:
+      type: object
+      required: [id, nome]
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        nome2:
+          type: string
+
+    MusicRepertoireSong:
+      type: object
+      required: [categoryId, nome, artista, verses]
+      properties:
+        sourceId:
+          type: integer
+        categoryId:
+          type: integer
+        nome:
+          type: string
+        artista:
+          type: string
+        compositor:
+          type: string
+        verses:
+          type: array
+          items:
+            type: string
+
+    MusicRepertoireFile:
+      type: object
+      required: [format, version, exportedAt, categories, songs]
+      properties:
+        format:
+          type: string
+          enum: [livepraise-music-repertoire]
+        version:
+          type: integer
+          enum: [1]
+        exportedAt:
+          type: string
+          format: date-time
+        appVersion:
+          type: string
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/MusicRepertoireCategory'
+        songs:
+          type: array
+          items:
+            $ref: '#/components/schemas/MusicRepertoireSong'
+
+    MusicRepertoireImportResult:
+      type: object
+      properties:
+        categoriesCreated:
+          type: integer
+        categoriesReused:
+          type: integer
+        songsImported:
+          type: integer
+        songsSkipped:
+          type: integer
+        versesImported:
+          type: integer
 
     PlaylistResolveRequest:
       type: object

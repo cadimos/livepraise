@@ -9,7 +9,7 @@ export type UpdateStatus =
   | { kind: 'error'; message: string; fallback: true };
 
 contextBridge.exposeInMainWorld('livepraise', {
-  version: '1.0.0-alpha.1',
+  version: '1.0.0-alpha.2',
   runtime: {
     node: process.versions.node,
     chrome: process.versions.chrome,

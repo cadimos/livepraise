@@ -313,6 +313,7 @@ function applyAction(action: LiveAction): void {
     }
     case 'viewMusica':
     case 'viewBiblia': {
+      content.style.visibility = 'hidden';
       content.innerHTML = action.valor;
       break;
     }

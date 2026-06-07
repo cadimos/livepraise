@@ -314,25 +314,31 @@ onUnmounted(() => {
       {{ error }}
     </div>
 
-    <label class="lp-panel-label">{{ t('bible.translation') }}</label>
-    <select
-      :value="prefs.bibleFile"
-      class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
-      @change="loadBooks(($event.target as HTMLSelectElement).value)"
-    >
-      <option v-for="b in bibles" :key="b.arquivo" :value="b.arquivo">
-        {{ b.nome }}
-      </option>
-    </select>
+    <div class="lp-panel-field-row">
+      <label class="lp-panel-label" for="bible-translation">{{ t('bible.translation') }}</label>
+      <select
+        id="bible-translation"
+        :value="prefs.bibleFile"
+        class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
+        @change="loadBooks(($event.target as HTMLSelectElement).value)"
+      >
+        <option v-for="b in bibles" :key="b.arquivo" :value="b.arquivo">
+          {{ b.nome }}
+        </option>
+      </select>
+    </div>
 
-    <label class="lp-panel-label">{{ t('common.search') }}</label>
-    <input
-      ref="searchInputRef"
-      v-model="searchQuery"
-      type="search"
-      class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
-      :placeholder="t('bible.searchReferencePlaceholder')"
-    />
+    <div class="lp-panel-field-row">
+      <label class="lp-panel-label" for="bible-search">{{ t('common.search') }}</label>
+      <input
+        id="bible-search"
+        ref="searchInputRef"
+        v-model="searchQuery"
+        type="search"
+        class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
+        :placeholder="t('bible.searchReferencePlaceholder')"
+      />
+    </div>
     <div
       v-if="bibleSearchHistoryVisible.length"
       class="flex flex-wrap gap-1.5"
