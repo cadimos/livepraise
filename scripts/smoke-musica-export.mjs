@@ -16,7 +16,12 @@ process.env.LIVEPRAISE_HOME = exportHome;
 process.env.LIVEPRAISE_APP_ROOT = appRoot;
 process.env.LIVEPRAISE_PORT = '0';
 
-const { countRepertoireVerses } = await import('../dist/shared/music-repertoire.js');
+const {
+  countRepertoireVerses,
+  MUSIC_REPERTOIRE_MAX_BYTES,
+  MusicRepertoireValidationError,
+  parseMusicRepertoireJson,
+} = await import('../dist/shared/music-repertoire.js');
 const { startLivepraiseServer, stopLivepraiseServer } = await import(
   '../dist/server/index.js'
 );
@@ -88,14 +93,13 @@ try {
   const dbVerseCount = await countVersesInDb(base2, hit.id);
   assert(dbVerseCount === verses.length, 'BD limpa deve ter a mesma contagem de versos');
 
-  const { MUSIC_REPERTOIRE_MAX_BYTES } = await import('../dist/shared/music-repertoire.js');
-  const oversized = `{${' '.repeat(MUSIC_REPERTOIRE_MAX_BYTES + 64)}}`;
-  const res = await fetch(`${base2}/musica/import`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: oversized,
-  });
-  assert(res.status === 400, 'import deve rejeitar ficheiro acima do limite de tamanho');
+  let sizeRejected = false;
+  try {
+    parseMusicRepertoireJson(' '.repeat(MUSIC_REPERTOIRE_MAX_BYTES + 1));
+  } catch (err) {
+    sizeRejected = err instanceof MusicRepertoireValidationError;
+  }
+  assert(sizeRejected, 'parse deve rejeitar ficheiro acima do limite de tamanho');
 
   console.log('Smoke musica-export OK');
   await stopLivepraiseServer();

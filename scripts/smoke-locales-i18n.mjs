@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Smoke tarefa 4 — locales adicionais (en-US) e paridade de chaves.
+ * Smoke tarefa 4 — locales adicionais e paridade de chaves.
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -14,6 +14,8 @@ const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'livepraise-locales-'));
 process.env.LIVEPRAISE_HOME = testHome;
 process.env.LIVEPRAISE_APP_ROOT = appRoot;
 process.env.LIVEPRAISE_PORT = '0';
+
+const DERIVED_LOCALES = ['en-US', 'pt-PT', 'es-ES'];
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -43,25 +45,27 @@ function flattenKeys(node, prefix = '') {
 }
 
 const pt = JSON.parse(fs.readFileSync(path.join(appRoot, 'locales/pt-BR.json'), 'utf8'));
-const en = JSON.parse(fs.readFileSync(path.join(appRoot, 'locales/en-US.json'), 'utf8'));
-const installEn = JSON.parse(
-  fs.readFileSync(path.join(appRoot, 'install/locales/en-US.json'), 'utf8'),
-);
-
 const ptKeys = new Set(flattenKeys(pt));
-const enKeys = new Set(flattenKeys(en));
-const missingInEn = [...ptKeys].filter((key) => !enKeys.has(key));
-const extraInEn = [...enKeys].filter((key) => !ptKeys.has(key));
+pass('L-0', `fonte pt-BR (${ptKeys.size} chaves)`);
 
-assert(missingInEn.length === 0, `chaves em falta em en-US: ${missingInEn.join(', ')}`);
-assert(extraInEn.length === 0, `chaves extra em en-US: ${extraInEn.join(', ')}`);
-pass('L-1', `paridade de chaves (${ptKeys.size} chaves)`);
-
-assert(
-  JSON.stringify(en) === JSON.stringify(installEn),
-  'locales/en-US.json deve coincidir com install/locales/en-US.json',
-);
-pass('L-2', 'install/locales/en-US.json sincronizado');
+for (const code of DERIVED_LOCALES) {
+  const locale = JSON.parse(
+    fs.readFileSync(path.join(appRoot, `locales/${code}.json`), 'utf8'),
+  );
+  const install = JSON.parse(
+    fs.readFileSync(path.join(appRoot, `install/locales/${code}.json`), 'utf8'),
+  );
+  const localeKeys = new Set(flattenKeys(locale));
+  const missing = [...ptKeys].filter((key) => !localeKeys.has(key));
+  const extra = [...localeKeys].filter((key) => !ptKeys.has(key));
+  assert(missing.length === 0, `${code}: chaves em falta: ${missing.join(', ')}`);
+  assert(extra.length === 0, `${code}: chaves extra: ${extra.join(', ')}`);
+  assert(
+    JSON.stringify(locale) === JSON.stringify(install),
+    `locales/${code}.json deve coincidir com install/locales/${code}.json`,
+  );
+  pass(`L-${code}`, `paridade de chaves`);
+}
 
 const { startLivepraiseServer, stopLivepraiseServer } = await import(
   '../dist/server/index.js'
@@ -75,32 +79,36 @@ try {
   assert(listRes.ok, `GET /locales → ${listRes.status}`);
   const listBody = await listRes.json();
   assert(listBody.default === 'pt-BR', `default deve ser pt-BR (${listBody.default})`);
-  assert(
-    listBody.items?.includes('pt-BR') && listBody.items?.includes('en-US'),
-    `items deve incluir pt-BR e en-US (${JSON.stringify(listBody.items)})`,
-  );
-  pass('L-3', 'GET /locales lista pt-BR + en-US, default pt-BR');
+  for (const code of ['pt-BR', ...DERIVED_LOCALES]) {
+    assert(
+      listBody.items?.includes(code),
+      `items deve incluir ${code} (${JSON.stringify(listBody.items)})`,
+    );
+  }
+  pass('L-api-list', 'GET /locales lista todos os idiomas, default pt-BR');
 
-  const enRes = await fetch(`${base}/locales/en-US.json`);
-  assert(enRes.ok, `GET /locales/en-US.json → ${enRes.status}`);
-  const enBody = await enRes.json();
-  assert(enBody.app?.name === 'Live Praise', 'en-US carrega mensagens');
-  assert(enBody.locales?.meta?.['en-US'] === 'English', 'meta en-US');
-  pass('L-4', 'GET /locales/en-US.json → 200');
+  for (const code of DERIVED_LOCALES) {
+    const res = await fetch(`${base}/locales/${code}.json`);
+    assert(res.ok, `GET /locales/${code}.json → ${res.status}`);
+    const body = await res.json();
+    assert(body.app?.name === 'Live Praise', `${code} carrega mensagens`);
+    assert(body.locales?.meta?.[code], `${code} meta legível`);
+    pass(`L-api-${code}`, `GET /locales/${code}.json → 200`);
+  }
 
   const i18nSrc = fs.readFileSync(
     path.join(appRoot, 'apps/operator/src/i18n.ts'),
     'utf8',
   );
   assert(i18nSrc.includes("DEFAULT_LOCALE = 'pt-BR'"), 'DEFAULT_LOCALE pt-BR');
-  assert(i18nSrc.includes("fallbackLocale: DEFAULT_LOCALE"), 'fallback pt-BR');
+  assert(i18nSrc.includes('fallbackLocale: DEFAULT_LOCALE'), 'fallback pt-BR');
 
   const prefsSrc = fs.readFileSync(
     path.join(appRoot, 'apps/operator/src/composables/usePreferences.ts'),
     'utf8',
   );
   assert(prefsSrc.includes("locale: 'pt-BR'"), 'preferência inicial pt-BR');
-  pass('L-5', 'pt-BR permanece default no operador');
+  pass('L-default', 'pt-BR permanece default no operador');
 } finally {
   await stopLivepraiseServer();
 }

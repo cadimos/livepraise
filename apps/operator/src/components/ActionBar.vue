@@ -99,12 +99,12 @@ function reloadApp() {
 
 <template>
   <nav
-    class="flex flex-wrap items-center gap-1 border-b border-lp-action-bar/80 bg-lp-action-bar px-3 py-2 text-sm text-lp-text shadow-sm"
+    class="flex flex-wrap items-center gap-0.5 border-b border-lp-action-bar/80 bg-lp-action-bar px-2 py-1 text-sm text-lp-text shadow-sm"
     aria-label="Ações rápidas"
   >
     <button
       type="button"
-      class="inline-flex items-center gap-2 rounded-md px-3 py-2 font-medium transition hover:bg-white/15"
+      class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-medium transition hover:bg-white/15"
       :class="frozen ? 'bg-white/20 ring-1 ring-white/40' : ''"
       :title="
         (frozen ? t('actions.unfreeze') : t('actions.freeze')) +
@@ -112,51 +112,51 @@ function reloadApp() {
       "
       @click="toggleFrozen()"
     >
-      <Snowflake class="h-5 w-5 shrink-0" aria-hidden="true" />
+      <Snowflake class="h-4 w-4 shrink-0" aria-hidden="true" />
       {{ frozen ? t('actions.unfreeze') : t('actions.freeze') }}
     </button>
 
     <button
       type="button"
-      class="inline-flex items-center gap-2 rounded-md px-3 py-2 font-medium transition hover:bg-white/15"
+      class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-medium transition hover:bg-white/15"
       :title="t('actions.clearScreen')"
       :aria-label="t('actions.clearScreen')"
       @click="clearScreen"
     >
-      <Presentation class="h-5 w-5 shrink-0" aria-hidden="true" />
+      <Presentation class="h-4 w-4 shrink-0" aria-hidden="true" />
       {{ t('actions.clearScreen') }}
     </button>
 
     <button
       type="button"
-      class="inline-flex items-center gap-2 rounded-md px-3 py-2 font-medium transition hover:bg-white/15"
+      class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-medium transition hover:bg-white/15"
       :title="t('actions.newSong')"
       @click="emit('openNewSong')"
     >
-      <Music class="h-5 w-5 shrink-0" aria-hidden="true" />
+      <Music class="h-4 w-4 shrink-0" aria-hidden="true" />
       {{ t('actions.newSong') }}
     </button>
 
     <button
       type="button"
-      class="inline-flex items-center gap-2 rounded-md px-3 py-2 font-medium transition hover:bg-white/15"
+      class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-medium transition hover:bg-white/15"
       :title="t('actions.notepad')"
       @click="emit('openNotepad')"
     >
-      <NotebookPen class="h-5 w-5 shrink-0" aria-hidden="true" />
+      <NotebookPen class="h-4 w-4 shrink-0" aria-hidden="true" />
       {{ t('actions.notepad') }}
     </button>
 
     <button
       type="button"
-      class="inline-flex items-center gap-2 rounded-md px-3 py-2 font-medium transition hover:bg-white/15"
+      class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-medium transition hover:bg-white/15"
       :title="
         t('actions.reload') +
         (comboLabel('reload_data') !== '—' ? ` (${comboLabel('reload_data')})` : '')
       "
       @click="reloadApp"
     >
-      <RotateCw class="h-5 w-5 shrink-0" aria-hidden="true" />
+      <RotateCw class="h-4 w-4 shrink-0" aria-hidden="true" />
       {{ t('actions.reload') }}
     </button>
 

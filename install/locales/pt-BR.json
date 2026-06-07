@@ -23,7 +23,7 @@
     "theme": "Tema",
     "locale": "Idioma",
     "backup": {
-      "panelTitle": "Backup e restauro",
+      "panelTitle": "Backup e restauração",
       "panelIntro": "Exporte ou importe o ambiente Live Praise (base de dados, mídia, temas e preferências). Apenas administradores. Use ao mudar de computador ou recuperar após uma falha.",
       "openBackup": "Gerar backup…",
       "openRestore": "Restaurar de ficheiro…",

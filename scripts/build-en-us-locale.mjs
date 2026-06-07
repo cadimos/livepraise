@@ -149,7 +149,7 @@ function translateValue(value) {
     'Nenhum pedido pendente.': 'No pending requests.',
     'Aprovar': 'Approve',
     'Rejeitar': 'Reject',
-    'Backup e restauro': 'Backup and restore',
+    'Backup e restauração': 'Backup and restore',
     'Exporte ou importe o ambiente Live Praise (base de dados, mídia, temas e preferências). Apenas administradores. Use ao mudar de computador ou recuperar após uma falha.':
       'Export or import the Live Praise environment (database, media, themes and preferences). Administrators only. Use when moving computers or recovering after a failure.',
     'Gerar backup…': 'Create backup…',
@@ -491,10 +491,12 @@ function translateValue(value) {
     'Selecione uma música': 'Select a song',
     'Editar música': 'Edit song',
     'Excluir música': 'Delete song',
+    'Repertório de louvores (JSON)': 'Song repertoire (JSON)',
+    'Exporte ou importe só músicas, categorias e versos em ficheiro JSON — útil para partilhar repertório entre igrejas. Isto é independente do backup .zip do ambiente completo.':
+      'Export or import only songs, categories and stanzas as a JSON file — useful for sharing repertoire between churches. This is separate from the full-environment .zip backup.',
     'Exportar categoria': 'Export category',
-    'Exportar seleção': 'Export selection',
+    'Exportar tudo': 'Export all',
     'Importar repertório': 'Import repertoire',
-    'Selecione uma música para exportar.': 'Select a song to export.',
     'Selecione uma categoria.': 'Select a category.',
     'Importadas {songs} músicas ({verses} versos).': 'Imported {songs} songs ({verses} stanzas).',
     'Não foi possível exportar o repertório.': 'Could not export repertoire.',
@@ -628,6 +630,8 @@ en.locales = {
   meta: {
     'pt-BR': 'Portuguese (Brazil)',
     'en-US': 'English',
+    'pt-PT': 'Portuguese (Portugal)',
+    'es-ES': 'Spanish',
   },
 };
 

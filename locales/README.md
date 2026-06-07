@@ -16,13 +16,19 @@
 4. Adicionar rótulo legível em `locales.meta.{code}` nos ficheiros `pt-BR.json` e do novo idioma.
 5. Correr `npm run smoke:locales` antes do merge.
 
-### Regenerar `en-US` após mudanças em `pt-BR`
+### Regenerar locales derivados após mudanças em `pt-BR`
 
 ```bash
-node scripts/build-en-us-locale.mjs
+npm run sync:locales
 ```
 
-Revise traduções novas no mapa em `scripts/build-en-us-locale.mjs` quando adicionar chaves.
+| Idioma | Script | Mapa de tradução |
+|--------|--------|------------------|
+| `en-US` | `scripts/build-en-us-locale.mjs` | `scripts/build-en-us-locale.mjs` (inline) |
+| `pt-PT` | `scripts/build-pt-pt-locale.mjs` | regras PT-PT + `OVERRIDES` |
+| `es-ES` | `scripts/build-es-es-locale.mjs` | `scripts/locale-maps/en-to-es.mjs` (via `en-US`) |
+
+Revise traduções novas nos mapas quando adicionar chaves.
 
 ## Não alterar sem decisão de produto
 

@@ -1,10 +1,10 @@
 # Inventário pendente — Live Praise
 
 **Versão analisada:** `1.0.0-alpha.2`  
-**Última atualização:** 2026-06-07  
+**Última atualização:** 2026-06-07 (revisão pós-implementação)  
 **Repositório:** `electron/`, `server/`, `core/`, `apps/`, `web/`, `shared/`
 
-Backlog do que **ainda não está implementado** (ou está só parcialmente). Cada entrada indica o **estado actual**, **como deve funcionar** quando incompleto, e **tarefas** restantes.
+Backlog do que **ainda não está implementado** (ou está só parcialmente). Itens **✅** da alpha.2 estão concluídos — secções mantidas como registo histórico e referência de smokes.
 
 **Legenda:** ✅ implementado · 🟡 parcial · ❌ pendente · 🎯 **escopo confirmado alpha.2** · 📅 **versão futura** (não alpha.2)
 
@@ -18,28 +18,30 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). Ca
 | 1 | Auditoria e retenção | ✅ | `audit_logs`, purge diário, `GET /api/audit/logs`, `smoke:audit` |
 | 2 | Release GitHub | ✅ | Validado manualmente alpha.2 — draft unificado, instaladores Win/Linux/macOS OK |
 | 3 | Testes automatizados | 📅 | **Fora do escopo alpha.2** — smokes actuais bastam; Vitest/Playwright numa versão futura |
-| 4 | Locales adicionais | ✅ | `en-US` + labels legíveis; `pt-BR` default inalterado; `smoke:locales` |
+| 4 | Locales adicionais | ✅ | `en-US`, `pt-PT`, `es-ES`; `pt-BR` default; `npm run sync:locales` |
 | 5 | Watcher de vídeos | ✅ | `videoWatcher.ts` + WS `media-updated` → `VideosPanel`; `smoke:video-watcher` |
 | 6 | Busca online de louvores | 📅 | **Fora do escopo alpha.2** — Fuse.js local; busca online numa versão futura |
 | 7 | Editor visual de temas | 📅 | **Fora do escopo alpha.2** — leitura/sync OK; editor UI numa versão futura |
 | 8 | Telemetria opt-in | 📅 | **Fora do escopo alpha.2** — log local existe; envio remoto opt-in no futuro |
 | 9 | Versão única no build | ✅ | `bump-version` + `sync:version`; `package.json` → preload, UI, OpenAPI |
 | 10 | Smoke instalador Windows | 🟡 | **Automação CI** — tu já testaste à mão; falta script no workflow (opcional) |
-| 11 | Import/export repertório | 🎯 | **Confirmado alpha.2** — export/import JSON no painel Louvor (≠ backup ZIP) |
+| 11 | Import/export repertório | ✅ | `GET/POST /musica/export|import`, Backup e restauração, `smoke:musica-export` |
 | 12 | Acessibilidade WCAG | 📅 | **Fora do escopo alpha.2** — parcial hoje; auditoria WCAG numa versão futura |
 | 13 | Auto-update validado | 🟡 | **Código ✅**; falta testar *update* de versão antiga→nova por SO (não só instalador) |
 | 14 | Flash textfill ao trocar verso | ✅ | Root oculto durante textfill; sem flash ao trocar versos |
 
-### Escopo confirmado **alpha.2**
+### Entregue em **alpha.2** ✅
 
-| # | Item | Entregáveis mínimos |
+| # | Item | Smoke / verificação |
 |---|------|---------------------|
-| ~~**1**~~ | ~~**Auditoria e retenção**~~ | ✅ Concluído — migration 008, `core/audit`, `core/retention`, API admin |
-| ~~**4**~~ | ~~**Locales adicionais**~~ | ✅ Concluído — `en-US`, `locales/README.md`, selector com rótulos |
-| ~~**14**~~ | ~~**Flash textfill ao trocar verso**~~ | ✅ Concluído — `runRefreshTextfill` oculta root; projetor/retorno/live/espaços externos |
-| ~~**5**~~ | ~~**Watcher de vídeos**~~ | ✅ Concluído — fs.watch recursivo, debounce, `media-updated` |
-| ~~**9**~~ | ~~**Versão única no build**~~ | ✅ Concluído — `bump-version`, `sync:version`, `smoke:version` |
-| **11** | **Import/export repertório** | API + UI Louvor; export/import JSON de categorias/músicas/versos; smoke |
+| 0 | Migração v0.0.8 → 1.x | `npm run smoke:legacy-upgrade` |
+| 1 | Auditoria e retenção | `npm run smoke:audit` |
+| 2 | Release GitHub (draft unificado) | Validado manualmente |
+| 4 | Locales (`en-US`; `pt-BR` default) | `npm run smoke:locales` |
+| 5 | Watcher de vídeos | `npm run smoke:video-watcher` |
+| 9 | Versão única no build | `npm run bump-version` · `npm run smoke:version` |
+| 11 | Import/export repertório | `npm run smoke:musica-export` |
+| 14 | Flash textfill ao trocar verso | `tests/projection-textfill-visibility.test.mjs` · `smoke:cad313` |
 
 ### Fora do escopo **alpha.2** *(confirmado — versão futura)*
 
@@ -287,11 +289,11 @@ Suite **Vitest** para `core/` e `shared/` e **Playwright** (ou equivalente) para
 
 Isto cobre upload pelo operador e ficheiros descobertos ao **mudar de categoria** ou reabrir o painel.
 
-### O que falta
+### Problema resolvido *(alpha.2)*
 
-Copiar vídeo para `~/livepraise/videos/{categoria}/` **com painel já aberto** → operador não vê o ficheiro até recarregar manualmente.
+Copiar vídeo para `~/livepraise/videos/{categoria}/` **com painel já aberto** — antes o operador não via o ficheiro até recarregar manualmente.
 
-### Como deve funcionar
+### Como funciona agora
 
 1. Servidor detecta criação/alteração nas pastas de categoria (ignorar `thumb/` e temporários).
 2. Chama o mesmo `scheduleVideoPipeline` — sem duplicar ffmpeg.
@@ -409,15 +411,12 @@ Hoje, cada release exige editar a versão **manualmente em vários sítios** (`p
 - `server/health.ts` lê versão de `package.json` em runtime.
 - `scripts/resolve-release-version.mjs` sincroniza versão no CI de release.
 
-### O que falta *(alpha.2)*
+### Antes vs depois *(alpha.2)*
 
-| Ficheiro | Hoje |
-|----------|------|
-| `package.json` | Fonte principal ✅ |
-| `server/health.ts` | Lê `package.json` em runtime ✅ |
-| `electron/preload.ts` | `'1.0.0-alpha.2'` hardcoded |
-| `StatusBar.vue` / `AboutModal.vue` | `APP_VERSION` hardcoded |
-| `openapi.yaml` | exemplo hardcoded |
+| Antes | Depois |
+|-------|--------|
+| Versão em 5+ ficheiros editados à mão | `shared/app-version.ts` gerado por `sync-app-version.mjs` |
+| Risco de divergência UI / OpenAPI / preload | `npm run bump-version -- <versão>` + `build` corre sync |
 
 ### Implementado *(alpha.2)*
 
@@ -463,7 +462,7 @@ O script **B** repete o que fizeste à mão (desinstalar → instalar NSIS → v
 
 ---
 
-## 11. Import/export do repertório completo 🎯 *(escopo alpha.2)*
+## 11. Import/export do repertório completo ✅ *(concluído em alpha.2)*
 
 ### Explicação (em português claro)
 
@@ -472,11 +471,11 @@ O script **B** repete o que fizeste à mão (desinstalar → instalar NSIS → v
 | Funcionalidade | Existe? | Para quê |
 |----------------|---------|----------|
 | **Backup/restore** (`Configurações → Backup`) | ✅ Sim | Copiar **todo** o ambiente ou grupos (`database`, imagens, vídeos…) para outra máquina ou recuperação |
-| **Export/import só de louvores** (JSON no painel Músicas) | ❌ Não | Partilhar **só repertório** (categorias/músicas/versos) com outra igreja, editar num editor de texto, importar selecção |
+| **Export/import só de louvores** (JSON no painel Músicas) | ✅ Sim | Partilhar **só repertório** (categorias/músicas/versos) com outra igreja, editar num editor de texto, importar selecção |
 
 O grupo `database` do backup **inclui** todas as músicas — mas o ficheiro é um **ZIP de backup**, não um export amigável para o painel Louvor.
 
-**Resposta directa:** backup de repertório **sim** (via BD); export granular de louvores **não**.
+**Resposta directa:** backup de repertório **sim** (via BD); export granular de louvores **sim** (`GET/POST /musica/export|import` + Configurações → Backup e restauração).
 
 ### Já existe
 
@@ -485,14 +484,18 @@ O grupo `database` do backup **inclui** todas as músicas — mas o ficheiro é 
 
 Isto serve **migrar ambiente inteiro**, não exportar só louvores para partilhar/editar JSON.
 
-### O que falta *(alpha.2)*
+### Implementado *(alpha.2)*
 
-Export/import **granular** a partir do painel Louvor (caso de uso distinto do backup ZIP).
+- `core/music/repertoire.ts` — export/import com formato `livepraise-music-repertoire`.
+- `GET /musica/export` e `POST /musica/import` — filtros por categoria ou IDs; conflitos `remap` / `skip` / `overwrite`.
+- UI Configurações → Backup e restauração — exportar categoria/tudo; importar JSON (limite 8 MB).
+- `apps/operator/src/composables/useMusicRepertoireTransfer.ts`.
+- Smoke `npm run smoke:musica-export`.
 
 ### Tarefas *(alpha.2)*
 
 - [x] `GET /musica/export` e `POST /musica/import` (JSON versionado `livepraise-music-repertoire`).
-- [x] UI em Louvor: Exportar selecção / categoria / Importar ficheiro.
+- [x] UI em Configurações → Backup e restauração: exportar categoria / tudo / importar JSON.
 - [x] Validação de schema, conflitos de ID (`remap`/`skip`/`overwrite`) e limite de 8 MB.
 - [x] Smoke: export → import em BD limpa → mesma contagem de versos.
 - [x] Entrada `npm run smoke:musica-export`.
@@ -617,7 +620,6 @@ Ao **projectar o verso seguinte** (ou anterior) em louvor ou Bíblia, a tela **p
 - [x] Garantir que o binary search **nunca** deixa tamanho intermédio visível (revisar `suppressVisibilityToggle` e passagem dupla em `runRefreshTextfill`).
 - [x] Aplicar mesma correcção em **stage-return** e tiles de pré-visualização se reproduzirem o bug.
 - [x] Regressão: verso curto, verso longo, Bíblia multi-linha, textfill desactivado (deve usar `maxFontPx` sem regressão).
-- [ ] (Opcional) Nota em [`CHANGELOG.md`](CHANGELOG.md) secção Corrigido após merge.
 
 **Critério de sucesso:** operador avança versos durante culto simulado — audiência **não vê** redimensionamento intermédio; apenas o texto final estável.
 
@@ -626,7 +628,8 @@ Ao **projectar o verso seguinte** (ou anterior) em louvor ou Bíblia, a tela **p
 ## Metodologia
 
 1. Varredura de `server/`, `apps/`, `web/`, `core/`, `shared/`, `.github/workflows/` e scripts `smoke-*.mjs`.
-2. Confronto com o estado actual do repositório (2026-06-07).
-3. `node scripts/verify-openapi-coverage.mjs` — **64** endpoints HTTP alinhados.
+2. Confronto com o estado actual do repositório (2026-06-07, pós-implementação alpha.2).
+3. `node scripts/verify-openapi-coverage.mjs` — **67** endpoints HTTP alinhados.
+4. Smokes alpha.2: `smoke:audit`, `smoke:locales`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version`, `smoke:legacy-upgrade`.
 
 ---

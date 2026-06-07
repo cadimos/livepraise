@@ -119,14 +119,14 @@
     },
     "users": {
       "title": "Utilizadores",
-      "intro": "Contas para acesso remoto e operador local. Alterações de senha ou papel invalidam sessões activas.",
+      "intro": "Contas para acesso remoto e operador local. Alterações de senha ou papel invalidam sessões ativas.",
       "username": "Nome de utilizador",
       "password": "Senha",
       "newPassword": "Nova senha",
       "passwordOptional": "Deixe em branco para manter",
       "role": "Papel",
-      "active": "Conta activa",
-      "inactive": "inactivo",
+      "active": "Conta ativa",
+      "inactive": "inativo",
       "edit": "Editar",
       "save": "Guardar",
       "saving": "A guardar…",
@@ -134,7 +134,7 @@
       "create": "Criar utilizador",
       "createTitle": "Novo utilizador",
       "created": "Utilizador criado.",
-      "updated": "Utilizador actualizado.",
+      "updated": "Utilizador atualizado.",
       "empty": "Nenhum utilizador registado.",
       "roles": {
         "operator": "Operador",
@@ -163,13 +163,13 @@
       "backupModalTitle": "Gerar backup",
       "restoreModalTitle": "Restaurar ambiente",
       "backupIntro": "Escolha o que incluir no ficheiro .zip. Itens desmarcados não entram no backup.",
-      "restoreIntro": "Seleccione um backup (.zip) gerado por este sistema. Só pode restaurar grupos que existam nesse ficheiro.",
-      "restorePrivacyNote": "Restaurar substitui os dados seleccionados neste computador. Confirme que o ficheiro veio de uma fonte de confiança.",
+      "restoreIntro": "Selecione um backup (.zip) gerado por este sistema. Só pode restaurar grupos que existam nesse ficheiro.",
+      "restorePrivacyNote": "Restaurar substitui os dados selecionados neste computador. Confirme que o ficheiro veio de uma fonte de confiança.",
       "privacyTitle": "Dados sensíveis no backup",
       "privacyBody": "Este ficheiro contém dados da sua igreja. Se incluir a base de dados, também leva nomes de utilizadores e credenciais (palavras-passe encriptadas). Guarde-o num local seguro, apenas em dispositivos de confiança, e elimine-o quando já não for necessário. Não envie por e-mail nem armazene em nuvem pública sem encriptação adicional.",
       "privacyUnencryptedWarning": "Este backup não está protegido por palavra-passe. Qualquer pessoa com acesso ao ficheiro pode tentar recuperar contas de operador.",
-      "selectAll": "Seleccionar todos",
-      "selectNone": "Limpar selecção",
+      "selectAll": "Selecionar todos",
+      "selectNone": "Limpar seleção",
       "generate": "Gerar backup",
       "generating": "A gerar backup…",
       "generatingGroup": "A processar: {group}",
@@ -183,17 +183,17 @@
       "successTitle": "Backup concluído",
       "successMessage": "O ficheiro foi guardado com sucesso.",
       "successSize": "Tamanho: {size} · Grupos: {groups}",
-      "restoreSuccessTitle": "Restauro concluído",
-      "restoreSuccessMessage": "Os grupos seleccionados foram aplicados.",
+      "restoreSuccessTitle": "Restauração concluída",
+      "restoreSuccessMessage": "Os grupos selecionados foram aplicados.",
       "manifestSummary": "Backup de {date} · Versão {appVersion} · {groupCount} grupos no ficheiro",
       "groupNotInBackup": "Não incluído neste backup",
       "databaseReloginWarning": "Após restaurar a base de dados, todos os operadores terão de iniciar sessão novamente.",
       "overwriteTitle": "Substituir dados existentes?",
       "overwriteBody": "Os seguintes grupos já existem neste computador e serão substituídos: {groups}.",
-      "overwriteAcknowledge": "Compreendo que os dados seleccionados serão substituídos",
+      "overwriteAcknowledge": "Compreendo que os dados selecionados serão substituídos",
       "overwriteConfirm": "Substituir e restaurar",
       "reloginRequired": "Por segurança, todas as sessões foram terminadas. Inicie sessão novamente antes de continuar a operar.",
-      "globalBanner": "Manutenção: backup ou restauro em curso. Algumas acções estão temporariamente indisponíveis.",
+      "globalBanner": "Manutenção: backup ou restauração em curso. Algumas ações estão temporariamente indisponíveis.",
       "repertoire": {
         "title": "Repertório de louvores (JSON)",
         "intro": "Exporte ou importe só músicas, categorias e versos em ficheiro JSON — útil para partilhar repertório entre igrejas. Isto é independente do backup .zip do ambiente completo.",
@@ -231,23 +231,23 @@
         "diskFull": "Espaço em disco insuficiente para criar o backup.",
         "permissionDenied": "Sem permissão para escrever no destino escolhido.",
         "invalidZip": "Ficheiro inválido ou manifesto em falta.",
-        "migrationNewer": "Este backup é de uma versão mais recente do Live Praise. Actualize a aplicação antes de restaurar.",
+        "migrationNewer": "Este backup é de uma versão mais recente do Live Praise. Atualize a aplicação antes de restaurar.",
         "confirmRequired": "Confirme a substituição dos dados existentes.",
-        "noGroupsSelected": "Seleccione pelo menos um grupo."
+        "noGroupsSelected": "Selecione pelo menos um grupo."
       }
     },
     "errorLog": {
       "title": "Logs de erro",
       "intro": "Erros recentes do servidor e falhas de API na interface do operador.",
       "empty": "Nenhum erro registado.",
-      "refresh": "Actualizar",
-      "refreshing": "A actualizar…",
+      "refresh": "Atualizar",
+      "refreshing": "A atualizar…",
       "clear": "Limpar logs",
-      "confirmClear": "Limpar todos os registos de erro? Esta acção não pode ser desfeita.",
+      "confirmClear": "Limpar todos os registos de erro? Esta ação não pode ser desfeita.",
       "showDetail": "Ver detalhe",
       "hideDetail": "Ocultar detalhe",
       "displayDebugOverlay": "Overlay de debug nos monitores",
-      "displayDebugOverlayHint": "Quando activo, mostra no rodapé dos monitores de projeção e dos dispositivos ligados pela rede a última acção recebida (ex.: mudança de música às 17:08:38)."
+      "displayDebugOverlayHint": "Quando ativo, mostra no rodapé dos monitores de projeção e dos dispositivos ligados pela rede a última ação recebida (ex.: mudança de música às 17:08:38)."
     },
     "shortcuts": {
       "title": "Atalhos de teclado",
@@ -274,7 +274,7 @@
         "verseNext": "Próximo versículo",
         "stanzaPrev": "Verso anterior (música)",
         "stanzaNext": "Próximo verso (música)",
-        "clearScreen": "Limpar tela",
+        "clearScreen": "Limpar ecrã",
         "freezeToggle": "Congelar / descongelar",
         "reloadData": "Recarregar dados"
       }
@@ -379,7 +379,7 @@
     "composer": "Compositor",
     "lyrics": "Letra",
     "lyricsHint": "Separe cada verso com uma linha em branco entre eles.",
-    "save": "Salvar",
+    "save": "Guardar",
     "saving": "A guardar…",
     "cancel": "Cancelar",
     "errors": {
@@ -399,7 +399,7 @@
   "actions": {
     "freeze": "Congelar",
     "unfreeze": "Descongelar",
-    "clearScreen": "Limpar tela",
+    "clearScreen": "Limpar ecrã",
     "newSong": "Nova música",
     "notepad": "Bloco de notas",
     "reload": "Recarregar",
@@ -410,7 +410,7 @@
     "playlistImporting": "A importar playlist…",
     "playlistExportEmpty": "A fila está vazia — adicione músicas antes de exportar.",
     "help": "Ajuda",
-    "projectorScreen": "Tela projetor",
+    "projectorScreen": "Ecrã do projetor",
     "manageUsers": "Utilizadores",
     "worshipSettings": "Louvor e estofres",
     "bibleSettings": "Bíblia e pesquisa",
@@ -431,7 +431,7 @@
   "serviceTimer": {
     "title": "Contador / Timer de culto",
     "intro": "Escolha em cada monitor se exibe contagem progressiva (contador) ou regressiva (timer). Pode ter contador no retorno de palco e timer no projetor ao mesmo tempo.",
-    "enable": "Activar ferramenta",
+    "enable": "Ativar ferramenta",
     "durationMinutes": "Duração do timer (minutos)",
     "start": "Iniciar",
     "pause": "Pausar",
@@ -439,7 +439,7 @@
     "targetsTitle": "Monitores e dispositivos",
     "targetsHint": "Marque os ecrãs que devem mostrar o overlay. Em cada linha escolha Contador (sobe desde zero) ou Timer (desce até zero).",
     "loading": "A carregar monitores…",
-    "noTargets": "Nenhum monitor de projeção ou retorno configurado. Defina papéis em Configurações → Tela projetor.",
+    "noTargets": "Nenhum monitor de projeção ou retorno configurado. Defina papéis em Configurações → Ecrã do projetor.",
     "modes": {
       "counter": "Contador",
       "timer": "Timer"
@@ -453,7 +453,7 @@
   },
   "footerAlert": {
     "title": "Alerta no rodapé",
-    "intro": "Envia um texto rolante na barra inferior dos monitores seleccionados. O texto percorre o ecrã o número de vezes e na velocidade definidos.",
+    "intro": "Envia um texto rolante na barra inferior dos monitores selecionados. O texto percorre o ecrã o número de vezes e na velocidade definidos.",
     "text": "Texto do alerta",
     "textPlaceholder": "Ex.: Culto de oração às 20h — sala 2",
     "textRequired": "Escreva o texto do alerta antes de enviar.",
@@ -464,7 +464,7 @@
     "targetsTitle": "Monitores",
     "targetsHint": "Todos marcados = envia para todos os ecrãs de projeção, retorno e dispositivos ligados. Desmarque para restringir.",
     "loading": "A carregar monitores…",
-    "noTargets": "Nenhum monitor configurado. Defina papéis em Configurações → Tela projetor.",
+    "noTargets": "Nenhum monitor configurado. Defina papéis em Configurações → Ecrã do projetor.",
     "send": "Enviar alerta",
     "stop": "Parar alerta",
     "externalProfiles": {
@@ -490,7 +490,7 @@
       "Tailwind CSS e vue-i18n"
     ],
     "runtime": "Runtime desta instalação: Node.js {node}, Chromium {chromium}, Electron {electron}.",
-    "version": "Versão do aplicativo: {version}",
+    "version": "Versão da aplicação: {version}",
     "close": "Fechar"
   },
   "images": {
@@ -517,9 +517,9 @@
     "properties": "Propriedades",
     "changeCategory": "Mudar categoria",
     "applyToQueue": "Aplicar na fila",
-    "delete": "Excluir da biblioteca",
-    "deleteAria": "Excluir «{name}» da biblioteca",
-    "deleteConfirm": "Excluir «{name}»? Esta ação não pode ser desfeita.",
+    "delete": "Eliminar da biblioteca",
+    "deleteAria": "Eliminar «{name}» da biblioteca",
+    "deleteConfirm": "Eliminar «{name}»? Esta ação não pode ser desfeita.",
     "deleteConfirmQueueHint": "Itens na fila que usam este ficheiro deixam de projectar até serem removidos ou substituídos.",
     "fields": {
       "name": "Nome",
@@ -533,8 +533,8 @@
       "replaceQuick": "Erro ao substituir fundo rápido",
       "setInitial": "Erro ao definir fundo inicial",
       "changeCategory": "Erro ao mover ficheiro de categoria",
-      "noActiveQueue": "Seleccione ou crie uma fila (aba) antes de aplicar mídia.",
-      "delete": "Não foi possível excluir o ficheiro da biblioteca.",
+      "noActiveQueue": "Selecione ou crie uma fila (aba) antes de aplicar mídia.",
+      "delete": "Não foi possível eliminar o ficheiro da biblioteca.",
       "deleteProcessing": "Aguarde o processamento do vídeo terminar."
     }
   },
@@ -554,17 +554,17 @@
     "category": "Categoria",
     "songs": "Músicas",
     "verses": "Versos",
-    "loading": "Carregando…",
+    "loading": "A carregar…",
     "selectSong": "Selecione uma música",
     "addToQueue": "Adicionar à fila",
     "edit": "Editar música",
-    "delete": "Excluir música",
-    "deleteConfirm": "Excluir «{name}»? Esta ação não pode ser desfeita.",
+    "delete": "Eliminar música",
+    "deleteConfirm": "Eliminar «{name}»? Esta ação não pode ser desfeita.",
     "errors": {
       "categories": "Erro ao carregar categorias",
       "songs": "Erro ao carregar músicas",
       "verses": "Erro ao carregar versos",
-      "delete": "Não foi possível excluir a música."
+      "delete": "Não foi possível eliminar a música."
     }
   },
   "bible": {
@@ -609,18 +609,18 @@
       "off": "Desligado"
     },
     "screenSize": {
-      "title": "Tamanho da tela de projeção",
+      "title": "Tamanho do ecrã de projeção",
       "hint": "Escolha a proporção ou as dimensões em pixels da área de projeção no ecrã.",
       "perMonitorHint": "Cada monitor em «Projeção» pode ter tamanho diferente — use a engrenagem na linha do monitor. Computadores remotos em /projector aparecem na secção «Projetores remotos».",
       "configure": "Configurar tamanho da projeção",
       "monitorTitle": "Projeção — {label}",
       "savedFor": "Tamanho aplicado em {label}.",
-      "presetLabel": "Tamanho da tela",
+      "presetLabel": "Tamanho do ecrã",
       "widthLabel": "Largura (px)",
       "heightLabel": "Altura (px)",
       "widthPlaceholder": "ex.: 1920",
       "heightPlaceholder": "ex.: 1080",
-      "positionLabel": "Posição na tela",
+      "positionLabel": "Posição no ecrã",
       "positions": {
         "centro": "Centro (padrão)",
         "topo": "Topo",
@@ -640,7 +640,7 @@
       "livePreview": "Pré-visualizar no projetor enquanto altera (antes de aplicar)",
       "save": "Aplicar tamanho",
       "saving": "A aplicar…",
-      "saved": "Tamanho da tela guardado e enviado ao projetor.",
+      "saved": "Tamanho do ecrã guardado e enviado ao projetor.",
       "presets": {
         "16:9": "WideScreen (16:9)",
         "4:3": "Clássico (4:3)",
@@ -651,7 +651,7 @@
         "padrao": "Padrão (ecrã completo)"
       },
       "errors": {
-        "save": "Erro ao guardar tamanho da tela",
+        "save": "Erro ao guardar tamanho do ecrã",
         "socket": "Não foi possível enviar ao projetor — verifique a ligação ao vivo."
       }
     },
@@ -661,7 +661,7 @@
     },
     "remoteProjection": {
       "title": "Projetores remotos (/projector)",
-      "hint": "Cada browser aberto em /projector num computador remoto aparece aqui com configuração de tela independente. Endpoints diferentes (/stage, /vocal, …) têm identificadores separados.",
+      "hint": "Cada browser aberto em /projector num computador remoto aparece aqui com configuração de ecrã independente. Endpoints diferentes (/stage, /vocal, …) têm identificadores separados.",
       "none": "Nenhum projetor remoto ligado. Abra http://servidor:porta/projector no computador remoto.",
       "defaultLabel": "Projetor {id}"
     },
@@ -690,7 +690,7 @@
     }
   },
   "common": {
-    "loading": "Carregando…",
+    "loading": "A carregar…",
     "search": "Pesquisar",
     "searchPlaceholder": "Pesquisar…",
     "close": "Fechar",

@@ -19,12 +19,8 @@ import {
   type SongWithLyrics,
 } from '../../utils/worship-search';
 import { summarizeLabel } from '@shared/queue-items';
-import { CircleCheckBig, Download, Pencil, Trash2, Upload } from '@lucide/vue';
+import { CircleCheckBig, Pencil, Trash2 } from '@lucide/vue';
 import { useQueueDrag } from '../../composables/useQueueDrag';
-import {
-  exportMusicRepertoireFile,
-  importMusicRepertoireFile,
-} from '../../composables/useMusicRepertoireTransfer';
 
 const emit = defineEmits<{
   preview: [html: string];
@@ -45,8 +41,6 @@ const selectedSong = ref<Song | null>(null);
 const selectedVerseId = ref<number | null>(null);
 const loading = ref(false);
 const error = ref('');
-const importInputRef = ref<HTMLInputElement | null>(null);
-const transferBusy = ref(false);
 
 const SEARCH_DEBOUNCE_MS = 150;
 const searchInput = ref(prefs.value.worshipSearchQuery);
@@ -212,67 +206,6 @@ async function deleteSong(song: Song) {
   }
 }
 
-async function exportCategory() {
-  if (!prefs.value.musicCategoryId) {
-    window.alert(t('worship.export.noCategory'));
-    return;
-  }
-  transferBusy.value = true;
-  error.value = '';
-  try {
-    await exportMusicRepertoireFile({ categoryId: prefs.value.musicCategoryId });
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : t('worship.export.errors.export');
-  } finally {
-    transferBusy.value = false;
-  }
-}
-
-async function exportSelection() {
-  if (!selectedSong.value) {
-    window.alert(t('worship.export.noSelection'));
-    return;
-  }
-  transferBusy.value = true;
-  error.value = '';
-  try {
-    await exportMusicRepertoireFile({ songIds: [selectedSong.value.id] });
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : t('worship.export.errors.export');
-  } finally {
-    transferBusy.value = false;
-  }
-}
-
-function openImportPicker() {
-  importInputRef.value?.click();
-}
-
-async function onImportFile(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  input.value = '';
-  if (!file) return;
-
-  transferBusy.value = true;
-  error.value = '';
-  try {
-    const raw = await file.text();
-    const result = await importMusicRepertoireFile(raw);
-    window.alert(
-      t('worship.export.importSuccess', {
-        songs: result.songsImported,
-        verses: result.versesImported,
-      }),
-    );
-    await loadCategories();
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : t('worship.export.errors.import');
-  } finally {
-    transferBusy.value = false;
-  }
-}
-
 async function addToTabs(song: Song) {
   try {
     const data = await fetchJson<{ status: string; items: Verse[] }>(
@@ -321,63 +254,32 @@ onUnmounted(() => {
       {{ error }}
     </div>
 
-    <label class="lp-panel-label">{{ t('worship.category') }}</label>
-    <select
-      :value="prefs.musicCategoryId"
-      class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
-      @change="loadSongs(($event.target as HTMLSelectElement).value)"
-    >
-      <option v-for="cat in categories" :key="cat.id" :value="String(cat.id)">
-        {{ cat.descricao ?? cat.nome ?? `Categoria ${cat.id}` }}
-      </option>
-    </select>
-
-    <div class="flex flex-wrap gap-2">
-      <button
-        type="button"
-        class="inline-flex items-center gap-1.5 rounded-lg border border-lp-surface px-3 py-1.5 text-xs text-lp-text transition hover:bg-lp-surface/60 disabled:opacity-50"
-        :disabled="transferBusy || !prefs.musicCategoryId"
-        @click="exportCategory"
+    <div class="lp-panel-field-row">
+      <label class="lp-panel-label" for="worship-category">{{ t('worship.category') }}</label>
+      <select
+        id="worship-category"
+        :value="prefs.musicCategoryId"
+        class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
+        @change="loadSongs(($event.target as HTMLSelectElement).value)"
       >
-        <Download class="h-4 w-4" aria-hidden="true" />
-        {{ t('worship.export.category') }}
-      </button>
-      <button
-        type="button"
-        class="inline-flex items-center gap-1.5 rounded-lg border border-lp-surface px-3 py-1.5 text-xs text-lp-text transition hover:bg-lp-surface/60 disabled:opacity-50"
-        :disabled="transferBusy || !selectedSong"
-        @click="exportSelection"
-      >
-        <Download class="h-4 w-4" aria-hidden="true" />
-        {{ t('worship.export.selection') }}
-      </button>
-      <button
-        type="button"
-        class="inline-flex items-center gap-1.5 rounded-lg border border-lp-surface px-3 py-1.5 text-xs text-lp-text transition hover:bg-lp-surface/60 disabled:opacity-50"
-        :disabled="transferBusy"
-        @click="openImportPicker"
-      >
-        <Upload class="h-4 w-4" aria-hidden="true" />
-        {{ t('worship.export.import') }}
-      </button>
-      <input
-        ref="importInputRef"
-        type="file"
-        accept="application/json,.json"
-        class="hidden"
-        @change="onImportFile"
-      />
+        <option v-for="cat in categories" :key="cat.id" :value="String(cat.id)">
+          {{ cat.descricao ?? cat.nome ?? `Categoria ${cat.id}` }}
+        </option>
+      </select>
     </div>
 
-    <label class="lp-panel-label">{{ t('common.search') }}</label>
-    <input
-      :value="searchInput"
-      type="search"
-      class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
-      :placeholder="t('common.searchPlaceholder')"
-      @input="onSearchInput(($event.target as HTMLInputElement).value)"
-      @keydown.enter.prevent="onSearchEnter"
-    />
+    <div class="lp-panel-field-row">
+      <label class="lp-panel-label" for="worship-search">{{ t('common.search') }}</label>
+      <input
+        id="worship-search"
+        :value="searchInput"
+        type="search"
+        class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
+        :placeholder="t('common.searchPlaceholder')"
+        @input="onSearchInput(($event.target as HTMLInputElement).value)"
+        @keydown.enter.prevent="onSearchEnter"
+      />
+    </div>
 
     <div class="grid min-h-0 flex-1 grid-cols-2 gap-3">
       <div class="flex min-h-0 flex-col">

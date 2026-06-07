@@ -6,77 +6,90 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 ## [1.0.0-alpha.2] — 2026-06-07
 
-Segunda release alpha — estabilização pós-lançamento inicial: migração legada v0.0.8, correcções no instalador Windows, refactor do servidor e melhorias no pipeline de release/CI.
-
-> **Rascunho:** secções abaixo reflectem o trabalho desde `v1.0.0-alpha.1`. Itens adicionais desta release serão acrescentados conforme instruções de produto.
+Segunda release alpha — estabilização pós-`alpha.1`: migração legada, pipeline de release unificado, correcções Windows, e entregáveis de produto (auditoria, i18n, watcher de vídeos, export de louvores, sync de versão, textfill sem flash).
 
 ### Resumo
 
 | | 1.0.0-alpha.1 | 1.0.0-alpha.2 |
 |---|---|---|
-| **Foco** | Primeira alpha (reescrita 1.x) | Estabilização, Windows, migração legada, CI/release |
-| **Migração v0.0.8** | Parcial | Fluxo dedicado `legacy-upgrade` + smoke |
-| **Instalador Windows** | Problemas conhecidos | Correcções de instalação e modo dev |
-| **electron-builder** | 26.x anterior | 26.8.1 |
-| **CI Linux packaging** | AppImage/deb base | rpm + pacman no workflow de release |
+| **Foco** | Primeira alpha (reescrita 1.x) | Estabilização + funcionalidades de produto |
+| **Migração v0.0.8** | Parcial | `legacy-upgrade` + `smoke:legacy-upgrade` |
+| **Release CI** | Workflows separados | Draft único Win/Linux/macOS (validado manualmente) |
+| **Auditoria** | — | `audit_logs` + retenção + `GET /api/audit/logs` |
+| **Idiomas** | Só `pt-BR` | `pt-BR` (default) + `en-US` |
+| **Vídeos** | Pipeline + polling | Watcher de pasta + evento WS `media-updated` |
+| **Louvor** | CRUD local | Export/import JSON (`livepraise-music-repertoire`) |
+| **Projeção** | Flash ao trocar verso | Textfill oculta root até tamanho final |
+| **Versão** | Bump manual em vários ficheiros | `bump-version` + `shared/app-version.ts` |
+| **OpenAPI** | 64 endpoints | **67** endpoints |
 
 ---
 
 ### Adicionado
 
-- Caminho de **upgrade legado v0.0.8 → 1.x** (`server/db/legacy-upgrade.ts`): detecção de base sem `schema_migrations`, backup automático, quarentena de BD corrompida.
-- Smoke **`npm run smoke:legacy-upgrade`** para validar migração antes de release.
+#### Infraestrutura e release (desde alpha.1)
+
+- Caminho de **upgrade legado v0.0.8 → 1.x** (`server/db/legacy-upgrade.ts`) com backup automático e quarentena de BD corrompida.
+- Smoke **`npm run smoke:legacy-upgrade`**.
 - Script **`scripts/smoke-win-installer.mjs`** — validação do instalador NSIS no Windows.
-- Script **`scripts/test-electron-server-boot.mjs`** — arranque servidor dentro do Electron empacotado.
-- Serviço **`server/services/ffmpegBinary.ts`** — resolução centralizada do binário ffmpeg.
-- Helper **`server/db/migration-skip.ts`** — casos limite em migrations incrementais.
-- Workflow de release: instalação de ferramentas **rpm** e **pacman** no job Linux.
-- Pipeline **release unificado** (`release.yml`): draft único no GitHub, builds Win/Linux/macOS em paralelo — **validado manualmente** (instaladores gerados e executados com sucesso).
+- Serviço **`server/services/ffmpegBinary.ts`**; helper **`server/db/migration-skip.ts`**.
+- Workflow **`release.yml`**: draft único no GitHub, builds Win/Linux/macOS em paralelo, `resolve-release-version.mjs`, rpm + pacman no job Linux — **validado manualmente**.
+
+#### Alpha.2 — produto
+
+- **Auditoria e retenção** — migration `008_audit_logs.sql`, `core/audit/log.ts`, hooks em `auth`, `users`, `devices`, `backup`/`restore`; `core/retention/purge.ts` + scheduler diário (contas 30 d, logs 90 d, dispositivos 180 d); **`GET /api/audit/logs`** (admin); smoke **`npm run smoke:audit`**.
+- **Locales** — `locales/en-US.json` + `install/locales/en-US.json` (paridade de chaves com `pt-BR`); rótulos legíveis no selector; **`pt-BR` permanece default**; `locales/README.md`; smoke **`npm run smoke:locales`**.
+- **Watcher de vídeos** — `server/services/videoWatcher.ts` (`fs.watch` recursivo, debounce); integração com `scheduleVideoPipeline`; WebSocket **`media-updated`** → `VideosPanel.vue`; smoke **`npm run smoke:video-watcher`**.
+- **Import/export repertório** — formato JSON **`livepraise-music-repertoire`**; **`GET /musica/export`**, **`POST /musica/import`** (conflitos `remap`/`skip`/`overwrite`); UI no painel Louvor; smoke **`npm run smoke:musica-export`**.
+- **Versão única** — `scripts/bump-version.mjs`, `scripts/sync-app-version.mjs`, `shared/app-version.ts`; sync no `build`; **`npm run bump-version`**, **`npm run smoke:version`**.
+
+---
 
 ### Alterado
 
-- Refactor de **`server/index.ts`** e **`server/bootstrap.ts`** (arranque modular, gestão de BD).
-- Melhorias na **ligação WebSocket** (`ws`) e gestão de sessões de base de dados.
+- Refactor de **`server/index.ts`** e **`server/bootstrap.ts`** (arranque modular, watcher, retention scheduler).
+- Melhorias na **ligação WebSocket** e gestão de sessões de base de dados.
 - Refactor do **pipeline de vídeo** (`server/services/videoPipeline.ts`).
-- Ajustes em **`server/config/paths.ts`** (paths do home dir e binários).
-- Formatação e legibilidade dos **scripts** (`scripts/*.mjs`).
-- **README:** requisitos mínimos e instruções Windows/Linux actualizadas.
+- **`shared/projection-textfill`** — root oculto durante medição; `suppressVisibilityToggle` na passagem dupla; projetor/retorno/live ocultam conteúdo **antes** de `innerHTML` ao trocar verso.
+- **`PreviewOutputTile.vue`** — padrão `previewReady` alinhado a `ProjectionTypographyPreview.vue`.
+- **README** — requisitos e instruções Windows/Linux.
 - **electron-builder** actualizado para **26.8.1**.
+
+---
 
 ### Corrigido
 
 - Instalação no **Windows** (NSIS) e uso incorrecto do modo dev como migração.
 - Migração **v0.0.8 → 1.0.0-alpha.1** (repertório e sidecars WAL/SHM).
+- **Flash textfill** ao trocar verso em louvor/Bíblia — público deixa de ver texto pequeno antes do tamanho final.
 - Action de deploy Windows e resolução de versão no workflow de release.
 - Vulnerabilidade na dependência **`tmp`**.
-- `.gitignore` e workflows GHA (artefactos e paths de build).
+- `.gitignore` e workflows GHA.
+
+---
 
 ### Removido
 
 - Workflow **CodeQL** (desactivado nesta linha de release).
+- Três workflows **CA-R40** separados — substituídos por **`release.yml`** unificado.
 
-### Planeado (escopo confirmado alpha.2)
-
-- **Auditoria e retenção de dados** — tabela `audit_logs`, registo de acções sensíveis (`auth`, `users`, `devices`), jobs de retenção (contas 30 d, logs 90 d, dispositivos inactivos 180 d) além de `purgeExpiredSessions`, smoke dedicado. Ver secção 1 de [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md).
-- **Locales adicionais** — primeiro idioma `en-US` com paridade de chaves a `pt-BR`; **`pt-BR` permanece idioma padrão** (fallback, instalação nova, API `default`). Ver secção 4.
-- **Flash textfill ao trocar verso** — corrigir piscar da projeção (texto pequeno visível antes do tamanho final) em louvor/Bíblia. Ver secção 14.
-- **Watcher de vídeos** — detectar ficheiros copiados/movidos para `~/livepraise/videos/{categoria}/` com painel Vídeos aberto; pipeline ffmpeg + notificação WS ao operador. Ver secção 5.
-- **Versão única no build** — script `bump-version` propagando `package.json` para preload, UI e OpenAPI. Ver secção 9.
-- **Import/export repertório** — export/import JSON de louvores no painel Músicas (distinto do backup ZIP). Ver secção 11.
+---
 
 ### Fora do escopo alpha.2
 
-- **Vitest + Playwright** (secção 3) — adiado para versão futura; smokes e testes Node em `tests/` mantêm-se como gate actual.
-- **Busca online de louvores** (secção 6) — Fuse.js local mantém-se; API online numa versão futura.
-- **Editor visual de temas** (secção 7) — temas bundled + sync; editor na UI numa versão futura.
-- **Telemetria opt-in** (secção 8) — log local mantém-se; envio remoto opt-in numa versão futura.
-- **Acessibilidade WCAG** (secção 12) — tema alto contraste mantém-se; auditoria sistemática numa versão futura.
+Adiado para versão futura (ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md)):
 
-### Pendente (continua em [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md))
+- Vitest + Playwright (secção 3)
+- Busca online de louvores (secção 6)
+- Editor visual de temas (secção 7)
+- Telemetria opt-in remota (secção 8)
+- Auditoria WCAG sistemática (secção 12)
 
-Outros itens planeados para alpha.2 ou seguintes — a confirmar:
+### Pendente / opcional pós-alpha.2
 
-<!-- Espaço reservado para itens adicionais desta release -->
+- Smoke **`smoke-win-installer`** no CI Windows (secção 10) — validação manual já feita.
+- Teste de **auto-update in-app** alpha.1 → alpha.2 após **Publish release** (secção 13).
+- Painel UI para logs de auditoria (API admin já existe).
 
 ---
 
@@ -261,20 +274,19 @@ Reescrita completa com arquitetura modular (Electron 42 + TypeScript + Vue 3), p
 
 ---
 
-### Pendente (não incluído nesta release)
+### Pendente (não incluído em alpha.1; ver alpha.2 para itens já entregues)
 
-Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md):
+Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md) — **entregue em alpha.2:** auditoria, locales `en-US`, watcher de vídeos, export/import louvor, sync de versão, flash textfill, release unificado.
 
-1. Auditoria e retenção de dados (`audit_logs`).
-2. Checklist operacional completo de release multi-OS (CI existe; falta gate humano por tag).
-3. Suite Vitest + Playwright além dos smokes.
-4. Locales adicionais (`en-US`, `es`, …).
-5. Import/export do repertório completo.
-6. Watcher de pasta de vídeos (detecção em tempo real com painel aberto).
-7. Busca online de louvores (nova fonte — decisão de produto).
-8. Editor visual de temas (color pickers; normalização já existe).
-9. Telemetria opt-in de crashes.
-10. Sincronização multi-estação (fora de escopo).
+**Ainda pendente (alpha.3+ ou opcional):**
+
+1. Suite Vitest + Playwright além dos smokes.
+2. Busca online de louvores (nova fonte — decisão de produto).
+3. Editor visual de temas (color pickers).
+4. Telemetria opt-in de crashes (envio remoto).
+5. Acessibilidade WCAG sistemática.
+6. Smoke instalador Windows no CI; teste auto-update in-app por SO.
+7. Sincronização multi-estação (fora de escopo).
 
 ---
 

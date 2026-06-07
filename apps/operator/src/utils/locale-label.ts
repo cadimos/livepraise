@@ -3,6 +3,8 @@ import { useI18n } from 'vue-i18n';
 const FALLBACK_LABELS: Record<string, string> = {
   'pt-BR': 'Português (Brasil)',
   'en-US': 'English',
+  'pt-PT': 'Português (Portugal)',
+  'es-ES': 'Español',
 };
 
 /** Rótulo legível para o selector de idioma (chave `locales.meta.*` ou fallback). */

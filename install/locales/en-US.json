@@ -194,6 +194,21 @@
       "overwriteConfirm": "Replace and restore",
       "reloginRequired": "For security, all sessions were ended. Sign in again before continuing to operate.",
       "globalBanner": "Maintenance: backup or restore in progress. Some actions are temporarily unavailable.",
+      "repertoire": {
+        "title": "Song repertoire (JSON)",
+        "intro": "Export or import only songs, categories and stanzas as a JSON file — useful for sharing repertoire between churches. This is separate from the full-environment .zip backup.",
+        "category": "Category",
+        "exportCategory": "Export category",
+        "exportAll": "Export all",
+        "import": "Import repertoire",
+        "noCategory": "Select a category.",
+        "importSuccess": "Imported {songs} songs ({verses} stanzas).",
+        "errors": {
+          "categories": "Error loading categories",
+          "export": "Could not export repertoire.",
+          "import": "Could not import file."
+        }
+      },
       "groups": {
         "database": "Database (worship, users, Bible, system)",
         "databaseHint": "Includes operator accounts and encrypted credentials.",
@@ -545,18 +560,6 @@
     "edit": "Edit song",
     "delete": "Delete song",
     "deleteConfirm": "Delete «{name}»? This action cannot be undone.",
-    "export": {
-      "category": "Export category",
-      "selection": "Export selection",
-      "import": "Import repertoire",
-      "noSelection": "Select a song to export.",
-      "noCategory": "Select a category.",
-      "importSuccess": "Imported {songs} songs ({verses} stanzas).",
-      "errors": {
-        "export": "Could not export repertoire.",
-        "import": "Could not import file."
-      }
-    },
     "errors": {
       "categories": "Error loading categories",
       "songs": "Error loading songs",
@@ -697,7 +700,9 @@
   "locales": {
     "meta": {
       "pt-BR": "Portuguese (Brazil)",
-      "en-US": "English"
+      "en-US": "English",
+      "pt-PT": "Portuguese (Portugal)",
+      "es-ES": "Spanish"
     }
   }
 }
