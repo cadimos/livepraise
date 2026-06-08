@@ -597,6 +597,7 @@
   "displays": {
     "intro": "Set each monitor role: the operator uses the primary monitor; public projection and stage return show different content.",
     "primary": "primary",
+    "disconnected": "disconnected",
     "monitorsTitle": "Monitors",
     "none": "No monitor detected. Run Live Praise on this computer to list connected screens.",
     "save": "Save roles",
@@ -652,7 +653,8 @@
       },
       "errors": {
         "save": "Error saving screen size",
-        "socket": "Could not send to projector — check live connection."
+        "socket": "Could not send to projector — check live connection.",
+        "disconnected": "This monitor is not connected — plug it in or pick the correct monitor in the list."
       }
     },
     "errors": {

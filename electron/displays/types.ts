@@ -17,6 +17,7 @@ export interface DisplayAssignment {
   role: DisplayRole;
   bounds: { x: number; y: number; width: number; height: number };
   primary: boolean;
+  connected?: boolean;
   screenSize?: DisplayScreenSize;
 }
 

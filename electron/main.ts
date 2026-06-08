@@ -129,8 +129,10 @@ async function launchWorkspace(): Promise<void> {
 
   await displayManager.openAll();
   displayManager.attachHotplugListeners();
+  displayManager.ensureOperatorVisible();
   splashWindow?.close();
   splashWindow = null;
+  displayManager.ensureOperatorVisible();
 }
 
 app.whenReady().then(async () => {

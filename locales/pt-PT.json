@@ -597,6 +597,7 @@
   "displays": {
     "intro": "Defina o papel de cada monitor: o operador usa o monitor principal; a projeção pública e o retorno de palco mostram conteúdos diferentes.",
     "primary": "principal",
+    "disconnected": "desligado",
     "monitorsTitle": "Monitores",
     "none": "Nenhum monitor detectado. Execute o Live Praise neste computador para listar os ecrãs ligados.",
     "save": "Guardar papéis",
@@ -652,7 +653,8 @@
       },
       "errors": {
         "save": "Erro ao guardar tamanho do ecrã",
-        "socket": "Não foi possível enviar ao projetor — verifique a ligação ao vivo."
+        "socket": "Não foi possível enviar ao projetor — verifique a ligação ao vivo.",
+        "disconnected": "Este monitor não está ligado — ligue-o ou escolha o monitor correcto na lista."
       }
     },
     "errors": {

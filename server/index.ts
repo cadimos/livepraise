@@ -109,7 +109,7 @@ export async function createLivepraiseApp(
   app.use('/imagem', createImageRouter());
   app.use('/video', createVideoRouter());
   app.use('/display', createDisplayRouter());
-  app.use('/displays', createDisplaysConfigRouter());
+  app.use('/displays', createDisplaysConfigRouter(liveHub));
   app.use('/themes', createThemesRouter());
   app.use('/locales', createLocalesRouter());
   app.use(createBackgroundRouter());

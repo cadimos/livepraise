@@ -10,7 +10,7 @@ import { resolveProjectionMediaUrl } from '/shared/projection-media-url.js';
 import { clearProjectionVideoUnlock, playProjectionVideo } from '/shared/projection-video-player.js';
 import { playYoutubeProjection, stopYoutubeProjection } from './youtube-iframe-player.js';
 import { createFooterAlertOverlay } from '/shared/footer-alert-overlay.js';
-import { parseAjustarTelaPayload, buildAjustarTelaValor, normalizeContentFit } from '/shared/screen-layout.js';
+import { parseAjustarTelaPayload, buildAjustarTelaValor, normalizeContentFit, matchesAjustarTelaTarget, resolveProjectionStageSize, type AjustarTelaPayload } from '/shared/screen-layout.js';
 import { ensureEndpointDeviceId } from '/shared/endpoint-device-id.js';
 import { createServiceTimerOverlay } from '/shared/service-timer-overlay.js';
 import {
@@ -73,6 +73,61 @@ const LOCAL_DISPLAY_ID = projectorDisplayId();
 const LOCAL_DEVICE_ID =
   LOCAL_DISPLAY_ID === null ? ensureEndpointDeviceId('projection') : null;
 
+function readViewportFromUrl(): { w: number; h: number } | null {
+  const params = new URLSearchParams(location.search);
+  const w = Number.parseInt(params.get('vw') ?? '', 10);
+  const h = Number.parseInt(params.get('vh') ?? '', 10);
+  if (!Number.isFinite(w) || w <= 0 || !Number.isFinite(h) || h <= 0) return null;
+  return { w, h };
+}
+
+let displayBounds = readViewportFromUrl();
+let currentScreenLayout: AjustarTelaPayload | null = null;
+
+function readClientViewport(): { w: number; h: number } {
+  const w = document.documentElement.clientWidth || window.innerWidth || 0;
+  const h = document.documentElement.clientHeight || window.innerHeight || 0;
+  return {
+    w: Math.max(1, Math.round(w)),
+    h: Math.max(1, Math.round(h)),
+  };
+}
+
+/** Viewport lógico para letterbox — prioriza bounds do monitor (Electron). */
+function projectionViewport(): { w: number; h: number } {
+  if (displayBounds) {
+    return { w: displayBounds.w, h: displayBounds.h };
+  }
+  return readClientViewport();
+}
+
+async function refreshDisplayBoundsFromConfig(): Promise<void> {
+  if (LOCAL_DISPLAY_ID === null) return;
+  try {
+    const res = await fetch(`${location.origin}/displays/config`);
+    if (!res.ok) return;
+    const data = (await res.json()) as {
+      config?: {
+        assignments?: Array<{
+          displayId: number;
+          bounds?: { width: number; height: number };
+        }>;
+      };
+    };
+    const assignment = data.config?.assignments?.find(
+      (a) => a.displayId === LOCAL_DISPLAY_ID,
+    );
+    if (assignment?.bounds?.width && assignment.bounds.height) {
+      displayBounds = {
+        w: assignment.bounds.width,
+        h: assignment.bounds.height,
+      };
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
 async function registerRemoteDevice(): Promise<void> {
   if (!LOCAL_DEVICE_ID) return;
   try {
@@ -96,20 +151,7 @@ const footerAlertOverlay = createFooterAlertOverlay({
 
 function shouldApplyScreenLayout(valor: string): ReturnType<typeof parseAjustarTelaPayload> | null {
   const parsed = parseAjustarTelaPayload(valor);
-  if (parsed.deviceId !== null) {
-    if (LOCAL_DEVICE_ID === null || parsed.deviceId !== LOCAL_DEVICE_ID) {
-      return null;
-    }
-    return parsed;
-  }
-  if (
-    parsed.displayId !== null &&
-    LOCAL_DISPLAY_ID !== null &&
-    parsed.displayId !== LOCAL_DISPLAY_ID
-  ) {
-    return null;
-  }
-  if (parsed.displayId !== null && LOCAL_DISPLAY_ID === null && LOCAL_DEVICE_ID !== null) {
+  if (!matchesAjustarTelaTarget(parsed, LOCAL_DISPLAY_ID, LOCAL_DEVICE_ID)) {
     return null;
   }
   return parsed;
@@ -138,6 +180,7 @@ function applyContentFit(contentFit: string): void {
 }
 
 async function applyStoredScreenSize(): Promise<void> {
+  await refreshDisplayBoundsFromConfig();
   if (LOCAL_DISPLAY_ID !== null) {
     try {
       const res = await fetch(`${location.origin}/displays/config`);
@@ -163,9 +206,15 @@ async function applyStoredScreenSize(): Promise<void> {
       );
       const screen = assignment?.screenSize;
       if (!screen) return;
-      applyScreenSize(buildAjustarTelaValor(screen.preset, screen.largura, screen.altura));
-      applyScreenPosition(screen.position ?? 'centro', Number.parseInt(screen.offsetX ?? '0', 10) || 0, Number.parseInt(screen.offsetY ?? '0', 10) || 0);
-      applyContentFit(screen.contentFit ?? 'estender');
+      applyScreenLayout({
+        displayId: LOCAL_DISPLAY_ID,
+        deviceId: null,
+        size: buildAjustarTelaValor(screen.preset, screen.largura, screen.altura),
+        position: screen.position ?? 'centro',
+        offsetX: Number.parseInt(screen.offsetX ?? '0', 10) || 0,
+        offsetY: Number.parseInt(screen.offsetY ?? '0', 10) || 0,
+        contentFit: normalizeContentFit(screen.contentFit ?? 'estender'),
+      });
     } catch {
       /* ignore */
     }
@@ -193,11 +242,30 @@ async function applyStoredScreenSize(): Promise<void> {
     };
     const screen = data.device?.screenSize;
     if (!screen) return;
-    applyScreenSize(buildAjustarTelaValor(screen.preset, screen.largura, screen.altura));
-    applyScreenPosition(screen.position ?? 'centro', Number.parseInt(screen.offsetX ?? '0', 10) || 0, Number.parseInt(screen.offsetY ?? '0', 10) || 0);
-    applyContentFit(screen.contentFit ?? 'estender');
+    applyScreenLayout({
+      displayId: null,
+      deviceId: LOCAL_DEVICE_ID,
+      size: buildAjustarTelaValor(screen.preset, screen.largura, screen.altura),
+      position: screen.position ?? 'centro',
+      offsetX: Number.parseInt(screen.offsetX ?? '0', 10) || 0,
+      offsetY: Number.parseInt(screen.offsetY ?? '0', 10) || 0,
+      contentFit: normalizeContentFit(screen.contentFit ?? 'estender'),
+    });
   } catch {
     /* ignore */
+  }
+}
+
+function applyScreenLayout(layout: AjustarTelaPayload): void {
+  currentScreenLayout = layout;
+  applyScreenSize(layout.size);
+  applyScreenPosition(layout.position, layout.offsetX, layout.offsetY);
+  applyContentFit(layout.contentFit);
+}
+
+function reapplyCurrentScreenLayout(): void {
+  if (currentScreenLayout) {
+    applyScreenSize(currentScreenLayout.size);
   }
 }
 
@@ -205,14 +273,18 @@ async function applyStoredScreenSize(): Promise<void> {
 function applyScreenSize(valor: string): void {
   const stage = byId<HTMLDivElement>('stage');
   const targets = [stage, byId<HTMLDivElement>('bg-layer'), byId<HTMLDivElement>('conteudo')];
-
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
+  const viewport = projectionViewport();
+  const resolved = resolveProjectionStageSize(valor, viewport.w, viewport.h);
 
   const setSize = (width: number, height: number): void => {
     for (const el of targets) {
       el.style.width = `${width}px`;
       el.style.height = `${height}px`;
+      el.style.maxWidth = `${width}px`;
+      el.style.maxHeight = `${height}px`;
+      el.style.minWidth = `${width}px`;
+      el.style.minHeight = `${height}px`;
+      el.style.flex = '0 0 auto';
     }
   };
 
@@ -220,48 +292,22 @@ function applyScreenSize(valor: string): void {
     for (const el of targets) {
       el.style.width = '100%';
       el.style.height = '100%';
+      el.style.maxWidth = '';
+      el.style.maxHeight = '';
+      el.style.minWidth = '';
+      el.style.minHeight = '';
+      el.style.flex = '';
     }
   };
 
-  if (!valor || valor === 'padrao') {
+  if (resolved.fullScreen && (!valor || valor === 'padrao')) {
     resetFullScreen();
     document.body.dataset.screen = valor || 'padrao';
     return;
   }
 
-  const xIdx = valor.indexOf('x');
-  if (xIdx >= 0) {
-    const w = Number.parseInt(valor.slice(0, xIdx), 10);
-    const h = Number.parseInt(valor.slice(xIdx + 1), 10);
-    if (Number.isFinite(w) && w > 0 && Number.isFinite(h) && h > 0) {
-      setSize(w, h);
-      document.body.dataset.screen = valor;
-      return;
-    }
-  }
-
-  if (valor.includes(':')) {
-    const [numW, numH] = valor.split(':').map((part) => Number.parseInt(part, 10));
-    if (Number.isFinite(numW) && numW > 0 && Number.isFinite(numH) && numH > 0) {
-      let heightPx = (screenWidth * numH) / numW;
-      if (heightPx > screenHeight) {
-        heightPx = (screenHeight * numH) / numW;
-      }
-      setSize(screenWidth, Math.round(heightPx));
-      document.body.dataset.screen = valor;
-      return;
-    }
-  }
-
-  const fixedHeight = Number.parseInt(valor, 10);
-  if (Number.isFinite(fixedHeight) && fixedHeight > 0) {
-    setSize(screenWidth, fixedHeight);
-    document.body.dataset.screen = valor;
-    return;
-  }
-
-  resetFullScreen();
-  document.body.dataset.screen = valor;
+  setSize(resolved.width, resolved.height);
+  document.body.dataset.screen = valor || 'padrao';
 }
 
 function hideBackgroundMedia(): void {
@@ -328,9 +374,7 @@ function applyAction(action: LiveAction): void {
     case 'ajustarTela': {
       const layout = shouldApplyScreenLayout(action.valor);
       if (layout !== null) {
-        applyScreenSize(layout.size);
-        applyScreenPosition(layout.position, layout.offsetX, layout.offsetY);
-        applyContentFit(layout.contentFit);
+        applyScreenLayout(layout);
       }
       break;
     }
@@ -394,6 +438,9 @@ function connect(): WebSocket {
       const last = (message as WsJoinedMessage).state.lastAction;
       if (last) applyAction(last);
     }
+    if (message.type === 'displays-config-updated') {
+      void applyStoredScreenSize();
+    }
   });
 
   socket.addEventListener('message', (event) => {
@@ -409,6 +456,18 @@ function connect(): WebSocket {
 }
 
 connect();
+window.addEventListener('resize', () => {
+  reapplyCurrentScreenLayout();
+});
+window.addEventListener('load', () => {
+  void refreshDisplayBoundsFromConfig().then(() => {
+    if (currentScreenLayout) {
+      reapplyCurrentScreenLayout();
+    } else {
+      void applyStoredScreenSize();
+    }
+  });
+});
 void registerRemoteDevice().then(() => applyStoredScreenSize());
 void fetchProjectionTypographyPrefs().then((prefs) => typography.init(prefs));
 
