@@ -42,6 +42,8 @@ export class DisplayManager {
 
   async openAll(): Promise<void> {
     this.syncWithSystemDisplays();
+    await this.waitForOperatorWindow();
+    this.ensureOperatorVisible();
   }
 
   /** Escuta ligação/desligação de monitores e abre/fecha janelas sem reiniciar (CAD-175). */
@@ -100,6 +102,14 @@ export class DisplayManager {
       this.repositionWindow(assignment);
     }
 
+    const openedOperator = this.findOperatorWindow();
+    if (!openedOperator) {
+      console.warn(
+        '[livepraise] Nenhum monitor ligado com papel «operador». ' +
+          'Ligue o monitor principal ou redefina os papéis em Configurações → Tela projetor.',
+      );
+    }
+
     if (JSON.stringify(this.config.assignments) !== before) {
       this.config = saveAssignments(this.config.assignments);
     }
@@ -114,7 +124,8 @@ export class DisplayManager {
 
   private urlForRole(assignment: DisplayAssignment): string {
     const base = `http://127.0.0.1:${this.options.serverPort}`;
-    const displayQuery = `displayId=${assignment.displayId}`;
+    const { width, height } = assignment.bounds;
+    const displayQuery = `displayId=${assignment.displayId}&vw=${width}&vh=${height}`;
     switch (assignment.role) {
       case 'operator':
         return `${base}/operator/`;
@@ -162,12 +173,7 @@ export class DisplayManager {
     win.setMenuBarVisibility(false);
     void win.loadURL(this.urlForRole(assignment));
 
-    win.once('ready-to-show', () => {
-      if (assignment.role === 'operator') {
-        win.maximize();
-      }
-      win.show();
-    });
+    this.attachWindowReveal(win, assignment);
 
     win.on('closed', () => {
       this.windows.delete(key);
@@ -181,6 +187,86 @@ export class DisplayManager {
     });
 
     this.windows.set(key, win);
+  }
+
+  /** Garante que a janela fica visível mesmo se `ready-to-show` não disparar (ex.: falha parcial de GPU). */
+  private attachWindowReveal(
+    win: BrowserWindow,
+    assignment: DisplayAssignment,
+  ): void {
+    let revealed = false;
+    const reveal = (reason: string): void => {
+      if (revealed || win.isDestroyed()) return;
+      revealed = true;
+      if (assignment.role === 'operator') {
+        console.info(`[livepraise] A mostrar janela do operador (${reason}).`);
+      }
+      win.webContents.zoomFactor = 1;
+      win.show();
+      if (assignment.role === 'operator') {
+        if (!win.isMaximized()) win.maximize();
+        win.moveTop();
+        win.focus();
+      }
+    };
+
+    win.once('ready-to-show', () => reveal('ready-to-show'));
+    win.webContents.once('did-finish-load', () => {
+      setTimeout(() => reveal('did-finish-load'), 0);
+    });
+    win.webContents.once('did-fail-load', (_event, code, desc, url) => {
+      console.error(`[livepraise] Falha ao carregar ${url}: ${code} ${desc}`);
+      reveal('did-fail-load');
+    });
+    setTimeout(() => reveal('timeout'), 4_000);
+  }
+
+  ensureOperatorVisible(): void {
+    const win = this.findOperatorWindow();
+    if (!win || win.isDestroyed()) return;
+    win.webContents.zoomFactor = 1;
+    if (!win.isVisible()) win.show();
+    if (!win.isMaximized()) win.maximize();
+    win.moveTop();
+    win.focus();
+  }
+
+  private findOperatorWindow(): BrowserWindow | undefined {
+    for (const [key, win] of this.windows.entries()) {
+      if (win.isDestroyed()) continue;
+      const assignment = this.config.assignments.find(
+        (a) => String(a.displayId) === key,
+      );
+      if (assignment?.role === 'operator') return win;
+    }
+    return undefined;
+  }
+
+  private waitForOperatorWindow(maxMs = 12_000): Promise<void> {
+    return new Promise((resolve) => {
+      const deadline = Date.now() + maxMs;
+
+      const poll = (): void => {
+        const operator = this.findOperatorWindow();
+        if (operator?.isVisible()) {
+          resolve();
+          return;
+        }
+
+        if (Date.now() > deadline) {
+          console.warn(
+            '[livepraise] Tempo esgotado aguardando janela do operador; a forçar exibição.',
+          );
+          this.ensureOperatorVisible();
+          resolve();
+          return;
+        }
+
+        setTimeout(poll, 100);
+      };
+
+      poll();
+    });
   }
 }
 

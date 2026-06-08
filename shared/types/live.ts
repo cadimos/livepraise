@@ -101,6 +101,8 @@ export interface DisplayAssignment {
   primary: boolean;
   /** Opcional; relevante para monitores em projeção. */
   screenSize?: DisplayScreenSize;
+  /** false quando o monitor foi desligado mas a configuração foi preservada (CAD-175). */
+  connected?: boolean;
 }
 
 export interface DisplaysConfig {
@@ -218,6 +220,11 @@ export interface WsMediaUpdatedMessage {
   ts: number;
 }
 
+export interface WsDisplaysConfigUpdatedMessage {
+  type: 'displays-config-updated';
+  ts: number;
+}
+
 export type WsServerMessage =
   | WsJoinedMessage
   | WsLiveBroadcastMessage
@@ -229,4 +236,5 @@ export type WsServerMessage =
   | WsApprovalResolvedMessage
   | WsDevicePresenceMessage
   | WsProjectionTypographySyncMessage
-  | WsMediaUpdatedMessage;
+  | WsMediaUpdatedMessage
+  | WsDisplaysConfigUpdatedMessage;

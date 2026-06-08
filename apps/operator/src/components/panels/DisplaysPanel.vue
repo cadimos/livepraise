@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchJson } from '../../composables/useApi';
 import { useExternalDevices } from '../../composables/useExternalDevices';
-import { useLiveSocket } from '../../composables/useLiveSocket';
+import { useLiveSocket, whenLiveSocketReady } from '../../composables/useLiveSocket';
 import type { DisplayAssignment, DisplayScreenSize, ExternalDisplayProfile } from '@shared/types/live';
 import {
   SCREEN_SIZE_PRESETS,
@@ -12,6 +12,10 @@ import {
   buildAjustarTelaPayload,
   buildAjustarTelaPayloadForDevice,
   defaultScreenSize,
+  describeScreenLayoutSize,
+  parseCustomScreenPixels,
+  resolveProjectionStageSize,
+  fitAspectRatioInBox,
 } from '../../utils/screen-size';
 import { Settings } from '@lucide/vue';
 
@@ -87,6 +91,69 @@ function isExpandedDisplay(displayId: number): boolean {
 
 function isProjectionRole(role: DisplayRole): boolean {
   return role === 'projection';
+}
+
+function isConnectedDisplay(item: DisplayAssignment): boolean {
+  return item.connected !== false;
+}
+
+function sendScreenLayoutPreview(payload: string): void {
+  whenLiveSocketReady(() => {
+    if (!sendAction('ajustarTela', payload)) {
+      error.value = t('displays.screenSize.errors.socket');
+      return;
+    }
+    if (error.value === t('displays.screenSize.errors.socket')) {
+      error.value = '';
+    }
+  });
+}
+
+function useCustomScreenDimensions(screen: DisplayScreenSize): void {
+  if (screen.preset !== 'personalizado') {
+    screen.preset = 'personalizado';
+  }
+}
+
+function onScreenPresetChange(_item: DisplayAssignment): void {
+  /* Mantém largura/altura — úteis como referência do monitor nativo. */
+}
+
+function onRemoteScreenPresetChange(_item: ExternalDeviceDraft): void {
+  /* idem */
+}
+
+function effectiveScreenSizeLabel(
+  screen: DisplayScreenSize,
+  bounds?: { width: number; height: number },
+): string {
+  const vw = bounds?.width && bounds.width > 0 ? bounds.width : 1920;
+  const vh = bounds?.height && bounds.height > 0 ? bounds.height : 1080;
+  if (!screen.preset || screen.preset === 'padrao') {
+    return t('displays.screenSize.effective.fullScreen');
+  }
+  if (screen.preset === 'personalizado') {
+    const custom = parseCustomScreenPixels(screen.largura, screen.altura);
+    if (!custom) {
+      return t('displays.screenSize.effective.customInvalid');
+    }
+    const resolved = resolveProjectionStageSize(`${custom.w}x${custom.h}`, vw, vh);
+    return t('displays.screenSize.effective.customPixels', {
+      size: `${resolved.width}×${resolved.height}`,
+    });
+  }
+  const resolved = resolveProjectionStageSize(screen.preset, vw, vh);
+  return t('displays.screenSize.effective.ratioPixels', {
+    ratio: screen.preset,
+    size: `${resolved.width}×${resolved.height}`,
+  });
+}
+
+function validateCustomScreenSize(screen: DisplayScreenSize): boolean {
+  if (screen.preset !== 'personalizado') return true;
+  if (parseCustomScreenPixels(screen.largura, screen.altura)) return true;
+  error.value = t('displays.screenSize.errors.customDimensions');
+  return false;
 }
 
 function toggleScreenConfig(displayId: number): void {
@@ -191,11 +258,12 @@ async function loadExternalDevices() {
 function previewRemoteProjectorScreen(item: ExternalDeviceDraft): void {
   const screen = ensureRemoteScreenSize(item);
   if (!screen.livePreview) return;
-  sendAction('ajustarTela', buildAjustarTelaPayloadForDevice(item.deviceId, screen));
+  sendScreenLayoutPreview(buildAjustarTelaPayloadForDevice(item.deviceId, screen));
 }
 
 async function saveRemoteProjectorScreen(item: ExternalDeviceDraft) {
   const screen = ensureRemoteScreenSize(item);
+  if (!validateCustomScreenSize(screen)) return;
   savingRemoteDeviceId.value = item.deviceId;
   message.value = '';
   error.value = '';
@@ -281,7 +349,12 @@ async function saveRoles() {
 }
 
 async function saveDisplayScreen(item: DisplayAssignment) {
+  if (!isConnectedDisplay(item)) {
+    error.value = t('displays.screenSize.errors.disconnected');
+    return;
+  }
   const screen = ensureScreenSize(item);
+  if (!validateCustomScreenSize(screen)) return;
   savingScreenId.value = item.displayId;
   message.value = '';
   error.value = '';
@@ -290,10 +363,11 @@ async function saveDisplayScreen(item: DisplayAssignment) {
 
     if (isProjectionRole(item.role)) {
       const payload = buildAjustarTelaPayload(item.displayId, screen);
-      if (!sendAction('ajustarTela', payload)) {
-        error.value = t('displays.screenSize.errors.socket');
-        return;
-      }
+      whenLiveSocketReady(() => {
+        if (!sendAction('ajustarTela', payload)) {
+          error.value = t('displays.screenSize.errors.socket');
+        }
+      });
     }
 
     message.value = t('displays.screenSize.savedFor', { label: item.label });
@@ -306,11 +380,11 @@ async function saveDisplayScreen(item: DisplayAssignment) {
 }
 
 function previewDisplayScreen(item: DisplayAssignment): void {
-  if (!isProjectionRole(item.role)) return;
+  if (!isProjectionRole(item.role) || !isConnectedDisplay(item)) return;
   const screen = ensureScreenSize(item);
   if (!screen.livePreview) return;
   const payload = buildAjustarTelaPayload(item.displayId, screen);
-  sendAction('ajustarTela', payload);
+  sendScreenLayoutPreview(payload);
 }
 
 watch(
@@ -405,10 +479,16 @@ watch(onlineDevices, () => {
           <span class="text-sm text-lp-text">
             {{ item.label }}
             <span v-if="item.primary" class="ml-1 text-xs text-amber-400">{{ t('displays.primary') }}</span>
+            <span
+              v-if="!isConnectedDisplay(item)"
+              class="ml-2 rounded bg-rose-900/50 px-1.5 py-0.5 text-xs text-rose-300"
+            >
+              {{ t('displays.disconnected') }}
+            </span>
           </span>
           <div class="flex items-center gap-1">
             <button
-              v-if="isProjectionRole(item.role)"
+              v-if="isProjectionRole(item.role) && isConnectedDisplay(item)"
               type="button"
               class="rounded-md p-1.5 text-lp-muted transition hover:bg-lp-surface hover:text-lp-primary"
               :title="t('displays.screenSize.configure')"
@@ -430,7 +510,7 @@ watch(onlineDevices, () => {
         </div>
 
         <div
-          v-if="isExpandedDisplay(item.displayId) && isProjectionRole(item.role)"
+          v-if="isExpandedDisplay(item.displayId) && isProjectionRole(item.role) && isConnectedDisplay(item)"
           class="border-t border-lp-surface px-3 py-3"
         >
           <p class="mb-3 text-xs text-lp-muted">
@@ -442,11 +522,15 @@ watch(onlineDevices, () => {
               <select
                 v-model="ensureScreenSize(item).preset"
                 class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+                @change="onScreenPresetChange(item)"
               >
                 <option v-for="opt in presetOptions" :key="opt.value" :value="opt.value">
                   {{ opt.label }}
                 </option>
               </select>
+              <span class="text-xs text-lp-muted">
+                {{ t('displays.screenSize.customPresetHint') }}
+              </span>
             </label>
             <label class="flex flex-col gap-1 text-sm">
               <span class="text-lp-muted">{{ t('displays.screenSize.widthLabel') }}</span>
@@ -457,6 +541,7 @@ watch(onlineDevices, () => {
                 class="lp-field w-full rounded-md px-2 py-1.5 text-sm disabled:opacity-50"
                 :disabled="ensureScreenSize(item).preset !== 'personalizado'"
                 :placeholder="t('displays.screenSize.widthPlaceholder')"
+                @input="useCustomScreenDimensions(ensureScreenSize(item))"
               />
             </label>
             <label class="flex flex-col gap-1 text-sm">
@@ -468,8 +553,12 @@ watch(onlineDevices, () => {
                 class="lp-field w-full rounded-md px-2 py-1.5 text-sm disabled:opacity-50"
                 :disabled="ensureScreenSize(item).preset !== 'personalizado'"
                 :placeholder="t('displays.screenSize.heightPlaceholder')"
+                @input="useCustomScreenDimensions(ensureScreenSize(item))"
               />
             </label>
+            <p class="text-xs text-sky-300/90 sm:col-span-2">
+              {{ effectiveScreenSizeLabel(ensureScreenSize(item), item.bounds) }}
+            </p>
             <label class="flex flex-col gap-1 text-sm sm:col-span-2">
               <span class="text-lp-muted">{{ t('displays.screenSize.positionLabel') }}</span>
               <select
@@ -608,11 +697,15 @@ watch(onlineDevices, () => {
                 <select
                   v-model="ensureRemoteScreenSize(item).preset"
                   class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
+                  @change="onRemoteScreenPresetChange(item)"
                 >
                   <option v-for="opt in presetOptions" :key="opt.value" :value="opt.value">
                     {{ opt.label }}
                   </option>
                 </select>
+                <span class="text-xs text-lp-muted">
+                  {{ t('displays.screenSize.customPresetHint') }}
+                </span>
               </label>
               <label class="flex flex-col gap-1 text-sm">
                 <span class="text-lp-muted">{{ t('displays.screenSize.widthLabel') }}</span>
@@ -623,6 +716,7 @@ watch(onlineDevices, () => {
                   class="lp-field w-full rounded-md px-2 py-1.5 text-sm disabled:opacity-50"
                   :disabled="ensureRemoteScreenSize(item).preset !== 'personalizado'"
                   :placeholder="t('displays.screenSize.widthPlaceholder')"
+                  @input="useCustomScreenDimensions(ensureRemoteScreenSize(item))"
                 />
               </label>
               <label class="flex flex-col gap-1 text-sm">
@@ -634,8 +728,12 @@ watch(onlineDevices, () => {
                   class="lp-field w-full rounded-md px-2 py-1.5 text-sm disabled:opacity-50"
                   :disabled="ensureRemoteScreenSize(item).preset !== 'personalizado'"
                   :placeholder="t('displays.screenSize.heightPlaceholder')"
+                  @input="useCustomScreenDimensions(ensureRemoteScreenSize(item))"
                 />
               </label>
+              <p class="text-xs text-sky-300/90 sm:col-span-2">
+                {{ effectiveScreenSizeLabel(ensureRemoteScreenSize(item)) }}
+              </p>
               <label class="flex flex-col gap-1 text-sm sm:col-span-2">
                 <span class="text-lp-muted">{{ t('displays.screenSize.positionLabel') }}</span>
                 <select

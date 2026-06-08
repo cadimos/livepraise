@@ -19,6 +19,11 @@ body {
 
 body {
   display: flex;
+  width: 100vw;
+  height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 body[data-screen-align='centro'],
@@ -44,6 +49,12 @@ body[data-screen-align='personalizado'] {
   max-width: 100vw;
   max-height: 100vh;
   overflow: hidden;
+  flex-shrink: 0;
+}
+
+body[data-screen]:not([data-screen='padrao']) #stage {
+  outline: 2px solid rgba(56, 189, 248, 0.55);
+  outline-offset: -2px;
 }
 
 #bg-layer,
