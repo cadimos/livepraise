@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Textfill usa probe off-screen — span no DOM real não fica hidden durante medição.
+ * Medição in-place no span real — não fica hidden durante textfill.
  */
 import { JSDOM } from 'jsdom';
 
@@ -60,7 +60,7 @@ Object.defineProperty(span.style, 'visibility', {
 
 await refreshOutputTextfill(root, 24, 120, true, {});
 
-assert(!visibilityLog.includes('hidden'), 'span não deve ficar hidden com probe');
+assert(!visibilityLog.includes('hidden'), 'span não deve ficar hidden durante textfill');
 assert(visibilityValue === '', 'span visível após textfill');
 
 const fontSize = Number.parseInt(span.style.fontSize, 10);

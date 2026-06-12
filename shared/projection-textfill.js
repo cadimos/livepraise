@@ -1,5 +1,84 @@
 import { collectTextfillLayoutContext, isTextfillDiagnosticsEnabled, logTextfillDiagnostic, } from './projection-textfill-diagnostics.js';
-/** `.proximo` usa teto de fonte menor que `.atual` (paridade stage-return.css). */
+const SPAN_LINE_HEIGHT = 1.35;
+function applySpanFontStyles(span, fontStyles) {
+    span.style.fontFamily = fontStyles.fontFamily;
+    span.style.fontWeight = fontStyles.fontWeight;
+    span.style.fontStyle = fontStyles.fontStyle;
+}
+function spanFitMetrics(span, bounds, slackPx) {
+    void span.offsetHeight;
+    const maxH = bounds.height - slackPx;
+    const heightOverflow = Math.ceil(span.scrollHeight) - maxH;
+    const widthOverflow = Math.ceil(span.scrollWidth) - bounds.width;
+    const fits = maxH > 0 &&
+        bounds.width > 0 &&
+        heightOverflow <= HEIGHT_FIT_TOLERANCE_PX &&
+        widthOverflow <= WIDTH_FIT_TOLERANCE_PX;
+    return {
+        fits,
+        maxH,
+        heightOverflow,
+        widthOverflow,
+        spanOffsetH: span.scrollHeight,
+        spanOffsetW: span.scrollWidth,
+    };
+}
+/** Busca binária numa dimensão (altura ou largura) — paridade jquery-textfill. */
+function searchFontOnSpan(span, measureDim, maxDim, loBound, hiBound, slackPx, heightTolerance, applySlack) {
+    let lo = loBound;
+    let hi = hiBound;
+    let best = loBound;
+    const tolerance = heightTolerance ? HEIGHT_FIT_TOLERANCE_PX : WIDTH_FIT_TOLERANCE_PX;
+    const slack = applySlack ? slackPx : 0;
+    while (lo <= hi) {
+        const mid = Math.floor((lo + hi) / 2);
+        span.style.fontSize = `${mid}px`;
+        void span.offsetHeight;
+        const dim = measureDim(span);
+        if (dim <= maxDim - slack + tolerance) {
+            best = mid;
+            lo = mid + 1;
+        }
+        else {
+            hi = mid - 1;
+        }
+    }
+    span.style.fontSize = `${best}px`;
+    return best;
+}
+/**
+ * Mede no span real dentro da caixa de projeção — fontes e layout idênticos ao ecrã.
+ * `#conteudo` pode estar visibility:hidden; o layout continua válido.
+ */
+function measureFontSizeOnSpan(span, bounds, loBound, hiBound, slackPx, fontStyles) {
+    prepareSpan(span);
+    applySpanFontStyles(span, fontStyles);
+    span.style.lineHeight = String(SPAN_LINE_HEIGHT);
+    const forHeight = searchFontOnSpan(span, (el) => el.scrollHeight, bounds.height, loBound, hiBound, slackPx, true, true);
+    span.style.fontSize = `${forHeight}px`;
+    void span.offsetHeight;
+    const forWidth = searchFontOnSpan(span, (el) => el.scrollWidth, bounds.width, loBound, hiBound, slackPx, false, false);
+    return Math.min(forHeight, forWidth);
+}
+/** Ajuste final no DOM real — corrige tolerância da busca binária. */
+function verifyAndShrinkFontOnSpan(span, bounds, fontPx, loBound, slackPx) {
+    let px = fontPx;
+    span.style.fontSize = `${px}px`;
+    const limit = bounds.height - slackPx + HEIGHT_FIT_TOLERANCE_PX;
+    while (px > loBound && span.scrollHeight > limit) {
+        px -= 1;
+        span.style.fontSize = `${px}px`;
+        void span.offsetHeight;
+    }
+    return px;
+}
+function spanFitsAtFontPx(span, bounds, fontPx, slackPx, fontStyles) {
+    prepareSpan(span);
+    applySpanFontStyles(span, fontStyles);
+    span.style.lineHeight = String(SPAN_LINE_HEIGHT);
+    span.style.fontSize = `${fontPx}px`;
+    return spanFitMetrics(span, bounds, slackPx).fits;
+}
 const STAGE_RETURN_PROXIMO_MAX_SCALE = 0.72;
 /** Piso em saídas reais quando o perfil min não cabe (mobile / muito texto). */
 const STAGE_RETURN_OUTPUT_FLOOR_PX = 10;
@@ -71,8 +150,6 @@ function prepareSpan(span) {
     span.style.overflowWrap = 'break-word';
     span.style.wordBreak = 'break-word';
 }
-const PROBE_LINE_HEIGHT = 1.35;
-let textfillProbeRoot = null;
 /**
  * Área do corpo = largura/altura do root menos padding, título e rodapé.
  * Paridade com o modelo mental do operador (800×600 → caixa fixa).
@@ -121,28 +198,6 @@ function resolveContentAreaBounds(contentEl, box, options) {
     }
     return computeProjectionContentArea(contentEl, box);
 }
-function getTextfillProbe() {
-    if (!textfillProbeRoot) {
-        textfillProbeRoot = document.createElement('div');
-        textfillProbeRoot.setAttribute('aria-hidden', 'true');
-        textfillProbeRoot.dataset.textfillProbe = '1';
-        textfillProbeRoot.style.cssText =
-            'position:fixed;left:-20000px;top:0;visibility:visible;opacity:1;overflow:visible;pointer-events:none;z-index:-1;';
-        const box = document.createElement('div');
-        box.className = 'content';
-        box.style.overflow = 'hidden';
-        box.style.display = 'block';
-        box.style.boxSizing = 'border-box';
-        const span = document.createElement('span');
-        box.appendChild(span);
-        textfillProbeRoot.appendChild(box);
-        document.body.appendChild(textfillProbeRoot);
-    }
-    return {
-        box: textfillProbeRoot.querySelector('.content'),
-        span: textfillProbeRoot.querySelector('span'),
-    };
-}
 function readFontStyles(span, options) {
     if (options.fontFamily) {
         return {
@@ -157,81 +212,6 @@ function readFontStyles(span, options) {
         fontWeight: cs.fontWeight,
         fontStyle: cs.fontStyle,
     };
-}
-function configureTextfillProbe(probe, html, bounds, fontStyles) {
-    probe.box.style.width = `${bounds.width}px`;
-    probe.box.style.height = `${bounds.height}px`;
-    probe.span.innerHTML = html;
-    probe.span.style.display = 'block';
-    probe.span.style.width = '100%';
-    probe.span.style.maxWidth = '100%';
-    probe.span.style.lineHeight = String(PROBE_LINE_HEIGHT);
-    probe.span.style.overflowWrap = 'break-word';
-    probe.span.style.wordBreak = 'break-word';
-    probe.span.style.visibility = 'visible';
-    probe.span.style.fontFamily = fontStyles.fontFamily;
-    probe.span.style.fontWeight = fontStyles.fontWeight;
-    probe.span.style.fontStyle = fontStyles.fontStyle;
-}
-function probeFitMetrics(probe, bounds, slackPx) {
-    void probe.span.offsetHeight;
-    const maxH = bounds.height - slackPx;
-    const heightOverflow = Math.ceil(probe.span.offsetHeight) - maxH;
-    const widthOverflow = Math.ceil(probe.span.scrollWidth) - bounds.width;
-    const fits = maxH > 0 &&
-        bounds.width > 0 &&
-        heightOverflow <= HEIGHT_FIT_TOLERANCE_PX &&
-        widthOverflow <= WIDTH_FIT_TOLERANCE_PX;
-    return {
-        fits,
-        maxH,
-        heightOverflow,
-        widthOverflow,
-        spanOffsetH: probe.span.offsetHeight,
-        spanOffsetW: probe.span.offsetWidth,
-    };
-}
-/** Busca binária numa dimensão (altura ou largura) — paridade jquery-textfill. */
-function searchFontForDimension(probe, measureDim, maxDim, loBound, hiBound, slackPx, heightTolerance, applySlack) {
-    let lo = loBound;
-    let hi = hiBound;
-    let best = loBound;
-    const tolerance = heightTolerance ? HEIGHT_FIT_TOLERANCE_PX : WIDTH_FIT_TOLERANCE_PX;
-    const slack = applySlack ? slackPx : 0;
-    while (lo <= hi) {
-        const mid = Math.floor((lo + hi) / 2);
-        probe.span.style.fontSize = `${mid}px`;
-        void probe.span.offsetHeight;
-        const dim = measureDim(probe.span);
-        if (dim <= maxDim - slack + tolerance) {
-            best = mid;
-            lo = mid + 1;
-        }
-        else {
-            hi = mid - 1;
-        }
-    }
-    probe.span.style.fontSize = `${best}px`;
-    return best;
-}
-/**
- * Mede no probe visível fora do ecrã — evita scrollHeight errado com span hidden no DOM real.
- * Retorna min(fonte-altura, fonte-largura) como jquery-textfill.
- */
-function measureFontSizeInProbe(html, bounds, loBound, hiBound, slackPx, fontStyles) {
-    const probe = getTextfillProbe();
-    configureTextfillProbe(probe, html, bounds, fontStyles);
-    const forHeight = searchFontForDimension(probe, (el) => el.offsetHeight, bounds.height, loBound, hiBound, slackPx, true, true);
-    probe.span.style.fontSize = `${forHeight}px`;
-    void probe.span.offsetHeight;
-    const forWidth = searchFontForDimension(probe, (el) => el.scrollWidth, bounds.width, loBound, hiBound, slackPx, false, false);
-    return Math.min(forHeight, forWidth);
-}
-function probeMetricsForFontPx(html, bounds, fontPx, slackPx, fontStyles) {
-    const probe = getTextfillProbe();
-    configureTextfillProbe(probe, html, bounds, fontStyles);
-    probe.span.style.fontSize = `${fontPx}px`;
-    return probeFitMetrics(probe, bounds, slackPx);
 }
 function applyTextfill(contentEl, minPx, maxPx, enabled, options = {}, mode = 'output') {
     const span = textTarget(contentEl, options.spanSelector);
@@ -264,13 +244,14 @@ function applyTextfill(contentEl, minPx, maxPx, enabled, options = {}, mode = 'o
     prepareSpan(span);
     let targetPx = hiBound;
     if (enabled) {
-        targetPx = measureFontSizeInProbe(span.innerHTML, area, loBound, hiBound, slackPx, fontStyles);
+        targetPx = measureFontSizeOnSpan(span, area, loBound, hiBound, slackPx, fontStyles);
+        targetPx = verifyAndShrinkFontOnSpan(span, area, targetPx, loBound, slackPx);
         if (mode === 'output' &&
             span.closest('.retorno-musica, .retorno-biblia') &&
-            !probeMetricsForFontPx(span.innerHTML, area, targetPx, slackPx, fontStyles).fits) {
+            !spanFitsAtFontPx(span, area, targetPx, slackPx, fontStyles)) {
             const floorPx = STAGE_RETURN_OUTPUT_FLOOR_PX;
-            targetPx = measureFontSizeInProbe(span.innerHTML, area, floorPx, Math.max(floorPx, loBound - 1), slackPx, fontStyles);
-            targetPx = Math.max(floorPx, targetPx);
+            targetPx = measureFontSizeOnSpan(span, area, floorPx, Math.max(floorPx, loBound - 1), slackPx, fontStyles);
+            targetPx = Math.max(floorPx, verifyAndShrinkFontOnSpan(span, area, targetPx, floorPx, slackPx));
         }
     }
     span.style.fontSize = `${targetPx}px`;
@@ -285,15 +266,14 @@ function applyTextfill(contentEl, minPx, maxPx, enabled, options = {}, mode = 'o
         slackPx,
         resultFontPx: targetPx,
         options,
-        measurePhase: 'probe',
+        measurePhase: 'in-place',
     });
 }
 function recordTextfillDiagnostic(contentEl, span, box, area, data) {
     if (!isTextfillDiagnosticsEnabled())
         return;
     const layout = collectTextfillLayoutContext(contentEl, span, box);
-    const fontStyles = readFontStyles(span, data.options);
-    const metrics = probeMetricsForFontPx(span.innerHTML, area, data.resultFontPx, data.slackPx, fontStyles);
+    const metrics = spanFitMetrics(span, area, data.slackPx);
     const pass = data.options.diagnosticPass ?? 1;
     logTextfillDiagnostic({
         surface: data.options.diagnosticSurface ?? data.mode,
@@ -368,7 +348,7 @@ function applyStageReturnCoupledTextfill(rootEl, minPx, maxPx, enabled, options 
                 rootClientW: entry.box.clientWidth,
                 rootClientH: entry.box.clientHeight,
             };
-            if (!probeMetricsForFontPx(entry.span.innerHTML, area, size, slackPx, fontStyles).fits) {
+            if (!spanFitsAtFontPx(entry.span, area, size, slackPx, fontStyles)) {
                 return false;
             }
         }

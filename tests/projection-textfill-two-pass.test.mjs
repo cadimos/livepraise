@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Probe off-screen + área calculada — fonte maximizada sem cair no mínimo.
+ * Medição in-place + área calculada — fonte maximizada sem cair no mínimo.
  */
 import { JSDOM } from 'jsdom';
 
@@ -52,7 +52,7 @@ const area = computeProjectionContentArea(root, box);
 assert(area.width === 752, `largura calculada (${area.width})`);
 assert(area.height === 525, `altura calculada (${area.height})`);
 
-const probeSpan = document.createElement('span');
+const span = root.querySelector('.content > span');
 const chars = 72;
 const lineHeight = 1.35;
 const realScrollH = (size) => {
@@ -61,43 +61,35 @@ const realScrollH = (size) => {
   return Math.ceil(size * lines * lineHeight);
 };
 
-Object.defineProperty(probeSpan, 'offsetHeight', {
+Object.defineProperty(span, 'scrollHeight', {
   configurable: true,
   get() {
     const size = Number.parseInt(this.style.fontSize || '24', 10);
     return realScrollH(size);
   },
 });
-Object.defineProperty(probeSpan, 'offsetWidth', {
+Object.defineProperty(span, 'scrollWidth', {
   configurable: true,
   get() {
     return area.width;
   },
 });
+Object.defineProperty(span, 'offsetHeight', {
+  configurable: true,
+  get() {
+    return this.scrollHeight;
+  },
+});
 
 globalThis.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
-const { Element } = dom.window;
-
-const origAppend = Element.prototype.appendChild;
-Element.prototype.appendChild = function appendChild(child) {
-  const result = origAppend.call(this, child);
-  if (this.className === 'content' && child.tagName === 'SPAN') {
-    Object.defineProperty(child, 'offsetHeight', Object.getOwnPropertyDescriptor(probeSpan, 'offsetHeight'));
-    Object.defineProperty(child, 'offsetWidth', Object.getOwnPropertyDescriptor(probeSpan, 'offsetWidth'));
-  }
-  return result;
-};
 
 await refreshOutputTextfill(root, 24, 120, true, {});
 
-Element.prototype.appendChild = origAppend;
-
-const span = root.querySelector('.content > span');
 const fontSize = Number.parseInt(span.style.fontSize, 10);
 const maxH = area.height - 2;
 assert(fontSize > 40, `deve maximizar (${fontSize}px)`);
 assert(fontSize <= 120, `não excede max (${fontSize})`);
-assert(realScrollH(fontSize) <= maxH + 3, `probe cabe na área (${realScrollH(fontSize)}<=${maxH})`);
+assert(realScrollH(fontSize) <= maxH + 3, `cabe na área (${realScrollH(fontSize)}<=${maxH})`);
 
 console.log('projection-textfill-two-pass.test: OK');
 process.exit(0);
