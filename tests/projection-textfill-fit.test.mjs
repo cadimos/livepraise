@@ -45,6 +45,19 @@ function stubProbeSpan(span) {
       return wide ? Math.min(width, Math.ceil(size * 12)) : width;
     },
   });
+  Object.defineProperty(span, 'scrollWidth', {
+    configurable: true,
+    get() {
+      const size = Number.parseInt(this.style.fontSize || '8', 10);
+      const box = this.parentElement;
+      const width =
+        box?.clientWidth ||
+        Number.parseInt(box?.style.width ?? '', 10) ||
+        280;
+      const wide = width <= 150;
+      return wide ? Math.ceil(size * 12) : width;
+    },
+  });
 }
 
 const origAppend = Element.prototype.appendChild;

@@ -292,7 +292,7 @@ function probeFitMetrics(
   void probe.span.offsetHeight;
   const maxH = bounds.height - slackPx;
   const heightOverflow = Math.ceil(probe.span.offsetHeight) - maxH;
-  const widthOverflow = Math.ceil(probe.span.offsetWidth) - bounds.width;
+  const widthOverflow = Math.ceil(probe.span.scrollWidth) - bounds.width;
   const fits =
     maxH > 0 &&
     bounds.width > 0 &&
@@ -317,18 +317,20 @@ function searchFontForDimension(
   hiBound: number,
   slackPx: number,
   heightTolerance: boolean,
+  applySlack: boolean,
 ): number {
   let lo = loBound;
   let hi = hiBound;
   let best = loBound;
   const tolerance = heightTolerance ? HEIGHT_FIT_TOLERANCE_PX : WIDTH_FIT_TOLERANCE_PX;
+  const slack = applySlack ? slackPx : 0;
 
   while (lo <= hi) {
     const mid = Math.floor((lo + hi) / 2);
     probe.span.style.fontSize = `${mid}px`;
     void probe.span.offsetHeight;
     const dim = measureDim(probe.span);
-    if (dim <= maxDim - slackPx + tolerance) {
+    if (dim <= maxDim - slack + tolerance) {
       best = mid;
       lo = mid + 1;
     } else {
@@ -363,17 +365,19 @@ function measureFontSizeInProbe(
     hiBound,
     slackPx,
     true,
+    true,
   );
   probe.span.style.fontSize = `${forHeight}px`;
   void probe.span.offsetHeight;
 
   const forWidth = searchFontForDimension(
     probe,
-    (el) => el.offsetWidth,
+    (el) => el.scrollWidth,
     bounds.width,
     loBound,
     hiBound,
     slackPx,
+    false,
     false,
   );
 
@@ -778,6 +782,7 @@ async function runRefreshTextfill(
     fontStyle,
     diagnosticPass: 1,
   });
+  contentEl.style.visibility = '';
 }
 
 /** Aguarda fontes/layout e aplica textfill — prévias do operador (CAD-313). */
@@ -838,6 +843,7 @@ export async function refreshOutputTextfillAll(
     fontWeight,
     fontStyle,
   });
+  rootEl.style.visibility = '';
 }
 
 /** Retorno de palco — cada `.texto` com textfill independente. */
