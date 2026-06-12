@@ -257,7 +257,7 @@
       "textfillDiagnosticsExport": "Exportar JSONL",
       "textfillDiagnosticsClear": "Limpar diagnóstico",
       "textfillDiagnosticsConfirmClear": "Limpar todos os registos de textfill?",
-      "textfillDiagnosticsEntry": "{surface} · pass {pass} · {font}px (min {min} / max {max}) · caixa {boxW}×{boxH}"
+      "textfillDiagnosticsEntry": "{surface} · {phase} · {font}px (overflow H {overflowH}) · caixa {boxW}×{boxH}"
     },
     "shortcuts": {
       "title": "Atalhos de teclado",

@@ -11,7 +11,12 @@ export interface TextfillDiagnosticEntry {
   surface: string;
   mode: 'preview' | 'output';
   pass: number;
+  measurePhase?: string;
   resultFontPx: number;
+  heightOverflow?: number;
+  spanOffsetH?: number;
+  maxH?: number;
+  rootConcealed?: boolean;
   minFontPx: number;
   maxFontPx: number;
   textfillEnabled: boolean;
