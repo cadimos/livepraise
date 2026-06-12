@@ -18,6 +18,8 @@ export interface ProjectionTypographyControllerOptions {
   prefs?: ProjectionTypographyPrefs | null;
   shadowSelector?: string;
   textfillOptions?: Record<string, unknown>;
+  /** Rótulo no log de diagnóstico de textfill (ex.: `projector`, `operator-preview:Saída 1`). */
+  diagnosticSurface?: string;
   onProfileKey?: (profileKey: string) => void;
 }
 
