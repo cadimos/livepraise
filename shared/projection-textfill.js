@@ -177,7 +177,7 @@ function probeFitMetrics(probe, bounds, slackPx) {
     void probe.span.offsetHeight;
     const maxH = bounds.height - slackPx;
     const heightOverflow = Math.ceil(probe.span.offsetHeight) - maxH;
-    const widthOverflow = Math.ceil(probe.span.offsetWidth) - bounds.width;
+    const widthOverflow = Math.ceil(probe.span.scrollWidth) - bounds.width;
     const fits = maxH > 0 &&
         bounds.width > 0 &&
         heightOverflow <= HEIGHT_FIT_TOLERANCE_PX &&
@@ -192,17 +192,18 @@ function probeFitMetrics(probe, bounds, slackPx) {
     };
 }
 /** Busca binária numa dimensão (altura ou largura) — paridade jquery-textfill. */
-function searchFontForDimension(probe, measureDim, maxDim, loBound, hiBound, slackPx, heightTolerance) {
+function searchFontForDimension(probe, measureDim, maxDim, loBound, hiBound, slackPx, heightTolerance, applySlack) {
     let lo = loBound;
     let hi = hiBound;
     let best = loBound;
     const tolerance = heightTolerance ? HEIGHT_FIT_TOLERANCE_PX : WIDTH_FIT_TOLERANCE_PX;
+    const slack = applySlack ? slackPx : 0;
     while (lo <= hi) {
         const mid = Math.floor((lo + hi) / 2);
         probe.span.style.fontSize = `${mid}px`;
         void probe.span.offsetHeight;
         const dim = measureDim(probe.span);
-        if (dim <= maxDim - slackPx + tolerance) {
+        if (dim <= maxDim - slack + tolerance) {
             best = mid;
             lo = mid + 1;
         }
@@ -220,10 +221,10 @@ function searchFontForDimension(probe, measureDim, maxDim, loBound, hiBound, sla
 function measureFontSizeInProbe(html, bounds, loBound, hiBound, slackPx, fontStyles) {
     const probe = getTextfillProbe();
     configureTextfillProbe(probe, html, bounds, fontStyles);
-    const forHeight = searchFontForDimension(probe, (el) => el.offsetHeight, bounds.height, loBound, hiBound, slackPx, true);
+    const forHeight = searchFontForDimension(probe, (el) => el.offsetHeight, bounds.height, loBound, hiBound, slackPx, true, true);
     probe.span.style.fontSize = `${forHeight}px`;
     void probe.span.offsetHeight;
-    const forWidth = searchFontForDimension(probe, (el) => el.offsetWidth, bounds.width, loBound, hiBound, slackPx, false);
+    const forWidth = searchFontForDimension(probe, (el) => el.scrollWidth, bounds.width, loBound, hiBound, slackPx, false, false);
     return Math.min(forHeight, forWidth);
 }
 function probeMetricsForFontPx(html, bounds, fontPx, slackPx, fontStyles) {
@@ -489,6 +490,7 @@ async function runRefreshTextfill(contentEl, minPx, maxPx, enabled, options, mod
         fontStyle,
         diagnosticPass: 1,
     });
+    contentEl.style.visibility = '';
 }
 /** Aguarda fontes/layout e aplica textfill — prévias do operador (CAD-313). */
 export async function refreshPreviewTextfill(contentEl, minPx, maxPx, enabled, options = {}) {
@@ -520,6 +522,7 @@ export async function refreshOutputTextfillAll(rootEl, minPx, maxPx, enabled, op
         fontWeight,
         fontStyle,
     });
+    rootEl.style.visibility = '';
 }
 /** Retorno de palco — cada `.texto` com textfill independente. */
 export function applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, options) {
