@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Reconcile visível reinicia em loBound — não deve cair para o mínimo com scrollHeight inflado.
+ * Probe off-screen + área calculada — fonte maximizada sem cair no mínimo.
  */
 import { JSDOM } from 'jsdom';
 
@@ -24,9 +24,17 @@ document.fonts = {
   ready: Promise.resolve(),
 };
 
-const { refreshOutputTextfill } = await import('../shared/projection-textfill.js');
+const {
+  computeProjectionContentArea,
+  refreshOutputTextfill,
+} = await import('../shared/projection-textfill.js');
 
 const root = document.createElement('div');
+root.id = 'conteudo';
+root.style.width = '800px';
+root.style.height = '600px';
+root.style.padding = '24px';
+root.style.boxSizing = 'border-box';
 root.innerHTML = `
   <div class="titulo"></div>
   <div class="content"><span>Um plano pra salvar<br>Um pacto pra selar<br>Silêncio no céu</span></div>
@@ -34,68 +42,62 @@ root.innerHTML = `
 `;
 document.body.appendChild(root);
 
-const span = root.querySelector('.content > span');
 const box = root.querySelector('.content');
 const rodape = root.querySelector('.rodape');
 Object.defineProperty(rodape, 'offsetHeight', { configurable: true, get: () => 18 });
+Object.defineProperty(box, 'clientWidth', { configurable: true, get: () => 752 });
+Object.defineProperty(box, 'clientHeight', { configurable: true, get: () => 525 });
 
-const slackPx = 2;
-const maxH = () => box.clientHeight - slackPx;
+const area = computeProjectionContentArea(root, box);
+assert(area.width === 752, `largura calculada (${area.width})`);
+assert(area.height === 525, `altura calculada (${area.height})`);
+
+const probeSpan = document.createElement('span');
+const chars = 72;
+const lineHeight = 1.35;
 const realScrollH = (size) => {
-  const chars = 72;
-  const lineHeight = 1.35;
-  const charsPerLine = Math.max(1, 752 / size);
+  const charsPerLine = Math.max(1, area.width / size);
   const lines = Math.max(1, Math.ceil(chars / charsPerLine));
   return Math.ceil(size * lines * lineHeight);
 };
 
-let reconcilePass = false;
-
-Object.defineProperty(box, 'clientWidth', { configurable: true, get: () => 752 });
-Object.defineProperty(box, 'clientHeight', { configurable: true, get: () => 525 });
-Object.defineProperty(box, 'scrollWidth', { configurable: true, get: () => 752 });
-Object.defineProperty(span, 'scrollWidth', { configurable: true, get: () => 752 });
-Object.defineProperty(span, 'scrollHeight', {
+Object.defineProperty(probeSpan, 'offsetHeight', {
   configurable: true,
   get() {
-    const size = Number.parseInt(span.style.fontSize || '24', 10);
-    if (!reconcilePass && span.style.visibility === 'hidden') return 130;
+    const size = Number.parseInt(this.style.fontSize || '24', 10);
     return realScrollH(size);
   },
 });
-Object.defineProperty(span, 'offsetHeight', {
+Object.defineProperty(probeSpan, 'offsetWidth', {
   configurable: true,
   get() {
-    return this.scrollHeight;
+    return area.width;
   },
 });
 
-const originalDescriptor = Object.getOwnPropertyDescriptor(span.style, 'visibility');
-let visibilityValue = '';
-Object.defineProperty(span.style, 'visibility', {
-  configurable: true,
-  enumerable: true,
-  get() {
-    return visibilityValue;
-  },
-  set(value) {
-    visibilityValue = value;
-    if (value === '' && !reconcilePass) {
-      reconcilePass = true;
-    }
-  },
-});
+globalThis.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
+const { Element } = dom.window;
+
+const origAppend = Element.prototype.appendChild;
+Element.prototype.appendChild = function appendChild(child) {
+  const result = origAppend.call(this, child);
+  if (this.className === 'content' && child.tagName === 'SPAN') {
+    Object.defineProperty(child, 'offsetHeight', Object.getOwnPropertyDescriptor(probeSpan, 'offsetHeight'));
+    Object.defineProperty(child, 'offsetWidth', Object.getOwnPropertyDescriptor(probeSpan, 'offsetWidth'));
+  }
+  return result;
+};
 
 await refreshOutputTextfill(root, 24, 120, true, {});
 
+Element.prototype.appendChild = origAppend;
+
+const span = root.querySelector('.content > span');
 const fontSize = Number.parseInt(span.style.fontSize, 10);
-assert(visibilityValue === '', 'span visível no final');
-assert(
-  Math.ceil(span.scrollHeight) <= maxH() + 3,
-  `fonte deve caber visível (${fontSize}px, scrollH=${span.scrollHeight})`,
-);
-assert(fontSize > 40, `deve maximizar área útil (${fontSize}px)`);
-assert(fontSize <= 120, `não deve exceder max (${fontSize})`);
+const maxH = area.height - 2;
+assert(fontSize > 40, `deve maximizar (${fontSize}px)`);
+assert(fontSize <= 120, `não excede max (${fontSize})`);
+assert(realScrollH(fontSize) <= maxH + 3, `probe cabe na área (${realScrollH(fontSize)}<=${maxH})`);
 
 console.log('projection-textfill-two-pass.test: OK');
 process.exit(0);

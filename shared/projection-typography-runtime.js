@@ -207,10 +207,6 @@ export function createProjectionTypographyController(options) {
     if (refreshInProgress) return;
     refreshInProgress = true;
     const generation = ++refreshGeneration;
-    const textSpan = rootEl.querySelector('.content > span, .texto-fill');
-    if (textSpan instanceof HTMLElement) {
-      textSpan.style.visibility = 'hidden';
-    }
     try {
       profile = currentProfile();
       const cssFamily = resolveCssFamily(profile, manifest);
@@ -237,9 +233,6 @@ export function createProjectionTypographyController(options) {
         diagnosticSurface ?? profileKey,
       );
     } finally {
-      if (textSpan instanceof HTMLElement) {
-        textSpan.style.visibility = '';
-      }
       refreshInProgress = false;
     }
   }
