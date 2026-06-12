@@ -1,7 +1,8 @@
 import { computed, onMounted, ref } from 'vue';
 import { fetchJson } from './useApi';
 import { useExternalDevices } from './useExternalDevices';
-import type { ClientRole, DisplayAssignment } from '@shared/types/live';
+import type { ClientRole, DisplayAssignment, DisplayScreenSize } from '@shared/types/live';
+import { defaultScreenSize, resolvePreviewAspectRatio } from '../utils/screen-size';
 import {
   EXTERNAL_PREVIEW_PROFILE_ORDER,
   type PreviewGroupDescriptor,
@@ -94,8 +95,20 @@ export function usePreviewGroups() {
     return out;
   });
 
+  const primaryProjectionScreen = computed((): DisplayScreenSize => {
+    const monitor = assignments.value.find((a) => a.role === 'projection');
+    return monitor?.screenSize ?? defaultScreenSize();
+  });
+
+  const projectionPreviewAspect = computed(() => {
+    const screen = primaryProjectionScreen.value;
+    return resolvePreviewAspectRatio(screen.preset, screen.largura, screen.altura);
+  });
+
   return {
     visibleGroups,
+    primaryProjectionScreen,
+    projectionPreviewAspect,
     reloadDisplays: loadDisplays,
   };
 }
