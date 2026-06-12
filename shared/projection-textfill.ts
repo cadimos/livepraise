@@ -23,6 +23,8 @@ const PREVIEW_FIT_SLACK_PX = 2;
 const OUTPUT_FIT_SLACK_PX = 2;
 /** scrollWidth ≈ clientWidth em blocos width:100% com wrap — tolerância subpixel. */
 const WIDTH_FIT_TOLERANCE_PX = 2;
+/** line-height / subpixel — evita rejeitar tamanho que já passou na busca binária. */
+const HEIGHT_FIT_TOLERANCE_PX = 3;
 
 type TextfillMode = 'preview' | 'output';
 
@@ -112,28 +114,13 @@ function textFitsBox(span: HTMLElement, box: HTMLElement, slackPx: number): bool
   void span.offsetHeight;
   const maxH = box.clientHeight - slackPx;
   if (maxH <= 0 || box.clientWidth <= 0) return false;
-  if (Math.ceil(span.scrollHeight) > maxH) return false;
+  const heightOverflow = Math.ceil(span.scrollHeight) - maxH;
+  if (heightOverflow > HEIGHT_FIT_TOLERANCE_PX) return false;
 
   // Largura: em blocos com width:100% o scrollWidth iguala o clientWidth mesmo com
   // quebra de linha válida. Só falha com overflow horizontal real.
   const widthOverflow = Math.ceil(span.scrollWidth) - box.clientWidth;
   return widthOverflow <= WIDTH_FIT_TOLERANCE_PX;
-}
-
-/** Garante tamanho final mesmo se o grid ainda não estabilizou após a medição. */
-function shrinkToFitBox(
-  span: HTMLElement,
-  box: HTMLElement,
-  targetPx: number,
-  floorPx: number,
-  slackPx: number,
-): number {
-  let size = targetPx;
-  while (size > floorPx && !textFitsBox(span, box, slackPx)) {
-    size -= 1;
-    span.style.fontSize = `${size}px`;
-  }
-  return size;
 }
 
 function applyTextfill(
@@ -178,7 +165,6 @@ function applyTextfill(
       targetPx = Math.max(floorPx, targetPx);
     }
 
-    targetPx = shrinkToFitBox(span, box, targetPx, loBound, slackPx);
     span.style.fontSize = `${targetPx}px`;
   };
 
@@ -217,6 +203,7 @@ function runBinarySearch(
     }
   }
 
+  span.style.fontSize = `${best}px`;
   return best;
 }
 
@@ -374,6 +361,30 @@ async function ensureStageReturnTextfillBoxes(rootEl: HTMLElement): Promise<void
   }
 }
 
+function measureLayoutReady(
+  contentEl: HTMLElement,
+  box: HTMLElement,
+  mode: TextfillMode,
+): boolean {
+  const minHeight = mode === 'preview' ? 16 : 24;
+  const minWidth = mode === 'preview' ? 16 : 24;
+  const height = box.clientHeight;
+  const width = box.clientWidth;
+  if (height < minHeight || width < minWidth) return false;
+
+  const rodape = contentEl.querySelector<HTMLElement>('.rodape');
+  if (rodape && rodape.textContent?.trim() && rodape.offsetHeight <= 0) {
+    return false;
+  }
+
+  const titulo = contentEl.querySelector<HTMLElement>('.titulo');
+  if (titulo && titulo.textContent?.trim() && titulo.offsetHeight <= 0) {
+    return false;
+  }
+
+  return true;
+}
+
 async function ensureMeasurableBox(
   contentEl: HTMLElement,
   mode: TextfillMode = 'output',
@@ -383,21 +394,20 @@ async function ensureMeasurableBox(
     contentEl.querySelector<HTMLElement>('.texto') ??
     contentEl;
 
-  const minHeight = mode === 'preview' ? 16 : 24;
-  const minWidth = mode === 'preview' ? 16 : 24;
-
   let stableHeight = -1;
-  for (let attempt = 0; attempt < 24; attempt += 1) {
+  let stableWidth = -1;
+  for (let attempt = 0; attempt < 32; attempt += 1) {
     const height = box.clientHeight;
     const width = box.clientWidth;
     if (
-      height >= minHeight &&
-      width >= minWidth &&
-      height === stableHeight
+      measureLayoutReady(contentEl, box, mode) &&
+      height === stableHeight &&
+      width === stableWidth
     ) {
       return;
     }
     stableHeight = height;
+    stableWidth = width;
     await waitForLayoutFrames();
   }
 }
