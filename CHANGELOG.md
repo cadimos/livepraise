@@ -4,6 +4,14 @@ Todas as alterações relevantes do Live Praise são documentadas neste ficheiro
 
 O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Unreleased]
+
+### Adicionado
+
+- **Diagnóstico de textfill** — registo JSONL de medições de fonte e layout (prévia e projetor) em `~/livepraise/textfill-diagnostics.jsonl`; UI em Configurações → Logs de erro; exportação JSONL para suporte.
+
+---
+
 ## [1.0.0-alpha.2] — 2026-06-07
 
 Segunda release alpha — estabilização pós-`alpha.1`: migração legada, pipeline de release unificado, correcções Windows, e entregáveis de produto (auditoria, i18n, watcher de vídeos, export de louvores, sync de versão, textfill sem flash).

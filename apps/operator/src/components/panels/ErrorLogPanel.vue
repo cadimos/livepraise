@@ -2,10 +2,23 @@
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useErrorLog, type ErrorLogEntry } from '../../composables/useErrorLog';
+import { useTextfillDiagnostics } from '../../composables/useTextfillDiagnostics';
 import { usePreferences } from '../../composables/usePreferences';
 
 const { t } = useI18n();
 const { items, loading, error, refresh, clear } = useErrorLog();
+const {
+  enabled: textfillDiagnosticsEnabled,
+  items: textfillItems,
+  logPath: textfillLogPath,
+  entryCount: textfillEntryCount,
+  loading: textfillLoading,
+  error: textfillError,
+  refresh: refreshTextfillDiagnostics,
+  clear: clearTextfillDiagnostics,
+  setEnabled: setTextfillDiagnosticsEnabled,
+  exportJsonl: exportTextfillDiagnostics,
+} = useTextfillDiagnostics();
 const { prefs, setDisplayDebugOverlay } = usePreferences();
 
 const expandedIds = ref<Set<string>>(new Set());
@@ -43,8 +56,14 @@ async function onClear(): void {
   if (ok) expandedIds.value = new Set();
 }
 
+async function onClearTextfillDiagnostics(): Promise<void> {
+  if (!window.confirm(t('settings.errorLog.textfillDiagnosticsConfirmClear'))) return;
+  await clearTextfillDiagnostics();
+}
+
 onMounted(() => {
   void refresh();
+  void refreshTextfillDiagnostics();
 });
 </script>
 
@@ -64,6 +83,78 @@ onMounted(() => {
         <span class="text-xs text-lp-muted">{{ t('settings.errorLog.displayDebugOverlayHint') }}</span>
       </span>
     </label>
+
+    <section class="flex flex-col gap-2 rounded border border-amber-500/30 bg-amber-950/20 px-3 py-3">
+      <div>
+        <h3 class="font-medium text-lp-text">{{ t('settings.errorLog.textfillDiagnostics') }}</h3>
+        <p class="mt-1 text-xs text-lp-muted">{{ t('settings.errorLog.textfillDiagnosticsHint') }}</p>
+      </div>
+
+      <label class="flex items-start gap-2">
+        <input
+          type="checkbox"
+          class="mt-0.5"
+          :checked="textfillDiagnosticsEnabled"
+          @change="setTextfillDiagnosticsEnabled(($event.target as HTMLInputElement).checked)"
+        />
+        <span class="text-sm text-lp-text">{{ t('settings.errorLog.textfillDiagnosticsEnabled') }}</span>
+      </label>
+
+      <p v-if="textfillLogPath" class="break-all font-mono text-xs text-lp-muted">
+        {{ t('settings.errorLog.textfillDiagnosticsPath') }}: {{ textfillLogPath }}
+      </p>
+      <p class="text-xs text-lp-muted">
+        {{ t('settings.errorLog.textfillDiagnosticsCount', { count: textfillEntryCount }) }}
+      </p>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          class="rounded bg-lp-primary px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+          :disabled="textfillLoading"
+          @click="refreshTextfillDiagnostics()"
+        >
+          {{ textfillLoading ? t('settings.errorLog.refreshing') : t('settings.errorLog.refresh') }}
+        </button>
+        <button
+          type="button"
+          class="rounded border border-lp-surface px-3 py-1.5 text-xs text-lp-text hover:bg-lp-surface/40 disabled:opacity-50"
+          :disabled="textfillLoading || !textfillEntryCount"
+          @click="exportTextfillDiagnostics()"
+        >
+          {{ t('settings.errorLog.textfillDiagnosticsExport') }}
+        </button>
+        <button
+          type="button"
+          class="rounded border border-rose-500/50 px-3 py-1.5 text-xs text-rose-200 hover:bg-rose-900/30 disabled:opacity-50"
+          :disabled="textfillLoading || !textfillEntryCount"
+          @click="onClearTextfillDiagnostics()"
+        >
+          {{ t('settings.errorLog.textfillDiagnosticsClear') }}
+        </button>
+      </div>
+
+      <p v-if="textfillError" class="text-rose-300" role="alert">{{ textfillError }}</p>
+      <p v-else-if="!textfillLoading && !textfillItems.length" class="text-xs text-lp-muted">
+        {{ t('settings.errorLog.textfillDiagnosticsEmpty') }}
+      </p>
+      <ul v-else class="flex max-h-40 flex-col gap-1 overflow-y-auto font-mono text-[11px] text-lp-muted">
+        <li v-for="entry in textfillItems" :key="entry.id">
+          {{
+            t('settings.errorLog.textfillDiagnosticsEntry', {
+              surface: entry.surface,
+              pass: entry.pass,
+              font: entry.resultFontPx,
+              min: entry.loBound,
+              max: entry.hiBound,
+              boxW: entry.box.clientW,
+              boxH: entry.box.clientH,
+            })
+          }}
+          — {{ entry.textSnippet }}
+        </li>
+      </ul>
+    </section>
 
     <div class="flex flex-wrap items-center gap-2">
       <button

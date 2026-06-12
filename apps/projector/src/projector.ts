@@ -412,6 +412,7 @@ const typography = createProjectionTypographyController({
   rootEl: byId<HTMLDivElement>('conteudo'),
   role: 'projector',
   mode: 'output',
+  diagnosticSurface: 'projector',
 });
 
 function connect(): WebSocket {

@@ -143,6 +143,7 @@ async function applyTypography(remeasure = false): Promise<void> {
       fontWeight: profile.value.fontWeight,
       fontStyle: profile.value.fontStyle,
       fitSlackPx: fitSlackPx.value,
+      diagnosticSurface: `operator-preview:${props.label}`,
     },
   );
 

@@ -247,7 +247,17 @@
       "showDetail": "View detail",
       "hideDetail": "Hide detail",
       "displayDebugOverlay": "Debug overlay on monitors",
-      "displayDebugOverlayHint": "When active, shows the last received action in the footer of projection monitors and network-connected devices (e.g. song change at 5:08:38 PM)."
+      "displayDebugOverlayHint": "When active, shows the last received action in the footer of projection monitors and network-connected devices (e.g. song change at 5:08:38 PM).",
+      "textfillDiagnostics": "Textfill diagnostics (preview/projector)",
+      "textfillDiagnosticsHint": "Records font-size and layout box measurements. Reproduce the issue (project 2–3 verses), export the file, and send it to support.",
+      "textfillDiagnosticsEnabled": "Enable textfill logging",
+      "textfillDiagnosticsPath": "Server file",
+      "textfillDiagnosticsCount": "{count} record(s)",
+      "textfillDiagnosticsEmpty": "No records yet. Project worship lyrics with logging enabled.",
+      "textfillDiagnosticsExport": "Export JSONL",
+      "textfillDiagnosticsClear": "Clear diagnostics",
+      "textfillDiagnosticsConfirmClear": "Clear all textfill diagnostic records?",
+      "textfillDiagnosticsEntry": "{surface} · pass {pass} · {font}px (min {min} / max {max}) · box {boxW}×{boxH}"
     },
     "shortcuts": {
       "title": "Keyboard shortcuts",
