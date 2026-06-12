@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Medição oculta só o span (root visível) — sem opacity:0 no root.
+ * Textfill usa probe off-screen — span no DOM real não fica hidden durante medição.
  */
 import { JSDOM } from 'jsdom';
 
@@ -18,6 +18,7 @@ globalThis.requestAnimationFrame = (cb) => {
   cb(0);
   return 0;
 };
+globalThis.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
 
 document.fonts = {
   load: async () => {},
@@ -27,11 +28,14 @@ document.fonts = {
 const { refreshOutputTextfill } = await import('../shared/projection-textfill.js');
 
 const root = document.createElement('div');
+root.className = 'conteudo';
+root.style.width = '400px';
+root.style.height = '300px';
+root.style.padding = '20px';
+root.style.boxSizing = 'border-box';
 root.innerHTML = `
   <div class="titulo"></div>
-  <div class="content" style="height:200px;width:400px;overflow:hidden">
-    <span>Linha um<br>Linha dois<br>Linha três com texto longo para forçar textfill</span>
-  </div>
+  <div class="content" style="overflow:hidden"><span>Linha um<br>Linha dois<br>Linha três</span></div>
   <div class="rodape">Rodapé</div>
 `;
 document.body.appendChild(root);
@@ -56,12 +60,11 @@ Object.defineProperty(span.style, 'visibility', {
 
 await refreshOutputTextfill(root, 24, 120, true, {});
 
-assert(visibilityLog.includes('hidden'), 'span deve ficar hidden durante textfill');
-assert(visibilityValue === '', 'span deve voltar visível após textfill');
-assert(root.style.opacity !== '0', 'root não deve usar opacity:0');
+assert(!visibilityLog.includes('hidden'), 'span não deve ficar hidden com probe');
+assert(visibilityValue === '', 'span visível após textfill');
 
 const fontSize = Number.parseInt(span.style.fontSize, 10);
-assert(Number.isFinite(fontSize) && fontSize >= 24, `fontSize final aplicado (${fontSize})`);
+assert(Number.isFinite(fontSize) && fontSize >= 24, `fontSize aplicado (${fontSize})`);
 
 console.log('projection-textfill-visibility.test: OK');
 process.exit(0);

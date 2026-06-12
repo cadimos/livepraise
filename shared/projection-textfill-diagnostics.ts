@@ -18,9 +18,12 @@ export interface TextfillDiagnosticPayload {
   resultFontPx: number;
   fits: boolean;
   spanOffsetH?: number;
+  spanOffsetW?: number;
   maxH?: number;
   heightOverflow?: number;
   widthOverflow?: number;
+  computedAreaW?: number;
+  computedAreaH?: number;
   rootConcealed?: boolean;
   box: {
     clientW: number;

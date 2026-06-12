@@ -19,6 +19,30 @@ export interface ProjectionTextfillOptions {
   diagnosticSurface?: string;
   /** Passagem do refresh (1 ou 2). */
   diagnosticPass?: number;
+  fontFamily?: string;
+  fontWeight?: number | string;
+  fontStyle?: string;
+}
+
+/** Área útil do corpo — root menos topo, rodapé e padding. */
+export interface ProjectionContentAreaBounds {
+  width: number;
+  height: number;
+  tituloH: number;
+  rodapeH: number;
+  rootClientW: number;
+  rootClientH: number;
+}
+
+interface TextfillFontStyles {
+  fontFamily: string;
+  fontWeight: string;
+  fontStyle: string;
+}
+
+interface TextfillProbe {
+  box: HTMLDivElement;
+  span: HTMLSpanElement;
 }
 
 /** `.proximo` usa teto de fonte menor que `.atual` (paridade stage-return.css). */
@@ -125,97 +149,153 @@ interface TextfillFitMetrics {
   heightOverflow: number;
   widthOverflow: number;
   spanOffsetH: number;
+  spanOffsetW: number;
 }
 
-function concealDepth(rootEl: HTMLElement): number {
-  return Number(rootEl.dataset.textfillConcealDepth ?? '0');
-}
+const PROBE_LINE_HEIGHT = 1.35;
+let textfillProbeRoot: HTMLDivElement | null = null;
 
-/** Oculta sem `visibility:hidden` — esse modo subestima scrollHeight no Chromium. */
-export function concealProjectionTextfill(rootEl: HTMLElement): void {
-  const depth = concealDepth(rootEl);
-  if (depth > 0) {
-    rootEl.dataset.textfillConcealDepth = String(depth + 1);
-    return;
+/**
+ * Área do corpo = largura/altura do root menos padding, título e rodapé.
+ * Paridade com o modelo mental do operador (800×600 → caixa fixa).
+ */
+export function computeProjectionContentArea(
+  contentEl: HTMLElement,
+  fallbackBox?: HTMLElement,
+): ProjectionContentAreaBounds {
+  const root = contentEl.closest<HTMLElement>('#conteudo, .conteudo') ?? contentEl;
+  const titulo = contentEl.querySelector<HTMLElement>('.titulo');
+  const rodape = contentEl.querySelector<HTMLElement>('.rodape');
+  const rootStyle = window.getComputedStyle(root);
+
+  const padT = parseFloat(rootStyle.paddingTop) || 0;
+  const padB = parseFloat(rootStyle.paddingBottom) || 0;
+  const padL = parseFloat(rootStyle.paddingLeft) || 0;
+  const padR = parseFloat(rootStyle.paddingRight) || 0;
+
+  const tituloH =
+    titulo && titulo.textContent?.trim() ? titulo.offsetHeight : 0;
+  const rodapeH =
+    rodape && rodape.textContent?.trim() ? rodape.offsetHeight : 0;
+  const zoneGap =
+    rodape && rodapeH > 0
+      ? parseFloat(window.getComputedStyle(rodape).marginTop) || 0
+      : 0;
+
+  let width = Math.max(0, Math.round(root.clientWidth - padL - padR));
+  let height = Math.max(
+    0,
+    Math.round(root.clientHeight - padT - padB - tituloH - rodapeH - zoneGap),
+  );
+
+  if (fallbackBox) {
+    if (fallbackBox.clientWidth > 0) width = fallbackBox.clientWidth;
+    if (fallbackBox.clientHeight > 0) height = fallbackBox.clientHeight;
   }
-  rootEl.dataset.textfillConcealPrev = JSON.stringify({
-    visibility: rootEl.style.visibility,
-    opacity: rootEl.style.opacity,
-    pointerEvents: rootEl.style.pointerEvents,
-  });
-  rootEl.dataset.textfillConcealDepth = '1';
-  rootEl.style.visibility = 'visible';
-  rootEl.style.opacity = '0';
-  rootEl.style.pointerEvents = 'none';
-}
 
-export function revealProjectionTextfill(rootEl: HTMLElement): void {
-  const depth = concealDepth(rootEl);
-  if (depth <= 0) return;
-  if (depth > 1) {
-    rootEl.dataset.textfillConcealDepth = String(depth - 1);
-    return;
-  }
-
-  const raw = rootEl.dataset.textfillConcealPrev;
-  delete rootEl.dataset.textfillConcealPrev;
-  delete rootEl.dataset.textfillConcealDepth;
-  if (raw) {
-    try {
-      const prev = JSON.parse(raw) as {
-        visibility: string;
-        opacity: string;
-        pointerEvents: string;
-      };
-      rootEl.style.visibility = prev.visibility;
-      rootEl.style.opacity = prev.opacity;
-      rootEl.style.pointerEvents = prev.pointerEvents;
-      return;
-    } catch {
-      /* fallback */
-    }
-  }
-  rootEl.style.opacity = '';
-  rootEl.style.pointerEvents = '';
-}
-
-function forceVisibleForMeasurement(rootEl: HTMLElement): {
-  visibility: string;
-  opacity: string;
-  pointerEvents: string;
-} {
-  const snapshot = {
-    visibility: rootEl.style.visibility,
-    opacity: rootEl.style.opacity,
-    pointerEvents: rootEl.style.pointerEvents,
+  return {
+    width,
+    height,
+    tituloH,
+    rodapeH,
+    rootClientW: root.clientWidth,
+    rootClientH: root.clientHeight,
   };
-  rootEl.style.visibility = 'visible';
-  rootEl.style.opacity = '';
-  rootEl.style.pointerEvents = '';
-  return snapshot;
 }
 
-function restoreVisibilitySnapshot(
-  rootEl: HTMLElement,
-  snapshot: { visibility: string; opacity: string; pointerEvents: string },
-): void {
-  rootEl.style.visibility = snapshot.visibility;
-  rootEl.style.opacity = snapshot.opacity;
-  rootEl.style.pointerEvents = snapshot.pointerEvents;
-}
-
-function textFitsBoxMetrics(
-  span: HTMLElement,
+function resolveContentAreaBounds(
+  contentEl: HTMLElement,
   box: HTMLElement,
+  options: ProjectionTextfillOptions,
+): ProjectionContentAreaBounds {
+  if (options.measureElement) {
+    return {
+      width: options.measureElement.clientWidth,
+      height: options.measureElement.clientHeight,
+      tituloH: 0,
+      rodapeH: 0,
+      rootClientW: contentEl.clientWidth,
+      rootClientH: contentEl.clientHeight,
+    };
+  }
+  return computeProjectionContentArea(contentEl, box);
+}
+
+function getTextfillProbe(): TextfillProbe {
+  if (!textfillProbeRoot) {
+    textfillProbeRoot = document.createElement('div');
+    textfillProbeRoot.setAttribute('aria-hidden', 'true');
+    textfillProbeRoot.dataset.textfillProbe = '1';
+    textfillProbeRoot.style.cssText =
+      'position:fixed;left:-20000px;top:0;visibility:visible;opacity:1;overflow:visible;pointer-events:none;z-index:-1;';
+    const box = document.createElement('div');
+    box.className = 'content';
+    box.style.overflow = 'hidden';
+    box.style.display = 'block';
+    box.style.boxSizing = 'border-box';
+    const span = document.createElement('span');
+    box.appendChild(span);
+    textfillProbeRoot.appendChild(box);
+    document.body.appendChild(textfillProbeRoot);
+  }
+  return {
+    box: textfillProbeRoot.querySelector('.content') as HTMLDivElement,
+    span: textfillProbeRoot.querySelector('span') as HTMLSpanElement,
+  };
+}
+
+function readFontStyles(
+  span: HTMLElement,
+  options: ProjectionTextfillOptions,
+): TextfillFontStyles {
+  if (options.fontFamily) {
+    return {
+      fontFamily: options.fontFamily,
+      fontWeight: String(options.fontWeight ?? 400),
+      fontStyle: options.fontStyle ?? 'normal',
+    };
+  }
+  const cs = window.getComputedStyle(span);
+  return {
+    fontFamily: cs.fontFamily,
+    fontWeight: cs.fontWeight,
+    fontStyle: cs.fontStyle,
+  };
+}
+
+function configureTextfillProbe(
+  probe: TextfillProbe,
+  html: string,
+  bounds: Pick<ProjectionContentAreaBounds, 'width' | 'height'>,
+  fontStyles: TextfillFontStyles,
+): void {
+  probe.box.style.width = `${bounds.width}px`;
+  probe.box.style.height = `${bounds.height}px`;
+  probe.span.innerHTML = html;
+  probe.span.style.display = 'block';
+  probe.span.style.width = '100%';
+  probe.span.style.maxWidth = '100%';
+  probe.span.style.lineHeight = String(PROBE_LINE_HEIGHT);
+  probe.span.style.overflowWrap = 'break-word';
+  probe.span.style.wordBreak = 'break-word';
+  probe.span.style.visibility = 'visible';
+  probe.span.style.fontFamily = fontStyles.fontFamily;
+  probe.span.style.fontWeight = fontStyles.fontWeight;
+  probe.span.style.fontStyle = fontStyles.fontStyle;
+}
+
+function probeFitMetrics(
+  probe: TextfillProbe,
+  bounds: Pick<ProjectionContentAreaBounds, 'width' | 'height'>,
   slackPx: number,
 ): TextfillFitMetrics {
-  void span.offsetHeight;
-  const maxH = box.clientHeight - slackPx;
-  const heightOverflow = Math.ceil(span.scrollHeight) - maxH;
-  const widthOverflow = Math.ceil(span.scrollWidth) - box.clientWidth;
+  void probe.span.offsetHeight;
+  const maxH = bounds.height - slackPx;
+  const heightOverflow = Math.ceil(probe.span.offsetHeight) - maxH;
+  const widthOverflow = Math.ceil(probe.span.offsetWidth) - bounds.width;
   const fits =
     maxH > 0 &&
-    box.clientWidth > 0 &&
+    bounds.width > 0 &&
     heightOverflow <= HEIGHT_FIT_TOLERANCE_PX &&
     widthOverflow <= WIDTH_FIT_TOLERANCE_PX;
   return {
@@ -223,13 +303,94 @@ function textFitsBoxMetrics(
     maxH,
     heightOverflow,
     widthOverflow,
-    spanOffsetH: span.offsetHeight,
+    spanOffsetH: probe.span.offsetHeight,
+    spanOffsetW: probe.span.offsetWidth,
   };
 }
 
-/** Texto cabe na área útil de `.content` (só o corpo central). */
-function textFitsBox(span: HTMLElement, box: HTMLElement, slackPx: number): boolean {
-  return textFitsBoxMetrics(span, box, slackPx).fits;
+/** Busca binária numa dimensão (altura ou largura) — paridade jquery-textfill. */
+function searchFontForDimension(
+  probe: TextfillProbe,
+  measureDim: (el: HTMLElement) => number,
+  maxDim: number,
+  loBound: number,
+  hiBound: number,
+  slackPx: number,
+  heightTolerance: boolean,
+): number {
+  let lo = loBound;
+  let hi = hiBound;
+  let best = loBound;
+  const tolerance = heightTolerance ? HEIGHT_FIT_TOLERANCE_PX : WIDTH_FIT_TOLERANCE_PX;
+
+  while (lo <= hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    probe.span.style.fontSize = `${mid}px`;
+    void probe.span.offsetHeight;
+    const dim = measureDim(probe.span);
+    if (dim <= maxDim - slackPx + tolerance) {
+      best = mid;
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+
+  probe.span.style.fontSize = `${best}px`;
+  return best;
+}
+
+/**
+ * Mede no probe visível fora do ecrã — evita scrollHeight errado com span hidden no DOM real.
+ * Retorna min(fonte-altura, fonte-largura) como jquery-textfill.
+ */
+function measureFontSizeInProbe(
+  html: string,
+  bounds: Pick<ProjectionContentAreaBounds, 'width' | 'height'>,
+  loBound: number,
+  hiBound: number,
+  slackPx: number,
+  fontStyles: TextfillFontStyles,
+): number {
+  const probe = getTextfillProbe();
+  configureTextfillProbe(probe, html, bounds, fontStyles);
+
+  const forHeight = searchFontForDimension(
+    probe,
+    (el) => el.offsetHeight,
+    bounds.height,
+    loBound,
+    hiBound,
+    slackPx,
+    true,
+  );
+  probe.span.style.fontSize = `${forHeight}px`;
+  void probe.span.offsetHeight;
+
+  const forWidth = searchFontForDimension(
+    probe,
+    (el) => el.offsetWidth,
+    bounds.width,
+    loBound,
+    hiBound,
+    slackPx,
+    false,
+  );
+
+  return Math.min(forHeight, forWidth);
+}
+
+function probeMetricsForFontPx(
+  html: string,
+  bounds: ProjectionContentAreaBounds,
+  fontPx: number,
+  slackPx: number,
+  fontStyles: TextfillFontStyles,
+): TextfillFitMetrics {
+  const probe = getTextfillProbe();
+  configureTextfillProbe(probe, html, bounds, fontStyles);
+  probe.span.style.fontSize = `${fontPx}px`;
+  return probeFitMetrics(probe, bounds, slackPx);
 }
 
 function applyTextfill(
@@ -248,11 +409,13 @@ function applyTextfill(
   const { lo: loBound, hi: hiBound } = scaledFontBounds(minPx, maxPx, scale, mode);
   const slackPx = resolveSlackPx(options, mode);
   const fallbackPx = enabled ? loBound : hiBound;
+  const area = resolveContentAreaBounds(contentEl, box, options);
+  const fontStyles = readFontStyles(span, options);
 
-  if (box.clientHeight <= 0 || box.clientWidth <= 0) {
+  if (area.width <= 0 || area.height <= 0) {
     span.style.fontSize = `${fallbackPx}px`;
     span.style.visibility = '';
-    recordTextfillDiagnostic(contentEl, span, box, {
+    recordTextfillDiagnostic(contentEl, span, box, area, {
       mode,
       minPx,
       maxPx,
@@ -269,80 +432,56 @@ function applyTextfill(
 
   prepareSpan(span);
 
-  const measure = (): void => {
-    span.style.fontSize = `${loBound}px`;
-    let targetPx = enabled
-      ? runBinarySearch(span, box, loBound, hiBound, slackPx)
-      : hiBound;
-
-    if (
-      enabled &&
-      mode === 'output' &&
-      span.closest('.retorno-musica, .retorno-biblia') &&
-      !textFitsBox(span, box, slackPx)
-    ) {
-      const floorPx = STAGE_RETURN_OUTPUT_FLOOR_PX;
-      targetPx = runBinarySearch(span, box, floorPx, loBound - 1, slackPx);
-      targetPx = Math.max(floorPx, targetPx);
-    }
-
-    span.style.fontSize = `${targetPx}px`;
-    recordTextfillDiagnostic(contentEl, span, box, {
-      mode,
-      minPx,
-      maxPx,
-      enabled,
+  let targetPx = hiBound;
+  if (enabled) {
+    targetPx = measureFontSizeInProbe(
+      span.innerHTML,
+      area,
       loBound,
       hiBound,
       slackPx,
-      resultFontPx: targetPx,
-      options,
-    });
-  };
+      fontStyles,
+    );
 
-  if (options.suppressVisibilityToggle) {
-    measure();
-    return;
-  }
-
-  span.style.visibility = 'hidden';
-  try {
-    measure();
-  } finally {
-    span.style.visibility = '';
-  }
-}
-
-function runBinarySearch(
-  span: HTMLElement,
-  box: HTMLElement,
-  loBound: number,
-  hiBound: number,
-  slackPx: number,
-): number {
-  let lo = loBound;
-  let hi = hiBound;
-  let best = loBound;
-
-  while (lo <= hi) {
-    const mid = Math.floor((lo + hi) / 2);
-    span.style.fontSize = `${mid}px`;
-    if (textFitsBox(span, box, slackPx)) {
-      best = mid;
-      lo = mid + 1;
-    } else {
-      hi = mid - 1;
+    if (
+      mode === 'output' &&
+      span.closest('.retorno-musica, .retorno-biblia') &&
+      !probeMetricsForFontPx(span.innerHTML, area, targetPx, slackPx, fontStyles).fits
+    ) {
+      const floorPx = STAGE_RETURN_OUTPUT_FLOOR_PX;
+      targetPx = measureFontSizeInProbe(
+        span.innerHTML,
+        area,
+        floorPx,
+        Math.max(floorPx, loBound - 1),
+        slackPx,
+        fontStyles,
+      );
+      targetPx = Math.max(floorPx, targetPx);
     }
   }
 
-  span.style.fontSize = `${best}px`;
-  return best;
+  span.style.fontSize = `${targetPx}px`;
+  span.style.visibility = '';
+  recordTextfillDiagnostic(contentEl, span, box, area, {
+    mode,
+    minPx,
+    maxPx,
+    enabled,
+    loBound,
+    hiBound,
+    slackPx,
+    resultFontPx: targetPx,
+    options,
+    measurePhase: 'probe',
+  });
 }
 
 function recordTextfillDiagnostic(
   contentEl: HTMLElement,
   span: HTMLElement,
   box: HTMLElement,
+  area: ProjectionContentAreaBounds,
   data: {
     mode: TextfillMode;
     minPx: number;
@@ -359,7 +498,14 @@ function recordTextfillDiagnostic(
 ): void {
   if (!isTextfillDiagnosticsEnabled()) return;
   const layout = collectTextfillLayoutContext(contentEl, span, box);
-  const metrics = textFitsBoxMetrics(span, box, data.slackPx);
+  const fontStyles = readFontStyles(span, data.options);
+  const metrics = probeMetricsForFontPx(
+    span.innerHTML,
+    area,
+    data.resultFontPx,
+    data.slackPx,
+    fontStyles,
+  );
   const pass = data.options.diagnosticPass ?? 1;
   logTextfillDiagnostic({
     surface: data.options.diagnosticSurface ?? data.mode,
@@ -375,10 +521,13 @@ function recordTextfillDiagnostic(
     resultFontPx: data.resultFontPx,
     fits: metrics.fits,
     spanOffsetH: metrics.spanOffsetH,
+    spanOffsetW: metrics.spanOffsetW,
     maxH: metrics.maxH,
     heightOverflow: metrics.heightOverflow,
     widthOverflow: metrics.widthOverflow,
-    rootConcealed: concealDepth(contentEl) > 0 || contentEl.style.opacity === '0',
+    computedAreaW: area.width,
+    computedAreaH: area.height,
+    rootConcealed: false,
     ...layout,
     textSnippet: data.reason
       ? `${layout.textSnippet} [${data.reason}]`
@@ -438,11 +587,22 @@ function applyStageReturnCoupledTextfill(
     return true;
   }
 
+  const fontStyles = readFontStyles(entries[0].span, options);
+
   const fitsAtBase = (basePx: number): boolean => {
     for (const entry of entries) {
       const size = Math.max(floorPx, Math.round(basePx * entry.scale));
-      entry.span.style.fontSize = `${size}px`;
-      if (!textFitsBox(entry.span, entry.box, slackPx)) return false;
+      const area: ProjectionContentAreaBounds = {
+        width: entry.box.clientWidth,
+        height: entry.box.clientHeight,
+        tituloH: 0,
+        rodapeH: 0,
+        rootClientW: entry.box.clientWidth,
+        rootClientH: entry.box.clientHeight,
+      };
+      if (!probeMetricsForFontPx(entry.span.innerHTML, area, size, slackPx, fontStyles).fits) {
+        return false;
+      }
     }
     return true;
   };
@@ -564,88 +724,6 @@ function measureLayoutReady(
   return true;
 }
 
-function readSpanFontPx(span: HTMLElement | null): number {
-  if (!span) return 0;
-  const px = Number.parseInt(span.style.fontSize, 10);
-  return Number.isFinite(px) ? px : 0;
-}
-
-/** Pass 2 pode medir scrollHeight errado após pass 1 fixar fonte grande (hidden root). */
-function restorePass1IfPass2Broken(
-  span: HTMLElement | null,
-  pass1Px: number,
-  pass1Fits: boolean,
-  pass2Fits: boolean,
-): void {
-  if (span && pass1Fits && !pass2Fits && pass1Px > 0) {
-    span.style.fontSize = `${pass1Px}px`;
-  }
-}
-
-/**
- * Re-medida visível só quando o resultado oculto não cabe.
- * Reinicia em loBound — nunca reutiliza fonte grande (evita scrollHeight inflado).
- */
-async function reconcileVisibleTextfill(
-  contentEl: HTMLElement,
-  span: HTMLElement | null,
-  box: HTMLElement | null,
-  minPx: number,
-  maxPx: number,
-  enabled: boolean,
-  textfillOptions: ProjectionTextfillOptions,
-  mode: TextfillMode,
-  slackPx: number,
-): Promise<void> {
-  if (!span || !box || !enabled) return;
-
-  const scale = textfillOptions.maxFontPxScale ?? 1;
-  const { lo: loBound, hi: hiBound } = scaledFontBounds(minPx, maxPx, scale, mode);
-
-  await waitForLayoutFrames();
-  void span.offsetHeight;
-
-  const initial = textFitsBoxMetrics(span, box, slackPx);
-  if (initial.fits) {
-    recordTextfillDiagnostic(contentEl, span, box, {
-      mode,
-      minPx,
-      maxPx,
-      enabled,
-      loBound,
-      hiBound,
-      slackPx,
-      resultFontPx: readSpanFontPx(span),
-      options: { ...textfillOptions, diagnosticPass: 3 },
-      measurePhase: 'reconcile-visible-ok',
-    });
-    return;
-  }
-
-  const previousPx = readSpanFontPx(span);
-  prepareSpan(span);
-  span.style.fontSize = `${loBound}px`;
-  void span.offsetHeight;
-  await waitForLayoutFrames();
-
-  const corrected = runBinarySearch(span, box, loBound, hiBound, slackPx);
-  span.style.fontSize = `${corrected}px`;
-  span.style.visibility = '';
-  recordTextfillDiagnostic(contentEl, span, box, {
-    mode,
-    minPx,
-    maxPx,
-    enabled,
-    loBound,
-    hiBound,
-    slackPx,
-    resultFontPx: corrected,
-    options: { ...textfillOptions, diagnosticPass: 3 },
-    measurePhase: 'reconcile-visible-corrected',
-    reason: `was ${previousPx}px`,
-  });
-}
-
 async function ensureMeasurableBox(
   contentEl: HTMLElement,
   mode: TextfillMode = 'output',
@@ -693,62 +771,13 @@ async function runRefreshTextfill(
   await ensureMeasurableBox(contentEl, mode);
 
   const applyFn = mode === 'preview' ? applyPreviewTextfill : applyOutputTextfill;
-  /* Só o span fica hidden durante a busca — root visível para scrollHeight fiel. */
-  const fillOptions: ProjectionTextfillOptions = {
+  applyFn(contentEl, minPx, maxPx, enabled, {
     ...textfillOptions,
-    suppressVisibilityToggle: false,
-  };
-
-  const span = textTarget(contentEl, textfillOptions.spanSelector);
-  const box = measureBox(
-    contentEl,
-    textfillOptions.measureSelector,
-    textfillOptions.measureElement,
-  );
-  const slackPx = resolveSlackPx(textfillOptions, mode);
-
-  if (span) span.style.visibility = 'hidden';
-
-  try {
-    contentEl.dataset.textfillPass = '1';
-    applyFn(contentEl, minPx, maxPx, enabled, {
-      ...fillOptions,
-      diagnosticPass: 1,
-    });
-    const pass1Px = readSpanFontPx(span);
-    const pass1Fits = Boolean(span && box && textFitsBox(span, box, slackPx));
-
-    if (span) {
-      span.style.visibility = 'hidden';
-      span.style.fontSize = '';
-      void span.offsetHeight;
-      if (box !== span) void box.offsetHeight;
-    }
-
-    await waitForLayoutFrames();
-    contentEl.dataset.textfillPass = '2';
-    applyFn(contentEl, minPx, maxPx, enabled, {
-      ...fillOptions,
-      diagnosticPass: 2,
-    });
-    const pass2Fits = Boolean(span && box && textFitsBox(span, box, slackPx));
-    restorePass1IfPass2Broken(span, pass1Px, pass1Fits, pass2Fits);
-  } finally {
-    delete contentEl.dataset.textfillPass;
-    if (span) span.style.visibility = '';
-  }
-
-  await reconcileVisibleTextfill(
-    contentEl,
-    span,
-    box,
-    minPx,
-    maxPx,
-    enabled,
-    fillOptions,
-    mode,
-    slackPx,
-  );
+    fontFamily,
+    fontWeight,
+    fontStyle,
+    diagnosticPass: 1,
+  });
 }
 
 /** Aguarda fontes/layout e aplica textfill — prévias do operador (CAD-313). */
@@ -805,13 +834,9 @@ export async function refreshOutputTextfillAll(
 
   applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, {
     fitSlackPx,
-    suppressVisibilityToggle: false,
-  });
-
-  await waitForLayoutFrames();
-  applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, {
-    fitSlackPx,
-    suppressVisibilityToggle: false,
+    fontFamily,
+    fontWeight,
+    fontStyle,
   });
 }
 
@@ -840,7 +865,9 @@ export function applyOutputTextfillAll(
       measureSelector: null,
       measureElement: stageReturnTextfillMeasureBox(node),
       maxFontPxScale: stageReturnMaxFontPxScale(node),
-      suppressVisibilityToggle: true,
+      fontFamily: options?.fontFamily,
+      fontWeight: options?.fontWeight,
+      fontStyle: options?.fontStyle,
     });
   }
 }
