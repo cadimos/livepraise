@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Medição oculta com scrollHeight errado deve ser corrigida na verificação visível (pass 3).
+ * Reconcile visível reinicia em loBound — não deve cair para o mínimo com scrollHeight inflado.
  */
 import { JSDOM } from 'jsdom';
 
@@ -24,11 +24,7 @@ document.fonts = {
   ready: Promise.resolve(),
 };
 
-const {
-  concealProjectionTextfill,
-  refreshOutputTextfill,
-  revealProjectionTextfill,
-} = await import('../shared/projection-textfill.js');
+const { refreshOutputTextfill } = await import('../shared/projection-textfill.js');
 
 const root = document.createElement('div');
 root.innerHTML = `
@@ -53,6 +49,8 @@ const realScrollH = (size) => {
   return Math.ceil(size * lines * lineHeight);
 };
 
+let reconcilePass = false;
+
 Object.defineProperty(box, 'clientWidth', { configurable: true, get: () => 752 });
 Object.defineProperty(box, 'clientHeight', { configurable: true, get: () => 525 });
 Object.defineProperty(box, 'scrollWidth', { configurable: true, get: () => 752 });
@@ -61,8 +59,7 @@ Object.defineProperty(span, 'scrollHeight', {
   configurable: true,
   get() {
     const size = Number.parseInt(span.style.fontSize || '24', 10);
-    const concealed = root.style.opacity === '0';
-    if (concealed) return 130;
+    if (!reconcilePass && span.style.visibility === 'hidden') return 130;
     return realScrollH(size);
   },
 });
@@ -73,21 +70,32 @@ Object.defineProperty(span, 'offsetHeight', {
   },
 });
 
+const originalDescriptor = Object.getOwnPropertyDescriptor(span.style, 'visibility');
+let visibilityValue = '';
+Object.defineProperty(span.style, 'visibility', {
+  configurable: true,
+  enumerable: true,
+  get() {
+    return visibilityValue;
+  },
+  set(value) {
+    visibilityValue = value;
+    if (value === '' && !reconcilePass) {
+      reconcilePass = true;
+    }
+  },
+});
+
 await refreshOutputTextfill(root, 24, 120, true, {});
 
 const fontSize = Number.parseInt(span.style.fontSize, 10);
-assert(root.style.opacity === '', 'root deve estar visível');
+assert(visibilityValue === '', 'span visível no final');
 assert(
   Math.ceil(span.scrollHeight) <= maxH() + 3,
-  `fonte visível deve caber na caixa (${fontSize}px, scrollH=${span.scrollHeight})`,
+  `fonte deve caber visível (${fontSize}px, scrollH=${span.scrollHeight})`,
 );
-assert(fontSize < 120, `deve corrigir medição oculta optimista (${fontSize}px)`);
-assert(fontSize > 24, `não deve cair para o mínimo (${fontSize}px)`);
-
-concealProjectionTextfill(root);
-assert(root.style.opacity === '0', 'conceal usa opacity 0');
-assert(root.style.visibility === 'visible', 'conceal força visibility visible');
-revealProjectionTextfill(root);
+assert(fontSize > 40, `deve maximizar área útil (${fontSize}px)`);
+assert(fontSize <= 120, `não deve exceder max (${fontSize})`);
 
 console.log('projection-textfill-two-pass.test: OK');
 process.exit(0);

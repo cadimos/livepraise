@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Garante que refreshOutputTextfill oculta com opacity (layout fiel) e termina visível.
+ * Medição oculta só o span (root visível) — sem opacity:0 no root.
  */
 import { JSDOM } from 'jsdom';
 
@@ -39,27 +39,27 @@ document.body.appendChild(root);
 const rodape = root.querySelector('.rodape');
 Object.defineProperty(rodape, 'offsetHeight', { configurable: true, get: () => 18 });
 
-const opacityLog = [];
-let opacityValue = '';
-Object.defineProperty(root.style, 'opacity', {
+const span = root.querySelector('.content > span');
+const visibilityLog = [];
+let visibilityValue = '';
+Object.defineProperty(span.style, 'visibility', {
   configurable: true,
   enumerable: true,
   get() {
-    return opacityValue;
+    return visibilityValue;
   },
   set(value) {
-    opacityLog.push(value);
-    opacityValue = value;
+    visibilityLog.push(value);
+    visibilityValue = value;
   },
 });
 
 await refreshOutputTextfill(root, 24, 120, true, {});
 
-assert(opacityLog.includes('0'), 'root deve ficar com opacity 0 durante textfill');
-assert(opacityValue === '', 'root deve voltar visível após textfill');
+assert(visibilityLog.includes('hidden'), 'span deve ficar hidden durante textfill');
+assert(visibilityValue === '', 'span deve voltar visível após textfill');
+assert(root.style.opacity !== '0', 'root não deve usar opacity:0');
 
-const span = root.querySelector('.content > span');
-assert(span, 'span de conteúdo presente');
 const fontSize = Number.parseInt(span.style.fontSize, 10);
 assert(Number.isFinite(fontSize) && fontSize >= 24, `fontSize final aplicado (${fontSize})`);
 

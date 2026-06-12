@@ -102,7 +102,6 @@ function ensureContentMarkup(root: HTMLElement): boolean {
   if (loadedContentHtml === props.contentHtml && root.querySelector('.content')) {
     return false;
   }
-  root.style.opacity = '0';
   root.innerHTML = props.contentHtml;
   loadedContentHtml = props.contentHtml;
   return true;
@@ -120,7 +119,7 @@ async function applyTypography(remeasure = false): Promise<void> {
   }
 
   if (!root.querySelector('.content span, .content, .texto')) {
-    root.style.opacity = '';
+    previewReady.value = true;
     return;
   }
 
@@ -146,7 +145,6 @@ async function applyTypography(remeasure = false): Promise<void> {
   );
 
   if (generation !== refreshGeneration) return;
-  root.style.opacity = '';
   previewReady.value = true;
 }
 

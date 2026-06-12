@@ -13,7 +13,7 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 ### Corrigido
 
 - **Textfill pass 2** — segunda passagem de medição podia inflar `scrollHeight` e forçar fonte mínima (24px) após pass 1 válida (120px); mantém pass 1 quando pass 2 não cabe; limpa fonte entre passagens; sombra de texto só em nós de texto (não em `.content`).
-- **Textfill medição oculta** — `visibility:hidden` subestimava `scrollHeight` (120px “cabe” com scrollH≈130); medição usa `opacity:0` + verificação visível (pass 3) que corrige overflow; diagnóstico inclui `measurePhase`, `heightOverflow`, `spanOffsetH`.
+- **Textfill medição oculta** — `visibility:hidden` no root e `opacity:0` distorcem `scrollHeight`; medição oculta só o `span` (root visível); pass 3 `reconcile-visible` reinicia em `loBound` se o resultado não cabe visível; diagnóstico inclui `measurePhase`, `heightOverflow`, `spanOffsetH`.
 
 ---
 
