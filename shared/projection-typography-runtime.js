@@ -124,7 +124,7 @@ function applyShadowTargets(rootEl, profile, shadowSelector) {
   }
 }
 
-async function runTextfill(rootEl, profile, mode, textfillOptions, cssFamily) {
+async function runTextfill(rootEl, profile, mode, textfillOptions, cssFamily, surfaceLabel) {
   const fitSlackPx = projectionTextShadowSlackPx(
     profile.textShadowLayers,
     profile.textShadowEnabled,
@@ -152,7 +152,11 @@ async function runTextfill(rootEl, profile, mode, textfillOptions, cssFamily) {
     profile.minFontPx,
     profile.maxFontPx,
     profile.textfillEnabled,
-    { ...fontOpts, ...textfillOptions },
+    {
+      ...fontOpts,
+      ...textfillOptions,
+      diagnosticSurface: textfillOptions?.diagnosticSurface ?? surfaceLabel ?? mode,
+    },
   );
 }
 
@@ -168,6 +172,7 @@ export function createProjectionTypographyController(options) {
     mode = 'output',
     shadowSelector = '.titulo, .content > span, .rodape:not(:empty), .content, .texto',
     textfillOptions,
+    diagnosticSurface,
     onProfileKey,
   } = options;
 
@@ -223,7 +228,14 @@ export function createProjectionTypographyController(options) {
       ensureFontFaceStyle(profile, origin, manifest, fontStyleEl);
       applyShadowTargets(rootEl, profile, shadowSelector);
       if (generation !== refreshGeneration) return;
-      await runTextfill(rootEl, profile, mode, textfillOptions, cssFamily);
+      await runTextfill(
+        rootEl,
+        profile,
+        mode,
+        textfillOptions,
+        cssFamily,
+        diagnosticSurface ?? profileKey,
+      );
     } finally {
       if (hadContent) {
         rootEl.style.visibility = '';

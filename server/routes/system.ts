@@ -4,6 +4,14 @@ import {
   clearErrorLogs,
   listErrorLogs,
 } from '../../core/error-log/store.js';
+import {
+  appendTextfillDiagnostics,
+  clearTextfillDiagnostics,
+  getTextfillDiagnosticsPath,
+  listTextfillDiagnostics,
+  textfillDiagnosticsMeta,
+} from '../../core/textfill-diagnostics/store.js';
+import type { AppendTextfillDiagnosticInput } from '../../core/textfill-diagnostics/types.js';
 import { listSystemFonts } from '../../core/fonts/system-fonts.js';
 import { getPrimaryLocalIpv4 } from '../../core/network/local-ipv4.js';
 import type { ErrorLogLevel } from '../../core/error-log/types.js';
@@ -64,6 +72,45 @@ export function createSystemRouter(): Router {
   api.delete('/error-log', requireOperatorAccess, (req: Request, res: Response) => {
     allowCors(req, res, () => {});
     clearErrorLogs();
+    res.json({ status: 'Sucesso' });
+  });
+
+  api.get('/textfill-diagnostics/meta', requireOperatorAccess, (_req: Request, res: Response) => {
+    const meta = textfillDiagnosticsMeta();
+    res.json({
+      status: 'Sucesso',
+      path: meta.path,
+      count: meta.count,
+      bytes: meta.bytes,
+    });
+  });
+
+  api.get('/textfill-diagnostics', requireOperatorAccess, (req: Request, res: Response) => {
+    const limitRaw = Number(req.query.limit ?? 200);
+    const limit = Number.isFinite(limitRaw)
+      ? Math.min(Math.max(1, Math.trunc(limitRaw)), 800)
+      : 200;
+    res.json({
+      status: 'Sucesso',
+      path: getTextfillDiagnosticsPath(),
+      items: listTextfillDiagnostics(limit),
+    });
+  });
+
+  api.post('/textfill-diagnostics', requireOperatorAccess, (req: Request, res: Response) => {
+    allowCors(req, res, () => {});
+    const body = req.body as { entries?: AppendTextfillDiagnosticInput[] };
+    const entries = Array.isArray(body.entries) ? body.entries : [];
+    if (!entries.length) {
+      jsonError(res, 400, 'entries obrigatório');
+      return;
+    }
+    const saved = appendTextfillDiagnostics(entries.slice(0, 20));
+    res.status(201).json({ status: 'Sucesso', count: saved.length });
+  });
+
+  api.delete('/textfill-diagnostics', requireOperatorAccess, (_req: Request, res: Response) => {
+    clearTextfillDiagnostics();
     res.json({ status: 'Sucesso' });
   });
 

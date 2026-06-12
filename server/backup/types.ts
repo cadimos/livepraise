@@ -12,6 +12,7 @@ export const BACKUP_GROUP_IDS = [
   'projection_state',
   'biblias',
   'error_log',
+  'textfill_diagnostics',
   'operator_ui',
 ] as const;
 

@@ -247,7 +247,17 @@
       "showDetail": "Ver detalhe",
       "hideDetail": "Ocultar detalhe",
       "displayDebugOverlay": "Overlay de debug nos monitores",
-      "displayDebugOverlayHint": "Quando activo, mostra no rodapé dos monitores de projeção e dos dispositivos ligados pela rede a última acção recebida (ex.: mudança de música às 17:08:38)."
+      "displayDebugOverlayHint": "Quando activo, mostra no rodapé dos monitores de projeção e dos dispositivos ligados pela rede a última acção recebida (ex.: mudança de música às 17:08:38).",
+      "textfillDiagnostics": "Diagnóstico de textfill (prévia/projetor)",
+      "textfillDiagnosticsHint": "Regista medições de tamanho de fonte e caixas de layout. Reproduza o problema (projecte 2–3 versos), exporte o ficheiro e envie à equipa de suporte.",
+      "textfillDiagnosticsEnabled": "Activar registo de textfill",
+      "textfillDiagnosticsPath": "Ficheiro no servidor",
+      "textfillDiagnosticsCount": "{count} registo(s)",
+      "textfillDiagnosticsEmpty": "Nenhum registo ainda. Projecte louvor com o registo activo.",
+      "textfillDiagnosticsExport": "Exportar JSONL",
+      "textfillDiagnosticsClear": "Limpar diagnóstico",
+      "textfillDiagnosticsConfirmClear": "Limpar todos os registos de textfill?",
+      "textfillDiagnosticsEntry": "{surface} · pass {pass} · {font}px (min {min} / max {max}) · caixa {boxW}×{boxH}"
     },
     "shortcuts": {
       "title": "Atalhos de teclado",

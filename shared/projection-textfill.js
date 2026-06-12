@@ -1,3 +1,4 @@
+import { collectTextfillLayoutContext, isTextfillDiagnosticsEnabled, logTextfillDiagnostic, } from './projection-textfill-diagnostics.js';
 /** `.proximo` usa teto de fonte menor que `.atual` (paridade stage-return.css). */
 const STAGE_RETURN_PROXIMO_MAX_SCALE = 0.72;
 /** Piso em saídas reais quando o perfil min não cabe (mobile / muito texto). */
@@ -96,6 +97,18 @@ function applyTextfill(contentEl, minPx, maxPx, enabled, options = {}, mode = 'o
     if (box.clientHeight <= 0 || box.clientWidth <= 0) {
         span.style.fontSize = `${fallbackPx}px`;
         span.style.visibility = '';
+        recordTextfillDiagnostic(contentEl, span, box, {
+            mode,
+            minPx,
+            maxPx,
+            enabled,
+            loBound,
+            hiBound,
+            slackPx,
+            resultFontPx: fallbackPx,
+            options,
+            reason: 'zero-box',
+        });
         return;
     }
     prepareSpan(span);
@@ -113,6 +126,17 @@ function applyTextfill(contentEl, minPx, maxPx, enabled, options = {}, mode = 'o
             targetPx = Math.max(floorPx, targetPx);
         }
         span.style.fontSize = `${targetPx}px`;
+        recordTextfillDiagnostic(contentEl, span, box, {
+            mode,
+            minPx,
+            maxPx,
+            enabled,
+            loBound,
+            hiBound,
+            slackPx,
+            resultFontPx: targetPx,
+            options,
+        });
     };
     if (options.suppressVisibilityToggle) {
         measure();
@@ -143,6 +167,28 @@ function runBinarySearch(span, box, loBound, hiBound, slackPx) {
     }
     span.style.fontSize = `${best}px`;
     return best;
+}
+function recordTextfillDiagnostic(contentEl, span, box, data) {
+    if (!isTextfillDiagnosticsEnabled())
+        return;
+    const layout = collectTextfillLayoutContext(contentEl, span, box);
+    logTextfillDiagnostic({
+        surface: data.options.diagnosticSurface ?? data.mode,
+        mode: data.mode,
+        pass: data.options.diagnosticPass ?? 1,
+        minFontPx: data.minPx,
+        maxFontPx: data.maxPx,
+        textfillEnabled: data.enabled,
+        loBound: data.loBound,
+        hiBound: data.hiBound,
+        slackPx: data.slackPx,
+        resultFontPx: data.resultFontPx,
+        fits: textFitsBox(span, box, data.slackPx),
+        ...layout,
+        textSnippet: data.reason
+            ? `${layout.textSnippet} [${data.reason}]`
+            : layout.textSnippet,
+    });
 }
 function resolveSlackPx(options, mode, extraPx = 0) {
     const baseSlack = mode === 'preview' ? PREVIEW_FIT_SLACK_PX : OUTPUT_FIT_SLACK_PX;
@@ -303,10 +349,16 @@ async function runRefreshTextfill(contentEl, minPx, maxPx, enabled, options, mod
     /* Ocultar o root durante ambas as passagens — evita flash entre frames e entre medições. */
     contentEl.style.visibility = 'hidden';
     try {
-        applyFn(contentEl, minPx, maxPx, enabled, fillOptions);
+        applyFn(contentEl, minPx, maxPx, enabled, {
+            ...fillOptions,
+            diagnosticPass: 1,
+        });
         /* Segunda passagem após o grid (topo/rodapé fixos) estabilizar a área de `.content`. */
         await waitForLayoutFrames();
-        applyFn(contentEl, minPx, maxPx, enabled, fillOptions);
+        applyFn(contentEl, minPx, maxPx, enabled, {
+            ...fillOptions,
+            diagnosticPass: 2,
+        });
     }
     finally {
         contentEl.style.visibility = '';

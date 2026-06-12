@@ -70,6 +70,12 @@ export const BACKUP_GROUPS: Record<BackupGroupId, BackupGroupDef> = {
     isDirectory: false,
     optional: true,
   },
+  textfill_diagnostics: {
+    id: 'textfill_diagnostics',
+    homeRelative: 'textfill-diagnostics.jsonl',
+    isDirectory: false,
+    optional: true,
+  },
   operator_ui: {
     id: 'operator_ui',
     homeRelative: null,
