@@ -1,9 +1,7 @@
 import {
-  concealProjectionTextfill,
   refreshOutputTextfill,
   refreshOutputTextfillAll,
   refreshPreviewTextfill,
-  revealProjectionTextfill,
 } from './projection-textfill.js';
 import { applyProjectionTypographyStyles } from './projection-typography.js';
 import { projectionTextShadowSlackPx, resolveProjectionTextShadowCss } from './projection-text-shadow.js';
@@ -209,9 +207,9 @@ export function createProjectionTypographyController(options) {
     if (refreshInProgress) return;
     refreshInProgress = true;
     const generation = ++refreshGeneration;
-    const hadContent = Boolean(rootEl.querySelector('.content, .texto')?.textContent?.trim());
-    if (hadContent) {
-      concealProjectionTextfill(rootEl);
+    const textSpan = rootEl.querySelector('.content > span, .texto-fill');
+    if (textSpan instanceof HTMLElement) {
+      textSpan.style.visibility = 'hidden';
     }
     try {
       profile = currentProfile();
@@ -239,8 +237,8 @@ export function createProjectionTypographyController(options) {
         diagnosticSurface ?? profileKey,
       );
     } finally {
-      if (hadContent) {
-        revealProjectionTextfill(rootEl);
+      if (textSpan instanceof HTMLElement) {
+        textSpan.style.visibility = '';
       }
       refreshInProgress = false;
     }

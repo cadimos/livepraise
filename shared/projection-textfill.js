@@ -401,15 +401,19 @@ function restorePass1IfPass2Broken(span, pass1Px, pass1Fits, pass2Fits) {
         span.style.fontSize = `${pass1Px}px`;
     }
 }
-async function verifyVisibleTextfill(contentEl, span, box, minPx, maxPx, enabled, textfillOptions, mode, slackPx) {
+/**
+ * Re-medida visível só quando o resultado oculto não cabe.
+ * Reinicia em loBound — nunca reutiliza fonte grande (evita scrollHeight inflado).
+ */
+async function reconcileVisibleTextfill(contentEl, span, box, minPx, maxPx, enabled, textfillOptions, mode, slackPx) {
     if (!span || !box || !enabled)
         return;
     const scale = textfillOptions.maxFontPxScale ?? 1;
     const { lo: loBound, hi: hiBound } = scaledFontBounds(minPx, maxPx, scale, mode);
     await waitForLayoutFrames();
     void span.offsetHeight;
-    const metrics = textFitsBoxMetrics(span, box, slackPx);
-    if (metrics.fits) {
+    const initial = textFitsBoxMetrics(span, box, slackPx);
+    if (initial.fits) {
         recordTextfillDiagnostic(contentEl, span, box, {
             mode,
             minPx,
@@ -420,13 +424,18 @@ async function verifyVisibleTextfill(contentEl, span, box, minPx, maxPx, enabled
             slackPx,
             resultFontPx: readSpanFontPx(span),
             options: { ...textfillOptions, diagnosticPass: 3 },
-            measurePhase: 'verify-visible-ok',
+            measurePhase: 'reconcile-visible-ok',
         });
         return;
     }
     const previousPx = readSpanFontPx(span);
-    const corrected = runBinarySearch(span, box, loBound, Math.max(loBound, Math.min(previousPx || hiBound, hiBound)), slackPx);
+    prepareSpan(span);
+    span.style.fontSize = `${loBound}px`;
+    void span.offsetHeight;
+    await waitForLayoutFrames();
+    const corrected = runBinarySearch(span, box, loBound, hiBound, slackPx);
     span.style.fontSize = `${corrected}px`;
+    span.style.visibility = '';
     recordTextfillDiagnostic(contentEl, span, box, {
         mode,
         minPx,
@@ -437,7 +446,7 @@ async function verifyVisibleTextfill(contentEl, span, box, minPx, maxPx, enabled
         slackPx,
         resultFontPx: corrected,
         options: { ...textfillOptions, diagnosticPass: 3 },
-        measurePhase: 'verify-visible-corrected',
+        measurePhase: 'reconcile-visible-corrected',
         reason: `was ${previousPx}px`,
     });
 }
@@ -471,15 +480,16 @@ async function runRefreshTextfill(contentEl, minPx, maxPx, enabled, options, mod
     });
     await ensureMeasurableBox(contentEl, mode);
     const applyFn = mode === 'preview' ? applyPreviewTextfill : applyOutputTextfill;
+    /* Só o span fica hidden durante a busca — root visível para scrollHeight fiel. */
     const fillOptions = {
         ...textfillOptions,
-        suppressVisibilityToggle: true,
+        suppressVisibilityToggle: false,
     };
     const span = textTarget(contentEl, textfillOptions.spanSelector);
     const box = measureBox(contentEl, textfillOptions.measureSelector, textfillOptions.measureElement);
     const slackPx = resolveSlackPx(textfillOptions, mode);
-    /* opacity:0 mantém layout fiel; visibility:hidden distorce scrollHeight no Chromium. */
-    concealProjectionTextfill(contentEl);
+    if (span)
+        span.style.visibility = 'hidden';
     try {
         contentEl.dataset.textfillPass = '1';
         applyFn(contentEl, minPx, maxPx, enabled, {
@@ -489,6 +499,7 @@ async function runRefreshTextfill(contentEl, minPx, maxPx, enabled, options, mod
         const pass1Px = readSpanFontPx(span);
         const pass1Fits = Boolean(span && box && textFitsBox(span, box, slackPx));
         if (span) {
+            span.style.visibility = 'hidden';
             span.style.fontSize = '';
             void span.offsetHeight;
             if (box !== span)
@@ -505,17 +516,10 @@ async function runRefreshTextfill(contentEl, minPx, maxPx, enabled, options, mod
     }
     finally {
         delete contentEl.dataset.textfillPass;
-        revealProjectionTextfill(contentEl);
+        if (span)
+            span.style.visibility = '';
     }
-    const visibilitySnapshot = forceVisibleForMeasurement(contentEl);
-    try {
-        await verifyVisibleTextfill(contentEl, span, box, minPx, maxPx, enabled, fillOptions, mode, slackPx);
-    }
-    finally {
-        if (concealDepth(contentEl) > 0) {
-            restoreVisibilitySnapshot(contentEl, visibilitySnapshot);
-        }
-    }
+    await reconcileVisibleTextfill(contentEl, span, box, minPx, maxPx, enabled, fillOptions, mode, slackPx);
 }
 /** Aguarda fontes/layout e aplica textfill — prévias do operador (CAD-313). */
 export async function refreshPreviewTextfill(contentEl, minPx, maxPx, enabled, options = {}) {
@@ -541,15 +545,15 @@ export async function refreshOutputTextfillAll(rootEl, minPx, maxPx, enabled, op
     });
     await ensureMeasurableBox(rootEl, 'output');
     await ensureStageReturnTextfillBoxes(rootEl);
-    concealProjectionTextfill(rootEl);
-    try {
-        applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, { fitSlackPx });
-        await waitForLayoutFrames();
-        applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, { fitSlackPx });
-    }
-    finally {
-        revealProjectionTextfill(rootEl);
-    }
+    applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, {
+        fitSlackPx,
+        suppressVisibilityToggle: false,
+    });
+    await waitForLayoutFrames();
+    applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, {
+        fitSlackPx,
+        suppressVisibilityToggle: false,
+    });
 }
 /** Retorno de palco — cada `.texto` com textfill independente. */
 export function applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, options) {
