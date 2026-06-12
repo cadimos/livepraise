@@ -27,6 +27,7 @@ const props = withDefaults(
     videoUrl?: string;
     youtubeEmbedUrl?: string;
     footerAlertPreview?: FooterAlertState | null;
+    frameAspectRatio?: { width: number; height: number };
     empty?: boolean;
   }>(),
   {
@@ -35,6 +36,7 @@ const props = withDefaults(
     videoUrl: '',
     youtubeEmbedUrl: '',
     footerAlertPreview: null,
+    frameAspectRatio: undefined,
     empty: false,
   },
 );
@@ -152,6 +154,12 @@ function scheduleApplyTypography(remeasure = false): void {
   }, 32);
 }
 
+const frameAspectStyle = computed(() => {
+  const ratio = props.frameAspectRatio;
+  if (!ratio || ratio.width <= 0 || ratio.height <= 0) return undefined;
+  return { aspectRatio: `${ratio.width} / ${ratio.height}` } as Record<string, string>;
+});
+
 const typographySignature = computed(() =>
   JSON.stringify({
     profile: profile.value,
@@ -161,6 +169,7 @@ const typographySignature = computed(() =>
     textShadowCss: textShadowCss.value,
     fontFaceCss: fontFaceCss.value,
     fitSlackPx: fitSlackPx.value,
+    frameAspectRatio: props.frameAspectRatio,
   }),
 );
 
@@ -208,7 +217,9 @@ onBeforeUnmount(() => {
 
     <div
       ref="frameRef"
-      class="projection-preview-frame relative aspect-video w-full overflow-hidden rounded-xl border border-lp-surface bg-black shadow-inner"
+      class="projection-preview-frame relative w-full overflow-hidden rounded-xl border border-lp-surface bg-black shadow-inner"
+      :class="{ 'aspect-video': !frameAspectStyle }"
+      :style="frameAspectStyle"
     >
       <template v-if="empty">
         <div

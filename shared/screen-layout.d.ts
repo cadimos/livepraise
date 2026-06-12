@@ -31,6 +31,12 @@ export function parseCustomScreenPixels(
   altura: string,
 ): { w: number; h: number } | null;
 
+export function resolvePreviewAspectRatio(
+  preset: string,
+  largura: string,
+  altura: string,
+): { width: number; height: number };
+
 export function describeScreenLayoutSize(
   preset: string,
   largura: string,

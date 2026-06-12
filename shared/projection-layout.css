@@ -219,6 +219,7 @@ body.footer-alert-active #conteudo,
 .projection-preview-frame .conteudo {
   --projection-zone-gap: clamp(0.25rem, 2cqh, 0.75rem);
   --projection-title-size: clamp(0.5rem, 5cqw, 1rem);
+  --projection-body-size: clamp(0.5rem, 8cqw, 1.25rem);
   --projection-footer-size: clamp(0.45rem, 4cqw, 0.85rem);
   --projection-footer-alert-reserve: clamp(1.5rem, 14cqh, 2.75rem);
 

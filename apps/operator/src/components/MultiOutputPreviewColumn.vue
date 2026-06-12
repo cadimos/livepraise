@@ -12,7 +12,7 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const { visibleGroups } = usePreviewGroups();
+const { visibleGroups, projectionPreviewAspect } = usePreviewGroups();
 const { frameForGroup, resolveOutputPreviewFrame } = useOutputPreviewState(
   () => visibleGroups.value,
 );
@@ -50,6 +50,7 @@ function tileProps(group: PreviewGroupDescriptor) {
       v-for="g in visibleGroups"
       :key="g.id"
       :label="t(g.labelKey)"
+      :frame-aspect-ratio="g.kind === 'projection' ? projectionPreviewAspect : undefined"
       v-bind="tileProps(g)"
     />
   </div>

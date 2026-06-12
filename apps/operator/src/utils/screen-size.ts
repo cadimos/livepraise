@@ -10,6 +10,7 @@ import {
   isRatioPreset,
   parseAjustarTelaPayload,
   parseCustomScreenPixels,
+  resolvePreviewAspectRatio,
   resolveProjectionStageSize,
   SCREEN_CONTENT_FITS,
 } from '@shared/screen-layout.js';
@@ -39,7 +40,7 @@ export interface TelaConfigRow {
   altura: number | string;
 }
 
-export { isRatioPreset, buildAjustarTelaValor, parseAjustarTelaPayload, buildAjustarTelaPayload, buildAjustarTelaPayloadForDevice, describeScreenLayoutSize, parseCustomScreenPixels, resolveProjectionStageSize, fitAspectRatioInBox };
+export { isRatioPreset, buildAjustarTelaValor, parseAjustarTelaPayload, buildAjustarTelaPayload, buildAjustarTelaPayloadForDevice, describeScreenLayoutSize, parseCustomScreenPixels, resolveProjectionStageSize, resolvePreviewAspectRatio, fitAspectRatioInBox };
 
 export function defaultScreenSize(): DisplayScreenSize {
   return { preset: 'padrao', largura: '', altura: '', ...defaultScreenLayoutFields() };

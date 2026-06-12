@@ -63,6 +63,34 @@ export function buildAjustarTelaValor(
 }
 
 /** Texto legível do tamanho que será aplicado no projetor. */
+/** Proporção largura:altura do tile de prévia conforme preset do projetor. */
+export function resolvePreviewAspectRatio(
+  preset: string,
+  largura: string,
+  altura: string,
+): { width: number; height: number } {
+  if (!preset || preset === 'padrao') {
+    return { width: 16, height: 9 };
+  }
+
+  if (preset === 'personalizado') {
+    const custom = parseCustomScreenPixels(largura, altura);
+    if (custom) {
+      return { width: custom.w, height: custom.h };
+    }
+    return { width: 16, height: 9 };
+  }
+
+  if (preset.includes(':')) {
+    const [numW, numH] = preset.split(':').map((part) => Number.parseInt(part, 10));
+    if (Number.isFinite(numW) && numW > 0 && Number.isFinite(numH) && numH > 0) {
+      return { width: numW, height: numH };
+    }
+  }
+
+  return { width: 16, height: 9 };
+}
+
 export function describeScreenLayoutSize(
   preset: string,
   largura: string,

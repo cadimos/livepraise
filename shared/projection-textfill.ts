@@ -108,9 +108,28 @@ function prepareSpan(span: HTMLElement): void {
 /** Texto cabe na área útil de `.content` (só o corpo central). */
 function textFitsBox(span: HTMLElement, box: HTMLElement, slackPx: number): boolean {
   void span.offsetHeight;
+  const maxW = box.clientWidth - slackPx;
   const maxH = box.clientHeight - slackPx;
-  if (maxH <= 0) return false;
-  return Math.ceil(span.scrollHeight) <= maxH;
+  if (maxW <= 0 || maxH <= 0) return false;
+  return (
+    Math.ceil(span.scrollWidth) <= maxW && Math.ceil(span.scrollHeight) <= maxH
+  );
+}
+
+/** Garante tamanho final mesmo se o grid ainda não estabilizou após a medição. */
+function shrinkToFitBox(
+  span: HTMLElement,
+  box: HTMLElement,
+  targetPx: number,
+  floorPx: number,
+  slackPx: number,
+): number {
+  let size = targetPx;
+  while (size > floorPx && !textFitsBox(span, box, slackPx)) {
+    size -= 1;
+    span.style.fontSize = `${size}px`;
+  }
+  return size;
 }
 
 function applyTextfill(
@@ -155,6 +174,7 @@ function applyTextfill(
       targetPx = Math.max(floorPx, targetPx);
     }
 
+    targetPx = shrinkToFitBox(span, box, targetPx, loBound, slackPx);
     span.style.fontSize = `${targetPx}px`;
   };
 
@@ -359,14 +379,22 @@ async function ensureMeasurableBox(
     contentEl.querySelector<HTMLElement>('.texto') ??
     contentEl;
 
-  const minHeight = mode === 'preview' ? 8 : 24;
-  const minWidth = mode === 'preview' ? 8 : 24;
+  const minHeight = mode === 'preview' ? 16 : 24;
+  const minWidth = mode === 'preview' ? 16 : 24;
 
-  for (let attempt = 0; attempt < 16; attempt += 1) {
-    if (box.clientHeight >= minHeight && box.clientWidth >= minWidth) return;
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => resolve());
-    });
+  let stableHeight = -1;
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    const height = box.clientHeight;
+    const width = box.clientWidth;
+    if (
+      height >= minHeight &&
+      width >= minWidth &&
+      height === stableHeight
+    ) {
+      return;
+    }
+    stableHeight = height;
+    await waitForLayoutFrames();
   }
 }
 

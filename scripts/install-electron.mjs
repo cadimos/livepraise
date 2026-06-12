@@ -27,7 +27,6 @@ main().catch((err) => {
 
 async function main() {
   const { version } = JSON.parse(fs.readFileSync(path.join(electronDir, 'package.json'), 'utf8'));
-  const extract = require('extract-zip');
   const { downloadArtifact } = await import('@electron/get');
 
   const platformPath = getPlatformPath();
@@ -81,7 +80,7 @@ async function main() {
     arch,
   });
 
-  await extract(zipPath, { dir: distDir });
+  await extractElectronZip(zipPath, distDir, platformPath);
 
   const distPath = process.env.ELECTRON_OVERRIDE_DIST_PATH || distDir;
   const srcTypeDefPath = path.join(distPath, 'electron.d.ts');
@@ -129,6 +128,48 @@ function isInstalled(version, platformPath) {
     process.env.ELECTRON_OVERRIDE_DIST_PATH ||
     path.join(electronDir, 'dist', platformPath);
   return fs.existsSync(electronPath);
+}
+
+async function extractElectronZip(zipPath, distDir, platformPath) {
+  fs.mkdirSync(distDir, { recursive: true });
+
+  if (process.platform === 'linux' && commandExists('unzip')) {
+    extractWithUnzip(zipPath, distDir);
+  } else {
+    const extract = require('extract-zip');
+    await extract(zipPath, { dir: distDir });
+  }
+
+  const binaryPath = path.join(distDir, platformPath);
+  if (fs.existsSync(binaryPath)) return;
+
+  if (commandExists('unzip')) {
+    console.warn('install-electron: extract-zip incompleto; a usar unzip…');
+    extractWithUnzip(zipPath, distDir);
+  }
+
+  if (!fs.existsSync(binaryPath)) {
+    throw new Error(`binário do Electron não encontrado em ${binaryPath}`);
+  }
+}
+
+function extractWithUnzip(zipPath, distDir) {
+  fs.rmSync(distDir, { recursive: true, force: true });
+  fs.mkdirSync(distDir, { recursive: true });
+  execSync(`unzip -oq ${shellQuote(zipPath)} -d ${shellQuote(distDir)}`, { stdio: 'inherit' });
+}
+
+function commandExists(command) {
+  try {
+    execSync(`command -v ${shellQuote(command)}`, { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function shellQuote(value) {
+  return `'${String(value).replace(/'/g, `'\\''`)}'`;
 }
 
 function hasStaleDist(distDir, platformPath) {
