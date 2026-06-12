@@ -303,6 +303,7 @@ const typography = createProjectionTypographyController({
     rootEl: byId('conteudo'),
     role: 'projector',
     mode: 'output',
+    diagnosticSurface: 'projector',
 });
 function connect() {
     const socket = new WebSocket(wsUrl());
