@@ -312,6 +312,18 @@ function measureLayoutReady(contentEl, box, mode) {
     }
     return true;
 }
+function readSpanFontPx(span) {
+    if (!span)
+        return 0;
+    const px = Number.parseInt(span.style.fontSize, 10);
+    return Number.isFinite(px) ? px : 0;
+}
+/** Pass 2 pode medir scrollHeight errado após pass 1 fixar fonte grande (hidden root). */
+function restorePass1IfPass2Broken(span, pass1Px, pass1Fits, pass2Fits) {
+    if (span && pass1Fits && !pass2Fits && pass1Px > 0) {
+        span.style.fontSize = `${pass1Px}px`;
+    }
+}
 async function ensureMeasurableBox(contentEl, mode = 'output') {
     const box = contentEl.querySelector('.content') ??
         contentEl.querySelector('.texto') ??
@@ -346,21 +358,38 @@ async function runRefreshTextfill(contentEl, minPx, maxPx, enabled, options, mod
         ...textfillOptions,
         suppressVisibilityToggle: true,
     };
+    const span = textTarget(contentEl, textfillOptions.spanSelector);
+    const box = measureBox(contentEl, textfillOptions.measureSelector, textfillOptions.measureElement);
+    const slackPx = resolveSlackPx(textfillOptions, mode);
     /* Ocultar o root durante ambas as passagens — evita flash entre frames e entre medições. */
     contentEl.style.visibility = 'hidden';
     try {
+        contentEl.dataset.textfillPass = '1';
         applyFn(contentEl, minPx, maxPx, enabled, {
             ...fillOptions,
             diagnosticPass: 1,
         });
+        const pass1Px = readSpanFontPx(span);
+        const pass1Fits = Boolean(span && box && textFitsBox(span, box, slackPx));
+        /* Limpa fonte da pass 1 antes de remediar — evita scrollHeight stale no Chromium. */
+        if (span) {
+            span.style.fontSize = '';
+            void span.offsetHeight;
+            if (box !== span)
+                void box.offsetHeight;
+        }
         /* Segunda passagem após o grid (topo/rodapé fixos) estabilizar a área de `.content`. */
         await waitForLayoutFrames();
+        contentEl.dataset.textfillPass = '2';
         applyFn(contentEl, minPx, maxPx, enabled, {
             ...fillOptions,
             diagnosticPass: 2,
         });
+        const pass2Fits = Boolean(span && box && textFitsBox(span, box, slackPx));
+        restorePass1IfPass2Broken(span, pass1Px, pass1Fits, pass2Fits);
     }
     finally {
+        delete contentEl.dataset.textfillPass;
         contentEl.style.visibility = '';
     }
 }

@@ -10,6 +10,10 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 - **Diagnóstico de textfill** — registo JSONL de medições de fonte e layout (prévia e projetor) em `~/livepraise/textfill-diagnostics.jsonl`; UI em Configurações → Logs de erro; exportação JSONL para suporte.
 
+### Corrigido
+
+- **Textfill pass 2** — segunda passagem de medição podia inflar `scrollHeight` e forçar fonte mínima (24px) após pass 1 válida (120px); mantém pass 1 quando pass 2 não cabe; limpa fonte entre passagens; sombra de texto só em nós de texto (não em `.content`).
+
 ---
 
 ## [1.0.0-alpha.2] — 2026-06-07

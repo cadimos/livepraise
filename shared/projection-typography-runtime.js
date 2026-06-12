@@ -170,7 +170,7 @@ export function createProjectionTypographyController(options) {
     externalProfile,
     origin = location.origin,
     mode = 'output',
-    shadowSelector = '.titulo, .content > span, .rodape:not(:empty), .content, .texto',
+    shadowSelector = '.titulo, .content > span, .rodape:not(:empty), .texto',
     textfillOptions,
     diagnosticSurface,
     onProfileKey,
