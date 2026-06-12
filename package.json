@@ -22,7 +22,7 @@
     "dev": "npm run build && node scripts/dev-electron.mjs",
     "start": "npm run dev",
     "build:electron": "tsc -p tsconfig.electron.json",
-    "build:server": "node scripts/check-node-version.mjs && node scripts/install-yt-dlp.mjs && node scripts/install-ffmpeg.mjs && tsc -p tsconfig.server.json && node -e \"const fs=require('fs');const p='dist/server/db/migrations';fs.mkdirSync(p,{recursive:true});for(const f of fs.readdirSync('server/db/migrations')) fs.copyFileSync('server/db/migrations/'+f,p+'/'+f);\" && node scripts/sync-shared-screen-layout.mjs",
+    "build:server": "node scripts/check-node-version.mjs && node scripts/install-yt-dlp.mjs && node scripts/install-ffmpeg.mjs && tsc -p tsconfig.server.json && node -e \"const fs=require('fs');const p='dist/server/db/migrations';fs.mkdirSync(p,{recursive:true});for(const f of fs.readdirSync('server/db/migrations')) fs.copyFileSync('server/db/migrations/'+f,p+'/'+f);\" && node scripts/sync-shared-modules.mjs",
     "build:projector": "tsc -p tsconfig.projector.json",
     "build:stage-return": "tsc -p tsconfig.stage-return.json",
     "build:operator": "vite build --config vite.config.ts",

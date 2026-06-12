@@ -120,8 +120,11 @@ async function applyTypography(remeasure = false): Promise<void> {
   }
 
   if (!root.querySelector('.content span, .content, .texto')) {
+    root.style.visibility = '';
     return;
   }
+
+  root.style.visibility = 'hidden';
 
   applyProjectionTypographyStyles(root, {
     fontFamily: cssFamily.value,
@@ -144,6 +147,7 @@ async function applyTypography(remeasure = false): Promise<void> {
   );
 
   if (generation !== refreshGeneration) return;
+  root.style.visibility = '';
   previewReady.value = true;
 }
 

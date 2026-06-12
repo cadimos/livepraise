@@ -181,6 +181,8 @@ export function createProjectionTypographyController(options) {
   let refreshScheduled = false;
   let refreshGeneration = 0;
   let refreshInProgress = false;
+  let resizeDebounce = null;
+  let onWindowResize = null;
 
   function currentProfile() {
     if (!prefs) return profile;
@@ -200,6 +202,10 @@ export function createProjectionTypographyController(options) {
     if (refreshInProgress) return;
     refreshInProgress = true;
     const generation = ++refreshGeneration;
+    const hadContent = Boolean(rootEl.querySelector('.content, .texto')?.textContent?.trim());
+    if (hadContent) {
+      rootEl.style.visibility = 'hidden';
+    }
     try {
       profile = currentProfile();
       const cssFamily = resolveCssFamily(profile, manifest);
@@ -219,6 +225,9 @@ export function createProjectionTypographyController(options) {
       if (generation !== refreshGeneration) return;
       await runTextfill(rootEl, profile, mode, textfillOptions, cssFamily);
     } finally {
+      if (hadContent) {
+        rootEl.style.visibility = '';
+      }
       refreshInProgress = false;
     }
   }
@@ -236,17 +245,32 @@ export function createProjectionTypographyController(options) {
     manifest = await loadFontsManifest(origin);
     await setPrefs(initialPrefs);
     if (typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(() => scheduleRefresh());
+      resizeObserver = new ResizeObserver(() => {
+        if (resizeDebounce) clearTimeout(resizeDebounce);
+        resizeDebounce = setTimeout(() => {
+          scheduleRefresh();
+        }, 150);
+      });
       resizeObserver.observe(rootEl);
       const stage = document.getElementById('stage');
       if (stage) resizeObserver.observe(stage);
     }
-    window.addEventListener('resize', scheduleRefresh);
+    onWindowResize = () => {
+      if (resizeDebounce) clearTimeout(resizeDebounce);
+      resizeDebounce = setTimeout(() => {
+        scheduleRefresh();
+      }, 150);
+    };
+    window.addEventListener('resize', onWindowResize);
   }
 
   function disconnect() {
+    if (resizeDebounce) clearTimeout(resizeDebounce);
     resizeObserver?.disconnect();
-    window.removeEventListener('resize', scheduleRefresh);
+    if (onWindowResize) {
+      window.removeEventListener('resize', onWindowResize);
+      onWindowResize = null;
+    }
     fontStyleEl.remove();
   }
 
