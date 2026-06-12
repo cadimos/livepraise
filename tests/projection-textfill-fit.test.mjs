@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Probe maximiza fonte; overflow horizontal reduz tamanho.
+ * Medição in-place maximiza fonte; overflow horizontal reduz tamanho.
  */
 import { JSDOM } from 'jsdom';
 
@@ -15,59 +15,32 @@ globalThis.window = dom.window;
 globalThis.document = dom.window.document;
 globalThis.HTMLElement = dom.window.HTMLElement;
 globalThis.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
-const { Element } = dom.window;
 
-function stubProbeSpan(span) {
-  Object.defineProperty(span, 'offsetHeight', {
+function stubSpanMetrics(span, boxWidth) {
+  Object.defineProperty(span, 'scrollHeight', {
     configurable: true,
     get() {
       const size = Number.parseInt(this.style.fontSize || '8', 10);
-      const box = this.parentElement;
-      const width =
-        box?.clientWidth ||
-        Number.parseInt(box?.style.width ?? '', 10) ||
-        280;
-      const wide = width <= 150;
+      const wide = boxWidth <= 150;
       const lines = wide ? 1 : 3;
       return Math.ceil(size * lines * 1.35);
-    },
-  });
-  Object.defineProperty(span, 'offsetWidth', {
-    configurable: true,
-    get() {
-      const size = Number.parseInt(this.style.fontSize || '8', 10);
-      const box = this.parentElement;
-      const width =
-        box?.clientWidth ||
-        Number.parseInt(box?.style.width ?? '', 10) ||
-        280;
-      const wide = width <= 150;
-      return wide ? Math.min(width, Math.ceil(size * 12)) : width;
     },
   });
   Object.defineProperty(span, 'scrollWidth', {
     configurable: true,
     get() {
       const size = Number.parseInt(this.style.fontSize || '8', 10);
-      const box = this.parentElement;
-      const width =
-        box?.clientWidth ||
-        Number.parseInt(box?.style.width ?? '', 10) ||
-        280;
-      const wide = width <= 150;
-      return wide ? Math.ceil(size * 12) : width;
+      const wide = boxWidth <= 150;
+      return wide ? Math.ceil(size * 12) : boxWidth;
+    },
+  });
+  Object.defineProperty(span, 'offsetHeight', {
+    configurable: true,
+    get() {
+      return this.scrollHeight;
     },
   });
 }
-
-const origAppend = Element.prototype.appendChild;
-Element.prototype.appendChild = function appendChild(child) {
-  const result = origAppend.call(this, child);
-  if (this.className === 'content' && child.tagName === 'SPAN') {
-    stubProbeSpan(child);
-  }
-  return result;
-};
 
 const { applyPreviewTextfill } = await import('../shared/projection-textfill.js');
 
@@ -88,9 +61,11 @@ Object.defineProperty(box, 'clientHeight', { configurable: true, get: () => 200 
 Object.defineProperty(root, 'clientWidth', { configurable: true, get: () => 320 });
 Object.defineProperty(root, 'clientHeight', { configurable: true, get: () => 240 });
 
+const span = root.querySelector('.content > span');
+stubSpanMetrics(span, 280);
+
 applyPreviewTextfill(root, 8, 120, true, {});
 
-const span = root.querySelector('.content > span');
 const fontSize = Number.parseInt(span.style.fontSize, 10);
 assert(Number.isFinite(fontSize) && fontSize > 0, `fontSize aplicado (${fontSize})`);
 assert(fontSize > 40, `fontSize deve maximizar área útil (${fontSize})`);
@@ -105,11 +80,12 @@ nowrapRoot.innerHTML = `
 `;
 document.body.appendChild(nowrapRoot);
 
-applyPreviewTextfill(nowrapRoot, 8, 120, true, {});
-const nowrapPx = Number.parseInt(nowrapRoot.querySelector('.content > span').style.fontSize, 10);
-assert(nowrapPx < 40, `overflow horizontal deve reduzir fonte (${nowrapPx})`);
+const nowrapSpan = nowrapRoot.querySelector('.content > span');
+stubSpanMetrics(nowrapSpan, 120);
 
-Element.prototype.appendChild = origAppend;
+applyPreviewTextfill(nowrapRoot, 8, 120, true, {});
+const nowrapPx = Number.parseInt(nowrapSpan.style.fontSize, 10);
+assert(nowrapPx < 40, `overflow horizontal deve reduzir fonte (${nowrapPx})`);
 
 console.log('projection-textfill-fit.test: OK');
 process.exit(0);
