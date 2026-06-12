@@ -5,6 +5,7 @@ export interface TextfillDiagnosticEntry {
   surface: string;
   mode: 'preview' | 'output';
   pass: number;
+  measurePhase?: string;
   minFontPx: number;
   maxFontPx: number;
   textfillEnabled: boolean;
@@ -13,6 +14,11 @@ export interface TextfillDiagnosticEntry {
   slackPx: number;
   resultFontPx: number;
   fits: boolean;
+  spanOffsetH?: number;
+  maxH?: number;
+  heightOverflow?: number;
+  widthOverflow?: number;
+  rootConcealed?: boolean;
   box: {
     clientW: number;
     clientH: number;

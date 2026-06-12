@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Garante que refreshOutputTextfill oculta o root durante o cálculo (sem flash entre passagens).
+ * Garante que refreshOutputTextfill oculta com opacity (layout fiel) e termina visível.
  */
 import { JSDOM } from 'jsdom';
 
@@ -19,40 +19,44 @@ globalThis.requestAnimationFrame = (cb) => {
   return 0;
 };
 
+document.fonts = {
+  load: async () => {},
+  ready: Promise.resolve(),
+};
+
 const { refreshOutputTextfill } = await import('../shared/projection-textfill.js');
 
 const root = document.createElement('div');
 root.innerHTML = `
-  <div class="titulo">Louvor</div>
+  <div class="titulo"></div>
   <div class="content" style="height:200px;width:400px;overflow:hidden">
     <span>Linha um<br>Linha dois<br>Linha três com texto longo para forçar textfill</span>
   </div>
-  <div class="rodape"></div>
+  <div class="rodape">Rodapé</div>
 `;
 document.body.appendChild(root);
 
-const visibilityLog = [];
-let visibilityValue = '';
-Object.defineProperty(root.style, 'visibility', {
+const rodape = root.querySelector('.rodape');
+Object.defineProperty(rodape, 'offsetHeight', { configurable: true, get: () => 18 });
+
+const opacityLog = [];
+let opacityValue = '';
+Object.defineProperty(root.style, 'opacity', {
   configurable: true,
   enumerable: true,
   get() {
-    return visibilityValue;
+    return opacityValue;
   },
   set(value) {
-    visibilityLog.push(value);
-    visibilityValue = value;
+    opacityLog.push(value);
+    opacityValue = value;
   },
 });
 
 await refreshOutputTextfill(root, 24, 120, true, {});
 
-assert(visibilityLog.includes('hidden'), 'root deve ficar hidden durante textfill');
-assert(
-  visibilityLog.filter((v) => v === 'hidden').length >= 1,
-  'pelo menos uma escrita hidden',
-);
-assert(visibilityValue === '', 'root deve voltar visível após textfill');
+assert(opacityLog.includes('0'), 'root deve ficar com opacity 0 durante textfill');
+assert(opacityValue === '', 'root deve voltar visível após textfill');
 
 const span = root.querySelector('.content > span');
 assert(span, 'span de conteúdo presente');
@@ -60,3 +64,4 @@ const fontSize = Number.parseInt(span.style.fontSize, 10);
 assert(Number.isFinite(fontSize) && fontSize >= 24, `fontSize final aplicado (${fontSize})`);
 
 console.log('projection-textfill-visibility.test: OK');
+process.exit(0);

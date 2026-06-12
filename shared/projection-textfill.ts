@@ -119,18 +119,117 @@ function prepareSpan(span: HTMLElement): void {
   span.style.wordBreak = 'break-word';
 }
 
-/** Texto cabe na área útil de `.content` (só o corpo central). */
-function textFitsBox(span: HTMLElement, box: HTMLElement, slackPx: number): boolean {
+interface TextfillFitMetrics {
+  fits: boolean;
+  maxH: number;
+  heightOverflow: number;
+  widthOverflow: number;
+  spanOffsetH: number;
+}
+
+function concealDepth(rootEl: HTMLElement): number {
+  return Number(rootEl.dataset.textfillConcealDepth ?? '0');
+}
+
+/** Oculta sem `visibility:hidden` — esse modo subestima scrollHeight no Chromium. */
+export function concealProjectionTextfill(rootEl: HTMLElement): void {
+  const depth = concealDepth(rootEl);
+  if (depth > 0) {
+    rootEl.dataset.textfillConcealDepth = String(depth + 1);
+    return;
+  }
+  rootEl.dataset.textfillConcealPrev = JSON.stringify({
+    visibility: rootEl.style.visibility,
+    opacity: rootEl.style.opacity,
+    pointerEvents: rootEl.style.pointerEvents,
+  });
+  rootEl.dataset.textfillConcealDepth = '1';
+  rootEl.style.visibility = 'visible';
+  rootEl.style.opacity = '0';
+  rootEl.style.pointerEvents = 'none';
+}
+
+export function revealProjectionTextfill(rootEl: HTMLElement): void {
+  const depth = concealDepth(rootEl);
+  if (depth <= 0) return;
+  if (depth > 1) {
+    rootEl.dataset.textfillConcealDepth = String(depth - 1);
+    return;
+  }
+
+  const raw = rootEl.dataset.textfillConcealPrev;
+  delete rootEl.dataset.textfillConcealPrev;
+  delete rootEl.dataset.textfillConcealDepth;
+  if (raw) {
+    try {
+      const prev = JSON.parse(raw) as {
+        visibility: string;
+        opacity: string;
+        pointerEvents: string;
+      };
+      rootEl.style.visibility = prev.visibility;
+      rootEl.style.opacity = prev.opacity;
+      rootEl.style.pointerEvents = prev.pointerEvents;
+      return;
+    } catch {
+      /* fallback */
+    }
+  }
+  rootEl.style.opacity = '';
+  rootEl.style.pointerEvents = '';
+}
+
+function forceVisibleForMeasurement(rootEl: HTMLElement): {
+  visibility: string;
+  opacity: string;
+  pointerEvents: string;
+} {
+  const snapshot = {
+    visibility: rootEl.style.visibility,
+    opacity: rootEl.style.opacity,
+    pointerEvents: rootEl.style.pointerEvents,
+  };
+  rootEl.style.visibility = 'visible';
+  rootEl.style.opacity = '';
+  rootEl.style.pointerEvents = '';
+  return snapshot;
+}
+
+function restoreVisibilitySnapshot(
+  rootEl: HTMLElement,
+  snapshot: { visibility: string; opacity: string; pointerEvents: string },
+): void {
+  rootEl.style.visibility = snapshot.visibility;
+  rootEl.style.opacity = snapshot.opacity;
+  rootEl.style.pointerEvents = snapshot.pointerEvents;
+}
+
+function textFitsBoxMetrics(
+  span: HTMLElement,
+  box: HTMLElement,
+  slackPx: number,
+): TextfillFitMetrics {
   void span.offsetHeight;
   const maxH = box.clientHeight - slackPx;
-  if (maxH <= 0 || box.clientWidth <= 0) return false;
   const heightOverflow = Math.ceil(span.scrollHeight) - maxH;
-  if (heightOverflow > HEIGHT_FIT_TOLERANCE_PX) return false;
-
-  // Largura: em blocos com width:100% o scrollWidth iguala o clientWidth mesmo com
-  // quebra de linha válida. Só falha com overflow horizontal real.
   const widthOverflow = Math.ceil(span.scrollWidth) - box.clientWidth;
-  return widthOverflow <= WIDTH_FIT_TOLERANCE_PX;
+  const fits =
+    maxH > 0 &&
+    box.clientWidth > 0 &&
+    heightOverflow <= HEIGHT_FIT_TOLERANCE_PX &&
+    widthOverflow <= WIDTH_FIT_TOLERANCE_PX;
+  return {
+    fits,
+    maxH,
+    heightOverflow,
+    widthOverflow,
+    spanOffsetH: span.offsetHeight,
+  };
+}
+
+/** Texto cabe na área útil de `.content` (só o corpo central). */
+function textFitsBox(span: HTMLElement, box: HTMLElement, slackPx: number): boolean {
+  return textFitsBoxMetrics(span, box, slackPx).fits;
 }
 
 function applyTextfill(
@@ -255,14 +354,18 @@ function recordTextfillDiagnostic(
     resultFontPx: number;
     options: ProjectionTextfillOptions;
     reason?: string;
+    measurePhase?: string;
   },
 ): void {
   if (!isTextfillDiagnosticsEnabled()) return;
   const layout = collectTextfillLayoutContext(contentEl, span, box);
+  const metrics = textFitsBoxMetrics(span, box, data.slackPx);
+  const pass = data.options.diagnosticPass ?? 1;
   logTextfillDiagnostic({
     surface: data.options.diagnosticSurface ?? data.mode,
     mode: data.mode,
-    pass: data.options.diagnosticPass ?? 1,
+    pass,
+    measurePhase: data.measurePhase ?? `pass-${pass}`,
     minFontPx: data.minPx,
     maxFontPx: data.maxPx,
     textfillEnabled: data.enabled,
@@ -270,7 +373,12 @@ function recordTextfillDiagnostic(
     hiBound: data.hiBound,
     slackPx: data.slackPx,
     resultFontPx: data.resultFontPx,
-    fits: textFitsBox(span, box, data.slackPx),
+    fits: metrics.fits,
+    spanOffsetH: metrics.spanOffsetH,
+    maxH: metrics.maxH,
+    heightOverflow: metrics.heightOverflow,
+    widthOverflow: metrics.widthOverflow,
+    rootConcealed: concealDepth(contentEl) > 0 || contentEl.style.opacity === '0',
     ...layout,
     textSnippet: data.reason
       ? `${layout.textSnippet} [${data.reason}]`
@@ -474,6 +582,66 @@ function restorePass1IfPass2Broken(
   }
 }
 
+async function verifyVisibleTextfill(
+  contentEl: HTMLElement,
+  span: HTMLElement | null,
+  box: HTMLElement | null,
+  minPx: number,
+  maxPx: number,
+  enabled: boolean,
+  textfillOptions: ProjectionTextfillOptions,
+  mode: TextfillMode,
+  slackPx: number,
+): Promise<void> {
+  if (!span || !box || !enabled) return;
+
+  const scale = textfillOptions.maxFontPxScale ?? 1;
+  const { lo: loBound, hi: hiBound } = scaledFontBounds(minPx, maxPx, scale, mode);
+
+  await waitForLayoutFrames();
+  void span.offsetHeight;
+
+  const metrics = textFitsBoxMetrics(span, box, slackPx);
+  if (metrics.fits) {
+    recordTextfillDiagnostic(contentEl, span, box, {
+      mode,
+      minPx,
+      maxPx,
+      enabled,
+      loBound,
+      hiBound,
+      slackPx,
+      resultFontPx: readSpanFontPx(span),
+      options: { ...textfillOptions, diagnosticPass: 3 },
+      measurePhase: 'verify-visible-ok',
+    });
+    return;
+  }
+
+  const previousPx = readSpanFontPx(span);
+  const corrected = runBinarySearch(
+    span,
+    box,
+    loBound,
+    Math.max(loBound, Math.min(previousPx || hiBound, hiBound)),
+    slackPx,
+  );
+  span.style.fontSize = `${corrected}px`;
+  recordTextfillDiagnostic(contentEl, span, box, {
+    mode,
+    minPx,
+    maxPx,
+    enabled,
+    loBound,
+    hiBound,
+    slackPx,
+    resultFontPx: corrected,
+    options: { ...textfillOptions, diagnosticPass: 3 },
+    measurePhase: 'verify-visible-corrected',
+    reason: `was ${previousPx}px`,
+  });
+}
+
 async function ensureMeasurableBox(
   contentEl: HTMLElement,
   mode: TextfillMode = 'output',
@@ -534,8 +702,8 @@ async function runRefreshTextfill(
   );
   const slackPx = resolveSlackPx(textfillOptions, mode);
 
-  /* Ocultar o root durante ambas as passagens — evita flash entre frames e entre medições. */
-  contentEl.style.visibility = 'hidden';
+  /* opacity:0 mantém layout fiel; visibility:hidden distorce scrollHeight no Chromium. */
+  concealProjectionTextfill(contentEl);
   try {
     contentEl.dataset.textfillPass = '1';
     applyFn(contentEl, minPx, maxPx, enabled, {
@@ -545,14 +713,12 @@ async function runRefreshTextfill(
     const pass1Px = readSpanFontPx(span);
     const pass1Fits = Boolean(span && box && textFitsBox(span, box, slackPx));
 
-    /* Limpa fonte da pass 1 antes de remediar — evita scrollHeight stale no Chromium. */
     if (span) {
       span.style.fontSize = '';
       void span.offsetHeight;
       if (box !== span) void box.offsetHeight;
     }
 
-    /* Segunda passagem após o grid (topo/rodapé fixos) estabilizar a área de `.content`. */
     await waitForLayoutFrames();
     contentEl.dataset.textfillPass = '2';
     applyFn(contentEl, minPx, maxPx, enabled, {
@@ -563,7 +729,26 @@ async function runRefreshTextfill(
     restorePass1IfPass2Broken(span, pass1Px, pass1Fits, pass2Fits);
   } finally {
     delete contentEl.dataset.textfillPass;
-    contentEl.style.visibility = '';
+    revealProjectionTextfill(contentEl);
+  }
+
+  const visibilitySnapshot = forceVisibleForMeasurement(contentEl);
+  try {
+    await verifyVisibleTextfill(
+      contentEl,
+      span,
+      box,
+      minPx,
+      maxPx,
+      enabled,
+      fillOptions,
+      mode,
+      slackPx,
+    );
+  } finally {
+    if (concealDepth(contentEl) > 0) {
+      restoreVisibilitySnapshot(contentEl, visibilitySnapshot);
+    }
   }
 }
 
@@ -619,15 +804,14 @@ export async function refreshOutputTextfillAll(
   await ensureMeasurableBox(rootEl, 'output');
   await ensureStageReturnTextfillBoxes(rootEl);
 
-  rootEl.style.visibility = 'hidden';
+  concealProjectionTextfill(rootEl);
   try {
     applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, { fitSlackPx });
 
-    /* Segunda passagem após faixas flex (.atual / .proximo) estabilizarem altura. */
     await waitForLayoutFrames();
     applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, { fitSlackPx });
   } finally {
-    rootEl.style.visibility = '';
+    revealProjectionTextfill(rootEl);
   }
 }
 

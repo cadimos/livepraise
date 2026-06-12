@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Pass 2 com scrollHeight inflado não deve sobrescrever pass 1 válida (regressão alpha.3).
+ * Medição oculta com scrollHeight errado deve ser corrigida na verificação visível (pass 3).
  */
 import { JSDOM } from 'jsdom';
 
@@ -24,7 +24,11 @@ document.fonts = {
   ready: Promise.resolve(),
 };
 
-const { applyOutputTextfill } = await import('../shared/projection-textfill.js');
+const {
+  concealProjectionTextfill,
+  refreshOutputTextfill,
+  revealProjectionTextfill,
+} = await import('../shared/projection-textfill.js');
 
 const root = document.createElement('div');
 root.innerHTML = `
@@ -39,6 +43,16 @@ const box = root.querySelector('.content');
 const rodape = root.querySelector('.rodape');
 Object.defineProperty(rodape, 'offsetHeight', { configurable: true, get: () => 18 });
 
+const slackPx = 2;
+const maxH = () => box.clientHeight - slackPx;
+const realScrollH = (size) => {
+  const chars = 72;
+  const lineHeight = 1.35;
+  const charsPerLine = Math.max(1, 752 / size);
+  const lines = Math.max(1, Math.ceil(chars / charsPerLine));
+  return Math.ceil(size * lines * lineHeight);
+};
+
 Object.defineProperty(box, 'clientWidth', { configurable: true, get: () => 752 });
 Object.defineProperty(box, 'clientHeight', { configurable: true, get: () => 525 });
 Object.defineProperty(box, 'scrollWidth', { configurable: true, get: () => 752 });
@@ -47,8 +61,9 @@ Object.defineProperty(span, 'scrollHeight', {
   configurable: true,
   get() {
     const size = Number.parseInt(span.style.fontSize || '24', 10);
-    if (root.dataset.textfillPass === '2') return 972;
-    return Math.ceil(size * 3 * 1.35);
+    const concealed = root.style.opacity === '0';
+    if (concealed) return 130;
+    return realScrollH(size);
   },
 });
 Object.defineProperty(span, 'offsetHeight', {
@@ -58,36 +73,21 @@ Object.defineProperty(span, 'offsetHeight', {
   },
 });
 
-const slackPx = 2;
-const maxH = () => box.clientHeight - slackPx;
-const fits = () => Math.ceil(span.scrollHeight) <= maxH() + 3;
-
-root.dataset.textfillPass = '1';
-applyOutputTextfill(root, 24, 120, true, {
-  diagnosticPass: 1,
-  suppressVisibilityToggle: true,
-});
-const pass1Px = Number.parseInt(span.style.fontSize, 10);
-const pass1Fits = fits();
-
-span.style.fontSize = '';
-void span.offsetHeight;
-
-root.dataset.textfillPass = '2';
-applyOutputTextfill(root, 24, 120, true, {
-  diagnosticPass: 2,
-  suppressVisibilityToggle: true,
-});
-const pass2Fits = fits();
-
-if (pass1Fits && !pass2Fits && pass1Px > 0) {
-  span.style.fontSize = `${pass1Px}px`;
-}
+await refreshOutputTextfill(root, 24, 120, true, {});
 
 const fontSize = Number.parseInt(span.style.fontSize, 10);
-assert(pass1Fits, 'pass 1 deve caber');
-assert(!pass2Fits, 'pass 2 simulada deve falhar');
-assert(fontSize === pass1Px, `deve manter pass 1 (${fontSize}px === ${pass1Px}px)`);
-assert(fontSize > 24, `não deve cair para o mínimo (${fontSize})`);
+assert(root.style.opacity === '', 'root deve estar visível');
+assert(
+  Math.ceil(span.scrollHeight) <= maxH() + 3,
+  `fonte visível deve caber na caixa (${fontSize}px, scrollH=${span.scrollHeight})`,
+);
+assert(fontSize < 120, `deve corrigir medição oculta optimista (${fontSize}px)`);
+assert(fontSize > 24, `não deve cair para o mínimo (${fontSize}px)`);
+
+concealProjectionTextfill(root);
+assert(root.style.opacity === '0', 'conceal usa opacity 0');
+assert(root.style.visibility === 'visible', 'conceal força visibility visible');
+revealProjectionTextfill(root);
 
 console.log('projection-textfill-two-pass.test: OK');
+process.exit(0);

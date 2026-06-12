@@ -143,10 +143,9 @@ onMounted(() => {
           {{
             t('settings.errorLog.textfillDiagnosticsEntry', {
               surface: entry.surface,
-              pass: entry.pass,
+              phase: entry.measurePhase ?? `pass-${entry.pass}`,
               font: entry.resultFontPx,
-              min: entry.loBound,
-              max: entry.hiBound,
+              overflowH: entry.heightOverflow ?? 0,
               boxW: entry.box.clientW,
               boxH: entry.box.clientH,
             })

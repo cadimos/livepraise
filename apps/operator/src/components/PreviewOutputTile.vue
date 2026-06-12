@@ -102,7 +102,7 @@ function ensureContentMarkup(root: HTMLElement): boolean {
   if (loadedContentHtml === props.contentHtml && root.querySelector('.content')) {
     return false;
   }
-  root.style.visibility = 'hidden';
+  root.style.opacity = '0';
   root.innerHTML = props.contentHtml;
   loadedContentHtml = props.contentHtml;
   return true;
@@ -120,11 +120,9 @@ async function applyTypography(remeasure = false): Promise<void> {
   }
 
   if (!root.querySelector('.content span, .content, .texto')) {
-    root.style.visibility = '';
+    root.style.opacity = '';
     return;
   }
-
-  root.style.visibility = 'hidden';
 
   applyProjectionTypographyStyles(root, {
     fontFamily: cssFamily.value,
@@ -148,7 +146,7 @@ async function applyTypography(remeasure = false): Promise<void> {
   );
 
   if (generation !== refreshGeneration) return;
-  root.style.visibility = '';
+  root.style.opacity = '';
   previewReady.value = true;
 }
 
