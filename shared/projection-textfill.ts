@@ -21,6 +21,8 @@ export const PREVIEW_TEXTFILL_MIN_PX = 8;
 
 const PREVIEW_FIT_SLACK_PX = 2;
 const OUTPUT_FIT_SLACK_PX = 2;
+/** scrollWidth ≈ clientWidth em blocos width:100% com wrap — tolerância subpixel. */
+const WIDTH_FIT_TOLERANCE_PX = 2;
 
 type TextfillMode = 'preview' | 'output';
 
@@ -108,12 +110,14 @@ function prepareSpan(span: HTMLElement): void {
 /** Texto cabe na área útil de `.content` (só o corpo central). */
 function textFitsBox(span: HTMLElement, box: HTMLElement, slackPx: number): boolean {
   void span.offsetHeight;
-  const maxW = box.clientWidth - slackPx;
   const maxH = box.clientHeight - slackPx;
-  if (maxW <= 0 || maxH <= 0) return false;
-  return (
-    Math.ceil(span.scrollWidth) <= maxW && Math.ceil(span.scrollHeight) <= maxH
-  );
+  if (maxH <= 0 || box.clientWidth <= 0) return false;
+  if (Math.ceil(span.scrollHeight) > maxH) return false;
+
+  // Largura: em blocos com width:100% o scrollWidth iguala o clientWidth mesmo com
+  // quebra de linha válida. Só falha com overflow horizontal real.
+  const widthOverflow = Math.ceil(span.scrollWidth) - box.clientWidth;
+  return widthOverflow <= WIDTH_FIT_TOLERANCE_PX;
 }
 
 /** Garante tamanho final mesmo se o grid ainda não estabilizou após a medição. */
