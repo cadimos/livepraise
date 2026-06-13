@@ -12,7 +12,7 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 ### Corrigido
 
-- **Textfill projetor — texto cortado** — `#conteudo` com `visibility:hidden` impedia `font-size` inline de aplicar no Electron (`resultFontPx` 120 vs `computedFontPx` 32); medição passa a exigir root visível; removido `font-size:inherit` do span; `flex-shrink:0`; reconcile quando style≠computed; diagnóstico inclui `styleFontPx`, `fontSizeMismatchPx`, `rootConcealed`.
+- **Textfill projetor — texto cortado** — `#conteudo` impedia `font-size` inline de aplicar no Electron (`styleFontPx` 120 vs `computedFontPx` 32); medição via probe off-screen (`#lp-textfill-probe`) + `font-size` com `!important` no span real; root visível durante refresh; `flex-shrink:0`; diagnóstico inclui `usedProbe`, `fontSizeMismatchPx`.
 - **Textfill pass 2** — segunda passagem de medição podia inflar `scrollHeight` e forçar fonte mínima (24px) após pass 1 válida (120px); mantém pass 1 quando pass 2 não cabe; limpa fonte entre passagens; sombra de texto só em nós de texto (não em `.content`).
 - **Textfill medição oculta** — `visibility:hidden` no root e `opacity:0` distorcem `scrollHeight`; medição oculta só o `span` (root visível); pass 3 `reconcile-visible` reinicia em `loBound` se o resultado não cabe visível; diagnóstico inclui `measurePhase`, `heightOverflow`, `spanOffsetH`.
 - **Textfill in-place** — medição no span real da projeção com `scrollHeight`/`scrollWidth` (paridade jquery-textfill); probe off-screen removido (font-size não aplicava no Electron).
