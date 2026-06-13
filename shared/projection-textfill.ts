@@ -93,7 +93,7 @@ function spanFitMetrics(
   const maxH = bounds.height - slackPx;
   const heightOverflow = spanVerticalOverflowPx(span, box, bounds, slackPx);
   const widthOverflow = Math.ceil(span.scrollWidth) - bounds.width;
-  const computedFontPx = Number.parseFloat(window.getComputedStyle(span).fontSize) || 0;
+  const computedFontPx = readComputedFontPx(span);
   const fits =
     maxH > 0 &&
     bounds.width > 0 &&
@@ -160,7 +160,7 @@ function searchFontOnSpan(
 
 /**
  * Mede no span real dentro da caixa de projeção — fontes e layout idênticos ao ecrã.
- * `#conteudo` pode estar visibility:hidden; o layout continua válido.
+ * Requer root visível: visibility:hidden no #conteudo impede font-size inline no Electron.
  */
 function measureFontSizeOnSpan(
   span: HTMLElement,
@@ -397,6 +397,51 @@ function resolveContentAreaBounds(
   return computeProjectionContentArea(contentEl, box);
 }
 
+function readComputedFontPx(span: HTMLElement): number {
+  return Number.parseFloat(window.getComputedStyle(span).fontSize) || 0;
+}
+
+function readStyleFontPx(span: HTMLElement): number {
+  return Number.parseFloat(span.style.fontSize) || 0;
+}
+
+/** Inline font-size não aplicou (ex.: #conteudo visibility:hidden no Electron). */
+function spanFontSizeMismatchPx(span: HTMLElement): number {
+  const stylePx = readStyleFontPx(span);
+  if (stylePx <= 0) return 0;
+  return Math.abs(stylePx - readComputedFontPx(span));
+}
+
+function applySpanFontPx(span: HTMLElement, px: number): void {
+  span.style.fontSize = `${px}px`;
+  void span.offsetHeight;
+}
+
+function reconcileSpanFontSize(
+  span: HTMLElement,
+  box: HTMLElement,
+  area: ProjectionContentAreaBounds,
+  targetPx: number,
+  loBound: number,
+  hiBound: number,
+  slackPx: number,
+  fontStyles: TextfillFontStyles,
+): number {
+  applySpanFontPx(span, targetPx);
+  const mismatchPx = spanFontSizeMismatchPx(span);
+  const overflowPx = spanVerticalOverflowPx(span, box, area, slackPx);
+  if (mismatchPx <= 1.5 && overflowPx <= HEIGHT_FIT_TOLERANCE_PX) {
+    return verifyAndShrinkFontOnSpan(span, box, area, targetPx, loBound, slackPx);
+  }
+
+  prepareSpan(span);
+  applySpanFontStyles(span, fontStyles);
+  let px = measureFontSizeOnSpan(span, area, loBound, hiBound, slackPx, fontStyles);
+  px = verifyAndShrinkFontOnSpan(span, box, area, px, loBound, slackPx);
+  applySpanFontPx(span, px);
+  return px;
+}
+
 function readFontStyles(
   span: HTMLElement,
   options: ProjectionTextfillOptions,
@@ -486,9 +531,20 @@ function applyTextfill(
         verifyAndShrinkFontOnSpan(span, box, area, targetPx, floorPx, slackPx),
       );
     }
+
+    targetPx = reconcileSpanFontSize(
+      span,
+      box,
+      area,
+      targetPx,
+      loBound,
+      hiBound,
+      slackPx,
+      fontStyles,
+    );
   }
 
-  span.style.fontSize = `${targetPx}px`;
+  applySpanFontPx(span, targetPx);
   span.style.visibility = '';
   recordTextfillDiagnostic(contentEl, span, box, area, {
     mode,
@@ -500,7 +556,8 @@ function applyTextfill(
     slackPx,
     resultFontPx: targetPx,
     options,
-    measurePhase: 'in-place',
+    measurePhase:
+      options.diagnosticPass === 2 ? 'reconcile-visible' : 'visible',
   });
 }
 
@@ -527,6 +584,7 @@ function recordTextfillDiagnostic(
   const layout = collectTextfillLayoutContext(contentEl, span, box);
   const metrics = spanFitMetrics(span, box, area, data.slackPx);
   const pass = data.options.diagnosticPass ?? 1;
+  const rootStyle = window.getComputedStyle(contentEl);
   logTextfillDiagnostic({
     surface: data.options.diagnosticSurface ?? data.mode,
     mode: data.mode,
@@ -539,6 +597,8 @@ function recordTextfillDiagnostic(
     hiBound: data.hiBound,
     slackPx: data.slackPx,
     resultFontPx: data.resultFontPx,
+    styleFontPx: readStyleFontPx(span),
+    fontSizeMismatchPx: spanFontSizeMismatchPx(span),
     fits: metrics.fits,
     spanOffsetH: metrics.spanOffsetH,
     spanOffsetW: metrics.spanOffsetW,
@@ -550,7 +610,8 @@ function recordTextfillDiagnostic(
     widthOverflow: metrics.widthOverflow,
     computedAreaW: area.width,
     computedAreaH: area.height,
-    rootConcealed: false,
+    rootConcealed:
+      contentEl.style.visibility === 'hidden' || rootStyle.visibility === 'hidden',
     ...layout,
     textSnippet: data.reason
       ? `${layout.textSnippet} [${data.reason}]`
@@ -793,6 +854,10 @@ async function runRefreshTextfill(
   });
   await ensureMeasurableBox(contentEl, mode);
 
+  // Medição com root visível — visibility:hidden no #conteudo impede font-size inline (Electron).
+  contentEl.style.visibility = 'visible';
+  await waitForLayoutFrames();
+
   const applyFn = mode === 'preview' ? applyPreviewTextfill : applyOutputTextfill;
   applyFn(contentEl, minPx, maxPx, enabled, {
     ...textfillOptions,
@@ -801,6 +866,21 @@ async function runRefreshTextfill(
     fontStyle,
     diagnosticPass: 1,
   });
+
+  if (enabled) {
+    const span = textTarget(contentEl, textfillOptions.spanSelector);
+    const mismatchPx = span ? spanFontSizeMismatchPx(span) : 0;
+    if (mismatchPx > 1.5) {
+      applyFn(contentEl, minPx, maxPx, enabled, {
+        ...textfillOptions,
+        fontFamily,
+        fontWeight,
+        fontStyle,
+        diagnosticPass: 2,
+      });
+    }
+  }
+
   contentEl.style.visibility = '';
 }
 
@@ -855,6 +935,9 @@ export async function refreshOutputTextfillAll(
   });
   await ensureMeasurableBox(rootEl, 'output');
   await ensureStageReturnTextfillBoxes(rootEl);
+
+  rootEl.style.visibility = 'visible';
+  await waitForLayoutFrames();
 
   applyOutputTextfillAll(rootEl, minPx, maxPx, enabled, {
     fitSlackPx,

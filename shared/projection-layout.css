@@ -85,7 +85,7 @@ body.footer-alert-active #conteudo,
   width: 100%;
   /* Textfill mede scrollHeight — flex-shrink distorce altura quando o texto estoura. */
   flex-shrink: 0;
-  font-size: inherit;
+  /* font-size só via textfill (inline) — inherit/unset mantém ~32px e quebra a busca binária. */
 }
 
 #conteudo .rodape,
