@@ -21,6 +21,7 @@ export interface TextfillDiagnosticEntry {
   computedFontPx?: number;
   styleFontPx?: number;
   fontSizeMismatchPx?: number;
+  usedProbe?: boolean;
   maxH?: number;
   heightOverflow?: number;
   widthOverflow?: number;

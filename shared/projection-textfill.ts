@@ -53,6 +53,71 @@ interface TextfillFitMetrics {
 }
 
 const SPAN_LINE_HEIGHT = 1.35;
+const TEXTFILL_PROBE_ID = 'lp-textfill-probe';
+let lastMeasureUsedProbe = false;
+
+function applySpanFontPx(span: HTMLElement, px: number): void {
+  span.style.setProperty('font-size', `${px}px`, 'important');
+  void span.offsetHeight;
+}
+
+function readComputedFontPx(span: HTMLElement): number {
+  return Number.parseFloat(window.getComputedStyle(span).fontSize) || 0;
+}
+
+function readStyleFontPx(span: HTMLElement): number {
+  return Number.parseFloat(span.style.fontSize) || 0;
+}
+
+/** Inline font-size não aplicou (ex.: inherit no #conteudo / Electron). */
+function spanFontSizeMismatchPx(span: HTMLElement): number {
+  const stylePx = readStyleFontPx(span);
+  if (stylePx <= 0) return 0;
+  return Math.abs(stylePx - readComputedFontPx(span));
+}
+
+function canMeasureFontInPlace(
+  span: HTMLElement,
+  fontStyles: TextfillFontStyles,
+  testPx: number,
+): boolean {
+  prepareSpan(span);
+  applySpanFontStyles(span, fontStyles);
+  applySpanFontPx(span, testPx);
+  return spanFontSizeMismatchPx(span) <= 1.5;
+}
+
+function ensureTextfillProbe(width: number): HTMLElement {
+  let probe = document.getElementById(TEXTFILL_PROBE_ID);
+  if (!probe) {
+    probe = document.createElement('div');
+    probe.id = TEXTFILL_PROBE_ID;
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText =
+      'position:fixed;left:-10000px;top:0;visibility:hidden;pointer-events:none;overflow:visible;';
+    document.body.appendChild(probe);
+  }
+  probe.style.width = `${width}px`;
+  return probe;
+}
+
+/** Probe isolado — evita inherit/visibility do #conteudo que quebram scrollHeight no Electron. */
+function syncProbeSpan(
+  sourceSpan: HTMLElement,
+  width: number,
+  fontStyles: TextfillFontStyles,
+): HTMLElement {
+  const probe = ensureTextfillProbe(width);
+  let span = probe.querySelector<HTMLElement>(':scope > span');
+  if (!span) {
+    span = document.createElement('span');
+    probe.replaceChildren(span);
+  }
+  prepareSpan(span);
+  applySpanFontStyles(span, fontStyles);
+  span.innerHTML = sourceSpan.innerHTML;
+  return span;
+}
 
 function applySpanFontStyles(span: HTMLElement, fontStyles: TextfillFontStyles): void {
   span.style.fontFamily = fontStyles.fontFamily;
@@ -97,6 +162,7 @@ function spanFitMetrics(
   const fits =
     maxH > 0 &&
     bounds.width > 0 &&
+    spanFontSizeMismatchPx(span) <= 1.5 &&
     heightOverflow <= HEIGHT_FIT_TOLERANCE_PX &&
     widthOverflow <= WIDTH_FIT_TOLERANCE_PX;
   const visualOverflowPx =
@@ -143,8 +209,7 @@ function searchFontOnSpan(
 
   while (lo <= hi) {
     const mid = Math.floor((lo + hi) / 2);
-    span.style.fontSize = `${mid}px`;
-    void span.offsetHeight;
+    applySpanFontPx(span, mid);
     const dim = measureDim(span);
     if (dim <= maxDim - slack + tolerance) {
       best = mid;
@@ -154,28 +219,33 @@ function searchFontOnSpan(
     }
   }
 
-  span.style.fontSize = `${best}px`;
+  applySpanFontPx(span, best);
   return best;
 }
 
 /**
- * Mede no span real dentro da caixa de projeção — fontes e layout idênticos ao ecrã.
- * Requer root visível: visibility:hidden no #conteudo impede font-size inline no Electron.
+ * Busca binária no span de medição (in-place ou probe off-screen).
+ * O resultado aplica-se no span real com !important.
  */
 function measureFontSizeOnSpan(
-  span: HTMLElement,
+  sourceSpan: HTMLElement,
   bounds: Pick<ProjectionContentAreaBounds, 'width' | 'height'>,
   loBound: number,
   hiBound: number,
   slackPx: number,
   fontStyles: TextfillFontStyles,
 ): number {
-  prepareSpan(span);
-  applySpanFontStyles(span, fontStyles);
-  span.style.lineHeight = String(SPAN_LINE_HEIGHT);
+  const inPlace = canMeasureFontInPlace(sourceSpan, fontStyles, loBound);
+  lastMeasureUsedProbe = !inPlace;
+  const measureSpan = inPlace
+    ? sourceSpan
+    : syncProbeSpan(sourceSpan, bounds.width, fontStyles);
+  prepareSpan(measureSpan);
+  applySpanFontStyles(measureSpan, fontStyles);
+  measureSpan.style.lineHeight = String(SPAN_LINE_HEIGHT);
 
   const forHeight = searchFontOnSpan(
-    span,
+    measureSpan,
     (el) => el.scrollHeight,
     bounds.height,
     loBound,
@@ -184,11 +254,10 @@ function measureFontSizeOnSpan(
     true,
     true,
   );
-  span.style.fontSize = `${forHeight}px`;
-  void span.offsetHeight;
+  applySpanFontPx(measureSpan, forHeight);
 
   const forWidth = searchFontOnSpan(
-    span,
+    measureSpan,
     (el) => el.scrollWidth,
     bounds.width,
     loBound,
@@ -211,11 +280,10 @@ function verifyAndShrinkFontOnSpan(
   slackPx: number,
 ): number {
   let px = fontPx;
-  span.style.fontSize = `${px}px`;
+  applySpanFontPx(span, px);
   while (px > loBound && spanVerticalOverflowPx(span, box, bounds, slackPx) > 0) {
     px -= 1;
-    span.style.fontSize = `${px}px`;
-    void span.offsetHeight;
+    applySpanFontPx(span, px);
   }
   return px;
 }
@@ -230,7 +298,7 @@ function spanFitsAtFontPx(
   prepareSpan(span);
   applySpanFontStyles(span, fontStyles);
   span.style.lineHeight = String(SPAN_LINE_HEIGHT);
-  span.style.fontSize = `${fontPx}px`;
+  applySpanFontPx(span, fontPx);
   return spanFitMetrics(span, null, bounds, slackPx).fits;
 }
 const STAGE_RETURN_PROXIMO_MAX_SCALE = 0.72;
@@ -397,26 +465,6 @@ function resolveContentAreaBounds(
   return computeProjectionContentArea(contentEl, box);
 }
 
-function readComputedFontPx(span: HTMLElement): number {
-  return Number.parseFloat(window.getComputedStyle(span).fontSize) || 0;
-}
-
-function readStyleFontPx(span: HTMLElement): number {
-  return Number.parseFloat(span.style.fontSize) || 0;
-}
-
-/** Inline font-size não aplicou (ex.: #conteudo visibility:hidden no Electron). */
-function spanFontSizeMismatchPx(span: HTMLElement): number {
-  const stylePx = readStyleFontPx(span);
-  if (stylePx <= 0) return 0;
-  return Math.abs(stylePx - readComputedFontPx(span));
-}
-
-function applySpanFontPx(span: HTMLElement, px: number): void {
-  span.style.fontSize = `${px}px`;
-  void span.offsetHeight;
-}
-
 function reconcileSpanFontSize(
   span: HTMLElement,
   box: HTMLElement,
@@ -481,7 +529,7 @@ function applyTextfill(
   const fontStyles = readFontStyles(span, options);
 
   if (area.width <= 0 || area.height <= 0) {
-    span.style.fontSize = `${fallbackPx}px`;
+    applySpanFontPx(span, fallbackPx);
     span.style.visibility = '';
     recordTextfillDiagnostic(contentEl, span, box, area, {
       mode,
@@ -599,6 +647,7 @@ function recordTextfillDiagnostic(
     resultFontPx: data.resultFontPx,
     styleFontPx: readStyleFontPx(span),
     fontSizeMismatchPx: spanFontSizeMismatchPx(span),
+    usedProbe: lastMeasureUsedProbe,
     fits: metrics.fits,
     spanOffsetH: metrics.spanOffsetH,
     spanOffsetW: metrics.spanOffsetW,
@@ -666,7 +715,7 @@ function applyStageReturnCoupledTextfill(
   );
   if (!allReady) {
     for (const entry of entries) {
-      entry.span.style.fontSize = `${Math.max(floorPx, Math.round(profileLo * entry.scale))}px`;
+      applySpanFontPx(entry.span, Math.max(floorPx, Math.round(profileLo * entry.scale)));
     }
     return true;
   }
@@ -693,7 +742,7 @@ function applyStageReturnCoupledTextfill(
 
   if (!enabled) {
     for (const entry of entries) {
-      entry.span.style.fontSize = `${Math.max(floorPx, Math.round(hiBound * entry.scale))}px`;
+      applySpanFontPx(entry.span, Math.max(floorPx, Math.round(hiBound * entry.scale)));
     }
     return true;
   }
@@ -718,7 +767,7 @@ function applyStageReturnCoupledTextfill(
   }
 
   for (const entry of entries) {
-    entry.span.style.fontSize = `${Math.max(floorPx, Math.round(best * entry.scale))}px`;
+    applySpanFontPx(entry.span, Math.max(floorPx, Math.round(best * entry.scale)));
   }
   return true;
 }
