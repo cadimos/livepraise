@@ -22,6 +22,8 @@ export interface TextfillDiagnosticPayload {
   spanClientH?: number;
   visualOverflowPx?: number;
   computedFontPx?: number;
+  styleFontPx?: number;
+  fontSizeMismatchPx?: number;
   maxH?: number;
   heightOverflow?: number;
   widthOverflow?: number;
