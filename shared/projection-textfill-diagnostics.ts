@@ -19,6 +19,9 @@ export interface TextfillDiagnosticPayload {
   fits: boolean;
   spanOffsetH?: number;
   spanOffsetW?: number;
+  spanClientH?: number;
+  visualOverflowPx?: number;
+  computedFontPx?: number;
   maxH?: number;
   heightOverflow?: number;
   widthOverflow?: number;

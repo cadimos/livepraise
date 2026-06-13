@@ -12,6 +12,7 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 ### Corrigido
 
+- **Textfill projetor — texto cortado** — `.content > span` encolhia no flex (`flex-shrink: 1`), subestimando `scrollHeight` (ex.: 130px com fonte 120px) e maximizando fonte indevidamente; `flex-shrink: 0` no span + verificação de overflow visual quando o layout tem retângulos válidos; diagnóstico inclui `spanClientH`, `visualOverflowPx` e `computedFontPx`.
 - **Textfill pass 2** — segunda passagem de medição podia inflar `scrollHeight` e forçar fonte mínima (24px) após pass 1 válida (120px); mantém pass 1 quando pass 2 não cabe; limpa fonte entre passagens; sombra de texto só em nós de texto (não em `.content`).
 - **Textfill medição oculta** — `visibility:hidden` no root e `opacity:0` distorcem `scrollHeight`; medição oculta só o `span` (root visível); pass 3 `reconcile-visible` reinicia em `loBound` se o resultado não cabe visível; diagnóstico inclui `measurePhase`, `heightOverflow`, `spanOffsetH`.
 - **Textfill in-place** — medição no span real da projeção com `scrollHeight`/`scrollWidth` (paridade jquery-textfill); probe off-screen removido (font-size não aplicava no Electron).
