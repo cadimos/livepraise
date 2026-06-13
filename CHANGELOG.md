@@ -12,7 +12,7 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 ### Corrigido
 
-- **Textfill projetor — texto cortado** — `#conteudo` impedia `font-size` inline de aplicar no Electron (`styleFontPx` 120 vs `computedFontPx` 32); medição via probe off-screen (`#lp-textfill-probe`) + `font-size` com `!important` no span real; root visível durante refresh; `flex-shrink:0`; diagnóstico inclui `usedProbe`, `fontSizeMismatchPx`.
+- **Textfill projetor — texto cortado** — `#conteudo` impedia `font-size` inline no Electron; medição via probe off-screen com altura fixa (paridade `.content`) + `!important` no span real; não re-verificar overflow visual no span real quando o probe foi usado (evitava cair no mínimo 24px).
 - **Textfill pass 2** — segunda passagem de medição podia inflar `scrollHeight` e forçar fonte mínima (24px) após pass 1 válida (120px); mantém pass 1 quando pass 2 não cabe; limpa fonte entre passagens; sombra de texto só em nós de texto (não em `.content`).
 - **Textfill medição oculta** — `visibility:hidden` no root e `opacity:0` distorcem `scrollHeight`; medição oculta só o `span` (root visível); pass 3 `reconcile-visible` reinicia em `loBound` se o resultado não cabe visível; diagnóstico inclui `measurePhase`, `heightOverflow`, `spanOffsetH`.
 - **Textfill in-place** — medição no span real da projeção com `scrollHeight`/`scrollWidth` (paridade jquery-textfill); probe off-screen removido (font-size não aplicava no Electron).

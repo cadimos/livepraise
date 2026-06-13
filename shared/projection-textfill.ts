@@ -54,6 +54,14 @@ interface TextfillFitMetrics {
 
 const SPAN_LINE_HEIGHT = 1.35;
 const TEXTFILL_PROBE_ID = 'lp-textfill-probe';
+/** Prévia do operador — pode ir abaixo de minFontPx para caber no tile (CAD-313 §3.1). */
+export const PREVIEW_TEXTFILL_MIN_PX = 8;
+const PREVIEW_FIT_SLACK_PX = 2;
+const OUTPUT_FIT_SLACK_PX = 2;
+/** scrollWidth ≈ clientWidth em blocos width:100% com wrap — tolerância subpixel. */
+const WIDTH_FIT_TOLERANCE_PX = 2;
+/** line-height / subpixel — evita rejeitar tamanho que já passou na busca binária. */
+const HEIGHT_FIT_TOLERANCE_PX = 3;
 let lastMeasureUsedProbe = false;
 
 function applySpanFontPx(span: HTMLElement, px: number): void {
@@ -87,27 +95,29 @@ function canMeasureFontInPlace(
   return spanFontSizeMismatchPx(span) <= 1.5;
 }
 
-function ensureTextfillProbe(width: number): HTMLElement {
+function ensureTextfillProbe(width: number, height: number): HTMLElement {
   let probe = document.getElementById(TEXTFILL_PROBE_ID);
   if (!probe) {
     probe = document.createElement('div');
     probe.id = TEXTFILL_PROBE_ID;
     probe.setAttribute('aria-hidden', 'true');
     probe.style.cssText =
-      'position:fixed;left:-10000px;top:0;visibility:hidden;pointer-events:none;overflow:visible;';
+      'position:fixed;left:-10000px;top:0;visibility:hidden;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:0;text-align:center;';
     document.body.appendChild(probe);
   }
   probe.style.width = `${width}px`;
+  probe.style.height = `${height}px`;
   return probe;
 }
 
-/** Probe isolado — evita inherit/visibility do #conteudo que quebram scrollHeight no Electron. */
+/** Probe isolado — paridade com `.content` (flex, altura fixa, overflow hidden). */
 function syncProbeSpan(
   sourceSpan: HTMLElement,
   width: number,
+  height: number,
   fontStyles: TextfillFontStyles,
 ): HTMLElement {
-  const probe = ensureTextfillProbe(width);
+  const probe = ensureTextfillProbe(width, height);
   let span = probe.querySelector<HTMLElement>(':scope > span');
   if (!span) {
     span = document.createElement('span');
@@ -146,6 +156,24 @@ function spanVerticalOverflowPx(
     Math.ceil(spanRect.bottom - boxRect.bottom + slackPx),
   );
   return Math.max(scrollOverflow, visualOverflow);
+}
+
+/** Ajuste por scrollHeight — fiável no probe; evita falso overflow visual no #conteudo. */
+function verifyAndShrinkFontScrollOnly(
+  span: HTMLElement,
+  bounds: Pick<ProjectionContentAreaBounds, 'height'>,
+  fontPx: number,
+  loBound: number,
+  slackPx: number,
+): number {
+  let px = fontPx;
+  applySpanFontPx(span, px);
+  const limit = bounds.height - slackPx + HEIGHT_FIT_TOLERANCE_PX;
+  while (px > loBound && Math.ceil(span.scrollHeight) > limit) {
+    px -= 1;
+    applySpanFontPx(span, px);
+  }
+  return px;
 }
 
 function spanFitMetrics(
@@ -239,7 +267,7 @@ function measureFontSizeOnSpan(
   lastMeasureUsedProbe = !inPlace;
   const measureSpan = inPlace
     ? sourceSpan
-    : syncProbeSpan(sourceSpan, bounds.width, fontStyles);
+    : syncProbeSpan(sourceSpan, bounds.width, bounds.height, fontStyles);
   prepareSpan(measureSpan);
   applySpanFontStyles(measureSpan, fontStyles);
   measureSpan.style.lineHeight = String(SPAN_LINE_HEIGHT);
@@ -267,7 +295,24 @@ function measureFontSizeOnSpan(
     false,
   );
 
-  return Math.min(forHeight, forWidth);
+  const candidate = Math.min(forHeight, forWidth);
+  if (lastMeasureUsedProbe) {
+    return verifyAndShrinkFontScrollOnly(
+      measureSpan,
+      bounds,
+      candidate,
+      loBound,
+      slackPx,
+    );
+  }
+  return verifyAndShrinkFontOnSpan(
+    measureSpan,
+    measureSpan.parentElement ?? measureSpan,
+    bounds,
+    candidate,
+    loBound,
+    slackPx,
+  );
 }
 
 /** Ajuste final no DOM real — corrige tolerância da busca binária e overflow visual. */
@@ -304,16 +349,6 @@ function spanFitsAtFontPx(
 const STAGE_RETURN_PROXIMO_MAX_SCALE = 0.72;
 /** Piso em saídas reais quando o perfil min não cabe (mobile / muito texto). */
 const STAGE_RETURN_OUTPUT_FLOOR_PX = 10;
-
-/** Prévia do operador — pode ir abaixo de minFontPx para caber no tile (CAD-313 §3.1). */
-export const PREVIEW_TEXTFILL_MIN_PX = 8;
-
-const PREVIEW_FIT_SLACK_PX = 2;
-const OUTPUT_FIT_SLACK_PX = 2;
-/** scrollWidth ≈ clientWidth em blocos width:100% com wrap — tolerância subpixel. */
-const WIDTH_FIT_TOLERANCE_PX = 2;
-/** line-height / subpixel — evita rejeitar tamanho que já passou na busca binária. */
-const HEIGHT_FIT_TOLERANCE_PX = 3;
 
 type TextfillMode = 'preview' | 'output';
 
@@ -476,6 +511,11 @@ function reconcileSpanFontSize(
   fontStyles: TextfillFontStyles,
 ): number {
   applySpanFontPx(span, targetPx);
+
+  if (lastMeasureUsedProbe) {
+    return targetPx;
+  }
+
   const mismatchPx = spanFontSizeMismatchPx(span);
   const overflowPx = spanVerticalOverflowPx(span, box, area, slackPx);
   if (mismatchPx <= 1.5 && overflowPx <= HEIGHT_FIT_TOLERANCE_PX) {
@@ -485,7 +525,9 @@ function reconcileSpanFontSize(
   prepareSpan(span);
   applySpanFontStyles(span, fontStyles);
   let px = measureFontSizeOnSpan(span, area, loBound, hiBound, slackPx, fontStyles);
-  px = verifyAndShrinkFontOnSpan(span, box, area, px, loBound, slackPx);
+  if (!lastMeasureUsedProbe) {
+    px = verifyAndShrinkFontOnSpan(span, box, area, px, loBound, slackPx);
+  }
   applySpanFontPx(span, px);
   return px;
 }
@@ -558,7 +600,9 @@ function applyTextfill(
       slackPx,
       fontStyles,
     );
-    targetPx = verifyAndShrinkFontOnSpan(span, box, area, targetPx, loBound, slackPx);
+    if (!lastMeasureUsedProbe) {
+      targetPx = verifyAndShrinkFontOnSpan(span, box, area, targetPx, loBound, slackPx);
+    }
 
     if (
       mode === 'output' &&
@@ -574,10 +618,14 @@ function applyTextfill(
         slackPx,
         fontStyles,
       );
-      targetPx = Math.max(
-        floorPx,
-        verifyAndShrinkFontOnSpan(span, box, area, targetPx, floorPx, slackPx),
-      );
+      if (!lastMeasureUsedProbe) {
+        targetPx = Math.max(
+          floorPx,
+          verifyAndShrinkFontOnSpan(span, box, area, targetPx, floorPx, slackPx),
+        );
+      } else {
+        targetPx = Math.max(floorPx, targetPx);
+      }
     }
 
     targetPx = reconcileSpanFontSize(
@@ -916,10 +964,9 @@ async function runRefreshTextfill(
     diagnosticPass: 1,
   });
 
-  if (enabled) {
+  if (enabled && !lastMeasureUsedProbe) {
     const span = textTarget(contentEl, textfillOptions.spanSelector);
-    const mismatchPx = span ? spanFontSizeMismatchPx(span) : 0;
-    if (mismatchPx > 1.5) {
+    if (span && spanFontSizeMismatchPx(span) > 1.5) {
       applyFn(contentEl, minPx, maxPx, enabled, {
         ...textfillOptions,
         fontFamily,
