@@ -47,6 +47,9 @@ interface TextfillFitMetrics {
   widthOverflow: number;
   spanOffsetH: number;
   spanOffsetW: number;
+  spanClientH: number;
+  visualOverflowPx: number;
+  computedFontPx: number;
 }
 
 const SPAN_LINE_HEIGHT = 1.35;
@@ -57,20 +60,57 @@ function applySpanFontStyles(span: HTMLElement, fontStyles: TextfillFontStyles):
   span.style.fontStyle = fontStyles.fontStyle;
 }
 
+function spanVerticalOverflowPx(
+  span: HTMLElement,
+  box: HTMLElement | null,
+  bounds: Pick<ProjectionContentAreaBounds, 'height'>,
+  slackPx: number,
+): number {
+  void span.offsetHeight;
+  const limit = bounds.height - slackPx + HEIGHT_FIT_TOLERANCE_PX;
+  const scrollOverflow = Math.ceil(span.scrollHeight) - limit;
+  if (!box?.isConnected) return scrollOverflow;
+
+  const spanRect = span.getBoundingClientRect();
+  const boxRect = box.getBoundingClientRect();
+  if (spanRect.height <= 0 || boxRect.height <= 0) return scrollOverflow;
+
+  const visualOverflow = Math.max(
+    0,
+    Math.ceil(boxRect.top - spanRect.top + slackPx),
+    Math.ceil(spanRect.bottom - boxRect.bottom + slackPx),
+  );
+  return Math.max(scrollOverflow, visualOverflow);
+}
+
 function spanFitMetrics(
   span: HTMLElement,
+  box: HTMLElement | null,
   bounds: Pick<ProjectionContentAreaBounds, 'width' | 'height'>,
   slackPx: number,
 ): TextfillFitMetrics {
   void span.offsetHeight;
   const maxH = bounds.height - slackPx;
-  const heightOverflow = Math.ceil(span.scrollHeight) - maxH;
+  const heightOverflow = spanVerticalOverflowPx(span, box, bounds, slackPx);
   const widthOverflow = Math.ceil(span.scrollWidth) - bounds.width;
+  const computedFontPx = Number.parseFloat(window.getComputedStyle(span).fontSize) || 0;
   const fits =
     maxH > 0 &&
     bounds.width > 0 &&
     heightOverflow <= HEIGHT_FIT_TOLERANCE_PX &&
     widthOverflow <= WIDTH_FIT_TOLERANCE_PX;
+  const visualOverflowPx =
+    box?.isConnected &&
+    span.getBoundingClientRect().height > 0 &&
+    box.getBoundingClientRect().height > 0
+      ? Math.max(
+          0,
+          Math.ceil(box.getBoundingClientRect().top - span.getBoundingClientRect().top + slackPx),
+          Math.ceil(
+            span.getBoundingClientRect().bottom - box.getBoundingClientRect().bottom + slackPx,
+          ),
+        )
+      : 0;
   return {
     fits,
     maxH,
@@ -78,6 +118,9 @@ function spanFitMetrics(
     widthOverflow,
     spanOffsetH: span.scrollHeight,
     spanOffsetW: span.scrollWidth,
+    spanClientH: span.clientHeight,
+    visualOverflowPx,
+    computedFontPx,
   };
 }
 
@@ -158,9 +201,10 @@ function measureFontSizeOnSpan(
   return Math.min(forHeight, forWidth);
 }
 
-/** Ajuste final no DOM real — corrige tolerância da busca binária. */
+/** Ajuste final no DOM real — corrige tolerância da busca binária e overflow visual. */
 function verifyAndShrinkFontOnSpan(
   span: HTMLElement,
+  box: HTMLElement,
   bounds: Pick<ProjectionContentAreaBounds, 'height'>,
   fontPx: number,
   loBound: number,
@@ -168,8 +212,7 @@ function verifyAndShrinkFontOnSpan(
 ): number {
   let px = fontPx;
   span.style.fontSize = `${px}px`;
-  const limit = bounds.height - slackPx + HEIGHT_FIT_TOLERANCE_PX;
-  while (px > loBound && span.scrollHeight > limit) {
+  while (px > loBound && spanVerticalOverflowPx(span, box, bounds, slackPx) > 0) {
     px -= 1;
     span.style.fontSize = `${px}px`;
     void span.offsetHeight;
@@ -188,7 +231,7 @@ function spanFitsAtFontPx(
   applySpanFontStyles(span, fontStyles);
   span.style.lineHeight = String(SPAN_LINE_HEIGHT);
   span.style.fontSize = `${fontPx}px`;
-  return spanFitMetrics(span, bounds, slackPx).fits;
+  return spanFitMetrics(span, null, bounds, slackPx).fits;
 }
 const STAGE_RETURN_PROXIMO_MAX_SCALE = 0.72;
 /** Piso em saídas reais quando o perfil min não cabe (mobile / muito texto). */
@@ -282,6 +325,7 @@ function prepareSpan(span: HTMLElement): void {
   }
   span.style.width = '100%';
   span.style.maxWidth = '100%';
+  span.style.flexShrink = '0';
   span.style.lineHeight = '1.35';
   span.style.overflowWrap = 'break-word';
   span.style.wordBreak = 'break-word';
@@ -421,7 +465,7 @@ function applyTextfill(
       slackPx,
       fontStyles,
     );
-    targetPx = verifyAndShrinkFontOnSpan(span, area, targetPx, loBound, slackPx);
+    targetPx = verifyAndShrinkFontOnSpan(span, box, area, targetPx, loBound, slackPx);
 
     if (
       mode === 'output' &&
@@ -437,7 +481,10 @@ function applyTextfill(
         slackPx,
         fontStyles,
       );
-      targetPx = Math.max(floorPx, verifyAndShrinkFontOnSpan(span, area, targetPx, floorPx, slackPx));
+      targetPx = Math.max(
+        floorPx,
+        verifyAndShrinkFontOnSpan(span, box, area, targetPx, floorPx, slackPx),
+      );
     }
   }
 
@@ -478,7 +525,7 @@ function recordTextfillDiagnostic(
 ): void {
   if (!isTextfillDiagnosticsEnabled()) return;
   const layout = collectTextfillLayoutContext(contentEl, span, box);
-  const metrics = spanFitMetrics(span, area, data.slackPx);
+  const metrics = spanFitMetrics(span, box, area, data.slackPx);
   const pass = data.options.diagnosticPass ?? 1;
   logTextfillDiagnostic({
     surface: data.options.diagnosticSurface ?? data.mode,
@@ -495,6 +542,9 @@ function recordTextfillDiagnostic(
     fits: metrics.fits,
     spanOffsetH: metrics.spanOffsetH,
     spanOffsetW: metrics.spanOffsetW,
+    spanClientH: metrics.spanClientH,
+    visualOverflowPx: metrics.visualOverflowPx,
+    computedFontPx: metrics.computedFontPx,
     maxH: metrics.maxH,
     heightOverflow: metrics.heightOverflow,
     widthOverflow: metrics.widthOverflow,
