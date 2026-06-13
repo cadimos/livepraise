@@ -27,7 +27,7 @@ document.fonts = {
 const {
   computeProjectionContentArea,
   refreshOutputTextfill,
-} = await import('../shared/projection-textfill.js');
+} = await import('../dist/shared/projection-textfill.js');
 
 const root = document.createElement('div');
 root.id = 'conteudo';

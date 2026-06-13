@@ -59,7 +59,7 @@ try {
   pass('CA-12b', 'PUT persiste tipografia (loopback operador)');
 
   const { applyPreviewTextfill, applyOutputTextfill } = await import(
-    '../shared/projection-textfill.js'
+    '../dist/shared/projection-textfill.js'
   );
   assert(typeof applyPreviewTextfill === 'function', 'applyPreviewTextfill export');
   assert(typeof applyOutputTextfill === 'function', 'applyOutputTextfill export');
@@ -69,7 +69,7 @@ try {
   pass('CA-1b', 'textfill oculta root durante refresh (sem flash)');
 
   const { createProjectionTypographyController } = await import(
-    '../shared/projection-typography-runtime.js'
+    '../dist/shared/projection-typography-runtime.js'
   );
   assert(typeof createProjectionTypographyController === 'function', 'runtime controller');
   pass('CA-3', 'runtime controller disponível');

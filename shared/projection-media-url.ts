@@ -2,8 +2,8 @@
  * Resolve valor de live-action (background/video) para URL absoluta no browser atual.
  * Aceita path relativo (/imagens/...) ou URL absoluta; reescreve loopback para LAN (CAD-186).
  */
-export function resolveProjectionMediaUrl(valor) {
-  let path;
+export function resolveProjectionMediaUrl(valor: string): string {
+  let path: string;
   try {
     path = decodeURIComponent(String(valor ?? ''));
   } catch {

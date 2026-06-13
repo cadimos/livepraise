@@ -33,16 +33,16 @@ function readSrc(relativePath) {
 }
 
 const { applyPreviewTextfill, applyOutputTextfill } = await import(
-  '../shared/projection-textfill.js'
+  '../dist/shared/projection-textfill.js'
 );
 const {
   DEFAULT_TEXT_SHADOW_LAYERS,
   defaultProjectionTypographyPrefs,
-} = await import('../shared/projection-typography.js');
+} = await import('../dist/shared/projection-typography.js');
 const {
   layersToTextShadowCss,
   resolveProjectionTextShadowCss,
-} = await import('../shared/projection-text-shadow.js');
+} = await import('../dist/shared/projection-text-shadow.js');
 
 const { startLivepraiseServer, stopLivepraiseServer } = await import(
   '../dist/server/index.js'

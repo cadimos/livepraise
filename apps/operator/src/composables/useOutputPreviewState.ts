@@ -6,7 +6,7 @@ import {
   EMPTY_OUTPUT_PREVIEW_FRAME,
   type OutputPreviewFrame,
 } from '@shared/output-preview';
-import { resolveProjectionMediaUrl } from '@shared/projection-media-url.js';
+import { resolveProjectionMediaUrl } from '@shared/projection-media-url';
 import { videoThumbRelativePath } from '@shared/queue-items';
 import { youtubeEmbedUrl, youtubeThumbnailUrl } from '@shared/youtube';
 import type { LiveAction, LiveState } from '@shared/types/live';

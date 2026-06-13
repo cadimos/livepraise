@@ -4,7 +4,7 @@ import type { FooterAlertState } from '@shared/footer-alert';
 import PreviewOutputTile from './PreviewOutputTile.vue';
 import { useOutputPreviewState } from '../composables/useOutputPreviewState';
 import { usePreviewGroups } from '../composables/usePreviewGroups';
-import { profileKeyForPreviewKind } from '@shared/projection-typography-runtime.js';
+import { profileKeyForPreviewKind } from '@shared/projection-typography-runtime';
 import type { PreviewGroupDescriptor, PreviewGroupKind } from '../types/preview-groups';
 
 const props = defineProps<{

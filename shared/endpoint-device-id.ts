@@ -2,11 +2,11 @@
 
 const LEGACY_KEY = 'livepraise.externalDeviceId';
 
-export function endpointDeviceStorageKey(profile) {
+export function endpointDeviceStorageKey(profile: string): string {
   return `${LEGACY_KEY}.${profile}`;
 }
 
-function createRandomUuid() {
+function createRandomUuid(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
@@ -27,7 +27,7 @@ function createRandomUuid() {
   });
 }
 
-export function ensureEndpointDeviceId(profile) {
+export function ensureEndpointDeviceId(profile: string): string {
   const key = endpointDeviceStorageKey(profile);
   let id = localStorage.getItem(key);
   if (id) return id;
