@@ -13,7 +13,7 @@ import {
   resolvePreviewAspectRatio,
   resolveProjectionStageSize,
   SCREEN_CONTENT_FITS,
-} from '@shared/screen-layout.js';
+} from '@shared/screen-layout';
 
 export const SCREEN_SIZE_PRESETS = [
   '16:9',

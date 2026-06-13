@@ -9,10 +9,10 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
     "paths": {
-      "/shared/display-debug-overlay.js": ["shared/display-debug-overlay.d.ts"],
-      "/shared/service-timer-overlay.js": ["shared/service-timer-overlay.d.ts"],
-      "/shared/footer-alert-overlay.js": ["shared/footer-alert-overlay.d.ts"],
-      "/shared/projection-typography-runtime.js": ["shared/projection-typography-runtime.d.ts"]
+      "/shared/display-debug-overlay.js": ["dist/shared/display-debug-overlay.d.ts"],
+      "/shared/service-timer-overlay.js": ["dist/shared/service-timer-overlay.d.ts"],
+      "/shared/footer-alert-overlay.js": ["dist/shared/footer-alert-overlay.d.ts"],
+      "/shared/projection-typography-runtime.js": ["dist/shared/projection-typography-runtime.d.ts"]
     }
   },
   "include": ["apps/stage-return/src/**/*.ts"]

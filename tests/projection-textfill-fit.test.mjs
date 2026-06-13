@@ -42,7 +42,7 @@ function stubSpanMetrics(span, boxWidth) {
   });
 }
 
-const { applyPreviewTextfill } = await import('../shared/projection-textfill.js');
+const { applyPreviewTextfill } = await import('../dist/shared/projection-textfill.js');
 
 const root = document.createElement('div');
 root.className = 'conteudo';

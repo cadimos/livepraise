@@ -106,6 +106,10 @@ dist
 # Build output
 dist/
 
+# shared — fonte só em .ts; JS em dist/shared/
+shared/**/*.js
+shared/**/*.d.ts
+
 # yt-dlp embutido (descarregado no install/build)
 vendor/yt-dlp/yt-dlp
 vendor/yt-dlp/yt-dlp.exe

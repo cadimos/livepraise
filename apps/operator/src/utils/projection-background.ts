@@ -1,4 +1,4 @@
-import { resolveProjectionMediaUrl } from '@shared/projection-media-url.js';
+import { resolveProjectionMediaUrl } from '@shared/projection-media-url';
 import type { LiveAction } from '@shared/types/live';
 
 export function isProjectionBackgroundAction(

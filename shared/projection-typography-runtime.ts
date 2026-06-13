@@ -3,67 +3,80 @@ import {
   refreshOutputTextfillAll,
   refreshPreviewTextfill,
 } from './projection-textfill.js';
-import { applyProjectionTypographyStyles } from './projection-typography.js';
+import {
+  applyProjectionTypographyStyles,
+  DEFAULT_PROJECTION_TYPOGRAPHY_PROFILE,
+  type ProjectionTypographyPrefs,
+  type ProjectionTypographyProfile,
+  type ProjectionTypographyProfileKey,
+} from './projection-typography.js';
 import { projectionTextShadowSlackPx, resolveProjectionTextShadowCss } from './projection-text-shadow.js';
 
-const DEFAULT_PROFILE = {
-  fontSource: 'bundled',
-  fontFamily: 'roboto',
-  fontWeight: 700,
-  fontStyle: 'normal',
-  minFontPx: 24,
-  maxFontPx: 120,
-  textfillEnabled: true,
-  textShadowEnabled: true,
-  textShadowLayers: [
-    { offsetX: 2, offsetY: 2, blur: 0, color: '#000000' },
-    { offsetX: 3, offsetY: 3, blur: 0, color: '#000000' },
-    { offsetX: 5, offsetY: 5, blur: 0, color: '#000000' },
-    { offsetX: 6, offsetY: 6, blur: 0, color: '#000000' },
-  ],
+interface FontsManifestFamily {
+  id: string;
+  cssFamily: string;
+  files: string[];
+}
+
+interface FontsManifest {
+  families?: FontsManifestFamily[];
+}
+
+const DEFAULT_PROFILE: ProjectionTypographyProfile = {
+  ...DEFAULT_PROJECTION_TYPOGRAPHY_PROFILE,
+  textShadowLayers: DEFAULT_PROJECTION_TYPOGRAPHY_PROFILE.textShadowLayers.map(
+    (layer) => ({ ...layer }),
+  ),
 };
 
-const PROFILE_BY_ROLE = {
+const PROFILE_BY_ROLE: Record<string, ProjectionTypographyProfileKey | null> = {
   projector: 'projector',
   'stage-return': 'stageReturn',
   'external-display': null,
   'live-viewer': 'live',
 };
 
-const PROFILE_BY_EXTERNAL = {
+const PROFILE_BY_EXTERNAL: Record<string, ProjectionTypographyProfileKey> = {
   live: 'live',
   vocal: 'vocal',
   stage: 'stage',
   player: 'player',
 };
 
-let manifestCache = null;
+let manifestCache: FontsManifest | null = null;
 
-function resolveBundledFontFileName(weight, style) {
+function resolveBundledFontFileName(weight: number, style: string): string {
   if (weight === 700 && style === 'italic') return 'BoldItalic';
   if (weight === 700) return 'Bold';
   if (style === 'italic') return 'Italic';
   return 'Regular';
 }
 
-function bundledFontFileForProfile(files, weight, style) {
+function bundledFontFileForProfile(
+  files: string[],
+  weight: number,
+  style: string,
+): string | null {
   const suffix = resolveBundledFontFileName(weight, style);
   return files.find((file) => file.includes(`-${suffix}.`)) ?? files[0] ?? null;
 }
 
-async function loadFontsManifest(origin) {
+async function loadFontsManifest(origin: string): Promise<FontsManifest | null> {
   if (manifestCache) return manifestCache;
   try {
     const res = await fetch(`${origin}/fonts/manifest.json`, { cache: 'default' });
     if (!res.ok) return null;
-    manifestCache = await res.json();
+    manifestCache = (await res.json()) as FontsManifest;
     return manifestCache;
   } catch {
     return null;
   }
 }
 
-function resolveCssFamily(profile, manifest) {
+function resolveCssFamily(
+  profile: ProjectionTypographyProfile,
+  manifest: FontsManifest | null,
+): string {
   if (profile.fontSource === 'system') {
     return `${profile.fontFamily}, sans-serif`;
   }
@@ -71,7 +84,12 @@ function resolveCssFamily(profile, manifest) {
   return family?.cssFamily ?? 'Roboto, sans-serif';
 }
 
-function ensureFontFaceStyle(profile, origin, manifest, styleEl) {
+function ensureFontFaceStyle(
+  profile: ProjectionTypographyProfile,
+  origin: string,
+  manifest: FontsManifest | null,
+  styleEl: HTMLStyleElement,
+): void {
   if (profile.fontSource !== 'bundled') {
     if (styleEl.parentNode) styleEl.remove();
     return;
@@ -89,42 +107,63 @@ function ensureFontFaceStyle(profile, origin, manifest, styleEl) {
   if (!styleEl.parentNode) document.head.appendChild(styleEl);
 }
 
-function normalizeProfile(raw) {
-  if (!raw || typeof raw !== 'object') return { ...DEFAULT_PROFILE };
+function normalizeProfile(raw: unknown): ProjectionTypographyProfile {
+  if (!raw || typeof raw !== 'object') {
+    return {
+      ...DEFAULT_PROFILE,
+      textShadowLayers: DEFAULT_PROFILE.textShadowLayers.map((layer) => ({ ...layer })),
+    };
+  }
+  const record = raw as Partial<ProjectionTypographyProfile>;
   return {
     ...DEFAULT_PROFILE,
-    ...raw,
-    textShadowLayers: Array.isArray(raw.textShadowLayers) && raw.textShadowLayers.length
-      ? raw.textShadowLayers
-      : DEFAULT_PROFILE.textShadowLayers,
+    ...record,
+    textShadowLayers:
+      Array.isArray(record.textShadowLayers) && record.textShadowLayers.length
+        ? record.textShadowLayers
+        : DEFAULT_PROFILE.textShadowLayers.map((layer) => ({ ...layer })),
   };
 }
 
-function resolveProfileKey(role, externalProfile) {
+function resolveProfileKey(
+  role: string,
+  externalProfile?: string,
+): ProjectionTypographyProfileKey {
   if (role === 'external-display' && externalProfile) {
     return PROFILE_BY_EXTERNAL[externalProfile] ?? 'live';
   }
   return PROFILE_BY_ROLE[role] ?? 'projector';
 }
 
-function applyShadowTargets(rootEl, profile, shadowSelector) {
+function applyShadowTargets(
+  rootEl: HTMLElement,
+  profile: ProjectionTypographyProfile,
+  shadowSelector: string,
+): void {
   const css = resolveProjectionTextShadowCss(
     profile.textShadowLayers,
     profile.textShadowEnabled,
     profile.textShadowCssAdvanced,
   );
-  const targets = rootEl.querySelectorAll(shadowSelector);
+  const targets = rootEl.querySelectorAll<HTMLElement>(shadowSelector);
   if (!targets.length) {
-    const fallback = rootEl.querySelector('.content, .texto');
+    const fallback = rootEl.querySelector<HTMLElement>('.content, .texto');
     if (fallback) fallback.style.textShadow = css;
     return;
   }
-  for (const target of targets) {
+  for (const target of Array.from(targets)) {
     target.style.textShadow = css;
   }
 }
 
-async function runTextfill(rootEl, profile, mode, textfillOptions, cssFamily, surfaceLabel) {
+async function runTextfill(
+  rootEl: HTMLElement,
+  profile: ProjectionTypographyProfile,
+  mode: 'preview' | 'output',
+  textfillOptions: Record<string, unknown> | undefined,
+  cssFamily: string,
+  surfaceLabel: string,
+): Promise<void> {
   const fitSlackPx = projectionTextShadowSlackPx(
     profile.textShadowLayers,
     profile.textShadowEnabled,
@@ -145,25 +184,40 @@ async function runTextfill(rootEl, profile, mode, textfillOptions, cssFamily, su
     );
     return;
   }
-  const refreshFn =
-    mode === 'preview' ? refreshPreviewTextfill : refreshOutputTextfill;
-  await refreshFn(
-    rootEl,
-    profile.minFontPx,
-    profile.maxFontPx,
-    profile.textfillEnabled,
-    {
-      ...fontOpts,
-      ...textfillOptions,
-      diagnosticSurface: textfillOptions?.diagnosticSurface ?? surfaceLabel ?? mode,
-    },
-  );
+  const refreshFn = mode === 'preview' ? refreshPreviewTextfill : refreshOutputTextfill;
+  await refreshFn(rootEl, profile.minFontPx, profile.maxFontPx, profile.textfillEnabled, {
+    ...fontOpts,
+    ...textfillOptions,
+    diagnosticSurface: (textfillOptions?.diagnosticSurface as string | undefined) ?? surfaceLabel ?? mode,
+  });
 }
 
-/**
- * Controlador partilhado para previews e saídas reais (CAD-313).
- */
-export function createProjectionTypographyController(options) {
+export interface ProjectionTypographyController {
+  init(initialPrefs: ProjectionTypographyPrefs | null): Promise<void>;
+  setPrefs(nextPrefs: ProjectionTypographyPrefs | null): Promise<void>;
+  refresh(): Promise<void>;
+  scheduleRefresh(): void;
+  disconnect(): void;
+  getProfileKey(): ProjectionTypographyProfileKey;
+}
+
+export interface ProjectionTypographyControllerOptions {
+  rootEl: HTMLElement;
+  role: string;
+  externalProfile?: string;
+  origin?: string;
+  mode?: 'preview' | 'output';
+  prefs?: ProjectionTypographyPrefs | null;
+  shadowSelector?: string;
+  textfillOptions?: Record<string, unknown>;
+  diagnosticSurface?: string;
+  onProfileKey?: (profileKey: ProjectionTypographyProfileKey) => void;
+}
+
+/** Controlador partilhado para previews e saídas reais (CAD-313). */
+export function createProjectionTypographyController(
+  options: ProjectionTypographyControllerOptions,
+): ProjectionTypographyController {
   const {
     rootEl,
     role,
@@ -179,22 +233,22 @@ export function createProjectionTypographyController(options) {
   let prefs = options.prefs ?? null;
   let profileKey = resolveProfileKey(role, externalProfile);
   let profile = normalizeProfile(prefs?.[profileKey]);
-  let manifest = null;
+  let manifest: FontsManifest | null = null;
   const fontStyleEl = document.createElement('style');
   fontStyleEl.dataset.projectionTypography = 'font-face';
-  let resizeObserver = null;
+  let resizeObserver: ResizeObserver | null = null;
   let refreshScheduled = false;
   let refreshGeneration = 0;
   let refreshInProgress = false;
-  let resizeDebounce = null;
-  let onWindowResize = null;
+  let resizeDebounce: ReturnType<typeof setTimeout> | null = null;
+  let onWindowResize: (() => void) | null = null;
 
-  function currentProfile() {
+  function currentProfile(): ProjectionTypographyProfile {
     if (!prefs) return profile;
     return normalizeProfile(prefs[profileKey] ?? profile);
   }
 
-  function scheduleRefresh() {
+  function scheduleRefresh(): void {
     if (refreshScheduled) return;
     refreshScheduled = true;
     requestAnimationFrame(() => {
@@ -203,7 +257,7 @@ export function createProjectionTypographyController(options) {
     });
   }
 
-  async function refresh() {
+  async function refresh(): Promise<void> {
     if (refreshInProgress) return;
     refreshInProgress = true;
     const generation = ++refreshGeneration;
@@ -237,7 +291,7 @@ export function createProjectionTypographyController(options) {
     }
   }
 
-  async function setPrefs(nextPrefs) {
+  async function setPrefs(nextPrefs: ProjectionTypographyPrefs | null): Promise<void> {
     prefs = nextPrefs;
     profileKey = resolveProfileKey(role, externalProfile);
     profile = currentProfile();
@@ -246,7 +300,7 @@ export function createProjectionTypographyController(options) {
     await refresh();
   }
 
-  async function init(initialPrefs) {
+  async function init(initialPrefs: ProjectionTypographyPrefs | null): Promise<void> {
     manifest = await loadFontsManifest(origin);
     await setPrefs(initialPrefs);
     if (typeof ResizeObserver !== 'undefined') {
@@ -269,7 +323,7 @@ export function createProjectionTypographyController(options) {
     window.addEventListener('resize', onWindowResize);
   }
 
-  function disconnect() {
+  function disconnect(): void {
     if (resizeDebounce) clearTimeout(resizeDebounce);
     resizeObserver?.disconnect();
     if (onWindowResize) {
@@ -289,7 +343,7 @@ export function createProjectionTypographyController(options) {
   };
 }
 
-export function profileKeyForPreviewKind(kind) {
+export function profileKeyForPreviewKind(kind: string): ProjectionTypographyProfileKey {
   switch (kind) {
     case 'projection':
       return 'projector';
@@ -308,14 +362,19 @@ export function profileKeyForPreviewKind(kind) {
   }
 }
 
-export async function fetchProjectionTypographyPrefs(origin = location.origin) {
+export async function fetchProjectionTypographyPrefs(
+  origin: string = location.origin,
+): Promise<ProjectionTypographyPrefs | null> {
   const res = await fetch(`${origin}/api/projection-typography`);
   if (!res.ok) return null;
-  const data = await res.json();
+  const data = (await res.json()) as { projectionTypography?: ProjectionTypographyPrefs };
   return data?.projectionTypography ?? null;
 }
 
-export function attachProjectionTypographyWs(controller, onMessage) {
+export function attachProjectionTypographyWs(
+  controller: ProjectionTypographyController,
+  onMessage?: (message: { type?: string; projectionTypography?: ProjectionTypographyPrefs }) => void,
+): (message: { type?: string; projectionTypography?: ProjectionTypographyPrefs }) => void {
   const previous = onMessage;
   return (message) => {
     if (message?.type === 'projection-typography-sync' && message.projectionTypography) {

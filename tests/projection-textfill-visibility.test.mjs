@@ -25,7 +25,7 @@ document.fonts = {
   ready: Promise.resolve(),
 };
 
-const { refreshOutputTextfill } = await import('../shared/projection-textfill.js');
+const { refreshOutputTextfill } = await import('../dist/shared/projection-textfill.js');
 
 const root = document.createElement('div');
 root.className = 'conteudo';

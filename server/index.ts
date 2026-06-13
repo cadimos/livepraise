@@ -144,7 +144,7 @@ export async function createLivepraiseApp(
   app.get('/stage-return', (_req, res) => res.redirect(302, '/stage/'));
   app.get('/stage-return/', (_req, res) => res.redirect(302, '/stage/'));
 
-  app.use('/shared', express.static(path.join(appRoot, 'shared')));
+  app.use('/shared', express.static(path.join(appRoot, 'dist', 'shared')));
 
   const publicViewerRoutes = [
     { mount: '/live', root: path.join(appRoot, 'web/live') },
