@@ -60,6 +60,8 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 
 | npm | Ficheiro |
 |-----|----------|
+| `smoke:surfaces` | `smoke-build-surfaces.mjs` — artefactos `dist/` após `npm run build` (TS-030/031) |
+| `check:js-in-src` | `check-js-in-src.mjs` — gate sem `.js` em pastas fonte |
 | `verify:openapi` | `verify-openapi-coverage.mjs` |
 | `sync:locales` | `build-*-locale.mjs` |
 | `dist:*` | `dist-win.mjs`, `dist-linux.mjs`, etc. |
@@ -69,6 +71,7 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 | Script | Função |
 |--------|--------|
 | `copy-shared-assets.mjs` | CSS de `shared/` → `dist/shared/` |
-| `copy-browser-app-static.mjs` | HTML/CSS de `apps/*` → `dist/apps/*/` |
+| `copy-browser-app-static.mjs` | HTML/CSS de `apps/*` ou `web/*` → `dist/` |
+| `lib/smoke-helpers.mjs` | assert, fetchJson, env isolado, loadLivepraiseServer (SM-007) |
 
 Ver também [`docs/BUILD.md`](../docs/BUILD.md).

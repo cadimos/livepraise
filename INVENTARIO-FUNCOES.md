@@ -4,6 +4,8 @@
 **Última atualização:** 2026-06-07 (revisão pós-implementação)  
 **Repositório:** `electron/`, `server/`, `core/`, `apps/`, `web/`, `shared/`
 
+**TypeScript (meta técnica — 2026-06):** Migração em curso documentada em [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md). Estado: fonte `.ts`/`.vue` em server, core, shared, electron, operator, web, projector/stage-return; configs `tailwind.config.ts` e `postcss.config.ts`; emit em `dist/`; gate `npm run typecheck` + `check:js-in-src` no CI. Pendências menores: hardening web (TS-033+), consolidação smokes `cad*`.
+
 Backlog do que **ainda não está implementado** (ou está só parcialmente). Itens **✅** da alpha.2 estão concluídos — secções mantidas como registo histórico e referência de smokes.
 
 **Legenda:** ✅ implementado · 🟡 parcial · ❌ pendente · 🎯 **escopo confirmado alpha.2** · 📅 **versão futura** (não alpha.2)

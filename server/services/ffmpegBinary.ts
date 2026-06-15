@@ -6,7 +6,7 @@ import ffmpegStatic from 'ffmpeg-static';
 const pkgPath =
   typeof ffmpegStatic === 'string'
     ? ffmpegStatic
-    : (ffmpegStatic as { default?: string }).default;
+    : (ffmpegStatic as unknown as { default?: string }).default;
 
 function siblingCandidates(binPath: string): string[] {
   const dir = path.dirname(binPath);

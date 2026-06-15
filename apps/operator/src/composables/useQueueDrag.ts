@@ -48,7 +48,7 @@ export function useQueueDrag() {
 
     if (payload.sourceItemId && payload.sourceTabId) {
       const tab = prefs.value.chromeTabs.find((t) => t.id === tabId);
-      if (!tab) return;
+      if (!tab?.items) return;
       if (payload.sourceTabId === tabId) {
         const fromIndex = tab.items.findIndex((i) => i.id === payload.sourceItemId);
         if (fromIndex >= 0 && fromIndex !== tab.items.length - 1) {
@@ -77,7 +77,7 @@ export function useQueueDrag() {
 
     if (payload.sourceItemId && payload.sourceTabId) {
       const tab = prefs.value.chromeTabs.find((t) => t.id === tabId);
-      if (!tab) return;
+      if (!tab?.items) return;
       if (payload.sourceTabId === tabId) {
         const fromIndex = tab.items.findIndex((i) => i.id === payload.sourceItemId);
         if (fromIndex < 0) return;

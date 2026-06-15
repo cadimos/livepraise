@@ -28,58 +28,58 @@ Objetivo: código de produto tipado, uma única fonte por módulo, build previs�
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TS-001 | Inventariar ficheiros `.js` de produto | Listar todos os `.js` versionados fora de `scripts/` e `tests/`; classificar como *fonte*, *build commitado* ou *config*. | Lista documentada em comentário no PR ou secção deste doc actualizada. | — | P0 | S |
-| TS-002 | Definir política «fonte vs artefacto» | Documentar regra: `.ts`/`.vue` = fonte; `dist/` e pastas de emit = artefacto; nunca commitar output de `tsc` excepto se explicitamente necessário para runtime. | Parágrafo em `README.md` ou `docs/BUILD.md`. | TS-001 | P0 | S |
-| TS-003 | Actualizar `.gitignore` para outputs | Ignorar `apps/projector/*.js` (excepto se mover emit), `apps/stage-return/*.js`, `core/displays/*.js` gerados, mantendo excepções explícitas se preciso. | `git status` limpo após build sem ficheiros novos indesejados. | TS-002 | P0 | S |
-| TS-004 | Remover `core/displays/config-file.js` do git | Apagar cópia compilada; garantir imports resolvem via `dist/core/` em runtime ou via path TS em dev. | Ficheiro removido; servidor arranca e testes passam. | TS-003 | P0 | S |
-| TS-005 | Remover `core/displays/merge-assignments.js` do git | Idem TS-004 para merge-assignments. | Idem TS-004. | TS-003 | P0 | S |
-| TS-006 | Verificar imports `electron/displays/merge-assignments` | Confirmar que `electron/displays/config.ts` importa de `./merge-assignments.js` (emit em `dist/electron/`) e não da cópia em `core/`. | Build electron OK. | TS-005 | P1 | S |
+| TS-001 | ✅ Inventariar ficheiros `.js` de produto | Listar todos os `.js` versionados fora de `scripts/` e `tests/`; classificar como *fonte*, *build commitado* ou *config*. | Lista documentada em comentário no PR ou secção deste doc actualizada. | — | P0 | S |
+| TS-002 | ✅ Definir política «fonte vs artefacto» | Documentar regra: `.ts`/`.vue` = fonte; `dist/` e pastas de emit = artefacto; nunca commitar output de `tsc` excepto se explicitamente necessário para runtime. | Parágrafo em `README.md` ou `docs/BUILD.md`. | TS-001 | P0 | S |
+| TS-003 | ✅ Actualizar `.gitignore` para outputs | Ignorar `apps/projector/*.js` (excepto se mover emit), `apps/stage-return/*.js`, `core/displays/*.js` gerados, mantendo excepções explícitas se preciso. | `git status` limpo após build sem ficheiros novos indesejados. | TS-002 | P0 | S |
+| TS-004 | ✅ Remover `core/displays/config-file.js` do git | Apagar cópia compilada; garantir imports resolvem via `dist/core/` em runtime ou via path TS em dev. | Ficheiro removido; servidor arranca e testes passam. | TS-003 | P0 | S |
+| TS-005 | ✅ Remover `core/displays/merge-assignments.js` do git | Idem TS-004 para merge-assignments. | Idem TS-004. | TS-003 | P0 | S |
+| TS-006 | ✅ Verificar imports `electron/displays/merge-assignments` | Confirmar que `electron/displays/config.ts` importa de `./merge-assignments.js` (emit em `dist/electron/`) e não da cópia em `core/`. | Build electron OK. | TS-005 | P1 | S |
 
 ### 1.2 Build projector / stage-return
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TS-007 | Decidir destino do emit projector | Opções: (A) manter emit em `apps/projector/` ou (B) mover para `dist/apps/projector/`. Documentar decisão. | ADR curto em `docs/` ou secção README. | TS-002 | P0 | S |
-| TS-008 | Ajustar `tsconfig.projector.json` se emit → `dist/` | Alterar `outDir`, `rootDir`, paths de import `/shared/*.js`. | `npm run build:projector` gera em local correcto. | TS-007 | P0 | M |
-| TS-009 | Actualizar `server/index.ts` static mount projector | Se emit mudou, actualizar `express.static` do projetor. | `/projector` carrega no browser. | TS-008 | P0 | S |
-| TS-010 | Remover `.js` commitados antigos do projector | Retirar do git `projector.js`, `youtube-iframe-player.js`, `projection-contrast.js` após emit estável. | Só fonte `.ts` em `apps/projector/src/`. | TS-008 | P0 | S |
-| TS-011 | Repetir TS-007–TS-010 para stage-return | Mesmo fluxo para `apps/stage-return/`. | `/stage-return` funcional. | TS-010 | P0 | M |
-| TS-012 | Incluir projector no `typecheck` | Adicionar `tsc -p tsconfig.projector.json --noEmit` ao script `typecheck`. | `npm run typecheck` falha se projector tiver erro TS. | TS-008 | P1 | S |
-| TS-013 | Incluir stage-return no `typecheck` | Idem para `tsconfig.stage-return.json`. | Idem TS-012. | TS-011 | P1 | S |
+| TS-007 | ✅ Decidir destino do emit projector | Opções: (A) manter emit em `apps/projector/` ou (B) mover para `dist/apps/projector/`. Documentar decisão. | ADR curto em `docs/` ou secção README. | TS-002 | P0 | S |
+| TS-008 | ✅ Ajustar `tsconfig.projector.json` se emit → `dist/` | Alterar `outDir`, `rootDir`, paths de import `/shared/*.js`. | `npm run build:projector` gera em local correcto. | TS-007 | P0 | M |
+| TS-009 | ✅ Actualizar `server/index.ts` static mount projector | Se emit mudou, actualizar `express.static` do projetor. | `/projector` carrega no browser. | TS-008 | P0 | S |
+| TS-010 | ✅ Remover `.js` commitados antigos do projector | Retirar do git `projector.js`, `youtube-iframe-player.js`, `projection-contrast.js` após emit estável. | Só fonte `.ts` em `apps/projector/src/`. | TS-008 | P0 | S |
+| TS-011 | ✅ Repetir TS-007–TS-010 para stage-return | Mesmo fluxo para `apps/stage-return/`. | `/stage-return` funcional. | TS-010 | P0 | M |
+| TS-012 | ✅ Incluir projector no `typecheck` | Adicionar `tsc -p tsconfig.projector.json --noEmit` ao script `typecheck`. | `npm run typecheck` falha se projector tiver erro TS. | TS-008 | P1 | S |
+| TS-013 | ✅ Incluir stage-return no `typecheck` | Idem para `tsconfig.stage-return.json`. | Idem TS-012. | TS-011 | P1 | S |
 
 ### 1.3 Migração `web/` → TypeScript
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TS-014 | Criar `tsconfig.web.json` | Config mínima: DOM, ES2022, emit para `web/` ou `dist/web/`, paths `/shared/*.js` como projector. | Config válida; `tsc -p tsconfig.web.json` compila. | TS-007 | P0 | M |
-| TS-015 | Migrar `web/live/live.js` → `src/live.ts` | Converter para TS; tipar WS, handlers, imports shared. | `/live` funciona; sem regressão textfill. | TS-014 | P0 | L |
-| TS-016 | Migrar `web/external-display/external-display.js` | Idem para external-display (live, vocal, stage, player). | Todas as rotas `/live`, `/vocal`, etc. OK. | TS-014 | P0 | L |
-| TS-017 | Extrair `projection-contrast` partilhado (ver ST-001) | Durante TS-016, importar módulo único em vez de `web/.../projection-contrast.js`. | Sem duplicação de ficheiro JS em web. | ST-001 | P0 | M |
-| TS-018 | Migrar `web/portal/portal.js` | Portal estático + lógica mínima em TS. | `/portal` OK. | TS-014 | P1 | M |
-| TS-019 | Migrar `web/remote/remote.js` | Controlo remoto web em TS. | `/remote` OK; auth/WS intactos. | TS-014 | P1 | L |
-| TS-020 | Actualizar `index.html` de cada web app | Scripts apontam para `.js` emitido (ou bundler único). | HTML carrega módulo correcto. | TS-015–019 | P0 | S |
-| TS-021 | Adicionar `build:web` ao `package.json` | Script encadeado no `build` principal. | `npm run build` inclui web. | TS-020 | P0 | S |
-| TS-022 | Incluir web no `typecheck` | `tsc -p tsconfig.web.json --noEmit`. | CI local typecheck cobre web. | TS-021 | P1 | S |
-| TS-023 | Remover `.js` fonte antigos de `web/` | Apagar `live.js`, `portal.js`, etc. após migração. | Só `.ts` (+ emit se aplicável) em web. | TS-021 | P0 | S |
+| TS-014 | ✅ Criar `tsconfig.web.json` | Config mínima: DOM, ES2022, emit para `web/` ou `dist/web/`, paths `/shared/*.js` como projector. | Config válida; `tsc -p tsconfig.web.json` compila. | TS-007 | P0 | M |
+| TS-015 | ✅ Migrar `web/live/live.js` → `src/live.ts` | Converter para TS; tipar WS, handlers, imports shared. | `/live` funciona; sem regressão textfill. | TS-014 | P0 | L |
+| TS-016 | ✅ Migrar `web/external-display/external-display.js` | Idem para external-display (live, vocal, stage, player). | Todas as rotas `/live`, `/vocal`, etc. OK. | TS-014 | P0 | L |
+| TS-017 | ✅ Extrair `projection-contrast` partilhado (ver ST-001) | Durante TS-016, importar módulo único em vez de `web/.../projection-contrast.js`. | Sem duplicação de ficheiro JS em web. | ST-001 | P0 | M |
+| TS-018 | ✅ Migrar `web/portal/portal.js` | Portal estático + lógica mínima em TS. | `/portal` OK. | TS-014 | P1 | M |
+| TS-019 | ✅ Migrar `web/remote/remote.js` | Controlo remoto web em TS. | `/remote` OK; auth/WS intactos. | TS-014 | P1 | L |
+| TS-020 | ✅ Actualizar `index.html` de cada web app | Scripts apontam para `.js` emitido (ou bundler único). | HTML carrega módulo correcto. | TS-015–019 | P0 | S |
+| TS-021 | ✅ Adicionar `build:web` ao `package.json` | Script encadeado no `build` principal. | `npm run build` inclui web. | TS-020 | P0 | S |
+| TS-022 | ✅ Incluir web no `typecheck` | `tsc -p tsconfig.web.json --noEmit`. | CI local typecheck cobre web. | TS-021 | P1 | S |
+| TS-023 | ✅ Remover `.js` fonte antigos de `web/` | Apagar `live.js`, `portal.js`, etc. após migração. | Só `.ts` (+ emit se aplicável) em web. | TS-021 | P0 | S |
 
 ### 1.4 Tooling e configs
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TS-024 | Migrar `tailwind.config.js` → `.ts` (opcional) | Se Vite/Tailwind suportam config TS no projecto. | Build operator inalterado. | — | P3 | S |
-| TS-025 | Migrar `postcss.config.js` → `.ts` (opcional) | Idem. | Build CSS OK. | — | P3 | S |
-| TS-026 | Unificar `paths` `@shared` / `@core` | Garantir mesmos aliases em tsconfigs (root, server, vite, web, projector). | Imports consistentes. | TS-014 | P2 | M |
-| TS-027 | Script `check:js-in-src` | Node script que falha se existir `.js` em pastas de fonte (allowlist scripts/tests/config). | npm script + opcional CI. | TS-023 | P1 | M |
-| TS-028 | Documentar fluxo de build completo | `docs/BUILD.md`: ordem build:server → shared → apps → operator → web. | Dev novo consegue buildar só lendo doc. | TS-021 | P1 | M |
+| TS-024 | ✅ Migrar `tailwind.config.js` → `.ts` | Se Vite/Tailwind suportam config TS no projecto. | Build operator inalterado. | — | P3 | S |
+| TS-025 | ✅ Migrar `postcss.config.js` → `.ts` | Idem. | Build CSS OK. | — | P3 | S |
+| TS-026 | ✅ Unificar `paths` `@shared` / `@core` | Garantir mesmos aliases em tsconfigs (root, server, vite, web, projector). | Imports consistentes. | TS-014 | P2 | M |
+| TS-027 | ✅ Script `check:js-in-src` | Node script que falha se existir `.js` em pastas de fonte (allowlist scripts/tests/config). | npm script + opcional CI. | TS-023 | P1 | M |
+| TS-028 | ✅ Documentar fluxo de build completo | `docs/BUILD.md`: ordem build:server → shared → apps → operator → web. | Dev novo consegue buildar só lendo doc. | TS-021 | P1 | M |
 
 ### 1.5 Validação e CI
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TS-029 | Correr `typecheck` no CI | Job ou step em `.github/workflows/ci.yml`. | PR falha com erro TS. | TS-012, TS-013, TS-022 | P1 | S |
-| TS-030 | Smoke pós-migração web | Manual ou SM-020: abrir live + external-display após build. | Sem erros consola; textfill OK. | TS-023 | P0 | S |
-| TS-031 | Smoke pós-remoção JS projector | Projector + stage-return após TS-010/011. | Projeção louvor/bíblia OK. | TS-010 | P0 | S |
-| TS-032 | Actualizar `INVENTARIO-FUNCOES.md` | Marcar «TypeScript 100%» como meta/concluído parcial. | Doc sincronizado. | TS-023 | P2 | S |
+| TS-029 | ✅ Correr `typecheck` no CI | Job ou step em `.github/workflows/ci.yml`. | PR falha com erro TS. | TS-012, TS-013, TS-022 | P1 | S |
+| TS-030 | ✅ Smoke pós-migração web | `npm run smoke:surfaces` — artefactos em `dist/web/*`. | Sem erros; ficheiros emit presentes. | TS-023 | P0 | S |
+| TS-031 | ✅ Smoke pós-remoção JS projector | Idem para `dist/apps/projector` e `stage-return`. | Build surfaces OK. | TS-010 | P0 | S |
+| TS-032 | ✅ Actualizar `INVENTARIO-FUNCOES.md` | Nota «TypeScript 100%» como meta/concluído parcial. | Doc sincronizado. | TS-023 | P2 | S |
 
 ### 1.6 Hardening (pós-migração)
 
@@ -109,30 +109,30 @@ Objetivo: um único caminho de integração (controller/composable), motor em `s
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TF-001 | Documentar arquitectura textfill | Criar `docs/projection-textfill.md`: camadas (motor, runtime, UI), modos preview/output, stage-return `allTexto`. | Doc lida standalone. | — | P1 | M |
-| TF-002 | Documentar API pública do motor | Listar exports: `applyPreviewTextfill`, `refreshOutputTextfill`, `refreshOutputTextfillAll`, opções. | Tabela na doc TF-001. | TF-001 | P1 | S |
-| TF-003 | Documentar `createProjectionTypographyController` | Quando usar controller vs motor directo (regra: **sempre controller** excepto testes unitários). | Secção «quando usar o quê». | TF-001 | P1 | S |
-| TF-004 | Diagrama de fluxo operador → projetor | Mermaid: prefs → WS → runtime → textfill → DOM. | Diagrama em TF-001. | TF-001 | P2 | S |
+| TF-001 | ✅ Documentar arquitectura textfill | Criar `docs/projection-textfill.md`: camadas (motor, runtime, UI), modos preview/output, stage-return `allTexto`. | Doc lida standalone. | — | P1 | M |
+| TF-002 | ✅ Documentar API pública do motor | Listar exports: `applyPreviewTextfill`, `refreshOutputTextfill`, `refreshOutputTextfillAll`, opções. | Tabela na doc TF-001. | TF-001 | P1 | S |
+| TF-003 | ✅ Documentar `createProjectionTypographyController` | Quando usar controller vs motor directo (regra: **sempre controller** excepto testes unitários). | Secção «quando usar o quê». | TF-001 | P1 | S |
+| TF-004 | ✅ Diagrama de fluxo operador → projetor | Mermaid: prefs → WS → runtime → textfill → DOM. | Diagrama em TF-001. | TF-001 | P2 | S |
 
 ### 2.2 Unificar operador (eliminar caminho paralelo)
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TF-005 | Auditar duplicação PreviewOutputTile vs runtime | Diff lógica: font-face, shadow, resize, debounce, textfill. | Lista de linhas/comportamentos duplicados. | TF-001 | P0 | M |
-| TF-006 | Criar composable `useProjectionTypographyPreview` | Vue composable que encapsula controller em modo `preview` para root HTMLElement ref. | Export testável; sem DOM global. | TF-005 | P0 | L |
-| TF-007 | Refactor `PreviewOutputTile.vue` | Substituir chamada directa `refreshPreviewTextfill` por composable/controller. | Prévia multi-saída idêntica visualmente. | TF-006 | P0 | M |
-| TF-008 | Refactor `ProjectionTypographyPreview.vue` | Idem TF-007 para painel Configurações → Tipografia. | Slider min/max/textfill reflecte na prévia. | TF-006 | P0 | M |
-| TF-009 | Paridade `fitSlackPx` / text-shadow | Garantir composable usa `projectionTextShadowSlackPx` como runtime. | Sem corte de sombra na prévia. | TF-007 | P1 | S |
-| TF-010 | Paridade debounce resize | Alinhar timings (32 ms / 120 ms) com runtime ou extrair constantes partilhadas. | Redimensionar janela não regredir. | TF-007 | P1 | S |
-| TF-011 | `diagnosticSurface` consistente | Prefixos `operator-preview:` mantidos via opção do controller. | Logs JSONL identificam superfície. | TF-007 | P2 | S |
-| TF-012 | Remover imports directos `@shared/projection-textfill` do operador | grep operador só via composable/runtime (excepto testes). | Zero imports directos em components. | TF-008 | P1 | S |
+| TF-005 | ✅ Auditar duplicação PreviewOutputTile vs runtime | Diff lógica: font-face, shadow, resize, debounce, textfill. | Lista de linhas/comportamentos duplicados. | TF-001 | P0 | M |
+| TF-006 | ✅ Criar composable `useProjectionTypographyPreview` | Vue composable que encapsula controller em modo `preview` para root HTMLElement ref. | Export testável; sem DOM global. | TF-005 | P0 | L |
+| TF-007 | ✅ Refactor `PreviewOutputTile.vue` | Substituir chamada directa `refreshPreviewTextfill` por composable/controller. | Prévia multi-saída idêntica visualmente. | TF-006 | P0 | M |
+| TF-008 | ✅ Refactor `ProjectionTypographyPreview.vue` | Idem TF-007 para painel Configurações → Tipografia. | Slider min/max/textfill reflecte na prévia. | TF-006 | P0 | M |
+| TF-009 | ✅ Paridade `fitSlackPx` / text-shadow | Garantir composable usa `projectionTextShadowSlackPx` como runtime. | Sem corte de sombra na prévia. | TF-007 | P1 | S |
+| TF-010 | ✅ Paridade debounce resize | Alinhar timings (32 ms / 120 ms) com runtime ou extrair constantes partilhadas. | Redimensionar janela não regredir. | TF-007 | P1 | S |
+| TF-011 | ✅ `diagnosticSurface` consistente | Prefixos `operator-preview:` mantidos via opção do controller. | Logs JSONL identificam superfície. | TF-007 | P2 | S |
+| TF-012 | ✅ Remover imports directos `@shared/projection-textfill` do operador | grep operador só via composable/runtime (excepto testes). | Zero imports directos em components. | TF-008 | P1 | S |
 
 ### 2.3 Superfícies de saída (validação)
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TF-013 | Validar projetor usa só controller | `apps/projector/src/projector.ts` — sem textfill directo. | grep confirma. | — | P1 | S |
-| TF-014 | Validar stage-return `allTexto: true` | Retorno acoplado `.atual`/`.proximo` via `refreshOutputTextfillAll`. | Dois blocos `.texto` escalam. | — | P1 | S |
+| TF-013 | ✅ Validar projetor usa só controller | `apps/projector/src/projector.ts` — sem textfill directo. | grep confirma. | — | P1 | S |
+| TF-014 | ✅ Validar stage-return `allTexto: true` | Retorno acoplado `.atual`/`.proximo` via `refreshOutputTextfillAll`. | Dois blocos `.texto` escalam. | — | P1 | S |
 | TF-015 | Validar `/live` e external-display | Após TS-015/016, controller com perfis correctos. | Perfis live/vocal/stage/player. | TS-015 | P1 | M |
 | TF-016 | Teste manual louvor longo 14+ versos | Projetor + prévia operador mesmo tamanho relativo. | Sem fonte 24px mínima incorrecta. | TF-007 | P0 | S |
 | TF-017 | Teste manual Bíblia versículo longo | Idem. | Texto cabe na área. | TF-016 | P1 | S |
@@ -173,8 +173,8 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| SM-001 | Inventariar 28 ficheiros `smoke-*.mjs` | Tabela: ficheiro, npm script, última feature, corre no CI?, dependências build. | Tabela em `scripts/README.md`. | — | P0 | M |
-| SM-002 | Mapear smoke → critérios de aceite originais | CAD-187…314: o que cada um valida ainda relevante? | Coluna «ainda necessário?» sim/não/parcial. | SM-001 | P0 | M |
+| SM-001 | ✅ Inventariar 28 ficheiros `smoke-*.mjs` | Tabela: ficheiro, npm script, última feature, corre no CI?, dependências build. | Tabela em `scripts/README.md`. | — | P0 | M |
+| SM-002 | ✅ Mapear smoke → critérios de aceite originais | CAD-187…314: o que cada um valida ainda relevante? | Coluna «ainda necessário?» sim/não/parcial. | SM-001 | P0 | M |
 | SM-003 | Identificar sobreposição entre smokes | Pares redundantes (ex.: cad288+cad290, cad221+cad224). | Lista de merge candidatos. | SM-002 | P1 | M |
 | SM-004 | Identificar testes órfãos em `tests/` | Quais só correm via smoke-cad* e não via release. | Lista + proposta destino. | SM-001 | P1 | S |
 
@@ -182,10 +182,10 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| SM-005 | Formalizar «smoke core» | Núcleo = `smoke-fase2`, `smoke-fase8`, `smoke-car40`. | Documentado como contrato release. | SM-001 | P0 | S |
+| SM-005 | ✅ Formalizar «smoke core» | Núcleo = `smoke-fase2`, `smoke-fase8`, `smoke-car40`. | Documentado como contrato release. | SM-001 | P0 | S |
 | SM-006 | Renomear scripts core (opcional) | Ex.: `smoke:core:bootstrap`, `smoke:core:ws`, `smoke:core:video` — aliases antigos mantidos. | Sem breaking change ou changelog. | SM-005 | P3 | S |
-| SM-007 | Extrair helpers partilhados smokes | `scripts/lib/smoke-helpers.mjs`: assert, fetchJson, tempHome, startServer. | 3+ smokes usam helper. | SM-001 | P1 | M |
-| SM-008 | Reduzir duplicação bootstrap em smokes | Usar helper SM-007 nos cad*. | Menos copy-paste start/stop server. | SM-007 | P2 | M |
+| SM-007 | ✅ Extrair helpers partilhados smokes | `scripts/lib/smoke-helpers.mjs`: assert, fetchJson, tempHome, startServer. | 3+ smokes usam helper. | SM-001 | P1 | M |
+| SM-008 | ✅ Reduzir duplicação bootstrap em smokes | Usar helper SM-007 nos cad*. | Menos copy-paste start/stop server. | SM-007 | P2 | M |
 
 ### 3.3 Consolidação por domínio
 
@@ -251,9 +251,9 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| ST-001 | Mover `projection-contrast` para `shared/` | Fonte única TS; projector + web importam `/shared/projection-contrast.js`. | Ficheiro duplicado web removido. | — | P0 | M |
-| ST-002 | Actualizar imports projector | `from '/shared/projection-contrast.js'`. | Build projector OK. | ST-001 | P0 | S |
-| ST-003 | Actualizar imports external-display | Idem após TS-016. | Contraste scrim OK em live/vocal. | ST-001, TS-016 | P0 | S |
+| ST-001 | ✅ Mover `projection-contrast` para `shared/` | Fonte única TS; projector + web importam `/shared/projection-contrast.js`. | Ficheiro duplicado web removido. | — | P0 | M |
+| ST-002 | ✅ Actualizar imports projector | `from '/shared/projection-contrast.js'`. | Build projector OK. | ST-001 | P0 | S |
+| ST-003 | ✅ Actualizar imports external-display | Idem após TS-016. | Contraste scrim OK em live/vocal. | ST-001, TS-016 | P0 | S |
 | ST-004 | Auditar outros duplicados web vs apps | grep lógica copiada (stripChords, wsUrl, etc.). | Lista ST-004 anexa ou issues. | TS-015 | P1 | M |
 | ST-005 | Extrair `stripChordsForProjection` para shared | Se duplicado em projector/live/operator. | Função única testável. | ST-004 | P2 | M |
 | ST-006 | Centralizar `wsUrl` helpers por perfil | Padrão `location.host` + path WS. | Menos copy-paste web apps. | ST-004 | P2 | M |
@@ -262,18 +262,18 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| ST-007 | Criar `docs/BUILD.md` | Ordem builds, env vars (`LIVEPRAISE_HOME`, `APP_ROOT`), artefactos. | Referenciado no README. | TS-028 | P1 | M |
-| ST-008 | Diagrama arquitectura runtime | Electron + server + static mounts + WS. | Mermaid em docs/ARCHITECTURE.md. | — | P2 | M |
+| ST-007 | ✅ Criar `docs/BUILD.md` | Ordem builds, env vars (`LIVEPRAISE_HOME`, `APP_ROOT`), artefactos. | Referenciado no README. | TS-028 | P1 | M |
+| ST-008 | ✅ Diagrama arquitectura runtime | Electron + server + static mounts + WS. | Mermaid em docs/ARCHITECTURE.md. | — | P2 | M |
 | ST-009 | Unificar destino emits apps | Meta: tudo relevante sob `dist/apps/*` (projector, stage-return, operator, web). | ADR + migração TS-007. | TS-007 | P1 | L |
 | ST-010 | Script `npm run clean` | Remove dist/, emits apps, caches. | Rebuild determinístico. | ST-009 | P2 | S |
 | ST-011 | Validar `copy-shared-assets.mjs` | CSS shared sempre em dist/shared após build. | projection-layout.css servido. | — | P1 | S |
-| ST-012 | Verificar ordem `build` no package.json | sync:version → server (inclui shared) → projector → stage-return → electron → operator → web. | Uma linha documentada. | TS-021 | P1 | S |
+| ST-012 | ✅ Verificar ordem `build` no package.json | sync:version → server (inclui shared) → projector → stage-return → electron → operator → web. | Uma linha documentada. | TS-021 | P1 | S |
 
 ### 4.3 Server / static / routing
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| ST-013 | Documentar mounts Express | Tabela path → pasta (`/shared`, `/projector`, `/live`, …). | docs/ARCHITECTURE.md | — | P1 | S |
+| ST-013 | ✅ Documentar mounts Express | Tabela path → pasta (`/shared`, `/projector`, `/live`, …). | docs/ARCHITECTURE.md | — | P1 | S |
 | ST-014 | Health check cobre todas superfícies | `server/health.ts` — web/live, portal, remote. | GET /health reporta activo. | — | P2 | S |
 | ST-015 | Revisar cache headers static | Projector vs operator vs shared — evitar stale em dev. | Comportamento documentado. | — | P3 | M |
 
@@ -299,7 +299,7 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
 | ST-023 | Revisar `.github/workflows/*.yml` | Nomes, smokes, alinhamento README/INVENTARIO. | Sem referências mortas. | SM-031 | P1 | M |
-| ST-024 | Adicionar job typecheck CI | Ver TS-029. | ci.yml typecheck. | TS-029 | P1 | S |
+| ST-024 | ✅ Adicionar job typecheck CI | Ver TS-029. | ci.yml typecheck. | TS-029 | P1 | S |
 | ST-025 | Actualizar README estrutura repositório | web/ TS, dist/, smokes consolidados. | Árvore actualizada. | TS-045, SM-042 | P1 | S |
 | ST-026 | Actualizar CHANGELOG meta técnica | Epics TS, TF, SM, ST concluídos. | Entrada por release. | — | P2 | S |
 
@@ -368,7 +368,7 @@ Exemplos de pedidos ao agente:
 - *«Execute SM-016 a SM-030, deprecando smokes cad*»* — intervalo.
 - *«Execute TF-006 e TF-007 — unificar PreviewOutputTile»* — tarefa com contexto.
 
-Após cada tarefa concluída, marcar `[x]` no ID correspondente neste ficheiro (ou mover para secção «Concluídas» no final).
+Após cada tarefa concluída, marcar `[x]` na secção «Concluídas» e **✅** na coluna Título da tabela do ID correspondente.
 
 ---
 
@@ -400,8 +400,6 @@ Após cada tarefa concluída, marcar `[x]` no ID correspondente neste ficheiro (
 - [x] **ST-008** — `docs/ARCHITECTURE.md`
 - [x] **ST-013** — Tabela mounts Express em ARCHITECTURE.md
 
-**Próximo:** TS-027 (`check:js-in-src`) ou TF-019 (tipos diagnóstico) ou SM-007 (helpers smokes).
-
 - [x] **TS-016** — `web/external-display/src/external-display.ts`
 - [x] **TS-017** — projection-contrast via `/shared/` (ST-001)
 - [x] **TS-018** — `web/portal/src/portal.ts`
@@ -417,3 +415,33 @@ Após cada tarefa concluída, marcar `[x]` no ID correspondente neste ficheiro (
 - [x] **TF-010** — debounce 32/120 ms no composable
 - [x] **TF-011** — `diagnosticSurface` no composable
 - [x] **TF-012** — operador sem import directo de textfill (só composable)
+- [x] **TS-027** — `npm run check:js-in-src`
+- [x] **TS-028** — fluxo de build em `docs/BUILD.md`
+- [x] **TS-029** — job `typecheck` no CI (`.github/workflows/ci.yml`)
+- [x] **SM-007** — `scripts/lib/smoke-helpers.mjs`
+- [x] **SM-008** — fase2, fase8, car40 usam helpers
+- [x] **TF-013** — projetor/live/external só via controller (grep)
+- [x] **TF-014** — retorno palco `allTexto: true` em external-display
+
+### TS-024–032 (2026-06-15)
+
+- [x] **TS-024** — `tailwind.config.ts` (removido `.js`)
+- [x] **TS-025** — `postcss.config.ts` (removido `.js`)
+- [x] **TS-030** — `scripts/smoke-build-surfaces.mjs` + `npm run smoke:surfaces`
+- [x] **TS-031** — projector + stage-return no smoke de surfaces
+- [x] **TS-032** — nota TypeScript em `INVENTARIO-FUNCOES.md`
+
+### TS-026 + itens implícitos (2026-06-15)
+
+- [x] **TS-014** — `tsconfig.web.json` (project references)
+- [x] **TS-015** — `web/live/src/live.ts`
+- [x] **ST-002** — projector importa `/shared/projection-contrast.js`
+- [x] **ST-003** — external-display importa contrast partilhado
+- [x] **ST-007** — `docs/BUILD.md` (ordem build + aliases)
+- [x] **ST-012** — ordem build documentada
+- [x] **ST-024** — typecheck no CI (paridade TS-029)
+- [x] **SM-005** — suite núcleo formalizada em `scripts/README.md`
+- [x] **TS-026** — `tsconfig.browser-paths.json` + extends unificados
+
+**Próximo:** SM-009 (consolidar smokes cad*) ou TS-033 (strict audit web) ou TF-015/016–018.
+

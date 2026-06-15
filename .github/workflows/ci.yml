@@ -6,6 +6,22 @@ on:
     branches: [master, main]
 
 jobs:
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run check:js-in-src
+      - run: npm run typecheck
+
   smoke:
     name: smoke tests
     runs-on: ubuntu-latest

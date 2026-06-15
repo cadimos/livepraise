@@ -5,7 +5,7 @@
 | Tipo | Extensões / local | Versionado no git? |
 |------|-------------------|--------------------|
 | **Fonte** | `.ts`, `.vue`, `.html`, `.css` em `apps/`, `web/`, `server/`, `core/`, `shared/`, `electron/` | Sim |
-| **Config de tooling** | `tailwind.config.js`, `postcss.config.js`, `scripts/*.mjs`, `tests/*.mjs` | Sim |
+| **Config de tooling** | `tailwind.config.ts`, `postcss.config.ts`, `scripts/*.mjs`, `tests/*.mjs` | Sim |
 | **Artefacto de build** | `dist/**` (server, shared, electron, operator, apps browser) | **Não** — gerado por `npm run build` |
 | **Emit browser apps** | `dist/apps/projector/`, `dist/apps/stage-return/` | **Não** — `tsc` + cópia de HTML/CSS |
 
@@ -20,7 +20,7 @@
 | `core/displays/config-file.js` | Build commitado (legado) | Removido — emit em `dist/core/` |
 | `core/displays/merge-assignments.js` | Cópia obsoleta (fonte em `electron/displays/`) | Removido |
 | `web/**/*.js` | **Fonte** (migração TS pendente) | ✅ Migrado — fonte em `web/*/src/*.ts`, emit em `dist/web/*/` |
-| `tailwind.config.js`, `postcss.config.js` | Config | Manter |
+| `tailwind.config.js`, `postcss.config.js` | Config | ✅ Migrados para `.ts` (TS-024, TS-025) |
 
 ## Decisão: destino do emit browser (TS-007)
 
@@ -42,8 +42,21 @@ npm run sync:version
   → build:stage-return
   → build:electron   (tsc → dist/electron/)
   → build:operator   (vite → dist/apps/operator/)
-  → build:web        (futuro — TS-021)
+  → build:web        (tsc web apps → dist/web/* + copy HTML/CSS)
 ```
+
+## Aliases de import (TS-026)
+
+Dois padrões, consoante a superfície:
+
+| Alias | Onde | Config | Runtime |
+|-------|------|--------|---------|
+| `@shared/*`, `@core/*` | Operador (Vite), `server/`, `core/` | `tsconfig.json` + `vite.config.ts` | Bundler / Node resolve para `shared/` e `core/` |
+| `/shared/*.js` | Projector, stage-return, web apps | `tsconfig.browser-paths.json` (estendido por cada `tsconfig.*.json` browser) | URL absoluta servida por Express em `/shared/` |
+
+**Fonte única dos paths browser:** `tsconfig.browser-paths.json` na raiz — projector, stage-return e `web/*/tsconfig.json` estendem este ficheiro em vez de duplicar entradas.
+
+Requer `npm run build:server` (ou `build`) antes do typecheck browser: os paths apontam para `.d.ts` em `dist/shared/`.
 
 ## Comandos úteis
 

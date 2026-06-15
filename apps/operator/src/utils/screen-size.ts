@@ -12,6 +12,7 @@ import {
   parseCustomScreenPixels,
   resolvePreviewAspectRatio,
   resolveProjectionStageSize,
+  fitAspectRatioInBox,
   SCREEN_CONTENT_FITS,
 } from '@shared/screen-layout';
 

@@ -17,6 +17,7 @@ import {
   createProjectionTypographyController,
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
+import type { ProjectionTypographyPrefs } from '/shared/projection-typography.js';
 
 type ExternalProfile = 'vocal' | 'stage' | 'player';
 
@@ -299,5 +300,7 @@ setViewerStatus(statusEl(), 'A ligar…');
 void registerDevice().catch((err) => {
   console.warn('Registo dispositivo:', err);
 });
-void fetchProjectionTypographyPrefs().then((prefs) => typography.init(prefs));
+void fetchProjectionTypographyPrefs().then((prefs: ProjectionTypographyPrefs | null) =>
+  typography.init(prefs),
+);
 connect();

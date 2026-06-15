@@ -109,3 +109,13 @@ Estilos de layout: `shared/projection-layout.css` — `.content > span` recebe `
 - `tests/projection-textfill-visibility.test.mjs`
 
 Integrados em `smoke:cad313` (a consolidar — SM-010).
+
+## Validação estática (TF-013, TF-014)
+
+| Superfície | Integração textfill | Estado |
+|------------|---------------------|--------|
+| Projetor | `createProjectionTypographyController` — sem import directo do motor | ✅ |
+| Live / external-display | Idem via `projection-typography-runtime` | ✅ |
+| Operador (prévia) | `useProjectionTypographyPreview` → `refreshPreviewTextfill` | ✅ |
+| Retorno palco (`/stage`) | `textfillOptions: { allTexto: true }` em external-display | ✅ |
+| `apps/stage-return/` (legado) | Compila mas **não** servido HTTP — Electron usa `/stage/` | ⚠️ ver ST-004 |

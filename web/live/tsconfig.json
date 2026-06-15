@@ -1,21 +1,12 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": ["../../tsconfig.json", "../../tsconfig.browser-paths.json"],
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": false,
     "outDir": "../../dist/web/live",
     "rootDir": "src",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "baseUrl": "../..",
-    "paths": {
-      "/shared/display-debug-overlay.js": ["dist/shared/display-debug-overlay.d.ts"],
-      "/shared/projection-media-url.js": ["dist/shared/projection-media-url.d.ts"],
-      "/shared/projection-video-player.js": ["dist/shared/projection-video-player.d.ts"],
-      "/shared/viewer-status.js": ["dist/shared/viewer-status.d.ts"],
-      "/shared/endpoint-device-id.js": ["dist/shared/endpoint-device-id.d.ts"],
-      "/shared/projection-typography-runtime.js": ["dist/shared/projection-typography-runtime.d.ts"]
-    }
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
   },
   "include": ["src/**/*.ts"]
 }
