@@ -400,9 +400,20 @@ Após cada tarefa concluída, marcar `[x]` no ID correspondente neste ficheiro (
 - [x] **ST-008** — `docs/ARCHITECTURE.md`
 - [x] **ST-013** — Tabela mounts Express em ARCHITECTURE.md
 
-**Próximo:** TS-016 (migrar `web/external-display`).
+**Próximo:** TS-027 (`check:js-in-src`) ou TF-019 (tipos diagnóstico) ou SM-007 (helpers smokes).
 
-- [x] **TS-014** — `tsconfig.web.json` + `web/live/tsconfig.json`
-- [x] **TS-015** — `web/live/src/live.ts`; removido `live.js` fonte
-- [x] **TS-020** — `index.html` live (script `live.js` emitido em dist)
-- [x] **TS-021** — `build:web` / `build:web:live` no package.json
+- [x] **TS-016** — `web/external-display/src/external-display.ts`
+- [x] **TS-017** — projection-contrast via `/shared/` (ST-001)
+- [x] **TS-018** — `web/portal/src/portal.ts`
+- [x] **TS-019** — `web/remote/src/remote.ts`
+- [x] **TS-020** — HTML/CSS copiados para `dist/web/*`
+- [x] **TS-021** — `build:web` completo (live + external + portal + remote)
+- [x] **TS-022** — web nos tsconfigs de `typecheck`
+- [x] **TS-023** — removidos `.js` fonte de `web/`
+- [x] **TF-006** — `useProjectionTypographyPreview.ts`
+- [x] **TF-007** — `PreviewOutputTile.vue` refactor
+- [x] **TF-008** — `ProjectionTypographyPreview.vue` refactor
+- [x] **TF-009** — `fitSlackPx` no composable
+- [x] **TF-010** — debounce 32/120 ms no composable
+- [x] **TF-011** — `diagnosticSurface` no composable
+- [x] **TF-012** — operador sem import directo de textfill (só composable)

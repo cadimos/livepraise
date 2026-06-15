@@ -21,10 +21,10 @@ flowchart TB
   subgraph surfaces [Superfícies browser]
     Op[dist/apps/operator]
     Proj[dist/apps/projector]
-    WebLive[web/live]
-    WebExt[web/external-display]
-    Remote[web/remote]
-    Portal[web/portal]
+    WebLive[dist/web/live]
+    WebExt[dist/web/external-display]
+    Remote[dist/web/remote]
+    Portal[dist/web/portal]
   end
 
   DM -->|127.0.0.1| Express
@@ -51,9 +51,9 @@ flowchart TB
 | `/projector` | `dist/apps/projector/` | Saída pública (monitor projeção) |
 | `/operator` | `dist/apps/operator/` | UI operador (Vue 3) |
 | `/live` | `dist/web/live/` | Visualizador live (browser) |
-| `/vocal`, `/stage`, `/player` | `web/external-display/` | Ecrãs externos (mesmo HTML/JS, perfil por rota) |
-| `/remote` | `web/remote/` | Controlo remoto web |
-| `/` | `web/portal/` | Portal inicial |
+| `/vocal`, `/stage`, `/player` | `dist/web/external-display/` | Ecrãs externos |
+| `/remote` | `dist/web/remote/` | Controlo remoto web |
+| `/` | `dist/web/portal/` | Portal inicial |
 | `/imagens`, `/videos` | `~/livepraise/{imagens,videos}` | Mídia do utilizador |
 | `/fonts` | `~/livepraise/fonts` + bundled | Fontes de projeção |
 

@@ -19,7 +19,7 @@
 | `apps/stage-return/stage-return.js` | Build commitado (legado) | Removido — emit em `dist/apps/stage-return/` |
 | `core/displays/config-file.js` | Build commitado (legado) | Removido — emit em `dist/core/` |
 | `core/displays/merge-assignments.js` | Cópia obsoleta (fonte em `electron/displays/`) | Removido |
-| `web/**/*.js` | **Fonte** (migração TS pendente) | Manter até TS-015+ |
+| `web/**/*.js` | **Fonte** (migração TS pendente) | ✅ Migrado — fonte em `web/*/src/*.ts`, emit em `dist/web/*/` |
 | `tailwind.config.js`, `postcss.config.js` | Config | Manter |
 
 ## Decisão: destino do emit browser (TS-007)

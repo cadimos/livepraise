@@ -51,8 +51,8 @@ projector / external-display / live     ← saídas via controller
 |----------|------|
 | Projetor, live, external-display, stage (`/stage/`) | `createProjectionTypographyController()` |
 | Testes unitários / smokes | Imports directos do motor |
-| Prévia operador (estado actual) | `refreshPreviewTextfill` directo — **a migrar para composable** (TF-006) |
-| Configurações → Tipografia | Idem prévia — **a migrar** |
+| Prévia operador | `useProjectionTypographyPreview()` composable |
+| Configurações → Tipografia | Idem composable |
 
 **Regra alvo:** produção usa sempre o **controller** ou composable Vue que o encapsula; o motor directo fica restrito a testes.
 
