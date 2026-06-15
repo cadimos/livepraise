@@ -172,7 +172,7 @@ try {
     assert(fontRes.ok, `CA-7 font ${fontRes.status}`);
     for (const file of [
       'apps/projector/src/projector.ts',
-      'web/live/live.js',
+      'web/live/src/live.ts',
       'apps/stage-return/src/stage-return.ts',
     ]) {
       const src = readSrc(file);

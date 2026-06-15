@@ -54,16 +54,19 @@ Dois padrões, consoante a superfície:
 | `@shared/*`, `@core/*` | Operador (Vite), `server/`, `core/` | `tsconfig.json` + `vite.config.ts` | Bundler / Node resolve para `shared/` e `core/` |
 | `/shared/*.js` | Projector, stage-return, web apps | `tsconfig.browser-paths.json` (estendido por cada `tsconfig.*.json` browser) | URL absoluta servida por Express em `/shared/` |
 
-**Fonte única dos paths browser:** `tsconfig.browser-paths.json` na raiz — projector, stage-return e `web/*/tsconfig.json` estendem este ficheiro em vez de duplicar entradas.
+**Fonte única dos paths browser:** `tsconfig.browser-paths.json` na raiz — projector, stage-return e `web/*/tsconfig.json` estendem este ficheiro. Runtime usa `/shared/*.js`; `import type` de `@shared/types/*` e `@shared/auth-session` apontam para `.d.ts` em `dist/shared/` (evita conflito `rootDir` em web).
 
-Requer `npm run build:server` (ou `build`) antes do typecheck browser: os paths apontam para `.d.ts` em `dist/shared/`.
+Requer `npm run build:server` (ou `build`) antes do typecheck browser: os paths `/shared/*.js` apontam para `.d.ts` em `dist/shared/`.
+
+**Git (TS-043):** `shared/**/*.js` e `shared/**/*.d.ts` estão no `.gitignore` — emit só em `dist/shared/`.
 
 ## Comandos úteis
 
 ```bash
-npm run build          # build completo
+npm run build          # build completo (produção, sem source maps browser)
+npm run build:browser:dev  # browser + maps (TS-038, usado por npm run dev)
 npm run typecheck      # verificação TS sem emit
-npm run dev            # build + Electron dev
+npm run dev            # browser dev com maps + Electron
 npm run dev:server     # servidor + operador (sem Electron)
 ```
 
@@ -78,3 +81,10 @@ npm run dev:server     # servidor + operador (sem Electron)
 ## Requisitos
 
 Node ≥ 22.12 (`engines` em `package.json`).
+
+## Decisões de build
+
+- **TS-037:** manter `tsc` para web/projector/stage-return — ver [`ADR-037-web-bundler.md`](ADR-037-web-bundler.md).
+- **TS-038:** source maps só em dev — `npm run build:browser:dev` (ou `npm run dev`, que o usa em vez de `build` completo para browser).
+- **TS-044:** quickstart clone em `README.md`; validação local com `npm run verify:build`.
+- **TS-045:** checklist de fecho — [`TS-045-EPIC-CHECKLIST.md`](TS-045-EPIC-CHECKLIST.md).

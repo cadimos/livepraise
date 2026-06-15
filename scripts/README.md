@@ -43,11 +43,21 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 | `smoke:cad290` | `smoke-cad290.mjs` | ❌ | Parcial | Release assets |
 | `smoke:cad300` | `smoke-cad300.mjs` | ❌ | Parcial | — |
 | `smoke:cad311` | `smoke-cad311.mjs` | ❌ | Parcial | Fontes bundled |
-| `smoke:cad313` | `smoke-cad313.mjs` | ❌ | **Sim** | Tipografia runtime + textfill |
+| `smoke:textfill` | `smoke-textfill.mjs` | ❌ | **Sim** | Tipografia + textfill (SM-010) |
+| `smoke:cad313` | `smoke-cad313.mjs` | ❌ | Parcial | Redireccionado → `smoke:textfill` |
 | `smoke:cad314` | `smoke-cad314.mjs` | ❌ | **Sim** | QA tipografia CA-1–14 |
 | `smoke-win-installer` | `smoke-win-installer.mjs` | ❌ | Manual Windows | Instalador NSIS |
 
-**Plano de consolidação:** SM-009–SM-030 — fundir cad* em `smoke-features.mjs` ou testes `tests/`; manter núcleo + legacy-upgrade + textfill.
+**Plano de consolidação:** SM-016–SM-029 deprecados (aviso + encaminhamento em `smoke-deprecated.mjs`); remoção física dos `.mjs` cad* em SM-030 (próximo release).
+
+### Suite features (SM-009)
+
+| npm | Ficheiro | O que valida |
+|-----|----------|--------------|
+| `smoke:features` | `smoke-features.mjs` | Todos: locales, audit, video-watcher, musica-export, version, textfill |
+| `smoke:features -- --only=locales` | idem | Um domínio (ver `--list`; aliases: typography → textfill) |
+
+Scripts individuais (`smoke:locales`, `smoke:audit`, …) mantidos como aliases directos.
 
 ## CI (GitHub Actions)
 
@@ -61,6 +71,9 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 | npm | Ficheiro |
 |-----|----------|
 | `smoke:surfaces` | `smoke-build-surfaces.mjs` — artefactos `dist/` após `npm run build` (TS-030/031) |
+| `smoke:features` | `smoke-features.mjs` — locales, audit, video-watcher, musica-export, version, **textfill** (SM-009/010) |
+| `smoke:textfill` | `smoke-textfill.mjs` — API tipografia + `tests/projection-textfill-*` (SM-010) |
+| `verify:build` | `verify-fresh-build.mjs` — build + surfaces (TS-044) |
 | `check:js-in-src` | `check-js-in-src.mjs` — gate sem `.js` em pastas fonte |
 | `verify:openapi` | `verify-openapi-coverage.mjs` |
 | `sync:locales` | `build-*-locale.mjs` |
@@ -72,6 +85,7 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 |--------|--------|
 | `copy-shared-assets.mjs` | CSS de `shared/` → `dist/shared/` |
 | `copy-browser-app-static.mjs` | HTML/CSS de `apps/*` ou `web/*` → `dist/` |
-| `lib/smoke-helpers.mjs` | assert, fetchJson, env isolado, loadLivepraiseServer (SM-007) |
+| `lib/smoke-helpers.mjs` | assert, fetchJson, env isolado (SM-007) |
+| `lib/smoke-textfill.mjs` | Asserções textfill importáveis (SM-010) |
 
 Ver também [`docs/BUILD.md`](../docs/BUILD.md).

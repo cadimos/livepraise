@@ -1,29 +1,23 @@
-const TOKEN_KEY = 'livepraise.auth.token';
-const USER_KEY = 'livepraise.auth.user';
-
-interface AuthUser {
-  username: string;
-  role: string;
-}
-
-interface AuthSession {
-  token: string;
-  user: AuthUser;
-}
+import {
+  AUTH_TOKEN_KEY,
+  AUTH_USER_KEY,
+  type AuthUser,
+} from '@shared/auth-session';
+import type { AuthLoginResponse, AuthSessionResponse } from '@shared/types/auth-api';
 
 function saveSession(token: string, user: AuthUser): void {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+  localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
 }
 
 function clearSession(): void {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+  localStorage.removeItem(AUTH_USER_KEY);
 }
 
-function readSession(): AuthSession | null {
-  const token = localStorage.getItem(TOKEN_KEY);
-  const rawUser = localStorage.getItem(USER_KEY);
+function readSession(): { token: string; user: AuthUser } | null {
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  const rawUser = localStorage.getItem(AUTH_USER_KEY);
   if (!token || !rawUser) return null;
   try {
     return { token, user: JSON.parse(rawUser) as AuthUser };
@@ -92,7 +86,7 @@ async function verifyExistingSession(): Promise<void> {
     clearSession();
     return;
   }
-  const data = (await res.json()) as { user: AuthUser };
+  const data = (await res.json()) as AuthSessionResponse;
   saveSession(session.token, data.user);
   showLoggedIn(data.user);
 }
@@ -111,7 +105,7 @@ byId<HTMLFormElement>('login-form').addEventListener('submit', async (event) => 
     body: JSON.stringify({ username, password }),
   });
 
-  const data = (await res.json()) as { token?: string; user?: AuthUser; error?: string };
+  const data = (await res.json()) as AuthLoginResponse;
   if (!res.ok) {
     errorEl.textContent = data.error ?? 'Falha no login';
     errorEl.hidden = false;

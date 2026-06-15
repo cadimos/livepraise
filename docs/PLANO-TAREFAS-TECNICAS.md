@@ -85,18 +85,18 @@ Objetivo: código de produto tipado, uma única fonte por módulo, build previs�
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TS-033 | `strict` audit em `web/` migrado | Corrigir `any` implícitos, null checks. | Sem `@ts-ignore` novos. | TS-023 | P2 | M |
-| TS-034 | Tipar payloads WebSocket em web | Reutilizar `shared/types/live.ts`. | Tipos alinhados server ↔ client. | TS-015 | P1 | M |
-| TS-035 | Tipar `portal.js` forms/API | Endpoints usados pelo portal. | Sem `any` em handlers principais. | TS-018 | P2 | M |
-| TS-036 | Tipar `remote.js` session/actions | Paridade com routes remote server. | Typecheck remote OK. | TS-019 | P2 | M |
-| TS-037 | Avaliar bundler único para web apps | Vite lib mode vs tsc puro — reduzir número de `.js` soltos. | ADR se adoptar bundler. | TS-021 | P3 | L |
+| TS-033 | ✅ `strict` audit em `web/` migrado | Corrigir `any` implícitos, null checks. | Sem `@ts-ignore` novos. | TS-023 | P2 | M |
+| TS-034 | ✅ Tipar payloads WebSocket em web | Reutilizar `shared/types/live.ts`. | Tipos alinhados server ↔ client. | TS-015 | P1 | M |
+| TS-035 | ✅ Tipar `portal.js` forms/API | Endpoints usados pelo portal. | Sem `any` em handlers principais. | TS-018 | P2 | M |
+| TS-036 | ✅ Tipar `remote.js` session/actions | Paridade com routes remote server. | Typecheck remote OK. | TS-019 | P2 | M |
+| TS-037 | ✅ Avaliar bundler único para web apps | Vite lib mode vs tsc puro — reduzir número de `.js` soltos. | ADR se adoptar bundler. | TS-021 | P3 | L |
 | TS-038 | Source maps em dev para web/projector | Facilitar debug Electron/browser. | Maps gerados em dev only. | TS-021 | P3 | M |
 | TS-039 | ESLint TypeScript (opcional) | `@typescript-eslint` regras mínimas. | lint script no package.json. | TS-029 | P3 | L |
 | TS-040 | Pre-commit hook typecheck (opcional) | Só se equipa quiser; documentar opt-in. | Hook documentado, não obrigatório. | TS-029 | P3 | S |
 | TS-041 | Remover referências a «paridade v0.0.8» obsoletas | Comentários que já não aplicam após TS. | grep limpo ou comentários actualizados. | — | P3 | S |
 | TS-042 | Verificar `depcheck` / paths `@shared/types` | Item `skipMissing` no package.json ainda necessário? | depcheck limpo ou justificado. | TS-026 | P3 | S |
-| TS-043 | Garantir `shared/**/*.js` nunca commitado | Reforçar regra `.gitignore` + TS-027. | Nenhum JS em shared/ no git. | TS-003 | P1 | S |
-| TS-044 | Teste: build limpo clone fresh | `git clone` → `npm ci` → `npm run build` sem passos manuais. | README quickstart válido. | TS-028 | P1 | S |
+| TS-043 | ✅ Garantir `shared/**/*.js` nunca commitado | Reforçar regra `.gitignore` + TS-027. | Nenhum JS em shared/ no git. | TS-003 | P1 | S |
+| TS-044 | ✅ Teste: build limpo clone fresh | `git clone` → `npm ci` → `npm run build` sem passos manuais. | README quickstart válido. | TS-028 | P1 | S |
 | TS-045 | Fechar epic TS — checklist final | TS-001–044 concluídos; web/projector/stage-return/core sem JS fonte. | Revisão CTO; tag interna opcional. | TS-030–044 | P0 | S |
 
 ---
@@ -150,7 +150,7 @@ Objetivo: um único caminho de integração (controller/composable), motor em `s
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TF-022 | Manter testes `tests/projection-textfill-*.test.mjs` | Integrar no smoke consolidado (SM-015), não apagar cobertura. | 3 testes passam após refactors. | TF-007 | P0 | S |
+| TF-022 | ✅ Manter testes `tests/projection-textfill-*.test.mjs` | Integrar no smoke consolidado (SM-015), não apagar cobertura. | 3 testes passam após refactors. | TF-007 | P0 | S |
 | TF-023 | Teste composable preview (futuro Vitest) | Se Vitest adoptado: mount composable com jsdom. | Backlog ou implementação mínima. | TF-006 | P3 | M |
 | TF-024 | Actualizar smoke CAD-313/314 ou sucessor | Asserções sobre composable/controller, não imports directos tile. | Smoke verde. | TF-012, SM-015 | P1 | M |
 | TF-025 | Caso agregado «textfill» no smoke release | Opcional: 1 teste rápido no gate release (SM-010). | release smoke inclui textfill. | SM-010 | P2 | M |
@@ -191,8 +191,8 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| SM-009 | Criar `smoke-features.mjs` (opcional) | Agrupa: locales, audit, video-watcher, musica-export, version-sync — flags `--only=locales`. | Um entrypoint; domínios isolados. | SM-003 | P1 | L |
-| SM-010 | Integrar textfill/tipografia no core ou features | Incorporar asserções de cad313/314 + tests/projection-textfill-* num módulo importável. | Cobertura textfill no gate. | SM-009, TF-022 | P1 | M |
+| SM-009 | ✅ Criar `smoke-features.mjs` (opcional) | Agrupa: locales, audit, video-watcher, musica-export, version-sync — flags `--only=locales`. | Um entrypoint; domínios isolados. | SM-003 | P1 | L |
+| SM-010 | ✅ Integrar textfill/tipografia no core ou features | Incorporar asserções de cad313/314 + tests/projection-textfill-* num módulo importável. | Cobertura textfill no gate. | SM-009, TF-022 | P1 | M |
 | SM-011 | Consolidar auth/roles (cad221+cad224) | Um script `smoke-auth.mjs` se ambos ainda relevantes. | npm script único; antigos deprecated. | SM-003 | P2 | M |
 | SM-012 | Consolidar displays (cad188+cad194) | Projetor + displays config num smoke. | Um script; build projector incluído. | SM-003 | P2 | M |
 | SM-013 | Consolidar backup/restore smokes | cad228, cad234, cad238 se sobrepostos. | Avaliar merge vs manter um. | SM-003 | P2 | L |
@@ -443,5 +443,21 @@ Após cada tarefa concluída, marcar `[x]` na secção «Concluídas» e **✅**
 - [x] **SM-005** — suite núcleo formalizada em `scripts/README.md`
 - [x] **TS-026** — `tsconfig.browser-paths.json` + extends unificados
 
-**Próximo:** SM-009 (consolidar smokes cad*) ou TS-033 (strict audit web) ou TF-015/016–018.
+### SM-009 + TS-033–036, TS-043 (2026-06-15)
+
+- [x] **SM-009** — `scripts/smoke-features.mjs` + `npm run smoke:features` (`--only=`, `--list`)
+- [x] **TS-033** — web sem `any`/`unknown` soltos; `byId` com null-check
+- [x] **TS-034** — WS tipado com `@shared/types/live` em live + external-display
+- [x] **TS-035** — portal usa `@shared/auth-session` + `@shared/types/auth-api`
+- [x] **TS-036** — remote usa tipos partilhados auth + `@shared/types/remote-api`
+- [x] **TS-043** — regra `shared/**/*.js` documentada (já no `.gitignore`)
+
+### SM-010 + TS-037 + TS-044 (2026-06-15)
+
+- [x] **SM-010** — `scripts/lib/smoke-textfill.mjs` + `smoke:textfill` + domínio `textfill` em `smoke:features`
+- [x] **TF-022** — testes `tests/projection-textfill-*` no smoke textfill
+- [x] **TS-037** — ADR: manter `tsc` (`docs/ADR-037-web-bundler.md`)
+- [x] **TS-044** — quickstart README + `npm run verify:build`
+
+**Fila:** TS-038 (source maps dev) → TS-045 (fechar epic TS) → SM-016+ (deprecar cad*) → TF-016–018 (QA manual textfill).
 

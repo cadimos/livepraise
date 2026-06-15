@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 /**
  * Smoke CAD-313 — tipografia runtime, textfill, sync WS.
+ * @deprecated Preferir `npm run smoke:textfill` (SM-010).
  */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { runTextfillIntegrationSmoke, runTextfillUnitTests } from './lib/smoke-textfill.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(scriptDir, '..');
@@ -31,48 +34,8 @@ const { port } = await startLivepraiseServer(0);
 const base = `http://127.0.0.1:${port}`;
 
 try {
-  const getDefault = await fetch(`${base}/api/projection-typography`);
-  assert(getDefault.ok, `GET default status ${getDefault.status}`);
-  const defaultBody = await getDefault.json();
-  assert(defaultBody.projectionTypography?.projector, 'GET default projector profile');
-  pass('CA-12a', 'GET /api/projection-typography');
-
-  const manifest = await fetch(`${base}/fonts/manifest.json`);
-  assert(manifest.ok, `manifest status ${manifest.status}`);
-  pass('CA-7a', 'GET /fonts/manifest.json');
-
-  const putRes = await fetch(`${base}/api/projection-typography`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      projectionTypography: {
-        ...defaultBody.projectionTypography,
-        vocal: {
-          ...defaultBody.projectionTypography.vocal,
-          maxFontPx: 88,
-          textfillEnabled: true,
-        },
-      },
-    }),
-  });
-  assert(putRes.ok, `PUT loopback status ${putRes.status}`);
-  pass('CA-12b', 'PUT persiste tipografia (loopback operador)');
-
-  const { applyPreviewTextfill, applyOutputTextfill } = await import(
-    '../dist/shared/projection-textfill.js'
-  );
-  assert(typeof applyPreviewTextfill === 'function', 'applyPreviewTextfill export');
-  assert(typeof applyOutputTextfill === 'function', 'applyOutputTextfill export');
-  pass('CA-1', 'helpers textfill exportados');
-
-  await import('../tests/projection-textfill-visibility.test.mjs');
-  pass('CA-1b', 'textfill oculta root durante refresh (sem flash)');
-
-  const { createProjectionTypographyController } = await import(
-    '../dist/shared/projection-typography-runtime.js'
-  );
-  assert(typeof createProjectionTypographyController === 'function', 'runtime controller');
-  pass('CA-3', 'runtime controller disponível');
+  await runTextfillIntegrationSmoke({ base, pass, assert });
+  runTextfillUnitTests(appRoot, pass);
 } finally {
   await stopLivepraiseServer();
 }

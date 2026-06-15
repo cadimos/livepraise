@@ -13,7 +13,11 @@
       "/shared/screen-layout.js": ["dist/shared/screen-layout.d.ts"],
       "/shared/service-timer-overlay.js": ["dist/shared/service-timer-overlay.d.ts"],
       "/shared/viewer-status.js": ["dist/shared/viewer-status.d.ts"],
-      "/shared/youtube.js": ["dist/shared/youtube.d.ts"]
+      "/shared/youtube.js": ["dist/shared/youtube.d.ts"],
+      "@shared/types/live": ["dist/shared/types/live.d.ts"],
+      "@shared/auth-session": ["dist/shared/auth-session.d.ts"],
+      "@shared/types/auth-api": ["dist/shared/types/auth-api.d.ts"],
+      "@shared/types/remote-api": ["dist/shared/types/remote-api.d.ts"]
     }
   }
 }

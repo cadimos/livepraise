@@ -12,20 +12,14 @@ import {
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
 import type { ProjectionTypographyPrefs } from '/shared/projection-typography.js';
+import type {
+  LiveAction,
+  WsJoinedMessage,
+  WsLiveBroadcastMessage,
+  WsServerMessage,
+} from '@shared/types/live';
 
 const PROFILE = 'live';
-
-interface LiveAction {
-  acao: string;
-  valor: string;
-}
-
-type LiveWsMessage = {
-  type?: string;
-  action?: LiveAction;
-  state?: { lastAction?: LiveAction | null };
-  projectionTypography?: unknown;
-};
 
 attachDisplayDebugOverlayListener();
 
@@ -181,28 +175,34 @@ function applyAction(action: LiveAction): void {
   refreshViewerStatus();
 }
 
+function parseWsMessage(raw: string): WsServerMessage {
+  return JSON.parse(raw) as WsServerMessage;
+}
+
 function connect(): void {
   wsConnected = false;
   refreshViewerStatus();
 
   const socket = new WebSocket(wsUrl());
-  let handleWsMessage = (message: LiveWsMessage): void => {
+  const handleLiveMessage = (message: WsServerMessage): void => {
     if (message.type === 'joined') {
+      const joined = message as WsJoinedMessage;
       wsConnected = true;
       refreshViewerStatus();
-      if (message.state?.lastAction) {
-        applyAction(message.state.lastAction);
+      if (joined.state.lastAction) {
+        applyAction(joined.state.lastAction);
       }
       return;
     }
-    if (message.type === 'live-action' && message.action) {
-      applyAction(message.action);
+    if (message.type === 'live-action') {
+      const live = message as WsLiveBroadcastMessage;
+      applyAction(live.action);
     }
   };
-  handleWsMessage = attachProjectionTypographyWs(
-    typography,
-    handleWsMessage as Parameters<typeof attachProjectionTypographyWs>[1],
-  ) as typeof handleWsMessage;
+
+  const handleWsMessage = attachProjectionTypographyWs(typography, (message) => {
+    handleLiveMessage(message as WsServerMessage);
+  });
 
   socket.addEventListener('open', () => {
     socket.send(
@@ -218,8 +218,7 @@ function connect(): void {
   });
 
   socket.addEventListener('message', (event) => {
-    const message = JSON.parse(String(event.data)) as LiveWsMessage;
-    handleWsMessage(message);
+    handleWsMessage(parseWsMessage(String(event.data)) as Parameters<typeof handleWsMessage>[0]);
   });
 
   socket.addEventListener('close', () => {

@@ -37,7 +37,7 @@ livepraise/
 └── resources/         # Ícones e assets de build
 ```
 
-Documentação técnica: [`docs/BUILD.md`](docs/BUILD.md) (build e política TS), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/projection-textfill.md`](docs/projection-textfill.md), [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md).
+Documentação técnica: [`docs/BUILD.md`](docs/BUILD.md) (build e política TS), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/projection-textfill.md`](docs/projection-textfill.md), [`docs/ADR-037-web-bundler.md`](docs/ADR-037-web-bundler.md), [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md).
 
 ## Requisitos
 
@@ -168,6 +168,19 @@ O Electron em `node_modules/electron/dist` é **por SO**. Após clonar ou copiar
 | **macOS** (`npm run dist:mac`) | macOS (DMG só se gera no Mac) |
 
 ## Desenvolvimento
+
+### Quickstart (clone limpo — TS-044)
+
+```bash
+git clone https://github.com/cadimos/livepraise.git
+cd livepraise
+npm ci                 # Node ≥ 22.12 (ver .nvmrc)
+npm run build          # server + electron + operator + web + apps browser
+npm run verify:build   # opcional: build + smoke:surfaces (validação pós-clone)
+npm run dev            # Electron
+```
+
+Ver [`docs/BUILD.md`](docs/BUILD.md) para ordem de build e aliases TypeScript.
 
 ```bash
 npm install
