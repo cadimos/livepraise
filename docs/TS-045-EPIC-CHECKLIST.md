@@ -22,7 +22,7 @@ Data: 2026-06-15
 |----|-------|
 | TS-024–025 | `tailwind.config.ts`, `postcss.config.ts` |
 | TS-037 | ADR: manter `tsc` — [`ADR-037-web-bundler.md`](ADR-037-web-bundler.md) |
-| TS-038 | Source maps só em dev — `npm run build:browser:dev` / `npm run dev` |
+| TS-038 | Source maps só em dev — `npm run verify:sourcemaps` |
 
 ## Opcionais em backlog (não bloqueiam TS-045)
 
@@ -40,7 +40,8 @@ npm run check:js-in-src    # zero .js fonte em pastas de produto
 npm run typecheck          # todos os tsconfigs
 npm run build              # produção sem source maps browser
 npm run smoke:surfaces     # artefactos dist/
-npm run verify:build       # build + surfaces (TS-044)
+npm run verify:sourcemaps  # TS-038
+npm run verify:build       # TS-044
 ```
 
 ## Fonte vs artefacto

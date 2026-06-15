@@ -27,35 +27,19 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 | `smoke:video-watcher` | `smoke-video-watcher.mjs` | ❌ | Sim | Watcher pasta vídeos |
 | `smoke:musica-export` | `smoke-musica-export.mjs` | ❌ | Sim | Export/import louvores |
 | `smoke:version` | `smoke-version-sync.mjs` | ❌ | Sim | Sync versão package.json |
-| `smoke:cad187` | `smoke-cad187.mjs` | ❌ | Parcial | WS join roles |
-| `smoke:cad188` | `smoke-cad188.mjs` | ❌ | Parcial | Displays + projector build |
-| `smoke:cad189` | `smoke-cad189.mjs` | ❌ | Parcial | — |
-| `smoke:cad190` | `smoke-cad190.mjs` | ❌ | Parcial | — |
-| `smoke:cad193` | `smoke-cad193.mjs` | ❌ | Parcial | — |
-| `smoke:cad194` | `smoke-cad194.mjs` | ❌ | Parcial | Projetor estático |
-| `smoke:cad221` | `smoke-cad221.mjs` | ❌ | Parcial | Auth/roles |
-| `smoke:cad224` | `smoke-cad224.mjs` | ❌ | Parcial | Preview groups / delivery |
-| `smoke:cad221-qa` | cad221 + cad224 | ❌ | Parcial | — |
-| `smoke:cad228` | `smoke-cad228.mjs` | ❌ | Parcial | Backup/restore |
-| `smoke:cad234` | `smoke-cad234.mjs` | ❌ | Parcial | — |
-| `smoke:cad238` | `smoke-cad238.mjs` | ❌ | Parcial | — |
-| `smoke:cad288` | `smoke-cad288.mjs` | ❌ | Parcial | CSS/contraste |
-| `smoke:cad290` | `smoke-cad290.mjs` | ❌ | Parcial | Release assets |
-| `smoke:cad300` | `smoke-cad300.mjs` | ❌ | Parcial | — |
-| `smoke:cad311` | `smoke-cad311.mjs` | ❌ | Parcial | Fontes bundled |
 | `smoke:textfill` | `smoke-textfill.mjs` | ❌ | **Sim** | Tipografia + textfill (SM-010) |
-| `smoke:cad313` | `smoke-cad313.mjs` | ❌ | Parcial | Redireccionado → `smoke:textfill` |
-| `smoke:cad314` | `smoke-cad314.mjs` | ❌ | **Sim** | QA tipografia CA-1–14 |
+| `smoke:typography-qa` | `smoke-typography-qa.mjs` | ❌ | **Sim** | QA CA-1–14 (ex cad314) |
+| `smoke:features` | `smoke-features.mjs` | ❌ | Sim | Entrypoint único (SM-009) |
 | `smoke-win-installer` | `smoke-win-installer.mjs` | ❌ | Manual Windows | Instalador NSIS |
 
-**Plano de consolidação:** SM-016–SM-029 deprecados (aviso + encaminhamento em `smoke-deprecated.mjs`); remoção física dos `.mjs` cad* em SM-030 (próximo release).
+**Nota:** scripts `smoke:cad*` removidos em SM-030 — ver CHANGELOG [Unreleased].
 
 ### Suite features (SM-009)
 
 | npm | Ficheiro | O que valida |
 |-----|----------|--------------|
-| `smoke:features` | `smoke-features.mjs` | Todos: locales, audit, video-watcher, musica-export, version, textfill |
-| `smoke:features -- --only=locales` | idem | Um domínio (ver `--list`; aliases: typography → textfill) |
+| `smoke:features` | `smoke-features.mjs` | locales, audit, video-watcher, musica-export, version, textfill, typography-qa |
+| `smoke:features -- --only=locales` | idem | Um domínio (ver `--list`) |
 
 Scripts individuais (`smoke:locales`, `smoke:audit`, …) mantidos como aliases directos.
 
@@ -73,6 +57,7 @@ Scripts individuais (`smoke:locales`, `smoke:audit`, …) mantidos como aliases 
 | `smoke:surfaces` | `smoke-build-surfaces.mjs` — artefactos `dist/` após `npm run build` (TS-030/031) |
 | `smoke:features` | `smoke-features.mjs` — locales, audit, video-watcher, musica-export, version, **textfill** (SM-009/010) |
 | `smoke:textfill` | `smoke-textfill.mjs` — API tipografia + `tests/projection-textfill-*` (SM-010) |
+| `verify:sourcemaps` | `verify-sourcemaps.mjs` — TS-038 dev vs produção |
 | `verify:build` | `verify-fresh-build.mjs` — build + surfaces (TS-044) |
 | `check:js-in-src` | `check-js-in-src.mjs` — gate sem `.js` em pastas fonte |
 | `verify:openapi` | `verify-openapi-coverage.mjs` |

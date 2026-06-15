@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Smoke CAD-314 — QA tipografia de projeção e textfill (CA-1–CA-14).
+ * QA tipografia de projeção e textfill (CA-1–CA-14) — ex smoke-cad314 (SM-030).
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -10,7 +10,7 @@ import { JSDOM } from 'jsdom';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const appRoot = path.resolve(scriptDir, '..');
-const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'livepraise-cad314-'));
+const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'livepraise-typography-qa-'));
 
 process.env.LIVEPRAISE_HOME = testHome;
 process.env.LIVEPRAISE_APP_ROOT = appRoot;
@@ -237,7 +237,7 @@ try {
     pass('CA-12', `PUT+GET em ${elapsed.toFixed(0)}ms (<1s)`);
   }
 
-  // CA-13 — path traversal em /fonts (paridade smoke-cad311)
+  // CA-13 — path traversal em /fonts
   {
     const res = await fetch(`${base}/fonts/roboto/..%2F..%2Fmusica.db`);
     assert(res.status === 404, `CA-13 status ${res.status}`);
@@ -269,7 +269,7 @@ try {
   skip('CA-2-visual', 'side-by-side físico — fora do smoke; validado algoritmo CA-2');
   skip('CA-5-visual', 'sombra sobre foto — validação visual manual/Electron');
 
-  console.log('smoke-cad314: OK');
+  console.log('smoke-typography-qa: OK');
 } finally {
   await stopLivepraiseServer();
   fs.rmSync(testHome, { recursive: true, force: true });

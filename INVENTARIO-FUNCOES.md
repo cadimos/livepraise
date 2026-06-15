@@ -43,7 +43,7 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). It
 | 5 | Watcher de vídeos | `npm run smoke:video-watcher` |
 | 9 | Versão única no build | `npm run bump-version` · `npm run smoke:version` |
 | 11 | Import/export repertório | `npm run smoke:musica-export` |
-| 14 | Flash textfill ao trocar verso | `tests/projection-textfill-visibility.test.mjs` · `smoke:cad313` |
+| 14 | Flash textfill ao trocar verso | `tests/projection-textfill-visibility.test.mjs` · `npm run smoke:textfill` |
 
 ### Fora do escopo **alpha.2** *(confirmado — versão futura)*
 
@@ -209,7 +209,7 @@ Melhorias de **regressão automática** — o fluxo principal já está validado
 
 ### Já existe
 
-- Smokes por feature (`scripts/smoke-cad*.mjs`, `smoke:legacy-upgrade`, gate `npm run smoke:release`).
+- Smokes por feature (`scripts/smoke-*.mjs`, `smoke:features`, gate `npm run smoke:release`).
 - CI PR: `ci.yml` corre `test:video-pipeline`, `smoke:bootstrap`, `smoke:fase8`.
 - Testes pontuais em `tests/` (temas, sanitização remote-fetch, redacção URLs error log) — runner Node nativo, **sem** Vitest.
 
@@ -613,7 +613,7 @@ Ao **projectar o verso seguinte** (ou anterior) em louvor ou Bíblia, a tela **p
 - `runRefreshTextfill` oculta o root (`visibility: hidden`) durante **ambas** as passagens de medição, com `suppressVisibilityToggle: true` no binary search.
 - Projetor, retorno de palco, `/live` e external-display: `visibility: hidden` **antes** de `innerHTML` ao trocar verso.
 - `PreviewOutputTile.vue`: padrão `previewReady` + `opacity-0` (paridade `ProjectionTypographyPreview.vue`).
-- Teste `tests/projection-textfill-visibility.test.mjs` integrado em `smoke:cad313`.
+- Teste `tests/projection-textfill-visibility.test.mjs` integrado em `npm run smoke:textfill`.
 
 ### Tarefas *(alpha.2)*
 

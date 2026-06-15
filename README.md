@@ -176,8 +176,9 @@ git clone https://github.com/cadimos/livepraise.git
 cd livepraise
 npm ci                 # Node ≥ 22.12 (ver .nvmrc)
 npm run build          # server + electron + operator + web + apps browser
+npm run verify:sourcemaps # TS-038: maps em dev, ausentes em produção
 npm run verify:build   # opcional: build + smoke:surfaces (validação pós-clone)
-npm run dev            # Electron
+npm run dev            # Electron (browser com source maps — TS-038)
 ```
 
 Ver [`docs/BUILD.md`](docs/BUILD.md) para ordem de build e aliases TypeScript.

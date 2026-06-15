@@ -85,6 +85,6 @@ Node ≥ 22.12 (`engines` em `package.json`).
 ## Decisões de build
 
 - **TS-037:** manter `tsc` para web/projector/stage-return — ver [`ADR-037-web-bundler.md`](ADR-037-web-bundler.md).
-- **TS-038:** source maps só em dev — `npm run build:browser:dev` (ou `npm run dev`, que o usa em vez de `build` completo para browser).
+- **TS-038:** source maps só em dev — `npm run build:browser:dev` / `npm run dev`; validar com `npm run verify:sourcemaps`.
 - **TS-044:** quickstart clone em `README.md`; validação local com `npm run verify:build`.
 - **TS-045:** checklist de fecho — [`TS-045-EPIC-CHECKLIST.md`](TS-045-EPIC-CHECKLIST.md).

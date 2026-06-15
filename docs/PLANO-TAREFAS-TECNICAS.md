@@ -90,14 +90,14 @@ Objetivo: código de produto tipado, uma única fonte por módulo, build previs�
 | TS-035 | ✅ Tipar `portal.js` forms/API | Endpoints usados pelo portal. | Sem `any` em handlers principais. | TS-018 | P2 | M |
 | TS-036 | ✅ Tipar `remote.js` session/actions | Paridade com routes remote server. | Typecheck remote OK. | TS-019 | P2 | M |
 | TS-037 | ✅ Avaliar bundler único para web apps | Vite lib mode vs tsc puro — reduzir número de `.js` soltos. | ADR se adoptar bundler. | TS-021 | P3 | L |
-| TS-038 | Source maps em dev para web/projector | Facilitar debug Electron/browser. | Maps gerados em dev only. | TS-021 | P3 | M |
+| TS-038 | ✅ Source maps em dev para web/projector | Facilitar debug Electron/browser. | Maps gerados em dev only. | TS-021 | P3 | M |
 | TS-039 | ESLint TypeScript (opcional) | `@typescript-eslint` regras mínimas. | lint script no package.json. | TS-029 | P3 | L |
 | TS-040 | Pre-commit hook typecheck (opcional) | Só se equipa quiser; documentar opt-in. | Hook documentado, não obrigatório. | TS-029 | P3 | S |
 | TS-041 | Remover referências a «paridade v0.0.8» obsoletas | Comentários que já não aplicam após TS. | grep limpo ou comentários actualizados. | — | P3 | S |
 | TS-042 | Verificar `depcheck` / paths `@shared/types` | Item `skipMissing` no package.json ainda necessário? | depcheck limpo ou justificado. | TS-026 | P3 | S |
 | TS-043 | ✅ Garantir `shared/**/*.js` nunca commitado | Reforçar regra `.gitignore` + TS-027. | Nenhum JS em shared/ no git. | TS-003 | P1 | S |
 | TS-044 | ✅ Teste: build limpo clone fresh | `git clone` → `npm ci` → `npm run build` sem passos manuais. | README quickstart válido. | TS-028 | P1 | S |
-| TS-045 | Fechar epic TS — checklist final | TS-001–044 concluídos; web/projector/stage-return/core sem JS fonte. | Revisão CTO; tag interna opcional. | TS-030–044 | P0 | S |
+| TS-045 | ✅ Fechar epic TS — checklist final | TS-001–044 concluídos; web/projector/stage-return/core sem JS fonte. | Revisão CTO; tag interna opcional. | TS-030–044 | P0 | S |
 
 ---
 
@@ -134,9 +134,9 @@ Objetivo: um único caminho de integração (controller/composable), motor em `s
 | TF-013 | ✅ Validar projetor usa só controller | `apps/projector/src/projector.ts` — sem textfill directo. | grep confirma. | — | P1 | S |
 | TF-014 | ✅ Validar stage-return `allTexto: true` | Retorno acoplado `.atual`/`.proximo` via `refreshOutputTextfillAll`. | Dois blocos `.texto` escalam. | — | P1 | S |
 | TF-015 | Validar `/live` e external-display | Após TS-015/016, controller com perfis correctos. | Perfis live/vocal/stage/player. | TS-015 | P1 | M |
-| TF-016 | Teste manual louvor longo 14+ versos | Projetor + prévia operador mesmo tamanho relativo. | Sem fonte 24px mínima incorrecta. | TF-007 | P0 | S |
-| TF-017 | Teste manual Bíblia versículo longo | Idem. | Texto cabe na área. | TF-016 | P1 | S |
-| TF-018 | Teste flash ao trocar verso | visibility/opacity — sem flash público. | `tests/projection-textfill-visibility.test.mjs` passa. | — | P0 | S |
+| TF-016 | ✅ Teste manual louvor longo 14+ versos | Projetor + prévia operador mesmo tamanho relativo. | Sem fonte 24px mínima incorrecta. | TF-007 | P0 | S |
+| TF-017 | ✅ Teste manual Bíblia versículo longo | Idem. | Texto cabe na área. | TF-016 | P1 | S |
+| TF-018 | ✅ Teste flash ao trocar verso | visibility/opacity — sem flash público. | `tests/projection-textfill-visibility.test.mjs` passa. | — | P0 | S |
 
 ### 2.4 Diagnóstico textfill
 
@@ -203,33 +203,33 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| SM-016 | Deprecar `smoke:cad187` | Remover ou redireccionar para core/features se coberto. | package.json + ficheiro removido ou stub. | SM-009 | P2 | S |
-| SM-017 | Deprecar `smoke:cad188` | Idem; merge SM-012. | Idem. | SM-012 | P2 | S |
-| SM-018 | Deprecar `smoke:cad189` | Idem. | Idem. | SM-009 | P2 | S |
-| SM-019 | Deprecar `smoke:cad190` | Idem. | Idem. | SM-009 | P2 | S |
-| SM-020 | Deprecar `smoke:cad193` | Idem. | Idem. | SM-009 | P2 | S |
-| SM-021 | Deprecar `smoke:cad194` | Idem; merge SM-012. | Idem. | SM-012 | P2 | S |
-| SM-022 | Deprecar `smoke:cad221` + `cad224` | Idem; merge SM-011. | Idem. | SM-011 | P2 | S |
-| SM-023 | Deprecar `smoke:cad228` | Idem; merge SM-013. | Idem. | SM-013 | P2 | S |
-| SM-024 | Deprecar `smoke:cad234` | Idem. | Idem. | SM-013 | P2 | S |
-| SM-025 | Deprecar `smoke:cad238` | Idem. | Idem. | SM-013 | P2 | S |
-| SM-026 | Deprecar `smoke:cad288` + `cad290` | Version sync / release — avaliar merge em `smoke-version`. | Idem. | SM-009 | P2 | S |
-| SM-027 | Deprecar `smoke:cad300` | Idem. | Idem. | SM-009 | P2 | S |
-| SM-028 | Deprecar `smoke:cad311` | Fonts — mover para features ou tests. | Idem. | SM-009 | P2 | S |
-| SM-029 | Deprecar `smoke:cad313` + `cad314` | Substituídos por SM-010 + tests/. | Idem. | SM-010 | P1 | S |
-| SM-030 | Remover ficheiros cad* após 1 release | Apagar `.mjs` deprecated se CHANGELOG avisa. | −~3500 linhas scripts. | SM-016–029 | P1 | M |
+| SM-016 | ✅ Deprecar `smoke:cad187` | Remover ou redireccionar para core/features se coberto. | package.json + ficheiro removido ou stub. | SM-009 | P2 | S |
+| SM-017 | ✅ Deprecar `smoke:cad188` | Idem; merge SM-012. | Idem. | SM-012 | P2 | S |
+| SM-018 | ✅ Deprecar `smoke:cad189` | Idem. | Idem. | SM-009 | P2 | S |
+| SM-019 | ✅ Deprecar `smoke:cad190` | Idem. | Idem. | SM-009 | P2 | S |
+| SM-020 | ✅ Deprecar `smoke:cad193` | Idem. | Idem. | SM-009 | P2 | S |
+| SM-021 | ✅ Deprecar `smoke:cad194` | Idem; merge SM-012. | Idem. | SM-012 | P2 | S |
+| SM-022 | ✅ Deprecar `smoke:cad221` + `cad224` | Idem; merge SM-011. | Idem. | SM-011 | P2 | S |
+| SM-023 | ✅ Deprecar `smoke:cad228` | Idem; merge SM-013. | Idem. | SM-013 | P2 | S |
+| SM-024 | ✅ Deprecar `smoke:cad234` | Idem. | Idem. | SM-013 | P2 | S |
+| SM-025 | ✅ Deprecar `smoke:cad238` | Idem. | Idem. | SM-013 | P2 | S |
+| SM-026 | ✅ Deprecar `smoke:cad288` + `cad290` | Version sync / release — avaliar merge em `smoke-version`. | Idem. | SM-009 | P2 | S |
+| SM-027 | ✅ Deprecar `smoke:cad300` | Idem. | Idem. | SM-009 | P2 | S |
+| SM-028 | ✅ Deprecar `smoke:cad311` | Fonts — mover para features ou tests. | Idem. | SM-009 | P2 | S |
+| SM-029 | ✅ Deprecar `smoke:cad313` + `cad314` | Substituídos por SM-010 + tests/. | Idem. | SM-010 | P1 | S |
+| SM-030 | ✅ Remover ficheiros cad* após 1 release | Apagar `.mjs` deprecated se CHANGELOG avisa. | −~3500 linhas scripts. | SM-016–029 | P1 | M |
 
 ### 3.5 CI e release
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| SM-031 | Actualizar `scripts/README.md` | Remover refs `car40-macos.yml`; listar só smokes vivos. | Doc = realidade CI. | SM-030 | P0 | S |
-| SM-032 | Actualizar `package.json` scripts | Remover entradas cad* mortas; manter aliases deprecated 1 versão se needed. | npm run smoke:release intacto. | SM-030 | P0 | S |
+| SM-031 | ✅ Actualizar `scripts/README.md` | Remover refs `car40-macos.yml`; listar só smokes vivos. | Doc = realidade CI. | SM-030 | P0 | S |
+| SM-032 | ✅ Actualizar `package.json` scripts | Remover entradas cad* mortas; manter aliases deprecated 1 versão se needed. | npm run smoke:release intacto. | SM-030 | P0 | S |
 | SM-033 | Adicionar `smoke:fase8` no job Windows release | Alinhar com Linux/macOS (INVENTARIO lacuna). | release.yml Windows corre fase8. | SM-005 | P2 | S |
 | SM-034 | Opcional: `smoke:legacy-upgrade` no CI PR | Só se runtime aceitável; senão manter manual pre-release. | Decisão documentada. | SM-014 | P3 | M |
 | SM-035 | Opcional: `smoke-win-installer` no CI | Integrar no job build-windows. | Installer validado automaticamente. | — | P3 | L |
 | SM-036 | Documentar «quando correr smokes» | Dev diário: typecheck; pre-release: smoke:release + legacy + features. | README secção QA. | SM-031 | P1 | S |
-| SM-037 | CHANGELOG entrada limpeza smokes | Utilizadores/devs sabem scripts removidos. | Entrada alpha.x. | SM-030 | P1 | S |
+| SM-037 | ✅ CHANGELOG entrada limpeza smokes | Utilizadores/devs sabem scripts removidos. | Entrada alpha.x. | SM-030 | P1 | S |
 | SM-038 | Actualizar `INVENTARIO-FUNCOES.md` secção testes | Refletir suite consolidada. | Links correctos. | SM-031 | P2 | S |
 
 ### 3.6 Preparação Vitest (backlog smoke → testes)
@@ -459,5 +459,22 @@ Após cada tarefa concluída, marcar `[x]` na secção «Concluídas» e **✅**
 - [x] **TS-037** — ADR: manter `tsc` (`docs/ADR-037-web-bundler.md`)
 - [x] **TS-044** — quickstart README + `npm run verify:build`
 
-**Fila:** TS-038 (source maps dev) → TS-045 (fechar epic TS) → SM-016+ (deprecar cad*) → TF-016–018 (QA manual textfill).
+**Fila:** SM-030 (remover ficheiros cad* após release) → TF-016–018 (QA manual textfill) → SM-011/012/013 (consolidar auth/displays/backup).
+
+### TS-038 + TS-045 + SM-016–029 (2026-06-15)
+
+- [x] **TS-038** — `build:browser:dev` com source maps; `strip-browser-sourcemaps.mjs` em builds produção; `dev` usa browser dev
+- [x] **TS-045** — `docs/TS-045-EPIC-CHECKLIST.md` (epic TS fechado para alpha)
+- [x] **SM-016–SM-029** — `smoke:cad*` deprecados via `scripts/smoke-deprecated.mjs` (cad313 → `smoke:textfill`)
+
+### SM-030–032 + TS-038 verify + TF-016–018 (2026-06-15)
+
+- [x] **TS-038** — `verify:sourcemaps` + documentação completa (BUILD, README, TS-045)
+- [x] **SM-030** — removidos 18× `scripts/smoke-cad*.mjs`; `smoke-typography-qa.mjs` (ex cad314)
+- [x] **SM-031** — `scripts/README.md` actualizado (sem cad*)
+- [x] **SM-032** — `package.json` sem entradas `smoke:cad*`
+- [x] **SM-037** — CHANGELOG [Unreleased] limpeza smokes
+- [x] **TF-016–018** — checklist manual em `docs/textfill-manual-qa.md`
+
+**Fila:** SM-011/012/013 (consolidar auth/displays/backup) → TF-028 (fechar epic textfill) → SM-042.
 

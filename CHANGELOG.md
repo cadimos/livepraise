@@ -8,6 +8,13 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 ### Adicionado
 
+- **TypeScript / build (TS-038)** — `npm run build:browser:dev` gera source maps para projector/web; `npm run verify:sourcemaps` valida dev vs produção; `npm run dev` usa browser dev.
+- **Smokes consolidados (SM-009/010/030)** — `smoke:features`, `smoke:textfill`, `smoke:typography-qa`; removidos `scripts/smoke-cad*.mjs` legados.
+
+### Removido
+
+- **Scripts `smoke:cad187` … `smoke:cad314`** — substituídos por `smoke:features`, `smoke:textfill`, `smoke:typography-qa`, `smoke:fase8`, `smoke:version`, etc. Ver [`scripts/README.md`](scripts/README.md).
+
 - **Diagnóstico de textfill** — registo JSONL de medições de fonte e layout (prévia e projetor) em `~/livepraise/textfill-diagnostics.jsonl`; UI em Configurações → Logs de erro; exportação JSONL para suporte.
 
 ### Corrigido

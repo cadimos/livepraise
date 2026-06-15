@@ -108,7 +108,7 @@ Estilos de layout: `shared/projection-layout.css` — `.content > span` recebe `
 - `tests/projection-textfill-two-pass.test.mjs`
 - `tests/projection-textfill-visibility.test.mjs`
 
-Integrados em `smoke:cad313` (a consolidar — SM-010).
+Integrados em `npm run smoke:textfill` e `npm run smoke:typography-qa` (SM-010/030).
 
 ## Validação estática (TF-013, TF-014)
 

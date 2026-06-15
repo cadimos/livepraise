@@ -45,6 +45,10 @@ const FEATURES = {
     label: 'textfill + tipografia (API + unit tests)',
     script: 'smoke-textfill.mjs',
   },
+  'typography-qa': {
+    label: 'QA tipografia CA-1–14',
+    script: 'smoke-typography-qa.mjs',
+  },
 };
 
 const ALIASES = {
@@ -55,6 +59,7 @@ const ALIASES = {
   'musica-export': 'musica-export',
   textfill: 'textfill',
   typography: 'textfill',
+  'typography-qa': 'typography-qa',
 };
 
 function printHelp() {
