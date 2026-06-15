@@ -110,6 +110,17 @@ dist/
 shared/**/*.js
 shared/**/*.d.ts
 
+# Emit tsc browser apps (fonte em apps/*/src/ ou web/*/src/)
+apps/projector/*.js
+apps/stage-return/*.js
+web/live/live.js
+web/external-display/*.js
+web/portal/*.js
+web/remote/*.js
+
+# Cópias compiladas obsoletas em core/ (fonte .ts → dist/core/)
+core/**/*.js
+
 # yt-dlp embutido (descarregado no install/build)
 vendor/yt-dlp/yt-dlp
 vendor/yt-dlp/yt-dlp.exe

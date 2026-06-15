@@ -1,0 +1,9 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./web/live/tsconfig.json" },
+    { "path": "./web/external-display/tsconfig.json" },
+    { "path": "./web/portal/tsconfig.json" },
+    { "path": "./web/remote/tsconfig.json" }
+  ]
+}

@@ -10,7 +10,6 @@ directories:
 files:
   - dist/**/*
   - web/**/*
-  - apps/projector/**/*
   - themes/**/*
   - resources/fonts/**/*
   - resources/icon/**/*

@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": false,
-    "outDir": "apps/stage-return",
+    "outDir": "dist/apps/stage-return",
     "rootDir": "apps/stage-return/src",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "baseUrl": ".",

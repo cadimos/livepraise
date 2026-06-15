@@ -1,28 +1,38 @@
 const TOKEN_KEY = 'livepraise.auth.token';
 const USER_KEY = 'livepraise.auth.user';
 
-function saveSession(token, user) {
+interface AuthUser {
+  username: string;
+  role: string;
+}
+
+interface AuthSession {
+  token: string;
+  user: AuthUser;
+}
+
+function saveSession(token: string, user: AuthUser): void {
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 
-function clearSession() {
+function clearSession(): void {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
 }
 
-function readSession() {
+function readSession(): AuthSession | null {
   const token = localStorage.getItem(TOKEN_KEY);
   const rawUser = localStorage.getItem(USER_KEY);
   if (!token || !rawUser) return null;
   try {
-    return { token, user: JSON.parse(rawUser) };
+    return { token, user: JSON.parse(rawUser) as AuthUser };
   } catch {
     return null;
   }
 }
 
-function consumeReturnUrl() {
+function consumeReturnUrl(): string | null {
   const params = new URLSearchParams(location.search);
   const raw = params.get('return');
   if (!raw) return null;
@@ -35,7 +45,7 @@ function consumeReturnUrl() {
   }
 }
 
-function redirectAfterLogin(user) {
+function redirectAfterLogin(user: AuthUser): boolean {
   const returnTo = consumeReturnUrl();
   if (!returnTo) return false;
   if (returnTo.startsWith('/operator') && user.role !== 'operator' && user.role !== 'admin') {
@@ -52,20 +62,26 @@ function redirectAfterLogin(user) {
   return true;
 }
 
-function showLoggedIn(user) {
-  document.getElementById('login-section').hidden = true;
-  document.getElementById('views-section').hidden = false;
-  document.getElementById('session-user').textContent = `${user.username} (${user.role})`;
+function byId<T extends HTMLElement>(id: string): T {
+  const el = document.getElementById(id);
+  if (!el) throw new Error(`Elemento #${id} não encontrado`);
+  return el as T;
+}
 
-  const remoteLink = document.getElementById('remote-link');
-  const operatorLink = document.getElementById('operator-link');
+function showLoggedIn(user: AuthUser): void {
+  byId<HTMLElement>('login-section').hidden = true;
+  byId<HTMLElement>('views-section').hidden = false;
+  byId('session-user').textContent = `${user.username} (${user.role})`;
+
+  const remoteLink = byId<HTMLElement>('remote-link');
+  const operatorLink = byId<HTMLElement>('operator-link');
   remoteLink.hidden = user.role !== 'remote' && user.role !== 'admin';
   operatorLink.hidden = user.role !== 'operator' && user.role !== 'admin';
 
   redirectAfterLogin(user);
 }
 
-async function verifyExistingSession() {
+async function verifyExistingSession(): Promise<void> {
   const session = readSession();
   if (!session) return;
 
@@ -76,18 +92,18 @@ async function verifyExistingSession() {
     clearSession();
     return;
   }
-  const data = await res.json();
+  const data = (await res.json()) as { user: AuthUser };
   saveSession(session.token, data.user);
   showLoggedIn(data.user);
 }
 
-document.getElementById('login-form').addEventListener('submit', async (event) => {
+byId<HTMLFormElement>('login-form').addEventListener('submit', async (event) => {
   event.preventDefault();
-  const errorEl = document.getElementById('login-error');
+  const errorEl = byId<HTMLElement>('login-error');
   errorEl.hidden = true;
 
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value;
+  const username = byId<HTMLInputElement>('username').value.trim();
+  const password = byId<HTMLInputElement>('password').value;
 
   const res = await fetch('/api/auth/login', {
     method: 'POST',
@@ -95,18 +111,19 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
     body: JSON.stringify({ username, password }),
   });
 
-  const data = await res.json();
+  const data = (await res.json()) as { token?: string; user?: AuthUser; error?: string };
   if (!res.ok) {
     errorEl.textContent = data.error ?? 'Falha no login';
     errorEl.hidden = false;
     return;
   }
 
+  if (!data.token || !data.user) return;
   saveSession(data.token, data.user);
   showLoggedIn(data.user);
 });
 
-document.getElementById('logout-btn').addEventListener('click', async () => {
+byId('logout-btn').addEventListener('click', async () => {
   const session = readSession();
   if (session) {
     await fetch('/api/auth/logout', {

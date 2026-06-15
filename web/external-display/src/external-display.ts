@@ -1,7 +1,7 @@
 import {
   attachProjectionContrast,
   syncProjectionContentState,
-} from './projection-contrast.js';
+} from '/shared/projection-contrast.js';
 import {
   attachDisplayDebugOverlayListener,
   updateLastActionBadge,
@@ -18,27 +18,45 @@ import {
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
 
-const PROFILES = new Set(['vocal', 'stage', 'player']);
+type ExternalProfile = 'vocal' | 'stage' | 'player';
+
+interface LiveAction {
+  acao: string;
+  valor: string;
+}
+
+type LiveWsMessage = {
+  type?: string;
+  action?: LiveAction;
+  state?: { lastAction?: LiveAction | null };
+  projectionTypography?: unknown;
+};
+
+interface DeviceRegisterResponse {
+  device?: { showChords?: boolean };
+}
+
+const PROFILES = new Set<string>(['vocal', 'stage', 'player']);
 
 attachDisplayDebugOverlayListener();
 
-function wsUrl() {
+function wsUrl(): string {
   const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${protocol}//${location.host}/ws/live`;
 }
 
-function detectProfile() {
+function detectProfile(): ExternalProfile {
   const segment = location.pathname.replace(/\/+$/, '').split('/').pop() ?? '';
-  if (PROFILES.has(segment)) return segment;
+  if (PROFILES.has(segment)) return segment as ExternalProfile;
   const fromQuery = new URLSearchParams(location.search).get('profile');
-  return PROFILES.has(fromQuery ?? '') ? fromQuery : 'vocal';
+  return PROFILES.has(fromQuery ?? '') ? (fromQuery as ExternalProfile) : 'vocal';
 }
 
-function ensureDeviceId(profile) {
+function ensureDeviceId(profile: ExternalProfile): string {
   return ensureEndpointDeviceId(profile);
 }
 
-function stripChordsForProjection(text) {
+function stripChordsForProjection(text: string): string {
   return text
     .split('\n')
     .filter((line) => !/^\s*[A-G][#b]?(\/|\s|$)/.test(line.trim()))
@@ -46,10 +64,10 @@ function stripChordsForProjection(text) {
     .trim();
 }
 
-function stripChordsFromHtml(html) {
+function stripChordsFromHtml(html: string): string {
   return html.replace(
     /(<(?:div|span|p)[^>]*class="[^"]*(?:content|texto)[^"]*"[^>]*>)([\s\S]*?)(<\/(?:div|span|p)>)/gi,
-    (_match, open, body, close) => {
+    (_match, open: string, body: string, close: string) => {
       const stripped = stripChordsForProjection(
         body.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ''),
       );
@@ -63,10 +81,10 @@ function stripChordsFromHtml(html) {
   );
 }
 
-function byId(id) {
+function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   const el = document.getElementById(id);
   if (!el) throw new Error(`Elemento #${id} não encontrado`);
-  return el;
+  return el as T;
 }
 
 const profile = detectProfile();
@@ -94,13 +112,13 @@ const footerAlertOverlay = createFooterAlertOverlay({
   id: deviceId,
 });
 
-const statusEl = () => byId('last-action');
+const statusEl = (): HTMLElement => byId('last-action');
 let wsConnected = false;
 let hasProjectionContent = false;
 
 let showChords = profile !== 'vocal';
 
-function refreshViewerStatus() {
+function refreshViewerStatus(): void {
   if (document.body.dataset.displayDebug === 'true') {
     return;
   }
@@ -120,12 +138,12 @@ function refreshViewerStatus() {
   );
 }
 
-async function registerDevice() {
+async function registerDevice(): Promise<void> {
   const res = await fetch(
     `/api/devices/${encodeURIComponent(deviceId)}?profile=${encodeURIComponent(profile)}`,
   );
   if (!res.ok) throw new Error(`Registo dispositivo falhou (${res.status})`);
-  const data = await res.json();
+  const data = (await res.json()) as DeviceRegisterResponse;
   if (profile === 'vocal') {
     showChords = false;
   } else if (data.device?.showChords !== undefined) {
@@ -133,18 +151,18 @@ async function registerDevice() {
   }
 }
 
-function filterHtml(html) {
+function filterHtml(html: string): string {
   if (profile === 'vocal' || !showChords) {
     return stripChordsFromHtml(html);
   }
   return html;
 }
 
-function applyAction(action) {
+function applyAction(action: LiveAction): void {
   const content = byId('conteudo');
-  const bgImg = byId('bg-image');
-  const videoWrap = byId('video-wrap');
-  const player = byId('player');
+  const bgImg = byId<HTMLImageElement>('bg-image');
+  const videoWrap = byId<HTMLElement>('video-wrap');
+  const player = byId<HTMLVideoElement>('player');
 
   switch (action.acao) {
     case 'background':
@@ -184,7 +202,6 @@ function applyAction(action) {
       location.reload();
       break;
     case 'ajustarTela':
-      /* vocal/stage/live ocupam viewport inteira — ajuste de tela é só do projetor/player */
       if (profile !== 'player') break;
       document.body.dataset.screen = action.valor;
       break;
@@ -226,12 +243,12 @@ attachProjectionContrast({
   video: byId('player'),
 });
 
-function connect() {
+function connect(): void {
   wsConnected = false;
   refreshViewerStatus();
 
   const socket = new WebSocket(wsUrl());
-  let handleWsMessage = (message) => {
+  let handleWsMessage = (message: LiveWsMessage): void => {
     if (message.type === 'joined') {
       wsConnected = true;
       refreshViewerStatus();
@@ -240,11 +257,14 @@ function connect() {
       }
       return;
     }
-    if (message.type === 'live-action') {
+    if (message.type === 'live-action' && message.action) {
       applyAction(message.action);
     }
   };
-  handleWsMessage = attachProjectionTypographyWs(typography, handleWsMessage);
+  handleWsMessage = attachProjectionTypographyWs(
+    typography,
+    handleWsMessage as Parameters<typeof attachProjectionTypographyWs>[1],
+  ) as typeof handleWsMessage;
 
   socket.addEventListener('open', () => {
     socket.send(
@@ -260,7 +280,7 @@ function connect() {
   });
 
   socket.addEventListener('message', (event) => {
-    const message = JSON.parse(String(event.data));
+    const message = JSON.parse(String(event.data)) as LiveWsMessage;
     handleWsMessage(message);
   });
 

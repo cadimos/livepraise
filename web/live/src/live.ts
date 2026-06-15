@@ -14,18 +14,30 @@ import {
 
 const PROFILE = 'live';
 
+interface LiveAction {
+  acao: string;
+  valor: string;
+}
+
+type LiveWsMessage = {
+  type?: string;
+  action?: LiveAction;
+  state?: { lastAction?: LiveAction | null };
+  projectionTypography?: unknown;
+};
+
 attachDisplayDebugOverlayListener();
 
-function wsUrl() {
+function wsUrl(): string {
   const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${protocol}//${location.host}/ws/live`;
 }
 
-function ensureDeviceId() {
+function ensureDeviceId(): string {
   return ensureEndpointDeviceId(PROFILE);
 }
 
-function stripChordsForProjection(text) {
+function stripChordsForProjection(text: string): string {
   return text
     .split('\n')
     .filter((line) => !/^\s*[A-G][#b]?(\/|\s|$)/.test(line.trim()))
@@ -33,10 +45,10 @@ function stripChordsForProjection(text) {
     .trim();
 }
 
-function stripChordsFromHtml(html) {
+function stripChordsFromHtml(html: string): string {
   return html.replace(
     /(<(?:div|span|p)[^>]*class="[^"]*(?:content|texto)[^"]*"[^>]*>)([\s\S]*?)(<\/(?:div|span|p)>)/gi,
-    (_match, open, body, close) => {
+    (_match, open: string, body: string, close: string) => {
       const stripped = stripChordsForProjection(
         body.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ''),
       );
@@ -50,17 +62,17 @@ function stripChordsFromHtml(html) {
   );
 }
 
-function byId(id) {
+function byId<T extends HTMLElement = HTMLElement>(id: string): T {
   const el = document.getElementById(id);
   if (!el) throw new Error(`Elemento #${id} não encontrado`);
-  return el;
+  return el as T;
 }
 
 /** CA-R21: /live não exibe fundo; remove vídeo/imagem para voltar ao preto. */
-function clearBackgroundMedia() {
-  const bgImg = byId('bg-image');
-  const videoWrap = byId('video-wrap');
-  const player = byId('player');
+function clearBackgroundMedia(): void {
+  const bgImg = byId<HTMLImageElement>('bg-image');
+  const videoWrap = byId<HTMLElement>('video-wrap');
+  const player = byId<HTMLVideoElement>('player');
   videoWrap.hidden = true;
   player.pause();
   player.removeAttribute('src');
@@ -79,11 +91,11 @@ const typography = createProjectionTypographyController({
   mode: 'output',
 });
 
-const statusEl = () => byId('last-action');
+const statusEl = (): HTMLElement => byId('last-action');
 let wsConnected = false;
 let hasProjectionContent = false;
 
-function refreshViewerStatus() {
+function refreshViewerStatus(): void {
   if (document.body.dataset.displayDebug === 'true') {
     return;
   }
@@ -103,18 +115,18 @@ function refreshViewerStatus() {
   );
 }
 
-async function registerDevice() {
+async function registerDevice(): Promise<void> {
   const res = await fetch(
     `/api/devices/${encodeURIComponent(deviceId)}?profile=${encodeURIComponent(PROFILE)}`,
   );
   if (!res.ok) throw new Error(`Registo dispositivo falhou (${res.status})`);
 }
 
-function applyAction(action) {
+function applyAction(action: LiveAction): void {
   const content = byId('conteudo');
-  const bgImg = byId('bg-image');
-  const videoWrap = byId('video-wrap');
-  const player = byId('player');
+  const bgImg = byId<HTMLImageElement>('bg-image');
+  const videoWrap = byId<HTMLElement>('video-wrap');
+  const player = byId<HTMLVideoElement>('player');
 
   switch (action.acao) {
     case 'background':
@@ -168,12 +180,12 @@ function applyAction(action) {
   refreshViewerStatus();
 }
 
-function connect() {
+function connect(): void {
   wsConnected = false;
   refreshViewerStatus();
 
   const socket = new WebSocket(wsUrl());
-  let handleWsMessage = (message) => {
+  let handleWsMessage = (message: LiveWsMessage): void => {
     if (message.type === 'joined') {
       wsConnected = true;
       refreshViewerStatus();
@@ -182,11 +194,14 @@ function connect() {
       }
       return;
     }
-    if (message.type === 'live-action') {
+    if (message.type === 'live-action' && message.action) {
       applyAction(message.action);
     }
   };
-  handleWsMessage = attachProjectionTypographyWs(typography, handleWsMessage);
+  handleWsMessage = attachProjectionTypographyWs(
+    typography,
+    handleWsMessage as Parameters<typeof attachProjectionTypographyWs>[1],
+  ) as typeof handleWsMessage;
 
   socket.addEventListener('open', () => {
     socket.send(
@@ -202,7 +217,7 @@ function connect() {
   });
 
   socket.addEventListener('message', (event) => {
-    const message = JSON.parse(String(event.data));
+    const message = JSON.parse(String(event.data)) as LiveWsMessage;
     handleWsMessage(message);
   });
 

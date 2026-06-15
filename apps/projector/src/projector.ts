@@ -1,7 +1,7 @@
 import {
   attachProjectionContrast,
   syncProjectionContentState,
-} from './projection-contrast.js';
+} from '/shared/projection-contrast.js';
 import {
   attachDisplayDebugOverlayListener,
   updateLastActionBadge,

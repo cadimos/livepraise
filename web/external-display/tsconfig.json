@@ -1,25 +1,24 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": false,
-    "outDir": "dist/apps/projector",
-    "rootDir": "apps/projector/src",
+    "outDir": "../../dist/web/external-display",
+    "rootDir": "src",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "baseUrl": ".",
+    "baseUrl": "../..",
     "paths": {
-      "/shared/display-debug-overlay.js": ["dist/shared/display-debug-overlay.d.ts"],
       "/shared/projection-contrast.js": ["dist/shared/projection-contrast.d.ts"],
+      "/shared/display-debug-overlay.js": ["dist/shared/display-debug-overlay.d.ts"],
       "/shared/projection-media-url.js": ["dist/shared/projection-media-url.d.ts"],
-      "/shared/service-timer-overlay.js": ["dist/shared/service-timer-overlay.d.ts"],
-      "/shared/footer-alert-overlay.js": ["dist/shared/footer-alert-overlay.d.ts"],
-      "/shared/youtube.js": ["dist/shared/youtube.d.ts"],
       "/shared/projection-video-player.js": ["dist/shared/projection-video-player.d.ts"],
-      "/shared/screen-layout.js": ["dist/shared/screen-layout.d.ts"],
+      "/shared/footer-alert-overlay.js": ["dist/shared/footer-alert-overlay.d.ts"],
       "/shared/endpoint-device-id.js": ["dist/shared/endpoint-device-id.d.ts"],
+      "/shared/service-timer-overlay.js": ["dist/shared/service-timer-overlay.d.ts"],
+      "/shared/viewer-status.js": ["dist/shared/viewer-status.d.ts"],
       "/shared/projection-typography-runtime.js": ["dist/shared/projection-typography-runtime.d.ts"]
     }
   },
-  "include": ["apps/projector/src/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }

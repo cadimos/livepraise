@@ -37,6 +37,8 @@ livepraise/
 └── resources/         # Ícones e assets de build
 ```
 
+Documentação técnica: [`docs/BUILD.md`](docs/BUILD.md) (build e política TS), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/projection-textfill.md`](docs/projection-textfill.md), [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md).
+
 ## Requisitos
 
 ### Para uso (após instalação)
