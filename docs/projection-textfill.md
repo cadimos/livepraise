@@ -92,11 +92,29 @@ Lógica **duplicada** entre `PreviewOutputTile.vue` / `ProjectionTypographyPrevi
 
 **Conclusão TF-005:** funcionalidade equivalente, mas **dois caminhos de integração**. Tarefas TF-006–TF-012 unificam via composable `useProjectionTypographyPreview`.
 
-## Diagnóstico
+## Diagnóstico (TF-021)
 
-- Toggle: Configurações → Logs de erro → diagnóstico textfill
-- Ficheiro: `~/livepraise/textfill-diagnostics.jsonl`
-- Módulos: `shared/projection-textfill-diagnostics.ts`, `core/textfill-diagnostics/`
+### Activar
+
+1. Operador → **Configurações** → **Logs de erro**
+2. Activar o toggle **diagnóstico textfill** (persiste em `localStorage` via `@shared/projection-textfill-diagnostics`)
+3. Reproduzir o caso (louvor longo, Bíblia, troca de verso) com prévia e/ou projetor abertos
+
+### Onde ficam os dados
+
+| Destino | Caminho |
+|---------|---------|
+| Ficheiro no disco | `~/livepraise/textfill-diagnostics.jsonl` (JSONL, uma linha por medição) |
+| API (operador autenticado) | `GET /api/system/textfill-diagnostics` |
+| UI | Configurações → Logs de erro (últimas 80 entradas; exportar JSONL) |
+
+### Suporte
+
+1. Pedir export JSONL na UI ou copiar `~/livepraise/textfill-diagnostics.jsonl`
+2. Campos úteis: `surface`, `mode`, `resultFontPx`, `heightOverflow`, `textSnippet`
+3. Limpar: botão na UI ou `DELETE /api/system/textfill-diagnostics`
+
+Módulos: `shared/projection-textfill-diagnostics.ts`, `core/textfill-diagnostics/`; tipo `TextfillDiagnosticEntry` em `@core/textfill-diagnostics/types`.
 
 ## CSS
 

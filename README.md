@@ -41,7 +41,7 @@ livepraise/
 └── resources/         # Ícones e assets de build
 ```
 
-Documentação técnica: [`docs/BUILD.md`](docs/BUILD.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/projection-textfill.md`](docs/projection-textfill.md), [`scripts/README.md`](scripts/README.md) (smokes), [`docs/TS-045-EPIC-CHECKLIST.md`](docs/TS-045-EPIC-CHECKLIST.md), [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md).
+Documentação técnica: [`docs/BUILD.md`](docs/BUILD.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/ST-038-EPIC-CHECKLIST.md`](docs/ST-038-EPIC-CHECKLIST.md), [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md).
 
 ## Requisitos
 

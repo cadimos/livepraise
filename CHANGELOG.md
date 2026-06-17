@@ -13,7 +13,7 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 - **Smokes consolidados (SM-009/010/011/012/013/030/042)** — `smoke:features`, domínios auth/displays/backup/textfill; checklists TF-028 + SM-042.
 - **TS-041** — comentários «paridade v0.0.8» actualizados em fonte TS (legado mantido só em `legacy-upgrade.ts`).
 - **TS-040/042, SM-041, ST-025** — hook git opt-in, `verify:depcheck`, `test:unit`, README estrutura actualizado.
-- **TS-046** — ESLint warnings reduzidos a zero (`lint:fix` + cleanup imports).
+- **ST-038** — epic estrutura fechado — [`ST-038-EPIC-CHECKLIST.md`](ST-038-EPIC-CHECKLIST.md); CI inclui `test:unit`.
 
 ### Removido
 

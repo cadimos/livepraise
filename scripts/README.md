@@ -48,9 +48,10 @@ Scripts individuais (`smoke:locales`, `smoke:audit`, …) mantidos como aliases 
 
 ## CI (GitHub Actions)
 
-| Workflow | Smokes |
-|----------|--------|
-| `.github/workflows/ci.yml` (PR) | `test:video-pipeline`, `smoke:bootstrap`, `smoke:fase8` |
+| Workflow | Smokes / gates |
+|----------|----------------|
+| Job `typecheck` (PR) | `check:js-in-src`, `lint`, `test:unit`, `typecheck` |
+| Job `smoke` (PR) | `test:video-pipeline`, `smoke:bootstrap`, `smoke:fase8` |
 | `.github/workflows/release.yml` | `smoke:bootstrap`, `smoke:fase8` (Linux/macOS); Windows parcial |
 
 ## Outros scripts úteis

@@ -146,9 +146,9 @@ Objetivo: um único caminho de integração (controller/composable), motor em `s
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TF-019 | Revisar `useTextfillDiagnostics` vs server types | Duplicação `TextfillDiagnosticEntry` em composable vs `core/textfill-diagnostics/types.ts`. | Tipo único importado. | — | P2 | M |
-| TF-020 | Unificar tipos diagnóstico | Operador importa de `@core/textfill-diagnostics/types` ou shared re-export. | DRY tipos. | TF-019 | P2 | S |
-| TF-021 | Documentar activação diagnóstico | TF-001: toggle Configurações → Logs; ficheiro `~/livepraise/textfill-diagnostics.jsonl`. | Suporte consegue reproduzir. | TF-001 | P2 | S |
+| TF-019 | ✅ Revisar `useTextfillDiagnostics` vs server types | Duplicação `TextfillDiagnosticEntry` em composable vs `core/textfill-diagnostics/types.ts`. | Tipo único importado. | — | P2 | M |
+| TF-020 | ✅ Unificar tipos diagnóstico | Operador importa de `@core/textfill-diagnostics/types` ou shared re-export. | DRY tipos. | TF-019 | P2 | S |
+| TF-021 | ✅ Documentar activação diagnóstico | TF-001: toggle Configurações → Logs; ficheiro `~/livepraise/textfill-diagnostics.jsonl`. | Suporte consegue reproduzir. | TF-001 | P2 | S |
 
 ### 2.5 Testes e regressão
 
@@ -268,9 +268,9 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 |----|--------|-----------|---------------------|------|---|------|
 | ST-007 | ✅ Criar `docs/BUILD.md` | Ordem builds, env vars (`LIVEPRAISE_HOME`, `APP_ROOT`), artefactos. | Referenciado no README. | TS-028 | P1 | M |
 | ST-008 | ✅ Diagrama arquitectura runtime | Electron + server + static mounts + WS. | Mermaid em docs/ARCHITECTURE.md. | — | P2 | M |
-| ST-009 | Unificar destino emits apps | Meta: tudo relevante sob `dist/apps/*` (projector, stage-return, operator, web). | ADR + migração TS-007. | TS-007 | P1 | L |
+| ST-009 | ✅ Unificar destino emits apps | Meta: `dist/apps/*` (projector, stage-return, operator); `dist/web/*` para portal/live/remote. | Documentado em ARCHITECTURE.md. | TS-007 | P1 | L |
 | ST-010 | Script `npm run clean` | Remove dist/, emits apps, caches. | Rebuild determinístico. | ST-009 | P2 | S |
-| ST-011 | Validar `copy-shared-assets.mjs` | CSS shared sempre em dist/shared após build. | projection-layout.css servido. | — | P1 | S |
+| ST-011 | ✅ Validar `copy-shared-assets.mjs` | CSS shared sempre em dist/shared após build. | projection-layout.css servido. | — | P1 | S |
 | ST-012 | ✅ Verificar ordem `build` no package.json | sync:version → server (inclui shared) → projector → stage-return → electron → operator → web. | Uma linha documentada. | TS-021 | P1 | S |
 
 ### 4.3 Server / static / routing
@@ -278,7 +278,7 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
 | ST-013 | ✅ Documentar mounts Express | Tabela path → pasta (`/shared`, `/projector`, `/live`, …). | docs/ARCHITECTURE.md | — | P1 | S |
-| ST-014 | Health check cobre todas superfícies | `server/health.ts` — web/live, portal, remote. | GET /health reporta activo. | — | P2 | S |
+| ST-014 | ✅ Health check cobre todas superfícies | `server/health.ts` — web/live, portal, remote. | GET /health reporta activo. | — | P2 | S |
 | ST-015 | Revisar cache headers static | Projector vs operator vs shared — evitar stale em dev. | Comportamento documentado. | — | P3 | M |
 
 ### 4.4 Operador Vue — padrões
@@ -294,7 +294,7 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| ST-020 | Documentar fluxo WS operador ↔ hub ↔ outputs | `shared/types/live.ts` como contrato. | ARCHITECTURE.md secção WS. | ST-008 | P1 | M |
+| ST-020 | ✅ Documentar fluxo WS operador ↔ hub ↔ outputs | `shared/types/live.ts` como contrato. | ARCHITECTURE.md secção WS. | ST-008 | P1 | M |
 | ST-021 | ✅ Verificar paridade eventos tipografia WS | Controller attachProjectionTypographyWs em todas saídas. | grep attachProjectionTypographyWs. | TF-015 | P1 | S |
 | ST-022 | Verificar paridade `display-debug-overlay` | Projector/live/external usam mesmo overlay debug. | Comportamento consistente. | — | P3 | S |
 
@@ -302,7 +302,7 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| ST-023 | Revisar `.github/workflows/*.yml` | Nomes, smokes, alinhamento README/INVENTARIO. | Sem referências mortas. | SM-031 | P1 | M |
+| ST-023 | ✅ Revisar `.github/workflows/*.yml` | Nomes, smokes, alinhamento README/INVENTARIO. | Sem referências mortas. | SM-031 | P1 | M |
 | ST-024 | ✅ Adicionar job typecheck CI | Ver TS-029. | ci.yml typecheck. | TS-029 | P1 | S |
 | ST-025 | ✅ Actualizar README estrutura repositório | web/ TS, dist/, smokes consolidados. | Árvore actualizada. | TS-045, SM-042 | P1 | S |
 | ST-026 | Actualizar CHANGELOG meta técnica | Epics TS, TF, SM, ST concluídos. | Entrada por release. | — | P2 | S |
@@ -323,16 +323,16 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
 | ST-033 | ✅ Manter `tests/security/*` no gate | Incluir em SM-041 ou smoke:release. | remote-fetch tests passam. | SM-041 | P1 | S |
-| ST-034 | Revisar `core/` boundaries | server importa core; apps não importam server. | grep violations. | — | P2 | M |
+| ST-034 | ✅ Revisar `core/` boundaries | server importa core; apps não importam server. | grep violations. | — | P2 | M |
 | ST-035 | Revisar paths `.js` em imports TS | NodeNext — consistente em server/electron/shared. | typecheck + runtime OK. | TS-026 | P2 | M |
 
 ### 4.9 Fecho estrutural
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| ST-036 | Review cruzado epic 1+4 | TS completo + ST-001/009 feitos. | Sem JS fonte produto. | TS-045, ST-009 | P0 | S |
-| ST-037 | Review cruzado epic 2+4 | Textfill unificado + contrast shared. | QA visual completo. | TF-028, ST-003 | P0 | S |
-| ST-038 | Fechar epic estrutura — checklist | Docs BUILD+ARCHITECTURE; CI alinhado; duplicações críticas zero. | Sign-off. | ST-023–037 | P0 | S |
+| ST-036 | ✅ Review cruzado epic 1+4 | TS completo + ST-001/009 feitos. | Sem JS fonte produto. | TS-045, ST-009 | P0 | S |
+| ST-037 | ✅ Review cruzado epic 2+4 | Textfill unificado + contrast shared. | QA visual completo. | TF-028, ST-003 | P0 | S |
+| ST-038 | ✅ Fechar epic estrutura — checklist | Docs BUILD+ARCHITECTURE; CI alinhado; duplicações críticas zero. | Sign-off. | ST-023–037 | P0 | S |
 
 ---
 
@@ -493,7 +493,19 @@ Após cada tarefa concluída, marcar `[x]` na secção «Concluídas» e **✅**
 - [x] **SM-012** — `scripts/lib/smoke-displays.mjs` + `npm run smoke:displays` (cad188 + cad194)
 - [x] **SM-013** — `scripts/lib/smoke-backup.mjs` + `npm run smoke:backup` (cad228 + cad234 + cad238)
 
-**Fila:** ST-036/037/038 → TF-019/021 → SM-003/004.
+**Fila:** ST-004/026 → SM-003/004 → TF-025.
+
+### TF-019/020/021 (2026-06-17)
+
+- [x] **TF-019/020** — `useTextfillDiagnostics` importa `TextfillDiagnosticEntry` de `@core/textfill-diagnostics/types`
+- [x] **TF-021** — secção diagnóstico expandida em `projection-textfill.md`
+
+### ST-036/037/038 (2026-06-17)
+
+- [x] **ST-036** — review TS+estrutura: `check:js-in-src`, lint 0, emits documentados
+- [x] **ST-037** — review textfill+contrast: composable, smokes, `projection-contrast` shared
+- [x] **ST-038** — `docs/ST-038-EPIC-CHECKLIST.md`; CI + `test:unit` no job typecheck
+- [x] **ST-009/011/014/020/023/034** — verificados no checklist ST-038
 
 ### TS-046 (2026-06-17)
 
