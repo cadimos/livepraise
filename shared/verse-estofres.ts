@@ -15,7 +15,7 @@ export function clampMaxEstofreLines(value: number): number {
   return Math.min(MAX_MAX_ESTOFRE_LINES, Math.max(MIN_MAX_ESTOFRE_LINES, n));
 }
 
-/** Normaliza letra vinda da BD (paridade v0.0.8: `<br />`, `<br>`, `\n`). */
+/** Normaliza letra vinda da BD (`<br />`, `<br>`, `\n`). */
 export function normalizeVerseText(text: string): string {
   return text
     .replace(/\r\n/g, '\n')

@@ -1,4 +1,4 @@
-/** Utilitários de música — paridade v0.0.8 (salvar_musica / versos). */
+/** Utilitários de música — versos, estrofes e letra editável. */
 
 export {
   clampMaxEstofreLines,
@@ -18,7 +18,7 @@ export function splitLyricsIntoVerses(lyrics: string): string[] {
     .filter(Boolean);
 }
 
-/** Junta versos da API em letra editável (paridade v0.0.8 viewModalMusica). */
+/** Junta versos da API em letra editável (blocos separados por linha em branco). */
 export function joinVersesIntoLyrics(verses: string[]): string {
   return verses
     .map((v) => v.replace(/<br \/>/gi, '\n').replace(/<br>/gi, '\n').trim())

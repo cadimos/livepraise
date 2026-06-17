@@ -29,6 +29,9 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 | `smoke:version` | `smoke-version-sync.mjs` | ❌ | Sim | Sync versão package.json |
 | `smoke:textfill` | `smoke-textfill.mjs` | ❌ | **Sim** | Tipografia + textfill (SM-010) |
 | `smoke:typography-qa` | `smoke-typography-qa.mjs` | ❌ | **Sim** | QA CA-1–14 (ex cad314) |
+| `smoke:auth` | `smoke-auth.mjs` | ❌ | Sim | Auth/delivery + preview (SM-011) |
+| `smoke:displays` | `smoke-displays.mjs` | ❌ | Sim | footerAlert + fila/media (SM-012) |
+| `smoke:backup` | `smoke-backup.mjs` | ❌ | Sim | import-url + fila + backup (SM-013) |
 | `smoke:features` | `smoke-features.mjs` | ❌ | Sim | Entrypoint único (SM-009) |
 | `smoke-win-installer` | `smoke-win-installer.mjs` | ❌ | Manual Windows | Instalador NSIS |
 
@@ -38,7 +41,7 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 
 | npm | Ficheiro | O que valida |
 |-----|----------|--------------|
-| `smoke:features` | `smoke-features.mjs` | locales, audit, video-watcher, musica-export, version, textfill, typography-qa |
+| `smoke:features` | `smoke-features.mjs` | locales, audit, video-watcher, musica-export, version, textfill, typography-qa, auth, displays, backup |
 | `smoke:features -- --only=locales` | idem | Um domínio (ver `--list`) |
 
 Scripts individuais (`smoke:locales`, `smoke:audit`, …) mantidos como aliases directos.
@@ -60,6 +63,8 @@ Scripts individuais (`smoke:locales`, `smoke:audit`, …) mantidos como aliases 
 | `verify:sourcemaps` | `verify-sourcemaps.mjs` — TS-038 dev vs produção |
 | `verify:build` | `verify-fresh-build.mjs` — build + surfaces (TS-044) |
 | `check:js-in-src` | `check-js-in-src.mjs` — gate sem `.js` em pastas fonte |
+| `test:unit` | `run-unit-tests.mjs` — todos os `tests/**/*.test.mjs` (SM-041) |
+| `verify:depcheck` | `depcheck` — TS-042 |
 | `verify:openapi` | `verify-openapi-coverage.mjs` |
 | `sync:locales` | `build-*-locale.mjs` |
 | `dist:*` | `dist-win.mjs`, `dist-linux.mjs`, etc. |
@@ -73,4 +78,4 @@ Scripts individuais (`smoke:locales`, `smoke:audit`, …) mantidos como aliases 
 | `lib/smoke-helpers.mjs` | assert, fetchJson, env isolado (SM-007) |
 | `lib/smoke-textfill.mjs` | Asserções textfill importáveis (SM-010) |
 
-Ver também [`docs/BUILD.md`](../docs/BUILD.md).
+Ver também [`docs/BUILD.md`](../docs/BUILD.md), [`TF-028-EPIC-CHECKLIST.md`](../docs/TF-028-EPIC-CHECKLIST.md), [`SM-042-EPIC-CHECKLIST.md`](../docs/SM-042-EPIC-CHECKLIST.md).

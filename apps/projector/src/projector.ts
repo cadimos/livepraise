@@ -269,7 +269,7 @@ function reapplyCurrentScreenLayout(): void {
   }
 }
 
-/** Paridade v0.0.8 `projetor.js` — ajusta área útil da projeção. */
+/** Ajusta a área útil da projeção conforme prefs do monitor. */
 function applyScreenSize(valor: string): void {
   const stage = byId<HTMLDivElement>('stage');
   const targets = [stage, byId<HTMLDivElement>('bg-layer'), byId<HTMLDivElement>('conteudo')];

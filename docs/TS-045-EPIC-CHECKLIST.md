@@ -23,15 +23,16 @@ Data: 2026-06-15
 | TS-024–025 | `tailwind.config.ts`, `postcss.config.ts` |
 | TS-037 | ADR: manter `tsc` — [`ADR-037-web-bundler.md`](ADR-037-web-bundler.md) |
 | TS-038 | Source maps só em dev — `npm run verify:sourcemaps` |
+| TS-039 | **Obrigatório (P1)** — `npm run lint` + CI |
+| TS-041 | Comentários «paridade v0.0.8» limpos em fonte produto |
+| TS-040 | Git hook opt-in — `npm run install:git-hooks` |
+| TS-042 | `npm run verify:depcheck` — skipMissing justificado |
 
 ## Opcionais em backlog (não bloqueiam TS-045)
 
 | ID | Título |
 |----|--------|
-| TS-039 | ESLint TypeScript |
-| TS-040 | Pre-commit hook typecheck |
-| TS-041 | Limpar comentários «paridade v0.0.8» |
-| TS-042 | depcheck / `@shared/types` skipMissing |
+| TS-043 | Política `shared/**/*.js` gitignore (revisão) |
 
 ## Verificação automática
 
@@ -40,8 +41,9 @@ npm run check:js-in-src    # zero .js fonte em pastas de produto
 npm run typecheck          # todos os tsconfigs
 npm run build              # produção sem source maps browser
 npm run smoke:surfaces     # artefactos dist/
-npm run verify:sourcemaps  # TS-038
+npm run lint               # TS-039 (0 errors)
 npm run verify:build       # TS-044
+npm run verify:depcheck    # TS-042
 ```
 
 ## Fonte vs artefacto

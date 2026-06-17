@@ -1,0 +1,10 @@
+#!/bin/sh
+# TS-040 — opt-in: npm run install:git-hooks
+# Corre lint + typecheck antes de cada commit (local; não faz parte do CI obrigatório).
+set -e
+cd "$(git rev-parse --show-toplevel)"
+echo "pre-commit: npm run lint"
+npm run lint
+echo "pre-commit: npm run typecheck"
+npm run typecheck
+echo "pre-commit: OK"

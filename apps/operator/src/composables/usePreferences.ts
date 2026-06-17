@@ -27,7 +27,7 @@ import {
 export type OperatorPanel = 'imagens' | 'videos' | 'louvor' | 'biblia';
 
 /** @deprecated Use {@link QueueItem} — mantido para import/export legado. */
-export interface ChromeTabVerse extends LegacyChromeTabVerse {}
+export type ChromeTabVerse = LegacyChromeTabVerse;
 
 export interface ChromeTab {
   id: string;

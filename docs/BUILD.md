@@ -66,9 +66,36 @@ Requer `npm run build:server` (ou `build`) antes do typecheck browser: os paths 
 npm run build          # build completo (produção, sem source maps browser)
 npm run build:browser:dev  # browser + maps (TS-038, usado por npm run dev)
 npm run typecheck      # verificação TS sem emit
+npm run lint           # ESLint (TS-039; CI bloqueia em errors)
+npm run test:unit      # unitários em tests/ (SM-041)
+npm run verify:depcheck # dependências (TS-042)
 npm run dev            # browser dev com maps + Electron
 npm run dev:server     # servidor + operador (sem Electron)
 ```
+
+## Git hooks (opt-in — TS-040)
+
+Por defeito **não** há hooks instalados. Para activar lint + typecheck antes de cada commit:
+
+```bash
+npm run install:git-hooks
+# remover: rm .git/hooks/pre-commit
+```
+
+## Depcheck (TS-042)
+
+```bash
+npm run verify:depcheck
+```
+
+| Entrada `skipMissing` | Motivo |
+|-----------------------|--------|
+| `@shared/types` | Alias TypeScript (`@shared/types/live`, etc.) — paths em `tsconfig.browser-paths.json`, não pacote npm |
+| `node:sqlite` | Built-in Node 22+ (`node:sqlite`); depcheck não reconhece protocolo `node:` |
+
+`ignoreMatches`: `autoprefixer`, `postcss`, `tailwindcss` (PostCSS config), `axe-core` (reservado para auditoria a11y futura).
+
+Config: `.depcheckrc` (espelhado em `package.json` → `depcheck`). O script `verify:depcheck` passa `--ignores=` porque o depcheck não detecta plugins referenciados só em `postcss.config.ts`.
 
 ## Variáveis de ambiente
 
@@ -86,5 +113,6 @@ Node ≥ 22.12 (`engines` em `package.json`).
 
 - **TS-037:** manter `tsc` para web/projector/stage-return — ver [`ADR-037-web-bundler.md`](ADR-037-web-bundler.md).
 - **TS-038:** source maps só em dev — `npm run build:browser:dev` / `npm run dev`; validar com `npm run verify:sourcemaps`.
+- **TS-039:** ESLint + typescript-eslint + vue — `npm run lint`; job CI executa lint antes do typecheck.
 - **TS-044:** quickstart clone em `README.md`; validação local com `npm run verify:build`.
 - **TS-045:** checklist de fecho — [`TS-045-EPIC-CHECKLIST.md`](TS-045-EPIC-CHECKLIST.md).

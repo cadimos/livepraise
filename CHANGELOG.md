@@ -9,7 +9,10 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 ### Adicionado
 
 - **TypeScript / build (TS-038)** — `npm run build:browser:dev` gera source maps para projector/web; `npm run verify:sourcemaps` valida dev vs produção; `npm run dev` usa browser dev.
-- **Smokes consolidados (SM-009/010/030)** — `smoke:features`, `smoke:textfill`, `smoke:typography-qa`; removidos `scripts/smoke-cad*.mjs` legados.
+- **ESLint TypeScript (TS-039)** — `eslint.config.js`, `npm run lint` / `lint:fix`; job CI typecheck executa lint antes do typecheck.
+- **Smokes consolidados (SM-009/010/011/012/013/030/042)** — `smoke:features`, domínios auth/displays/backup/textfill; checklists TF-028 + SM-042.
+- **TS-041** — comentários «paridade v0.0.8» actualizados em fonte TS (legado mantido só em `legacy-upgrade.ts`).
+- **TS-040/042, SM-041, ST-025** — hook git opt-in, `verify:depcheck`, `test:unit`, README estrutura actualizado.
 
 ### Removido
 

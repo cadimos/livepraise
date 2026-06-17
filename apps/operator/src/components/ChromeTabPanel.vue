@@ -34,6 +34,7 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const { prefs, addQueueItem, removeQueueItem, updateQueueItem } = usePreferences();
 const addModalOpen = ref(false);
+const dragOverIndex = ref<number | null>(null);
 
 const queueMenuOpen = ref(false);
 const queueMenuX = ref(0);

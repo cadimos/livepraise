@@ -91,10 +91,10 @@ Objetivo: código de produto tipado, uma única fonte por módulo, build previs�
 | TS-036 | ✅ Tipar `remote.js` session/actions | Paridade com routes remote server. | Typecheck remote OK. | TS-019 | P2 | M |
 | TS-037 | ✅ Avaliar bundler único para web apps | Vite lib mode vs tsc puro — reduzir número de `.js` soltos. | ADR se adoptar bundler. | TS-021 | P3 | L |
 | TS-038 | ✅ Source maps em dev para web/projector | Facilitar debug Electron/browser. | Maps gerados em dev only. | TS-021 | P3 | M |
-| TS-039 | ESLint TypeScript (opcional) | `@typescript-eslint` regras mínimas. | lint script no package.json. | TS-029 | P3 | L |
-| TS-040 | Pre-commit hook typecheck (opcional) | Só se equipa quiser; documentar opt-in. | Hook documentado, não obrigatório. | TS-029 | P3 | S |
-| TS-041 | Remover referências a «paridade v0.0.8» obsoletas | Comentários que já não aplicam após TS. | grep limpo ou comentários actualizados. | — | P3 | S |
-| TS-042 | Verificar `depcheck` / paths `@shared/types` | Item `skipMissing` no package.json ainda necessário? | depcheck limpo ou justificado. | TS-026 | P3 | S |
+| TS-039 | ✅ ESLint TypeScript | `@typescript-eslint` regras mínimas; `npm run lint` no CI. | lint script no package.json. | TS-029 | P1 | L |
+| TS-040 | ✅ Pre-commit hook typecheck (opcional) | Só se equipa quiser; documentar opt-in. | Hook documentado, não obrigatório. | TS-029 | P3 | S |
+| TS-041 | ✅ Remover referências a «paridade v0.0.8» obsoletas | Comentários que já não aplicam após TS. | grep limpo ou comentários actualizados. | — | P3 | S |
+| TS-042 | ✅ Verificar `depcheck` / paths `@shared/types` | Item `skipMissing` no package.json ainda necessário? | depcheck limpo ou justificado. | TS-026 | P3 | S |
 | TS-043 | ✅ Garantir `shared/**/*.js` nunca commitado | Reforçar regra `.gitignore` + TS-027. | Nenhum JS em shared/ no git. | TS-003 | P1 | S |
 | TS-044 | ✅ Teste: build limpo clone fresh | `git clone` → `npm ci` → `npm run build` sem passos manuais. | README quickstart válido. | TS-028 | P1 | S |
 | TS-045 | ✅ Fechar epic TS — checklist final | TS-001–044 concluídos; web/projector/stage-return/core sem JS fonte. | Revisão CTO; tag interna opcional. | TS-030–044 | P0 | S |
@@ -133,7 +133,7 @@ Objetivo: um único caminho de integração (controller/composable), motor em `s
 |----|--------|-----------|---------------------|------|---|------|
 | TF-013 | ✅ Validar projetor usa só controller | `apps/projector/src/projector.ts` — sem textfill directo. | grep confirma. | — | P1 | S |
 | TF-014 | ✅ Validar stage-return `allTexto: true` | Retorno acoplado `.atual`/`.proximo` via `refreshOutputTextfillAll`. | Dois blocos `.texto` escalam. | — | P1 | S |
-| TF-015 | Validar `/live` e external-display | Após TS-015/016, controller com perfis correctos. | Perfis live/vocal/stage/player. | TS-015 | P1 | M |
+| TF-015 | ✅ Validar `/live` e external-display | Após TS-015/016, controller com perfis correctos. | Perfis live/vocal/stage/player. | TS-015 | P1 | M |
 | TF-016 | ✅ Teste manual louvor longo 14+ versos | Projetor + prévia operador mesmo tamanho relativo. | Sem fonte 24px mínima incorrecta. | TF-007 | P0 | S |
 | TF-017 | ✅ Teste manual Bíblia versículo longo | Idem. | Texto cabe na área. | TF-016 | P1 | S |
 | TF-018 | ✅ Teste flash ao trocar verso | visibility/opacity — sem flash público. | `tests/projection-textfill-visibility.test.mjs` passa. | — | P0 | S |
@@ -152,7 +152,7 @@ Objetivo: um único caminho de integração (controller/composable), motor em `s
 |----|--------|-----------|---------------------|------|---|------|
 | TF-022 | ✅ Manter testes `tests/projection-textfill-*.test.mjs` | Integrar no smoke consolidado (SM-015), não apagar cobertura. | 3 testes passam após refactors. | TF-007 | P0 | S |
 | TF-023 | Teste composable preview (futuro Vitest) | Se Vitest adoptado: mount composable com jsdom. | Backlog ou implementação mínima. | TF-006 | P3 | M |
-| TF-024 | Actualizar smoke CAD-313/314 ou sucessor | Asserções sobre composable/controller, não imports directos tile. | Smoke verde. | TF-012, SM-015 | P1 | M |
+| TF-024 | ✅ Actualizar smoke CAD-313/314 ou sucessor | Asserções sobre composable/controller, não imports directos tile. | Smoke verde. | TF-012, SM-015 | P1 | M |
 | TF-025 | Caso agregado «textfill» no smoke release | Opcional: 1 teste rápido no gate release (SM-010). | release smoke inclui textfill. | SM-010 | P2 | M |
 
 ### 2.6 Melhorias opcionais (não bloqueiam unificação)
@@ -161,7 +161,7 @@ Objetivo: um único caminho de integração (controller/composable), motor em `s
 |----|--------|-----------|---------------------|------|---|------|
 | TF-026 | Avaliar componente Vue `<ProjectionContent>` | Wrapper template `.content` + controller — só se reduzir HTML duplicado nos tiles. | ADR; implementação opcional. | TF-007 | P3 | L |
 | TF-027 | Extrair constantes PREVIEW vs OUTPUT floors | `PREVIEW_TEXTFILL_MIN_PX`, `STAGE_RETURN_OUTPUT_FLOOR_PX` documentadas na API. | TF-002 actualizado. | TF-002 | P3 | S |
-| TF-028 | Fechar epic textfill — checklist | TF-001–025 concluídos; operador unificado. | Revisão visual QA. | TF-016–024 | P0 | S |
+| TF-028 | ✅ Fechar epic textfill — checklist | TF-001–025 concluídos; operador unificado. | Revisão visual QA. | TF-016–024 | P0 | S |
 
 ---
 
@@ -193,9 +193,9 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 |----|--------|-----------|---------------------|------|---|------|
 | SM-009 | ✅ Criar `smoke-features.mjs` (opcional) | Agrupa: locales, audit, video-watcher, musica-export, version-sync — flags `--only=locales`. | Um entrypoint; domínios isolados. | SM-003 | P1 | L |
 | SM-010 | ✅ Integrar textfill/tipografia no core ou features | Incorporar asserções de cad313/314 + tests/projection-textfill-* num módulo importável. | Cobertura textfill no gate. | SM-009, TF-022 | P1 | M |
-| SM-011 | Consolidar auth/roles (cad221+cad224) | Um script `smoke-auth.mjs` se ambos ainda relevantes. | npm script único; antigos deprecated. | SM-003 | P2 | M |
-| SM-012 | Consolidar displays (cad188+cad194) | Projetor + displays config num smoke. | Um script; build projector incluído. | SM-003 | P2 | M |
-| SM-013 | Consolidar backup/restore smokes | cad228, cad234, cad238 se sobrepostos. | Avaliar merge vs manter um. | SM-003 | P2 | L |
+| SM-011 | ✅ Consolidar auth/roles (cad221+cad224) | Um script `smoke-auth.mjs` se ambos ainda relevantes. | npm script único; antigos deprecated. | SM-003 | P2 | M |
+| SM-012 | ✅ Consolidar displays (cad188+cad194) | Projetor + displays config num smoke. | Um script; build projector incluído. | SM-003 | P2 | M |
+| SM-013 | ✅ Consolidar backup/restore smokes | cad228, cad234, cad238 se sobrepostos. | Avaliar merge vs manter um. | SM-003 | P2 | L |
 | SM-014 | Manter `smoke-legacy-upgrade` isolado | Migração v0.0.8 — não misturar com fase2. | Script + npm; doc quando correr. | SM-005 | P1 | S |
 | SM-015 | Manter testes unitários em `tests/` | Mover lógica pesada de cad313 para imports de `tests/*.mjs`. | Smokes finos, testes grossos. | SM-010 | P1 | M |
 
@@ -238,8 +238,8 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 |----|--------|-----------|---------------------|------|---|------|
 | SM-039 | Listar asserções cad* migráveis para Vitest | core/, shared/ funções puras. | Backlog Vitest. | SM-002 | P3 | M |
 | SM-040 | Manter runner Node nativo para integração | Smokes HTTP/WS continuam .mjs até Playwright. | Decisão INVENTARIO respeitada. | — | P2 | S |
-| SM-041 | Criar `npm run test:unit` placeholder | Corre tests/*.mjs seleccionados. | Script existe pre-Vitest. | SM-015 | P2 | S |
-| SM-042 | Fechar epic smokes — checklist | ≤8 scripts smoke + tests/; CI verde. | Contagem ficheiros scripts/smoke-*.mjs. | SM-030–041 | P0 | S |
+| SM-041 | ✅ Criar `npm run test:unit` placeholder | Corre tests/*.mjs seleccionados. | Script existe pre-Vitest. | SM-015 | P2 | S |
+| SM-042 | ✅ Fechar epic smokes — checklist | ≤8 scripts smoke + tests/; CI verde. | Contagem ficheiros scripts/smoke-*.mjs. | SM-030–041 | P0 | S |
 
 ---
 
@@ -300,7 +300,7 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 |----|--------|-----------|---------------------|------|---|------|
 | ST-023 | Revisar `.github/workflows/*.yml` | Nomes, smokes, alinhamento README/INVENTARIO. | Sem referências mortas. | SM-031 | P1 | M |
 | ST-024 | ✅ Adicionar job typecheck CI | Ver TS-029. | ci.yml typecheck. | TS-029 | P1 | S |
-| ST-025 | Actualizar README estrutura repositório | web/ TS, dist/, smokes consolidados. | Árvore actualizada. | TS-045, SM-042 | P1 | S |
+| ST-025 | ✅ Actualizar README estrutura repositório | web/ TS, dist/, smokes consolidados. | Árvore actualizada. | TS-045, SM-042 | P1 | S |
 | ST-026 | Actualizar CHANGELOG meta técnica | Epics TS, TF, SM, ST concluídos. | Entrada por release. | — | P2 | S |
 
 ### 4.7 Qualidade e dívida conhecida
@@ -355,7 +355,9 @@ Pedidos eficientes por **lote** — copiar o bloco de IDs para solicitar ao agen
 `TS-029`, `TS-030`, `TS-031`, `TS-044`, `TS-045`, `ST-023`, `ST-024`, `ST-025`, `SM-033`, `ST-036`, `ST-037`, `ST-038`
 
 ### Wave G — Opcionais / pós-beta
-Todo ID com **P3** ou secções TS-024/025, TS-037–043, TF-023/026/027, SM-033–035/039, ST-015/018/027–032
+Todo ID com **P3** ou secções TS-043, TF-023/026/027, SM-033–035/039, ST-015/018/027–032
+
+**Nota:** TS-039 (ESLint) foi promovida a **P1 obrigatória** — ver fila activa abaixo.
 
 ---
 
@@ -476,5 +478,29 @@ Após cada tarefa concluída, marcar `[x]` na secção «Concluídas» e **✅**
 - [x] **SM-037** — CHANGELOG [Unreleased] limpeza smokes
 - [x] **TF-016–018** — checklist manual em `docs/textfill-manual-qa.md`
 
-**Fila:** SM-011/012/013 (consolidar auth/displays/backup) → TF-028 (fechar epic textfill) → SM-042.
+### SM-011 + TS-039 (2026-06-15)
+
+- [x] **SM-011** — `scripts/lib/smoke-auth.mjs` + `npm run smoke:auth` + domínio `auth` em `smoke:features`
+- [x] **TS-039** — `eslint.config.js`, `npm run lint`, job CI; **promovida P3 opcional → P1 obrigatória**
+- Correcção: `dragOverIndex` ref em `ChromeTabPanel.vue` (detectado pelo ESLint)
+
+### SM-012/013 (2026-06-15)
+
+- [x] **SM-012** — `scripts/lib/smoke-displays.mjs` + `npm run smoke:displays` (cad188 + cad194)
+- [x] **SM-013** — `scripts/lib/smoke-backup.mjs` + `npm run smoke:backup` (cad228 + cad234 + cad238)
+
+**Fila:** ST-036/037 → TS-043 (opcional).
+
+### TS-040/042 + SM-041 + ST-025 (2026-06-15)
+
+- [x] **TS-040** — `scripts/git-hooks/pre-commit` + `npm run install:git-hooks` (opt-in)
+- [x] **TS-042** — `depcheck` devDep, `verify:depcheck`, `skipMissing` documentado
+- [x] **SM-041** — `npm run test:unit` (`scripts/run-unit-tests.mjs`, 7 testes)
+- [x] **ST-025** — README: árvore com `dist/`, `scripts/`, `tests/`, `docs/`
+
+### TF-028 + SM-042 + TS-041 (2026-06-15)
+
+- [x] **TF-028** — `docs/TF-028-EPIC-CHECKLIST.md` (epic textfill fechado para alpha)
+- [x] **SM-042** — `docs/SM-042-EPIC-CHECKLIST.md` (17 scripts; cad* zero; CI núcleo)
+- [x] **TS-041** — comentários «paridade v0.0.8» actualizados em fonte TS/Vue (mantidos em `legacy-upgrade.ts`)
 

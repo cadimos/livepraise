@@ -37,6 +37,6 @@ export function decodeLegacyPayload(raw: string): LiveAction | null {
   }
 }
 
-/** Ações suportadas na baseline Fase 3 (paridade monitorController). */
+/** Ações suportadas na baseline de projeção pública. */
 export const BASELINE_ACTION_SET: readonly LiveActionName[] =
   BASELINE_LIVE_ACTIONS;

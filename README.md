@@ -23,21 +23,25 @@ Software desktop open-source (MIT) para projeção de louvores, passagens bíbli
 ```
 livepraise/
 ├── electron/          # Processo principal Electron (splash, monitores)
-├── server/            # HTTP + WebSocket
-├── core/              # Lógica de sistema (projeção, auth, temas, segurança)
+├── server/            # HTTP + WebSocket (TypeScript → dist/server/)
+├── core/              # Lógica de domínio (projeção, auth, temas, segurança)
 ├── apps/
-│   ├── operator/      # Vue 3 + Vite + Tailwind
-│   ├── projector/     # Projeção pública
-│   └── stage-return/  # Retorno de palco
-├── web/               # Portal, /live, /remote, ecrãs externos
+│   ├── operator/      # Vue 3 + Vite + Tailwind (fonte .ts/.vue)
+│   ├── projector/     # Projeção pública (fonte .ts → dist/apps/projector/)
+│   └── stage-return/  # Retorno de palco (fonte .ts → dist/apps/stage-return/)
+├── web/               # Portal, /live, /remote, ecrãs externos (fonte .ts → dist/web/*/)
+├── shared/            # Tipos e utilitários TS (emit → dist/shared/)
+├── scripts/           # Build, smokes, dist, helpers (*.mjs)
+├── tests/             # Testes unitários Node (`npm run test:unit`)
+├── docs/              # BUILD, ARCHITECTURE, planos, ADRs, checklists epic
+├── dist/              # Artefactos de build (gitignored — `npm run build`)
 ├── themes/            # Temas (theme.json + assets)
 ├── locales/           # Traduções
 ├── install/           # Payload da primeira instalação → ~/livepraise
-├── shared/            # Tipos e utilitários TS partilhados
 └── resources/         # Ícones e assets de build
 ```
 
-Documentação técnica: [`docs/BUILD.md`](docs/BUILD.md) (build e política TS), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/projection-textfill.md`](docs/projection-textfill.md), [`docs/ADR-037-web-bundler.md`](docs/ADR-037-web-bundler.md), [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md).
+Documentação técnica: [`docs/BUILD.md`](docs/BUILD.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/projection-textfill.md`](docs/projection-textfill.md), [`scripts/README.md`](scripts/README.md) (smokes), [`docs/TS-045-EPIC-CHECKLIST.md`](docs/TS-045-EPIC-CHECKLIST.md), [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md).
 
 ## Requisitos
 
@@ -188,10 +192,15 @@ npm install
 npm run dev          # compila e abre o Electron (Linux/NTFS: --no-sandbox em dev)
 npm run dev:server   # só o servidor HTTP (porta 3000)
 npm run typecheck
+npm run lint             # ESLint (CI)
+npm run test:unit        # tests/*.mjs (requer build:server)
 npm run build        # server + electron + operator + projetor + stage-return
 ```
 
-Regressão entre versões (release / CI): [`scripts/README.md`](scripts/README.md) — `npm run smoke:release`.
+Regressão entre versões (release / CI): [`scripts/README.md`](scripts/README.md) — `npm run smoke:release`.  
+Smokes de feature: `npm run smoke:features` (auth, displays, backup, textfill, …).
+
+Hook git opt-in (lint + typecheck antes de commit): `npm run install:git-hooks` — ver [`docs/BUILD.md`](docs/BUILD.md#git-hooks-opt-in-ts-040).
 
 ## Instalação
 

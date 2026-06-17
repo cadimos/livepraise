@@ -49,6 +49,18 @@ const FEATURES = {
     label: 'QA tipografia CA-1–14',
     script: 'smoke-typography-qa.mjs',
   },
+  auth: {
+    label: 'auth/delivery + preview groups',
+    script: 'smoke-auth.mjs',
+  },
+  displays: {
+    label: 'footerAlert + fila/media (ex cad188/194)',
+    script: 'smoke-displays.mjs',
+  },
+  backup: {
+    label: 'import-url + fila + backup/restore (ex cad228/234/238)',
+    script: 'smoke-backup.mjs',
+  },
 };
 
 const ALIASES = {

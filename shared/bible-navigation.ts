@@ -2,7 +2,7 @@ export interface BibleVerseLike {
   versiculo: number;
 }
 
-/** Índice do próximo versículo na lista (paridade com setas do monitor.js). */
+/** Índice do próximo versículo na lista (navegação por setas). */
 export function computeNextVerseIndex(
   verses: BibleVerseLike[],
   selectedVerse: number | null,
