@@ -46,14 +46,21 @@ function onNewBlankDrop(event: DragEvent): void {
       @dragover="onDragOver"
       @drop="handleDropOnTab($event, tab.id)"
     >
-      <button type="button" class="min-h-7 min-w-0 flex-1 truncate text-left" @click="setActiveTab(tab.id)">
+      <button
+        type="button"
+        class="min-h-7 min-w-0 flex-1 truncate text-left"
+        @click="setActiveTab(tab.id)"
+      >
         <AlertTriangle
           v-if="tab.missing"
           class="mr-0.5 inline h-3.5 w-3.5 shrink-0 text-amber-400"
           aria-hidden="true"
         />
         {{ tab.label }}
-        <span v-if="tab.items?.length" class="ml-1 text-xs text-lp-muted">({{ tab.items.length }})</span>
+        <span
+          v-if="tab.items?.length"
+          class="ml-1 text-xs text-lp-muted"
+        >({{ tab.items.length }})</span>
       </button>
       <button
         type="button"
@@ -61,7 +68,10 @@ function onNewBlankDrop(event: DragEvent): void {
         :aria-label="t('tabs.close')"
         @click.stop="removeChromeTab(tab.id)"
       >
-        <X class="h-3.5 w-3.5" aria-hidden="true" />
+        <X
+          class="h-3.5 w-3.5"
+          aria-hidden="true"
+        />
       </button>
     </div>
 
@@ -73,11 +83,17 @@ function onNewBlankDrop(event: DragEvent): void {
       @dragover="onDragOver"
       @drop="onNewBlankDrop"
     >
-      <Plus class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+      <Plus
+        class="h-3.5 w-3.5 shrink-0"
+        aria-hidden="true"
+      />
       {{ t('tabs.newBlank') }}
     </button>
 
-    <p v-if="!prefs.chromeTabs.length" class="px-2 py-1 text-xs text-lp-muted">
+    <p
+      v-if="!prefs.chromeTabs.length"
+      class="px-2 py-1 text-xs text-lp-muted"
+    >
       {{ t('tabs.empty') }}
     </p>
   </div>

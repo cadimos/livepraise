@@ -375,7 +375,10 @@ onUnmounted(() => {
           @keydown.enter.prevent="addModalOpen = true"
           @keydown.space.prevent="addModalOpen = true"
         >
-          <Plus class="h-8 w-8 text-lp-primary" aria-hidden="true" />
+          <Plus
+            class="h-8 w-8 text-lp-primary"
+            aria-hidden="true"
+          />
           <span class="mt-2 px-2 text-center text-xs">{{ t('queueAdd.addCard') }}</span>
         </li>
         <li
@@ -415,8 +418,13 @@ onUnmounted(() => {
               alt=""
               class="h-20 w-full object-cover p-1 pt-5"
               draggable="false"
-            />
-            <p v-else class="p-2 pt-6 text-xs">{{ item.label }}</p>
+            >
+            <p
+              v-else
+              class="p-2 pt-6 text-xs"
+            >
+              {{ item.label }}
+            </p>
             <div
               v-if="item.youtubeImportJobId && item.youtubeImportPhase !== 'failed'"
               class="absolute inset-x-0 bottom-0 space-y-1 bg-black/75 p-2 pt-6"
@@ -444,7 +452,9 @@ onUnmounted(() => {
             </div>
           </template>
           <template v-else-if="item.kind === 'blank'">
-            <p class="p-2 pt-6 text-center text-xs italic text-lp-muted">{{ t('tabs.kindBlank') }}</p>
+            <p class="p-2 pt-6 text-center text-xs italic text-lp-muted">
+              {{ t('tabs.kindBlank') }}
+            </p>
           </template>
           <template v-else>
             <pre class="playlist-verse-text whitespace-pre-wrap p-2 pt-5 font-sans text-sm leading-snug">{{

@@ -107,12 +107,17 @@ onMounted(() => {
 
 <template>
   <div class="flex h-full flex-col gap-4">
-    <div v-if="error" class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200">
+    <div
+      v-if="error"
+      class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200"
+    >
       {{ error }}
     </div>
 
     <section>
-      <p class="mb-2 text-xs uppercase tracking-wider text-slate-500">Fundos rápidos</p>
+      <p class="mb-2 text-xs uppercase tracking-wider text-slate-500">
+        Fundos rápidos
+      </p>
       <div class="flex flex-wrap gap-2">
         <button
           v-for="(item, index) in quickBackgrounds"
@@ -125,7 +130,7 @@ onMounted(() => {
             :src="quickBackgroundDisplayUrl(item)"
             alt=""
             class="h-full w-full object-cover"
-          />
+          >
         </button>
       </div>
     </section>
@@ -137,18 +142,29 @@ onMounted(() => {
         class="mb-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
         @change="loadImages(($event.target as HTMLSelectElement).value)"
       >
-        <option v-for="cat in imageCategories" :key="cat" :value="cat">
+        <option
+          v-for="cat in imageCategories"
+          :key="cat"
+          :value="cat"
+        >
           {{ cat }}
         </option>
       </select>
       <ul class="grid min-h-0 flex-1 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4">
-        <li v-for="img in images" :key="img">
+        <li
+          v-for="img in images"
+          :key="img"
+        >
           <button
             type="button"
             class="aspect-video w-full overflow-hidden rounded-lg border border-slate-800 transition hover:border-sky-500"
             @click="projectBackground(mediaUrl(img))"
           >
-            <img :src="mediaUrl(img)" alt="" class="h-full w-full object-cover" />
+            <img
+              :src="mediaUrl(img)"
+              alt=""
+              class="h-full w-full object-cover"
+            >
           </button>
         </li>
       </ul>

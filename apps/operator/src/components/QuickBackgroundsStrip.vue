@@ -125,11 +125,19 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="shrink-0" :style="{ width: PREVIEW_COLUMN_WIDTH }">
+  <section
+    class="shrink-0"
+    :style="{ width: PREVIEW_COLUMN_WIDTH }"
+  >
     <p class="mb-1.5 text-[10px] uppercase tracking-wider text-lp-muted">
       {{ t('backgrounds.quick') }}
     </p>
-    <p v-if="error" class="mb-2 text-xs text-rose-300">{{ error }}</p>
+    <p
+      v-if="error"
+      class="mb-2 text-xs text-rose-300"
+    >
+      {{ error }}
+    </p>
     <div class="grid grid-cols-5 gap-2">
       <button
         v-for="(item, index) in visibleBackgrounds"
@@ -143,7 +151,7 @@ onUnmounted(() => {
           :src="quickBackgroundDisplayUrl(item)"
           alt=""
           class="h-full w-full object-cover"
-        />
+        >
       </button>
     </div>
   </section>

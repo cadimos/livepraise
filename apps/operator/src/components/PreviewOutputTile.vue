@@ -90,7 +90,10 @@ const { fontFaceStyleRef } = useProjectionTypographyPreview({
 </script>
 
 <template>
-  <article class="flex w-full shrink-0 flex-col gap-1" :aria-label="label">
+  <article
+    class="flex w-full shrink-0 flex-col gap-1"
+    :aria-label="label"
+  >
     <header class="flex min-h-[1.25rem] items-center gap-2">
       <h3 class="truncate text-xs font-medium text-lp-muted">
         {{ label }}
@@ -132,7 +135,7 @@ const { fontFaceStyleRef } = useProjectionTypographyPreview({
           :src="backgroundUrl"
           alt=""
           class="absolute inset-0 h-full w-full object-fill"
-        />
+        >
         <style ref="fontFaceStyleRef" />
         <div
           ref="contentRef"

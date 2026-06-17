@@ -13,13 +13,21 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col gap-3 text-sm">
-    <p class="text-lp-muted">{{ t('settings.approvals.intro') }}</p>
+    <p class="text-lp-muted">
+      {{ t('settings.approvals.intro') }}
+    </p>
 
-    <p v-if="!pendingApprovals.length" class="text-lp-muted">
+    <p
+      v-if="!pendingApprovals.length"
+      class="text-lp-muted"
+    >
       {{ t('settings.approvals.empty') }}
     </p>
 
-    <ul v-else class="flex flex-col gap-2">
+    <ul
+      v-else
+      class="flex flex-col gap-2"
+    >
       <li
         v-for="item in pendingApprovals"
         :key="item.id"

@@ -205,14 +205,23 @@ onUnmounted(() => {
         </nav>
 
         <div class="min-h-0 flex-1 overflow-y-auto p-3">
-          <ImagesPanel v-if="prefs.activePanel === 'imagens'" @preview-bg="onPreviewBg" />
-          <VideosPanel v-else-if="prefs.activePanel === 'videos'" @preview-bg="onPreviewBg" />
+          <ImagesPanel
+            v-if="prefs.activePanel === 'imagens'"
+            @preview-bg="onPreviewBg"
+          />
+          <VideosPanel
+            v-else-if="prefs.activePanel === 'videos'"
+            @preview-bg="onPreviewBg"
+          />
           <WorshipPanel
             v-else-if="prefs.activePanel === 'louvor'"
             @preview="onPreview"
             @edit-song="openEditSong"
           />
-          <BiblePanel v-else @preview="onPreview" />
+          <BiblePanel
+            v-else
+            @preview="onPreview"
+          />
         </div>
       </section>
 
@@ -220,17 +229,29 @@ onUnmounted(() => {
         class="flex min-h-0 shrink-0 flex-col gap-2"
         :style="{ width: PREVIEW_COLUMN_WIDTH }"
       >
-        <QuickBackgroundsStrip @preview-bg="onQuickBackground" @clear-preview="previewHtml = ''" />
+        <QuickBackgroundsStrip
+          @preview-bg="onQuickBackground"
+          @clear-preview="previewHtml = ''"
+        />
         <MultiOutputPreviewColumn :footer-alert-preview="previewPlayback" />
       </aside>
     </div>
 
     <ChromeTabs />
-    <ChromeTabPanel @preview="onPreview" @preview-bg="onPreviewBg" />
+    <ChromeTabPanel
+      @preview="onPreview"
+      @preview-bg="onPreviewBg"
+    />
     <StatusBar @open-displays="openSettings('displays')" />
 
-    <NewSongModal v-model:open="newSongOpen" v-model:edit-song-id="editSongId" />
-    <NotepadModal v-model:open="notepadOpen" @preview="onPreview" />
+    <NewSongModal
+      v-model:open="newSongOpen"
+      v-model:edit-song-id="editSongId"
+    />
+    <NotepadModal
+      v-model:open="notepadOpen"
+      @preview="onPreview"
+    />
     <AboutModal v-model:open="aboutOpen" />
     <ServiceTimerModal v-model:open="serviceTimerOpen" />
     <FooterAlertModal v-model:open="footerAlertOpen" />

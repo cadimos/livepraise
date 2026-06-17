@@ -98,6 +98,10 @@ Objetivo: código de produto tipado, uma única fonte por módulo, build previs�
 | TS-043 | ✅ Garantir `shared/**/*.js` nunca commitado | Reforçar regra `.gitignore` + TS-027. | Nenhum JS em shared/ no git. | TS-003 | P1 | S |
 | TS-044 | ✅ Teste: build limpo clone fresh | `git clone` → `npm ci` → `npm run build` sem passos manuais. | README quickstart válido. | TS-028 | P1 | S |
 | TS-045 | ✅ Fechar epic TS — checklist final | TS-001–044 concluídos; web/projector/stage-return/core sem JS fonte. | Revisão CTO; tag interna opcional. | TS-030–044 | P0 | S |
+| TS-046 | ✅ Reduzir warnings ESLint a zero | Baseline ~484 (0 errors); `lint:fix` + `no-unused-vars` + regras Vue. | `npm run lint` sem warnings. | TS-039 | P2 | L |
+| TS-046a | ✅ `npm run lint:fix` (auto-fixável) | vue/html-self-closing, max-attributes, singleline-newline, html-indent. | Warnings ≤ 50. | TS-046 | P2 | M |
+| TS-046b | ✅ Corrigir `@typescript-eslint/no-unused-vars` | Prefixo `_` ou remover imports/vars mortos. | Zero unused-vars. | TS-046a | P2 | S |
+| TS-046c | ✅ Revisar regras Vue restantes | Desactivar ou corrigir manualmente o que `lint:fix` não resolve. | `npm run lint` → 0 warnings. | TS-046b | P2 | M |
 
 ---
 
@@ -196,7 +200,7 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 | SM-011 | ✅ Consolidar auth/roles (cad221+cad224) | Um script `smoke-auth.mjs` se ambos ainda relevantes. | npm script único; antigos deprecated. | SM-003 | P2 | M |
 | SM-012 | ✅ Consolidar displays (cad188+cad194) | Projetor + displays config num smoke. | Um script; build projector incluído. | SM-003 | P2 | M |
 | SM-013 | ✅ Consolidar backup/restore smokes | cad228, cad234, cad238 se sobrepostos. | Avaliar merge vs manter um. | SM-003 | P2 | L |
-| SM-014 | Manter `smoke-legacy-upgrade` isolado | Migração v0.0.8 — não misturar com fase2. | Script + npm; doc quando correr. | SM-005 | P1 | S |
+| SM-014 | ✅ Manter `smoke-legacy-upgrade` isolado | Migração v0.0.8 — não misturar com fase2. | Script + npm; doc quando correr. | SM-005 | P1 | S |
 | SM-015 | Manter testes unitários em `tests/` | Mover lógica pesada de cad313 para imports de `tests/*.mjs`. | Smokes finos, testes grossos. | SM-010 | P1 | M |
 
 ### 3.4 Remoção / deprecação cad*
@@ -228,7 +232,7 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 | SM-033 | Adicionar `smoke:fase8` no job Windows release | Alinhar com Linux/macOS (INVENTARIO lacuna). | release.yml Windows corre fase8. | SM-005 | P2 | S |
 | SM-034 | Opcional: `smoke:legacy-upgrade` no CI PR | Só se runtime aceitável; senão manter manual pre-release. | Decisão documentada. | SM-014 | P3 | M |
 | SM-035 | Opcional: `smoke-win-installer` no CI | Integrar no job build-windows. | Installer validado automaticamente. | — | P3 | L |
-| SM-036 | Documentar «quando correr smokes» | Dev diário: typecheck; pre-release: smoke:release + legacy + features. | README secção QA. | SM-031 | P1 | S |
+| SM-036 | ✅ Documentar «quando correr smokes» | Dev diário: typecheck; pre-release: smoke:release + legacy + features. | README secção QA. | SM-031 | P1 | S |
 | SM-037 | ✅ CHANGELOG entrada limpeza smokes | Utilizadores/devs sabem scripts removidos. | Entrada alpha.x. | SM-030 | P1 | S |
 | SM-038 | Actualizar `INVENTARIO-FUNCOES.md` secção testes | Refletir suite consolidada. | Links correctos. | SM-031 | P2 | S |
 
@@ -291,7 +295,7 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
 | ST-020 | Documentar fluxo WS operador ↔ hub ↔ outputs | `shared/types/live.ts` como contrato. | ARCHITECTURE.md secção WS. | ST-008 | P1 | M |
-| ST-021 | Verificar paridade eventos tipografia WS | Controller attachProjectionTypographyWs em todas saídas. | grep attachProjectionTypographyWs. | TF-015 | P1 | S |
+| ST-021 | ✅ Verificar paridade eventos tipografia WS | Controller attachProjectionTypographyWs em todas saídas. | grep attachProjectionTypographyWs. | TF-015 | P1 | S |
 | ST-022 | Verificar paridade `display-debug-overlay` | Projector/live/external usam mesmo overlay debug. | Comportamento consistente. | — | P3 | S |
 
 ### 4.6 CI/CD e documentação
@@ -318,7 +322,7 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| ST-033 | Manter `tests/security/*` no gate | Incluir em SM-041 ou smoke:release. | remote-fetch tests passam. | SM-041 | P1 | S |
+| ST-033 | ✅ Manter `tests/security/*` no gate | Incluir em SM-041 ou smoke:release. | remote-fetch tests passam. | SM-041 | P1 | S |
 | ST-034 | Revisar `core/` boundaries | server importa core; apps não importam server. | grep violations. | — | P2 | M |
 | ST-035 | Revisar paths `.js` em imports TS | NodeNext — consistente em server/electron/shared. | typecheck + runtime OK. | TS-026 | P2 | M |
 
@@ -489,7 +493,20 @@ Após cada tarefa concluída, marcar `[x]` na secção «Concluídas» e **✅**
 - [x] **SM-012** — `scripts/lib/smoke-displays.mjs` + `npm run smoke:displays` (cad188 + cad194)
 - [x] **SM-013** — `scripts/lib/smoke-backup.mjs` + `npm run smoke:backup` (cad228 + cad234 + cad238)
 
-**Fila:** ST-036/037 → TS-043 (opcional).
+**Fila:** ST-036/037/038 → TF-019/021 → SM-003/004.
+
+### TS-046 (2026-06-17)
+
+- [x] **TS-046a** — `npm run lint:fix` (484 → 10 warnings)
+- [x] **TS-046b** — 10× `no-unused-vars` (imports mortos removidos)
+- [x] **TS-046c** — `npm run lint` → **0 warnings**, 0 errors
+
+### ST-021 + ST-033 + SM-014/036 (2026-06-17)
+
+- [x] **ST-021** — `attachProjectionTypographyWs` em projector, stage-return, live, external-display
+- [x] **ST-033** — `tests/security/*` no `npm run test:unit`
+- [x] **SM-014** — `smoke:legacy-upgrade` documentado (README tabela SM-036)
+- [x] **SM-036** — secção «Quando correr cada verificação» no README
 
 ### TS-040/042 + SM-041 + ST-025 (2026-06-15)
 

@@ -45,7 +45,7 @@ watch(
       :src="backgroundUrl"
       alt=""
       class="absolute inset-0 h-full w-full object-fill"
-    />
+    >
     <div
       ref="contentRef"
       class="conteudo absolute inset-0 z-[2] text-white"

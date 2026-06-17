@@ -9,10 +9,6 @@ function tableSql(db: Database, tableName: string): string | null {
   return row?.sql ?? null;
 }
 
-function tableExists(db: Database, tableName: string): boolean {
-  return tableSql(db, tableName) !== null;
-}
-
 /** Migration 004: só quando `users` existe e ainda não aceita papel `admin`. */
 export function shouldRunAdminRoleMigration(db: Database): boolean {
   const sql = tableSql(db, 'users');

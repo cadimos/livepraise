@@ -246,7 +246,10 @@ useDialogA11y(open, panelRef, {
       class="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-lp-surface bg-lp-background shadow-xl"
     >
       <header class="flex items-center justify-between border-b border-lp-surface px-4 py-3">
-        <h2 id="restore-modal-title" class="text-sm font-semibold text-lp-text">
+        <h2
+          id="restore-modal-title"
+          class="text-sm font-semibold text-lp-text"
+        >
           {{ t('settings.backup.restoreModalTitle') }}
         </h2>
         <button
@@ -256,21 +259,28 @@ useDialogA11y(open, panelRef, {
           :disabled="step === 'progress'"
           @click="onClose"
         >
-          <X class="h-4 w-4" aria-hidden="true" />
+          <X
+            class="h-4 w-4"
+            aria-hidden="true"
+          />
         </button>
       </header>
 
       <div class="min-h-0 flex-1 overflow-y-auto p-4">
         <template v-if="step === 'pick'">
-          <p class="text-sm text-lp-muted">{{ t('settings.backup.restoreIntro') }}</p>
-          <p class="mt-2 text-xs text-lp-muted">{{ t('settings.backup.restorePrivacyNote') }}</p>
+          <p class="text-sm text-lp-muted">
+            {{ t('settings.backup.restoreIntro') }}
+          </p>
+          <p class="mt-2 text-xs text-lp-muted">
+            {{ t('settings.backup.restorePrivacyNote') }}
+          </p>
           <input
             ref="fileInput"
             type="file"
             accept=".zip,application/zip"
             class="hidden"
             @change="onFilePicked"
-          />
+          >
           <button
             type="button"
             class="mt-4 rounded-lg bg-lp-primary px-4 py-2 text-sm font-medium text-white"
@@ -281,7 +291,9 @@ useDialogA11y(open, panelRef, {
         </template>
 
         <template v-else-if="step === 'select'">
-          <p class="text-xs text-lp-muted">{{ manifestSummary }}</p>
+          <p class="text-xs text-lp-muted">
+            {{ manifestSummary }}
+          </p>
           <ul class="mt-4 space-y-2">
             <li
               v-for="id in allGroups"
@@ -300,8 +312,11 @@ useDialogA11y(open, panelRef, {
                 @change="
                   toggleSelected(id, ($event.target as HTMLInputElement).checked)
                 "
-              />
-              <label :for="`restore-${id}`" class="flex-1">
+              >
+              <label
+                :for="`restore-${id}`"
+                class="flex-1"
+              >
                 <span class="font-medium text-lp-text">{{ groupLabel(id) }}</span>
                 <span
                   v-if="!isPresent(id)"
@@ -335,7 +350,11 @@ useDialogA11y(open, panelRef, {
             </p>
           </div>
           <label class="mt-4 flex items-start gap-2 text-sm">
-            <input v-model="overwriteAck" type="checkbox" class="mt-1" />
+            <input
+              v-model="overwriteAck"
+              type="checkbox"
+              class="mt-1"
+            >
             {{ t('settings.backup.overwriteAcknowledge') }}
           </label>
         </template>
@@ -348,7 +367,9 @@ useDialogA11y(open, panelRef, {
             :aria-valuenow="restoringProgress"
             :aria-valuetext="restoringGroupText"
           >
-            <p class="text-sm text-lp-muted">{{ restoringGroupText }}</p>
+            <p class="text-sm text-lp-muted">
+              {{ restoringGroupText }}
+            </p>
             <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-lp-surface">
               <div
                 class="h-full bg-lp-primary transition-all duration-300 motion-reduce:transition-none"
@@ -364,7 +385,12 @@ useDialogA11y(open, panelRef, {
           >
             <strong>{{ t('settings.backup.restoreSuccessTitle') }}</strong>
             <p>{{ t('settings.backup.restoreSuccessMessage') }}</p>
-            <p v-if="needsRelogin" class="mt-2">{{ t('settings.backup.reloginRequired') }}</p>
+            <p
+              v-if="needsRelogin"
+              class="mt-2"
+            >
+              {{ t('settings.backup.reloginRequired') }}
+            </p>
           </div>
           <button
             v-if="needsRelogin"

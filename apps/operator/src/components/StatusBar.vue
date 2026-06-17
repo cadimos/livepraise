@@ -105,7 +105,11 @@ onMounted(() => {
         class="rounded border border-lp-surface bg-lp-background px-1.5 py-0.5 text-xs text-lp-text"
         @change="onThemeChange"
       >
-        <option v-for="theme in themes" :key="theme.id" :value="theme.id">
+        <option
+          v-for="theme in themes"
+          :key="theme.id"
+          :value="theme.id"
+        >
           {{ theme.label }}
         </option>
       </select>
@@ -118,7 +122,11 @@ onMounted(() => {
         class="rounded border border-lp-surface bg-lp-background px-1.5 py-0.5 text-xs text-lp-text"
         @change="onLocaleChange"
       >
-        <option v-for="locale in localeOptions" :key="locale" :value="locale">
+        <option
+          v-for="locale in localeOptions"
+          :key="locale"
+          :value="locale"
+        >
           {{ localeLabel(locale) }}
         </option>
       </select>

@@ -3,7 +3,6 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
   fetchJson,
-  mediaUrl,
   type MusicCategory,
   type Song,
   type Verse,
@@ -250,26 +249,39 @@ onUnmounted(() => {
 
 <template>
   <div class="flex h-full flex-col gap-3">
-    <div v-if="error" class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200">
+    <div
+      v-if="error"
+      class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200"
+    >
       {{ error }}
     </div>
 
     <div class="lp-panel-field-row">
-      <label class="lp-panel-label" for="worship-category">{{ t('worship.category') }}</label>
+      <label
+        class="lp-panel-label"
+        for="worship-category"
+      >{{ t('worship.category') }}</label>
       <select
         id="worship-category"
         :value="prefs.musicCategoryId"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
         @change="loadSongs(($event.target as HTMLSelectElement).value)"
       >
-        <option v-for="cat in categories" :key="cat.id" :value="String(cat.id)">
+        <option
+          v-for="cat in categories"
+          :key="cat.id"
+          :value="String(cat.id)"
+        >
           {{ cat.descricao ?? cat.nome ?? `Categoria ${cat.id}` }}
         </option>
       </select>
     </div>
 
     <div class="lp-panel-field-row">
-      <label class="lp-panel-label" for="worship-search">{{ t('common.search') }}</label>
+      <label
+        class="lp-panel-label"
+        for="worship-search"
+      >{{ t('common.search') }}</label>
       <input
         id="worship-search"
         :value="searchInput"
@@ -278,14 +290,21 @@ onUnmounted(() => {
         :placeholder="t('common.searchPlaceholder')"
         @input="onSearchInput(($event.target as HTMLInputElement).value)"
         @keydown.enter.prevent="onSearchEnter"
-      />
+      >
     </div>
 
     <div class="grid min-h-0 flex-1 grid-cols-2 gap-3">
       <div class="flex min-h-0 flex-col">
-        <p class="mb-2 lp-panel-label">{{ t('worship.songs') }}</p>
+        <p class="mb-2 lp-panel-label">
+          {{ t('worship.songs') }}
+        </p>
         <ul class="min-h-0 flex-1 space-y-1 overflow-y-auto rounded-lg border border-lp-surface bg-lp-background/50 p-2">
-          <li v-if="loading" class="px-2 py-3 text-sm text-lp-muted">{{ t('worship.loading') }}</li>
+          <li
+            v-if="loading"
+            class="px-2 py-3 text-sm text-lp-muted"
+          >
+            {{ t('worship.loading') }}
+          </li>
           <li
             v-for="song in filteredSongs"
             :key="song.id"
@@ -296,7 +315,11 @@ onUnmounted(() => {
                 : 'text-lp-text/90'
             "
           >
-            <button type="button" class="flex-1 text-left" @click="selectSong(song)">
+            <button
+              type="button"
+              class="flex-1 text-left"
+              @click="selectSong(song)"
+            >
               {{ song.nome2 ?? song.nome }}
               <span class="block text-xs text-lp-muted">{{ song.artista }}</span>
             </button>
@@ -308,7 +331,10 @@ onUnmounted(() => {
                 :aria-label="t('worship.addToQueue')"
                 @click.stop="addToTabs(song)"
               >
-                <CircleCheckBig class="h-5 w-5" aria-hidden="true" />
+                <CircleCheckBig
+                  class="h-5 w-5"
+                  aria-hidden="true"
+                />
               </button>
               <button
                 type="button"
@@ -317,7 +343,10 @@ onUnmounted(() => {
                 :aria-label="t('worship.edit')"
                 @click.stop="editSong(song)"
               >
-                <Pencil class="h-5 w-5" aria-hidden="true" />
+                <Pencil
+                  class="h-5 w-5"
+                  aria-hidden="true"
+                />
               </button>
               <button
                 type="button"
@@ -326,7 +355,10 @@ onUnmounted(() => {
                 :aria-label="t('worship.delete')"
                 @click.stop="deleteSong(song)"
               >
-                <Trash2 class="h-5 w-5" aria-hidden="true" />
+                <Trash2
+                  class="h-5 w-5"
+                  aria-hidden="true"
+                />
               </button>
             </div>
           </li>
@@ -334,9 +366,14 @@ onUnmounted(() => {
       </div>
 
       <div class="flex min-h-0 flex-col">
-        <p class="mb-2 lp-panel-label">{{ t('worship.verses') }}</p>
+        <p class="mb-2 lp-panel-label">
+          {{ t('worship.verses') }}
+        </p>
         <ul class="min-h-0 flex-1 space-y-1 overflow-y-auto rounded-lg border border-lp-surface bg-lp-background/50 p-2">
-          <li v-if="!selectedSong" class="px-2 py-3 text-sm text-lp-muted">
+          <li
+            v-if="!selectedSong"
+            class="px-2 py-3 text-sm text-lp-muted"
+          >
             {{ t('worship.selectSong') }}
           </li>
           <li

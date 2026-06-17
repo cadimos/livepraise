@@ -50,8 +50,14 @@ function onSend(): void {
 </script>
 
 <template>
-  <SettingsModal v-model:open="open" :title="t('footerAlert.title')" wide>
-    <p class="mb-4 text-sm text-lp-muted">{{ t('footerAlert.intro') }}</p>
+  <SettingsModal
+    v-model:open="open"
+    :title="t('footerAlert.title')"
+    wide
+  >
+    <p class="mb-4 text-sm text-lp-muted">
+      {{ t('footerAlert.intro') }}
+    </p>
 
     <label class="mb-4 flex flex-col gap-1 text-sm">
       <span>{{ t('footerAlert.text') }}</span>
@@ -78,7 +84,7 @@ function onSend(): void {
               repeatCount: Number(($event.target as HTMLInputElement).value),
             })
           "
-        />
+        >
       </label>
       <label class="flex flex-col gap-1 text-sm">
         <span>{{ t('footerAlert.scrollDuration') }}</span>
@@ -93,7 +99,7 @@ function onSend(): void {
               scrollDurationSec: Number(($event.target as HTMLInputElement).value),
             })
           "
-        />
+        >
       </label>
       <label class="flex flex-col gap-1 text-sm">
         <span>{{ t('footerAlert.textColor') }}</span>
@@ -102,7 +108,7 @@ function onSend(): void {
           type="color"
           class="h-10 w-full cursor-pointer rounded-md border border-lp-surface bg-lp-background"
           @input="updateDraft({ textColor: ($event.target as HTMLInputElement).value })"
-        />
+        >
       </label>
       <label class="flex flex-col gap-1 text-sm">
         <span>{{ t('footerAlert.backgroundColor') }}</span>
@@ -113,18 +119,33 @@ function onSend(): void {
           @input="
             updateDraft({ backgroundColor: ($event.target as HTMLInputElement).value })
           "
-        />
+        >
       </label>
     </div>
 
-    <h3 class="mb-2 text-sm font-semibold">{{ t('footerAlert.targetsTitle') }}</h3>
-    <p class="mb-3 text-xs text-lp-muted">{{ t('footerAlert.targetsHint') }}</p>
+    <h3 class="mb-2 text-sm font-semibold">
+      {{ t('footerAlert.targetsTitle') }}
+    </h3>
+    <p class="mb-3 text-xs text-lp-muted">
+      {{ t('footerAlert.targetsHint') }}
+    </p>
 
-    <p v-if="loading" class="mb-4 text-sm text-lp-muted">{{ t('footerAlert.loading') }}</p>
-    <p v-else-if="!rows.length" class="mb-4 text-sm text-lp-muted">
+    <p
+      v-if="loading"
+      class="mb-4 text-sm text-lp-muted"
+    >
+      {{ t('footerAlert.loading') }}
+    </p>
+    <p
+      v-else-if="!rows.length"
+      class="mb-4 text-sm text-lp-muted"
+    >
       {{ t('footerAlert.noTargets') }}
     </p>
-    <ul v-else class="mb-4 max-h-48 space-y-2 overflow-y-auto rounded-lg border border-lp-surface p-2">
+    <ul
+      v-else
+      class="mb-4 max-h-48 space-y-2 overflow-y-auto rounded-lg border border-lp-surface p-2"
+    >
       <li
         v-for="row in rows"
         :key="row.key"
@@ -137,14 +158,20 @@ function onSend(): void {
             @change="
               setRowEnabled(row.key, ($event.target as HTMLInputElement).checked)
             "
-          />
+          >
           <span class="truncate">{{ row.label }}</span>
           <span class="shrink-0 text-xs text-lp-muted">{{ roleLabel(row.roleHint) }}</span>
         </label>
       </li>
     </ul>
 
-    <p v-if="sendError" class="mb-3 text-sm text-rose-300" role="alert">{{ sendError }}</p>
+    <p
+      v-if="sendError"
+      class="mb-3 text-sm text-rose-300"
+      role="alert"
+    >
+      {{ sendError }}
+    </p>
 
     <div class="flex flex-wrap gap-2">
       <button

@@ -127,16 +127,34 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col gap-4 text-sm">
-    <p class="text-lp-muted">{{ t('settings.users.intro') }}</p>
+    <p class="text-lp-muted">
+      {{ t('settings.users.intro') }}
+    </p>
 
-    <p v-if="error" class="rounded bg-rose-900/40 px-3 py-2 text-rose-200">{{ error }}</p>
-    <p v-if="message" class="rounded bg-emerald-900/40 px-3 py-2 text-emerald-200">
+    <p
+      v-if="error"
+      class="rounded bg-rose-900/40 px-3 py-2 text-rose-200"
+    >
+      {{ error }}
+    </p>
+    <p
+      v-if="message"
+      class="rounded bg-emerald-900/40 px-3 py-2 text-emerald-200"
+    >
       {{ message }}
     </p>
 
-    <div v-if="loading" class="text-lp-muted">{{ t('common.loading') }}</div>
+    <div
+      v-if="loading"
+      class="text-lp-muted"
+    >
+      {{ t('common.loading') }}
+    </div>
 
-    <ul v-else class="flex flex-col gap-2">
+    <ul
+      v-else
+      class="flex flex-col gap-2"
+    >
       <li
         v-for="user in users"
         :key="user.id"
@@ -144,7 +162,9 @@ onMounted(() => {
       >
         <template v-if="editingId === user.id">
           <div class="flex flex-col gap-2">
-            <p class="font-medium text-lp-text">{{ user.username }}</p>
+            <p class="font-medium text-lp-text">
+              {{ user.username }}
+            </p>
             <label class="flex flex-col gap-1">
               <span class="text-xs text-lp-muted">{{ t('settings.users.newPassword') }}</span>
               <input
@@ -152,7 +172,7 @@ onMounted(() => {
                 type="password"
                 class="rounded border border-lp-surface bg-lp-background px-2 py-1 text-lp-text"
                 :placeholder="t('settings.users.passwordOptional')"
-              />
+              >
             </label>
             <label class="flex flex-col gap-1">
               <span class="text-xs text-lp-muted">{{ t('settings.users.role') }}</span>
@@ -166,7 +186,10 @@ onMounted(() => {
               </select>
             </label>
             <label class="inline-flex items-center gap-2">
-              <input v-model="editActive" type="checkbox" />
+              <input
+                v-model="editActive"
+                type="checkbox"
+              >
               <span>{{ t('settings.users.active') }}</span>
             </label>
             <span class="flex gap-2">
@@ -207,12 +230,22 @@ onMounted(() => {
           </div>
         </template>
       </li>
-      <li v-if="!users.length" class="text-lp-muted">{{ t('settings.users.empty') }}</li>
+      <li
+        v-if="!users.length"
+        class="text-lp-muted"
+      >
+        {{ t('settings.users.empty') }}
+      </li>
     </ul>
 
     <section class="border-t border-lp-surface pt-4">
-      <h3 class="mb-2 font-semibold text-lp-text">{{ t('settings.users.createTitle') }}</h3>
-      <form class="flex flex-col gap-2" @submit.prevent="createUser">
+      <h3 class="mb-2 font-semibold text-lp-text">
+        {{ t('settings.users.createTitle') }}
+      </h3>
+      <form
+        class="flex flex-col gap-2"
+        @submit.prevent="createUser"
+      >
         <label class="flex flex-col gap-1">
           <span class="text-xs text-lp-muted">{{ t('settings.users.username') }}</span>
           <input
@@ -221,7 +254,7 @@ onMounted(() => {
             required
             autocomplete="off"
             class="rounded border border-lp-surface bg-lp-background px-2 py-1 text-lp-text"
-          />
+          >
         </label>
         <label class="flex flex-col gap-1">
           <span class="text-xs text-lp-muted">{{ t('settings.users.password') }}</span>
@@ -231,7 +264,7 @@ onMounted(() => {
             required
             autocomplete="new-password"
             class="rounded border border-lp-surface bg-lp-background px-2 py-1 text-lp-text"
-          />
+          >
         </label>
         <label class="flex flex-col gap-1">
           <span class="text-xs text-lp-muted">{{ t('settings.users.role') }}</span>

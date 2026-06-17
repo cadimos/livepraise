@@ -69,7 +69,9 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col gap-3 text-sm">
-    <p class="text-lp-muted">{{ t('settings.errorLog.intro') }}</p>
+    <p class="text-lp-muted">
+      {{ t('settings.errorLog.intro') }}
+    </p>
 
     <label class="flex items-start gap-2 rounded border border-lp-surface px-3 py-2">
       <input
@@ -77,7 +79,7 @@ onMounted(() => {
         class="mt-0.5"
         :checked="prefs.displayDebugOverlay"
         @change="setDisplayDebugOverlay(($event.target as HTMLInputElement).checked)"
-      />
+      >
       <span class="flex flex-col gap-0.5">
         <span class="font-medium text-lp-text">{{ t('settings.errorLog.displayDebugOverlay') }}</span>
         <span class="text-xs text-lp-muted">{{ t('settings.errorLog.displayDebugOverlayHint') }}</span>
@@ -86,8 +88,12 @@ onMounted(() => {
 
     <section class="flex flex-col gap-2 rounded border border-amber-500/30 bg-amber-950/20 px-3 py-3">
       <div>
-        <h3 class="font-medium text-lp-text">{{ t('settings.errorLog.textfillDiagnostics') }}</h3>
-        <p class="mt-1 text-xs text-lp-muted">{{ t('settings.errorLog.textfillDiagnosticsHint') }}</p>
+        <h3 class="font-medium text-lp-text">
+          {{ t('settings.errorLog.textfillDiagnostics') }}
+        </h3>
+        <p class="mt-1 text-xs text-lp-muted">
+          {{ t('settings.errorLog.textfillDiagnosticsHint') }}
+        </p>
       </div>
 
       <label class="flex items-start gap-2">
@@ -96,11 +102,14 @@ onMounted(() => {
           class="mt-0.5"
           :checked="textfillDiagnosticsEnabled"
           @change="setTextfillDiagnosticsEnabled(($event.target as HTMLInputElement).checked)"
-        />
+        >
         <span class="text-sm text-lp-text">{{ t('settings.errorLog.textfillDiagnosticsEnabled') }}</span>
       </label>
 
-      <p v-if="textfillLogPath" class="break-all font-mono text-xs text-lp-muted">
+      <p
+        v-if="textfillLogPath"
+        class="break-all font-mono text-xs text-lp-muted"
+      >
         {{ t('settings.errorLog.textfillDiagnosticsPath') }}: {{ textfillLogPath }}
       </p>
       <p class="text-xs text-lp-muted">
@@ -134,12 +143,27 @@ onMounted(() => {
         </button>
       </div>
 
-      <p v-if="textfillError" class="text-rose-300" role="alert">{{ textfillError }}</p>
-      <p v-else-if="!textfillLoading && !textfillItems.length" class="text-xs text-lp-muted">
+      <p
+        v-if="textfillError"
+        class="text-rose-300"
+        role="alert"
+      >
+        {{ textfillError }}
+      </p>
+      <p
+        v-else-if="!textfillLoading && !textfillItems.length"
+        class="text-xs text-lp-muted"
+      >
         {{ t('settings.errorLog.textfillDiagnosticsEmpty') }}
       </p>
-      <ul v-else class="flex max-h-40 flex-col gap-1 overflow-y-auto font-mono text-[11px] text-lp-muted">
-        <li v-for="entry in textfillItems" :key="entry.id">
+      <ul
+        v-else
+        class="flex max-h-40 flex-col gap-1 overflow-y-auto font-mono text-[11px] text-lp-muted"
+      >
+        <li
+          v-for="entry in textfillItems"
+          :key="entry.id"
+        >
           {{
             t('settings.errorLog.textfillDiagnosticsEntry', {
               surface: entry.surface,
@@ -174,20 +198,36 @@ onMounted(() => {
       </button>
     </div>
 
-    <p v-if="error" class="text-rose-300" role="alert">{{ error }}</p>
+    <p
+      v-if="error"
+      class="text-rose-300"
+      role="alert"
+    >
+      {{ error }}
+    </p>
 
-    <p v-else-if="!loading && !items.length" class="text-lp-muted">
+    <p
+      v-else-if="!loading && !items.length"
+      class="text-lp-muted"
+    >
       {{ t('settings.errorLog.empty') }}
     </p>
 
-    <ul v-else class="flex max-h-[50vh] flex-col gap-2 overflow-y-auto" role="list">
+    <ul
+      v-else
+      class="flex max-h-[50vh] flex-col gap-2 overflow-y-auto"
+      role="list"
+    >
       <li
         v-for="entry in items"
         :key="entry.id"
         class="rounded-lg border border-lp-surface bg-lp-surface/50 px-3 py-2"
       >
         <div class="flex flex-wrap items-start gap-2">
-          <time class="shrink-0 font-mono text-xs text-lp-muted" :datetime="entry.ts">
+          <time
+            class="shrink-0 font-mono text-xs text-lp-muted"
+            :datetime="entry.ts"
+          >
             {{ formatTs(entry.ts) }}
           </time>
           <span
@@ -198,7 +238,9 @@ onMounted(() => {
           </span>
           <span class="text-xs text-lp-muted">{{ entry.source }}</span>
         </div>
-        <p class="mt-1 break-words text-lp-text">{{ entry.message }}</p>
+        <p class="mt-1 break-words text-lp-text">
+          {{ entry.message }}
+        </p>
         <button
           v-if="entry.detail"
           type="button"

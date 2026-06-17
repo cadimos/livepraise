@@ -202,6 +202,16 @@ Smokes de feature: `npm run smoke:features` (auth, displays, backup, textfill, �
 
 Hook git opt-in (lint + typecheck antes de commit): `npm run install:git-hooks` — ver [`docs/BUILD.md`](docs/BUILD.md#git-hooks-opt-in-ts-040).
 
+### Quando correr cada verificação (SM-036)
+
+| Momento | Comandos |
+|---------|----------|
+| **Dev diário** | `npm run typecheck`, `npm run lint` |
+| **Antes de PR** | `npm run test:unit`, `npm run smoke:release` (CI faz o mesmo núcleo) |
+| **Pré-release manual** | `npm run smoke:features` ou `--only=auth,displays,backup,textfill` |
+| **Migração v0.0.8** | `npm run smoke:legacy-upgrade` (isolado — não misturar com fase2) |
+| **Pós-clone / build** | `npm run verify:build`, `npm run verify:sourcemaps` |
+
 ## Instalação
 
 Baixe os instaladores na página **[GitHub Releases](https://github.com/cadimos/livepraise/releases)** (secção *Assets* da versão desejada). Os nomes dos ficheiros incluem a versão; substitua `<versão>` nos exemplos pelo nome real do download.

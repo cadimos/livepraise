@@ -104,7 +104,9 @@ onMounted(() => {
 <template>
   <div class="space-y-6">
     <section class="space-y-4">
-      <p class="text-sm text-lp-muted">{{ t('settings.backup.panelIntro') }}</p>
+      <p class="text-sm text-lp-muted">
+        {{ t('settings.backup.panelIntro') }}
+      </p>
       <div class="flex flex-wrap gap-2">
         <button
           type="button"
@@ -143,7 +145,10 @@ onMounted(() => {
       </div>
 
       <div class="lp-panel-field-row max-w-md">
-        <label class="lp-panel-label" for="repertoire-category">{{
+        <label
+          class="lp-panel-label"
+          for="repertoire-category"
+        >{{
           t('settings.backup.repertoire.category')
         }}</label>
         <select
@@ -151,10 +156,14 @@ onMounted(() => {
           v-model="exportCategoryId"
           class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
         >
-        <option v-for="cat in categories" :key="cat.id" :value="String(cat.id)">
-          {{ cat.descricao ?? cat.nome ?? `Categoria ${cat.id}` }}
-        </option>
-      </select>
+          <option
+            v-for="cat in categories"
+            :key="cat.id"
+            :value="String(cat.id)"
+          >
+            {{ cat.descricao ?? cat.nome ?? `Categoria ${cat.id}` }}
+          </option>
+        </select>
       </div>
 
       <div class="flex flex-wrap gap-2">
@@ -164,7 +173,10 @@ onMounted(() => {
           :disabled="repertoireBusy || !exportCategoryId"
           @click="exportCategory"
         >
-          <Download class="h-4 w-4" aria-hidden="true" />
+          <Download
+            class="h-4 w-4"
+            aria-hidden="true"
+          />
           {{ t('settings.backup.repertoire.exportCategory') }}
         </button>
         <button
@@ -173,7 +185,10 @@ onMounted(() => {
           :disabled="repertoireBusy"
           @click="exportAll"
         >
-          <Download class="h-4 w-4" aria-hidden="true" />
+          <Download
+            class="h-4 w-4"
+            aria-hidden="true"
+          />
           {{ t('settings.backup.repertoire.exportAll') }}
         </button>
         <button
@@ -182,7 +197,10 @@ onMounted(() => {
           :disabled="repertoireBusy"
           @click="openImportPicker"
         >
-          <Upload class="h-4 w-4" aria-hidden="true" />
+          <Upload
+            class="h-4 w-4"
+            aria-hidden="true"
+          />
           {{ t('settings.backup.repertoire.import') }}
         </button>
         <input
@@ -191,7 +209,7 @@ onMounted(() => {
           accept="application/json,.json"
           class="hidden"
           @change="onImportFile"
-        />
+        >
       </div>
     </section>
 

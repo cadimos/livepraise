@@ -172,13 +172,24 @@ async function save(): Promise<void> {
           :aria-label="t('notepad.close')"
           @click="close"
         >
-          <X class="h-4 w-4" aria-hidden="true" />
+          <X
+            class="h-4 w-4"
+            aria-hidden="true"
+          />
         </button>
       </header>
 
       <div class="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-        <p v-if="loading" class="text-sm text-lp-muted">{{ t('newSong.loading') }}</p>
-        <p v-if="error" class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200">
+        <p
+          v-if="loading"
+          class="text-sm text-lp-muted"
+        >
+          {{ t('newSong.loading') }}
+        </p>
+        <p
+          v-if="error"
+          class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200"
+        >
           {{ error }}
         </p>
 
@@ -190,7 +201,7 @@ async function save(): Promise<void> {
             required
             :disabled="loading"
             class="mt-1 w-full rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text disabled:opacity-50"
-          />
+          >
         </label>
 
         <label class="block text-xs uppercase tracking-wider text-lp-muted">
@@ -201,7 +212,7 @@ async function save(): Promise<void> {
             required
             :disabled="loading"
             class="mt-1 w-full rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text disabled:opacity-50"
-          />
+          >
         </label>
 
         <label class="block text-xs uppercase tracking-wider text-lp-muted">
@@ -211,7 +222,7 @@ async function save(): Promise<void> {
             type="text"
             :disabled="loading"
             class="mt-1 w-full rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text disabled:opacity-50"
-          />
+          >
         </label>
 
         <label class="block text-xs uppercase tracking-wider text-lp-muted">
@@ -224,7 +235,9 @@ async function save(): Promise<void> {
             class="mt-1 w-full rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text disabled:opacity-50"
           />
         </label>
-        <p class="text-xs text-lp-muted">{{ t('newSong.lyricsHint') }}</p>
+        <p class="text-xs text-lp-muted">
+          {{ t('newSong.lyricsHint') }}
+        </p>
       </div>
 
       <footer class="flex justify-end gap-2 border-t border-lp-surface px-4 py-3">

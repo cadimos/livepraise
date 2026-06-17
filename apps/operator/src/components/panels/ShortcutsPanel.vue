@@ -42,7 +42,9 @@ onUnmounted(() => {
 
 <template>
   <div class="flex flex-col gap-3 text-sm">
-    <p class="text-lp-muted">{{ t('settings.shortcuts.intro') }}</p>
+    <p class="text-lp-muted">
+      {{ t('settings.shortcuts.intro') }}
+    </p>
 
     <p
       v-if="feedback"
@@ -63,10 +65,30 @@ onUnmounted(() => {
       <table class="min-w-full text-left text-xs">
         <thead class="border-b border-lp-surface bg-lp-surface/40 text-lp-muted">
           <tr>
-            <th scope="col" class="px-3 py-2 font-medium">{{ t('settings.shortcuts.colAction') }}</th>
-            <th scope="col" class="px-3 py-2 font-medium">{{ t('settings.shortcuts.colContext') }}</th>
-            <th scope="col" class="px-3 py-2 font-medium">{{ t('settings.shortcuts.colCombo') }}</th>
-            <th scope="col" class="px-3 py-2 font-medium">{{ t('settings.shortcuts.colActions') }}</th>
+            <th
+              scope="col"
+              class="px-3 py-2 font-medium"
+            >
+              {{ t('settings.shortcuts.colAction') }}
+            </th>
+            <th
+              scope="col"
+              class="px-3 py-2 font-medium"
+            >
+              {{ t('settings.shortcuts.colContext') }}
+            </th>
+            <th
+              scope="col"
+              class="px-3 py-2 font-medium"
+            >
+              {{ t('settings.shortcuts.colCombo') }}
+            </th>
+            <th
+              scope="col"
+              class="px-3 py-2 font-medium"
+            >
+              {{ t('settings.shortcuts.colActions') }}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -75,8 +97,12 @@ onUnmounted(() => {
             :key="item.id"
             class="border-b border-lp-surface/60 last:border-0"
           >
-            <td class="px-3 py-2 text-lp-text">{{ t(item.labelKey) }}</td>
-            <td class="px-3 py-2 text-lp-muted">{{ t(item.contextKey) }}</td>
+            <td class="px-3 py-2 text-lp-text">
+              {{ t(item.labelKey) }}
+            </td>
+            <td class="px-3 py-2 text-lp-muted">
+              {{ t(item.contextKey) }}
+            </td>
             <td
               class="px-3 py-2 font-mono"
               :class="listeningId === item.id ? 'font-semibold text-sky-300' : 'text-lp-text'"

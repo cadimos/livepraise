@@ -26,14 +26,19 @@ const { t } = useI18n();
       :class="props.wide ? 'max-w-4xl' : 'max-w-2xl'"
     >
       <header class="flex items-center justify-between border-b border-lp-surface px-4 py-3">
-        <h2 class="text-sm font-semibold text-lp-text">{{ title }}</h2>
+        <h2 class="text-sm font-semibold text-lp-text">
+          {{ title }}
+        </h2>
         <button
           type="button"
           class="rounded px-2 py-1 text-lp-muted hover:bg-lp-surface hover:text-lp-text"
           :aria-label="t('notepad.close')"
           @click="open = false"
         >
-          <X class="h-4 w-4" aria-hidden="true" />
+          <X
+            class="h-4 w-4"
+            aria-hidden="true"
+          />
         </button>
       </header>
       <div class="min-h-0 flex-1 overflow-y-auto p-4">

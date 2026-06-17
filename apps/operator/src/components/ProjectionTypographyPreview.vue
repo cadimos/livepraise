@@ -112,6 +112,8 @@ const { fontFaceStyleRef } = useProjectionTypographyPreview({
         aria-live="polite"
       />
     </div>
-    <p class="mt-2 text-xs text-lp-muted">{{ footnote }}</p>
+    <p class="mt-2 text-xs text-lp-muted">
+      {{ footnote }}
+    </p>
   </div>
 </template>

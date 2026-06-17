@@ -27,6 +27,7 @@ Data: 2026-06-15
 | TS-041 | Comentários «paridade v0.0.8» limpos em fonte produto |
 | TS-040 | Git hook opt-in — `npm run install:git-hooks` |
 | TS-042 | `npm run verify:depcheck` — skipMissing justificado |
+| TS-046 | **0 warnings** — `lint:fix` + cleanup imports |
 
 ## Opcionais em backlog (não bloqueiam TS-045)
 
@@ -41,7 +42,7 @@ npm run check:js-in-src    # zero .js fonte em pastas de produto
 npm run typecheck          # todos os tsconfigs
 npm run build              # produção sem source maps browser
 npm run smoke:surfaces     # artefactos dist/
-npm run lint               # TS-039 (0 errors)
+npm run lint               # TS-039/046 (0 errors, 0 warnings)
 npm run verify:build       # TS-044
 npm run verify:depcheck    # TS-042
 ```

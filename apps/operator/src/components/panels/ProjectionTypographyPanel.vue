@@ -117,7 +117,9 @@ function onAdvancedShadowInput(event: Event): void {
 
 <template>
   <div class="text-sm">
-    <p class="mb-4 text-lp-muted">{{ t('settings.projectionTypography.intro') }}</p>
+    <p class="mb-4 text-lp-muted">
+      {{ t('settings.projectionTypography.intro') }}
+    </p>
 
     <div
       class="mb-4 flex gap-1 overflow-x-auto border-b border-lp-surface"
@@ -188,7 +190,11 @@ function onAdvancedShadowInput(event: Event): void {
                 v-if="activeProfile.fontSource === 'bundled'"
                 :label="t('settings.projectionTypography.fontFamilyBundledGroup')"
               >
-                <option v-for="family in bundledFamilies" :key="family.id" :value="family.id">
+                <option
+                  v-for="family in bundledFamilies"
+                  :key="family.id"
+                  :value="family.id"
+                >
                   {{ family.label }}
                 </option>
               </optgroup>
@@ -251,7 +257,7 @@ function onAdvancedShadowInput(event: Event): void {
                   class="w-full rounded border border-lp-surface bg-lp-background px-2 py-1.5 tabular-nums text-lp-text"
                   :value="activeProfile.minFontPx"
                   @input="onMinMaxInput('minFontPx', $event)"
-                />
+                >
                 <span class="shrink-0 text-lp-muted">{{
                   t('settings.projectionTypography.minMaxUnit')
                 }}</span>
@@ -269,17 +275,24 @@ function onAdvancedShadowInput(event: Event): void {
                   class="w-full rounded border border-lp-surface bg-lp-background px-2 py-1.5 tabular-nums text-lp-text"
                   :value="activeProfile.maxFontPx"
                   @input="onMinMaxInput('maxFontPx', $event)"
-                />
+                >
                 <span class="shrink-0 text-lp-muted">{{
                   t('settings.projectionTypography.minMaxUnit')
                 }}</span>
               </div>
             </label>
           </div>
-          <p v-if="minMaxError" class="mt-1 text-xs text-red-400" role="alert">
+          <p
+            v-if="minMaxError"
+            class="mt-1 text-xs text-red-400"
+            role="alert"
+          >
             {{ t('settings.projectionTypography.minMaxError') }}
           </p>
-          <p v-else class="mt-1 text-xs text-lp-muted">
+          <p
+            v-else
+            class="mt-1 text-xs text-lp-muted"
+          >
             {{ t('settings.projectionTypography.minMaxHint') }}
           </p>
         </section>
@@ -298,7 +311,7 @@ function onAdvancedShadowInput(event: Event): void {
                   textfillEnabled: ($event.target as HTMLInputElement).checked,
                 })
               "
-            />
+            >
             <span class="font-medium text-lp-text">{{
               t('settings.projectionTypography.textfillEnabled')
             }}</span>
@@ -323,12 +336,15 @@ function onAdvancedShadowInput(event: Event): void {
                   textShadowEnabled: ($event.target as HTMLInputElement).checked,
                 })
               "
-            />
+            >
             <span class="font-medium text-lp-text">{{
               t('settings.projectionTypography.textShadowEnabled')
             }}</span>
           </label>
-          <p v-if="!activeProfile.textShadowEnabled" class="mt-1 text-xs text-lp-muted">
+          <p
+            v-if="!activeProfile.textShadowEnabled"
+            class="mt-1 text-xs text-lp-muted"
+          >
             {{ t('settings.projectionTypography.textShadowDisabledHint') }}
           </p>
 
@@ -340,7 +356,10 @@ function onAdvancedShadowInput(event: Event): void {
                 : ''
             "
           >
-            <details open class="group">
+            <details
+              open
+              class="group"
+            >
               <summary
                 class="cursor-pointer text-sm font-medium text-lp-text marker:content-none [&::-webkit-details-marker]:hidden"
               >
@@ -372,7 +391,7 @@ function onAdvancedShadowInput(event: Event): void {
                           class="min-w-0 flex-1"
                           :value="layer.offsetX"
                           @input="onShadowLayerChange(index, 'offsetX', $event)"
-                        />
+                        >
                         <span class="w-14 shrink-0 text-right tabular-nums text-lp-muted">{{
                           layer.offsetX
                         }}</span>
@@ -390,7 +409,7 @@ function onAdvancedShadowInput(event: Event): void {
                           class="min-w-0 flex-1"
                           :value="layer.offsetY"
                           @input="onShadowLayerChange(index, 'offsetY', $event)"
-                        />
+                        >
                         <span class="w-14 shrink-0 text-right tabular-nums text-lp-muted">{{
                           layer.offsetY
                         }}</span>
@@ -408,7 +427,7 @@ function onAdvancedShadowInput(event: Event): void {
                           class="min-w-0 flex-1"
                           :value="layer.blur"
                           @input="onShadowLayerChange(index, 'blur', $event)"
-                        />
+                        >
                         <span class="w-14 shrink-0 text-right tabular-nums text-lp-muted">{{
                           layer.blur
                         }}</span>
@@ -423,7 +442,7 @@ function onAdvancedShadowInput(event: Event): void {
                         class="h-9 w-full cursor-pointer rounded border border-lp-surface bg-lp-background"
                         :value="layer.color"
                         @input="onShadowLayerChange(index, 'color', $event)"
-                      />
+                      >
                     </label>
                   </div>
                 </div>
@@ -467,7 +486,11 @@ function onAdvancedShadowInput(event: Event): void {
                 :value="activeProfile.textShadowCssAdvanced ?? ''"
                 @input="onAdvancedShadowInput"
               />
-              <p v-if="advancedShadowError" class="mt-1 px-1 text-xs text-red-400" role="alert">
+              <p
+                v-if="advancedShadowError"
+                class="mt-1 px-1 text-xs text-red-400"
+                role="alert"
+              >
                 {{ t('settings.projectionTypography.shadowAdvancedError') }}
               </p>
             </details>

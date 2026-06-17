@@ -17,7 +17,6 @@ import {
   findBookFallbackForReference,
 } from '@shared/bible-reference';
 import { computeNextVerseIndex } from '@shared/bible-navigation';
-import { summarizeLabel } from '@shared/queue-items';
 import { useQueueDrag } from '../../composables/useQueueDrag';
 
 const emit = defineEmits<{
@@ -310,26 +309,39 @@ onUnmounted(() => {
 
 <template>
   <div class="flex h-full flex-col gap-3">
-    <div v-if="error" class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200">
+    <div
+      v-if="error"
+      class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200"
+    >
       {{ error }}
     </div>
 
     <div class="lp-panel-field-row">
-      <label class="lp-panel-label" for="bible-translation">{{ t('bible.translation') }}</label>
+      <label
+        class="lp-panel-label"
+        for="bible-translation"
+      >{{ t('bible.translation') }}</label>
       <select
         id="bible-translation"
         :value="prefs.bibleFile"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
         @change="loadBooks(($event.target as HTMLSelectElement).value)"
       >
-        <option v-for="b in bibles" :key="b.arquivo" :value="b.arquivo">
+        <option
+          v-for="b in bibles"
+          :key="b.arquivo"
+          :value="b.arquivo"
+        >
           {{ b.nome }}
         </option>
       </select>
     </div>
 
     <div class="lp-panel-field-row">
-      <label class="lp-panel-label" for="bible-search">{{ t('common.search') }}</label>
+      <label
+        class="lp-panel-label"
+        for="bible-search"
+      >{{ t('common.search') }}</label>
       <input
         id="bible-search"
         ref="searchInputRef"
@@ -337,7 +349,7 @@ onUnmounted(() => {
         type="search"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
         :placeholder="t('bible.searchReferencePlaceholder')"
-      />
+      >
     </div>
     <div
       v-if="bibleSearchHistoryVisible.length"
@@ -359,7 +371,9 @@ onUnmounted(() => {
 
     <div class="grid min-h-0 flex-1 grid-cols-3 gap-3">
       <div class="flex min-h-0 flex-col">
-        <p class="mb-2 lp-panel-label">{{ t('bible.books') }}</p>
+        <p class="mb-2 lp-panel-label">
+          {{ t('bible.books') }}
+        </p>
         <ul class="min-h-0 flex-1 overflow-y-auto rounded-lg border border-lp-surface bg-lp-background/50 p-2 text-sm">
           <li
             v-for="book in filteredBooks"
@@ -379,7 +393,9 @@ onUnmounted(() => {
       </div>
 
       <div class="flex min-h-0 flex-col">
-        <p class="mb-2 lp-panel-label">{{ t('bible.chapters') }}</p>
+        <p class="mb-2 lp-panel-label">
+          {{ t('bible.chapters') }}
+        </p>
         <ul class="grid min-h-0 flex-1 grid-cols-4 gap-1 overflow-y-auto rounded-lg border border-lp-surface bg-lp-background/50 p-2 text-sm">
           <li
             v-for="ch in chapters()"
@@ -399,7 +415,9 @@ onUnmounted(() => {
       </div>
 
       <div class="flex min-h-0 flex-col">
-        <p class="mb-2 lp-panel-label">{{ t('bible.verses') }}</p>
+        <p class="mb-2 lp-panel-label">
+          {{ t('bible.verses') }}
+        </p>
         <ul class="min-h-0 flex-1 space-y-1 overflow-y-auto rounded-lg border border-lp-surface bg-lp-background/50 p-2 text-sm">
           <li
             v-for="verse in verses"

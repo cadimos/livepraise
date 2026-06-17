@@ -7,15 +7,12 @@ import {
   applyRestore,
   createBackupZip,
   destGroupHasData,
-  groupsNeedingOverwrite,
   inspectBackupZip,
   normalizeGroupIds,
   BACKUP_GROUPS,
   BackupError,
   estimateGroupBytes,
-  type BackupGroupId,
 } from '../backup/index.js';
-import { getLivepraiseHome } from '../config/paths.js';
 import { getMainDb } from '../db/connection.js';
 import { requireAdminAccess } from '../middleware/auth.js';
 import { allowCors, jsonError } from '../middleware/common.js';

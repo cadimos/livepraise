@@ -113,6 +113,6 @@ Node ≥ 22.12 (`engines` em `package.json`).
 
 - **TS-037:** manter `tsc` para web/projector/stage-return — ver [`ADR-037-web-bundler.md`](ADR-037-web-bundler.md).
 - **TS-038:** source maps só em dev — `npm run build:browser:dev` / `npm run dev`; validar com `npm run verify:sourcemaps`.
-- **TS-039:** ESLint + typescript-eslint + vue — `npm run lint`; job CI executa lint antes do typecheck.
+- **TS-039:** ESLint + typescript-eslint + vue — `npm run lint`; 0 errors, 0 warnings (TS-046).
 - **TS-044:** quickstart clone em `README.md`; validação local com `npm run verify:build`.
 - **TS-045:** checklist de fecho — [`TS-045-EPIC-CHECKLIST.md`](TS-045-EPIC-CHECKLIST.md).
