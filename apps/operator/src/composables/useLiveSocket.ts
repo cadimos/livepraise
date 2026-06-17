@@ -4,6 +4,7 @@ import {
   readAuthToken,
 } from '@shared/auth-session';
 import type { LiveAction, LiveActionName, LiveState, WsDevicePresenceMessage } from '@shared/types/live';
+import { wsLiveUrl } from '@shared/ws-live-url';
 import { handleDevicePresence } from './useExternalDevices';
 import {
   onApprovalPending,
@@ -64,8 +65,7 @@ export function whenLiveSocketReady(fn: () => void): void {
 }
 
 function wsUrl(): string {
-  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${protocol}//${location.host}/ws/live`;
+  return wsLiveUrl();
 }
 
 function handleMessage(raw: string): void {

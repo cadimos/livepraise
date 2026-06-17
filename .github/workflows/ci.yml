@@ -21,6 +21,7 @@ jobs:
       - run: npm ci
       - run: npm run check:js-in-src
       - run: npm run lint
+      - run: npm run verify:openapi
       - run: npm run test:unit
       - run: npm run typecheck
 

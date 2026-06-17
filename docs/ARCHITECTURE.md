@@ -68,6 +68,20 @@ flowchart TB
 
 Eventos de tipografia de projeção propagam preferências (`projection-typography`) para todas as saídas via `attachProjectionTypographyWs` em `shared/projection-typography-runtime.ts`.
 
+## Cache de estáticos (ST-015)
+
+Política em `server/index.ts` — evitar HTML/JS stale em desenvolvimento:
+
+| Mount | `index.html` | Bundles JS (hash) | `/shared/*.js` | Fontes `/fonts` |
+|-------|--------------|-------------------|----------------|-----------------|
+| `/operator` | `no-store` | cache default Express (hash no filename Vite) | — | — |
+| `/projector` | `no-store` | cache default | — | — |
+| `/live`, `/vocal`, `/stage`, `/player` | `no-store` | cache default | — | — |
+| `/shared` | — | — | `no-store` | — |
+| `/fonts` | — | — | — | `max-age` (rotas API) |
+
+Portal e remote usam `express.static` simples (SPA dev raro); operador e saídas de projeção têm prioridade em dev local.
+
 ## Build e empacotamento
 
 Ver [`BUILD.md`](BUILD.md). O `electron-builder` inclui `dist/**/*` e `web/**/*`; artefactos browser compilados vivem só em `dist/`.

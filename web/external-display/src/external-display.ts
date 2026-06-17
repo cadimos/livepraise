@@ -25,6 +25,8 @@ import type {
   WsLiveBroadcastMessage,
   WsServerMessage,
 } from '@shared/types/live';
+import { stripChordsFromHtml } from '/shared/projection-chords.js';
+import { wsLiveUrl } from '/shared/ws-live-url.js';
 
 type ExternalProfile = Extract<ExternalDisplayProfile, 'vocal' | 'stage' | 'player'>;
 
@@ -37,8 +39,7 @@ const PROFILES = new Set<string>(['vocal', 'stage', 'player']);
 attachDisplayDebugOverlayListener();
 
 function wsUrl(): string {
-  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${protocol}//${location.host}/ws/live`;
+  return wsLiveUrl();
 }
 
 function detectProfile(): ExternalProfile {
@@ -50,31 +51,6 @@ function detectProfile(): ExternalProfile {
 
 function ensureDeviceId(profile: ExternalProfile): string {
   return ensureEndpointDeviceId(profile);
-}
-
-function stripChordsForProjection(text: string): string {
-  return text
-    .split('\n')
-    .filter((line) => !/^\s*[A-G][#b]?(\/|\s|$)/.test(line.trim()))
-    .join('\n')
-    .trim();
-}
-
-function stripChordsFromHtml(html: string): string {
-  return html.replace(
-    /(<(?:div|span|p)[^>]*class="[^"]*(?:content|texto)[^"]*"[^>]*>)([\s\S]*?)(<\/(?:div|span|p)>)/gi,
-    (_match, open: string, body: string, close: string) => {
-      const stripped = stripChordsForProjection(
-        body.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, ''),
-      );
-      const escaped = stripped
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\n/g, '<br />');
-      return `${open}${escaped}${close}`;
-    },
-  );
 }
 
 function byId<T extends HTMLElement = HTMLElement>(id: string): T {

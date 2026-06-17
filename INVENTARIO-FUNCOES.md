@@ -1,10 +1,10 @@
 # Inventário pendente — Live Praise
 
 **Versão analisada:** `1.0.0-alpha.2`  
-**Última atualização:** 2026-06-07 (revisão pós-implementação)  
+**Última actualização:** 2026-06-17 (suite consolidada — SM-038)  
 **Repositório:** `electron/`, `server/`, `core/`, `apps/`, `web/`, `shared/`
 
-**TypeScript (meta técnica — 2026-06):** Migração em curso documentada em [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md). Estado: fonte `.ts`/`.vue` em server, core, shared, electron, operator, web, projector/stage-return; configs `tailwind.config.ts` e `postcss.config.ts`; emit em `dist/`; gate `npm run typecheck` + `check:js-in-src` no CI. Pendências menores: hardening web (TS-033+), consolidação smokes `cad*`.
+**TypeScript (meta técnica — 2026-06):** Migração documentada em [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md). Estado: fonte `.ts`/`.vue` em todas as superfícies; emit em `dist/`; CI PR: `lint`, `test:unit`, `typecheck`, `verify:openapi`, smokes núcleo. Smokes `smoke:cad*` removidos — ver [`scripts/README.md`](scripts/README.md) e [`docs/SM-003-smoke-consolidacao.md`](docs/SM-003-smoke-consolidacao.md).
 
 Backlog do que **ainda não está implementado** (ou está só parcialmente). Itens **✅** da alpha.2 estão concluídos — secções mantidas como registo histórico e referência de smokes.
 
@@ -19,7 +19,7 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). It
 | 0 | Migração v0.0.8 → 1.x | ✅ | `legacy-upgrade.ts` + `smoke:legacy-upgrade` |
 | 1 | Auditoria e retenção | ✅ | `audit_logs`, purge diário, `GET /api/audit/logs`, `smoke:audit` |
 | 2 | Release GitHub | ✅ | Validado manualmente alpha.2 — draft unificado, instaladores Win/Linux/macOS OK |
-| 3 | Testes automatizados | 📅 | **Fora do escopo alpha.2** — smokes actuais bastam; Vitest/Playwright numa versão futura |
+| 3 | Testes automatizados | 📅 | Smokes consolidados + `test:unit` no CI; Vitest/Playwright futuro — [`docs/DIVIDA-TECNICA.md`](docs/DIVIDA-TECNICA.md) |
 | 4 | Locales adicionais | ✅ | `en-US`, `pt-PT`, `es-ES`; `pt-BR` default; `npm run sync:locales` |
 | 5 | Watcher de vídeos | ✅ | `videoWatcher.ts` + WS `media-updated` → `VideosPanel`; `smoke:video-watcher` |
 | 6 | Busca online de louvores | 📅 | **Fora do escopo alpha.2** — Fuse.js local; busca online numa versão futura |
@@ -57,9 +57,9 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). It
 
 ### Candidatos naturais para **alpha.2** (ainda a confirmar)
 
-Itens 🟡 com lacuna pequena e alto impacto operacional:
+Itens 🟡 com lacuna pequena:
 
-1. **Secção 10** — integrar `smoke-win-installer.mjs` no job Windows do `release.yml` (validação manual já feita; falta automatizar no CI).
+1. ~~**Secção 10** — integrar `smoke-win-installer` no job Windows~~ ✅ SM-035 (`smoke:win-installer:ci` em `release.yml`).
 
 ---
 
@@ -72,10 +72,10 @@ Itens 🟡 com lacuna pequena e alto impacto operacional:
 - Integração no arranque (`prepareLegacyDatabaseFile` em `server/index.ts`).
 - Smoke **`npm run smoke:legacy-upgrade`**.
 
-### Manutenção (opcional)
+### Manutenção
 
-- [ ] Documentar fluxo no README secção migração (hoje só no CHANGELOG).
-- [ ] Incluir `smoke:legacy-upgrade` no job CI de PR (hoje só no CHANGELOG como recomendação pré-release).
+- [x] Documentar fluxo no README secção migração.
+- [x] Decisão CI PR: **não** incluir `smoke:legacy-upgrade` — ver [`docs/SM-034-legacy-upgrade-ci.md`](docs/SM-034-legacy-upgrade-ci.md). Correr manual pré-release.
 
 ---
 
@@ -205,24 +205,54 @@ Melhorias de **regressão automática** — o fluxo principal já está validado
 
 ## 3. Testes automatizados (além de smokes) 📅 *(versão futura — não alpha.2)*
 
-> **Decisão alpha.2:** não implementar Vitest nem Playwright nesta versão. Os smokes existentes (`ci.yml`, `smoke:release`) continuam como gate de qualidade até uma release dedicada a testes formais.
+> **Decisão alpha.2:** não implementar Vitest nem Playwright nesta versão. A suite actual (`ci.yml` + `smoke:release`) é o gate de qualidade até release dedicada a testes formais.
 
-### Já existe
+### Gate actual (consolidado — SM-038)
 
-- Smokes por feature (`scripts/smoke-*.mjs`, `smoke:features`, gate `npm run smoke:release`).
-- CI PR: `ci.yml` corre `test:video-pipeline`, `smoke:bootstrap`, `smoke:fase8`.
-- Testes pontuais em `tests/` (temas, sanitização remote-fetch, redacção URLs error log) — runner Node nativo, **sem** Vitest.
+| Comando | Onde corre | O que valida |
+|---------|------------|--------------|
+| `npm run lint` | CI PR (`typecheck` job) | ESLint TypeScript — 0 warnings |
+| `npm run test:unit` | CI PR | 7× `tests/**/*.test.mjs` (textfill, temas, security) |
+| `npm run typecheck` | CI PR | Todas as superfícies TS |
+| `npm run verify:openapi` | CI PR | 67 endpoints vs `openapi.yaml` |
+| `npm run test:video-pipeline` | CI PR (`smoke` job) | Pipeline ffmpeg / vídeo |
+| `npm run smoke:bootstrap` | CI PR + release | Bootstrap BD, CRUD, persistência |
+| `npm run smoke:fase8` | CI PR + release (Win/Linux/macOS) | WS, health, instalação limpa |
+| `npm run smoke:release` | Manual pré-release | bootstrap → video → textfill → fase8 |
+
+Documentação: [`scripts/README.md`](scripts/README.md) · [`docs/SM-015-unit-tests-split.md`](docs/SM-015-unit-tests-split.md) · [`docs/SM-042-EPIC-CHECKLIST.md`](docs/SM-042-EPIC-CHECKLIST.md).
+
+### Smokes de feature (manual ou `smoke:features`)
+
+| npm | Domínio |
+|-----|---------|
+| `smoke:textfill` | Tipografia + motor textfill |
+| `smoke:typography-qa` | QA CA tipografia |
+| `smoke:auth` | Auth, roles, delivery |
+| `smoke:displays` | Displays + footer alert |
+| `smoke:backup` | Backup/restore + import URL |
+| `smoke:legacy-upgrade` | Migração v0.0.8 *(manual pré-release)* |
+| `smoke:locales`, `smoke:audit`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version` | Ver `smoke:features -- --list` |
+
+Scripts `smoke:cad187` … `smoke:cad314` **removidos** (SM-030). Mapeamento: [`docs/SM-003-smoke-consolidacao.md`](docs/SM-003-smoke-consolidacao.md).
+
+### Já existe (unitários Node)
+
+- `tests/projection-textfill-*.test.mjs` — motor textfill (jsdom)
+- `tests/security/remote-fetch*.test.mjs` — SSRF e content-type
+- `tests/themes/normalize.test.mjs` — normalização temas
+- Runner: `scripts/run-unit-tests.mjs` via `npm run test:unit` (SM-041)
 
 ### O que falta *(planeado — versão futura)*
 
-Suite **Vitest** para `core/` e `shared/` e **Playwright** (ou equivalente) para fluxos críticos do operador. Job dedicado `test.yml` em PR; falha bloqueia merge.
+Suite **Vitest** para `core/` e `shared/` e **Playwright** para fluxos críticos do operador. Backlog: [`docs/SM-039-vitest-backlog.md`](docs/SM-039-vitest-backlog.md) · [`docs/DIVIDA-TECNICA.md`](docs/DIVIDA-TECNICA.md) ST-028.
 
 ### Tarefas *(backlog — não alpha.2)*
 
 - [ ] Adicionar Vitest + config mínima.
 - [ ] Testes unitários: `bible-reference`, `queue-items`, `sanitize` projection, `sessions.purge`.
 - [ ] Playwright: arrancar `dev:server`, abrir operador, login loopback, projectar música mock.
-- [ ] Job GHA `test.yml` em PR (hoje smokes vivem só em `ci.yml`).
+- [ ] Job GHA `test.yml` em PR (hoje smokes + unitários vivem em `ci.yml`).
 - [ ] Integrar com `smoke:release` (smokes permanecem gate de release).
 
 ---

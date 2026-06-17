@@ -53,6 +53,8 @@ const surfaces = [
       'dist/shared/projection-textfill.js',
       'dist/shared/projection-typography-runtime.js',
       'dist/shared/projection-contrast.js',
+      'dist/shared/projection-chords.js',
+      'dist/shared/ws-live-url.js',
     ],
   },
 ];

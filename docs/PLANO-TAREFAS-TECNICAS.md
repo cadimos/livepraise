@@ -155,16 +155,16 @@ Objetivo: um único caminho de integração (controller/composable), motor em `s
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
 | TF-022 | ✅ Manter testes `tests/projection-textfill-*.test.mjs` | Integrar no smoke consolidado (SM-015), não apagar cobertura. | 3 testes passam após refactors. | TF-007 | P0 | S |
-| TF-023 | Teste composable preview (futuro Vitest) | Se Vitest adoptado: mount composable com jsdom. | Backlog ou implementação mínima. | TF-006 | P3 | M |
+| TF-023 | ✅ Teste composable preview (futuro Vitest) | Se Vitest adoptado: mount composable com jsdom. | Backlog ou implementação mínima. | TF-006 | P3 | M |
 | TF-024 | ✅ Actualizar smoke CAD-313/314 ou sucessor | Asserções sobre composable/controller, não imports directos tile. | Smoke verde. | TF-012, SM-015 | P1 | M |
-| TF-025 | Caso agregado «textfill» no smoke release | Opcional: 1 teste rápido no gate release (SM-010). | release smoke inclui textfill. | SM-010 | P2 | M |
+| TF-025 | ✅ Caso agregado «textfill» no smoke release | Opcional: 1 teste rápido no gate release (SM-010). | release smoke inclui textfill. | SM-010 | P2 | M |
 
 ### 2.6 Melhorias opcionais (não bloqueiam unificação)
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| TF-026 | Avaliar componente Vue `<ProjectionContent>` | Wrapper template `.content` + controller — só se reduzir HTML duplicado nos tiles. | ADR; implementação opcional. | TF-007 | P3 | L |
-| TF-027 | Extrair constantes PREVIEW vs OUTPUT floors | `PREVIEW_TEXTFILL_MIN_PX`, `STAGE_RETURN_OUTPUT_FLOOR_PX` documentadas na API. | TF-002 actualizado. | TF-002 | P3 | S |
+| TF-026 | ✅ Avaliar componente Vue `<ProjectionContent>` | Wrapper template `.content` + controller — só se reduzir HTML duplicado nos tiles. | ADR; implementação opcional. | TF-007 | P3 | L |
+| TF-027 | ✅ Extrair constantes PREVIEW vs OUTPUT floors | `PREVIEW_TEXTFILL_MIN_PX`, `STAGE_RETURN_OUTPUT_FLOOR_PX` documentadas na API. | TF-002 actualizado. | TF-002 | P3 | S |
 | TF-028 | ✅ Fechar epic textfill — checklist | TF-001–025 concluídos; operador unificado. | Revisão visual QA. | TF-016–024 | P0 | S |
 
 ---
@@ -179,15 +179,15 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 |----|--------|-----------|---------------------|------|---|------|
 | SM-001 | ✅ Inventariar 28 ficheiros `smoke-*.mjs` | Tabela: ficheiro, npm script, última feature, corre no CI?, dependências build. | Tabela em `scripts/README.md`. | — | P0 | M |
 | SM-002 | ✅ Mapear smoke → critérios de aceite originais | CAD-187…314: o que cada um valida ainda relevante? | Coluna «ainda necessário?» sim/não/parcial. | SM-001 | P0 | M |
-| SM-003 | Identificar sobreposição entre smokes | Pares redundantes (ex.: cad288+cad290, cad221+cad224). | Lista de merge candidatos. | SM-002 | P1 | M |
-| SM-004 | Identificar testes órfãos em `tests/` | Quais só correm via smoke-cad* e não via release. | Lista + proposta destino. | SM-001 | P1 | S |
+| SM-003 | ✅ Identificar sobreposição entre smokes | Pares redundantes (ex.: cad288+cad290, cad221+cad224). | Lista de merge candidatos. | SM-002 | P1 | M |
+| SM-004 | ✅ Identificar testes órfãos em `tests/` | Quais só correm via smoke-cad* e não via release. | Lista + proposta destino. | SM-001 | P1 | S |
 
 ### 3.2 Suite núcleo (manter)
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
 | SM-005 | ✅ Formalizar «smoke core» | Núcleo = `smoke-fase2`, `smoke-fase8`, `smoke-car40`. | Documentado como contrato release. | SM-001 | P0 | S |
-| SM-006 | Renomear scripts core (opcional) | Ex.: `smoke:core:bootstrap`, `smoke:core:ws`, `smoke:core:video` — aliases antigos mantidos. | Sem breaking change ou changelog. | SM-005 | P3 | S |
+| SM-006 | ✅ Renomear scripts core (opcional) | Ex.: `smoke:core:bootstrap`, `smoke:core:ws`, `smoke:core:video` — aliases antigos mantidos. | Sem breaking change ou changelog. | SM-005 | P3 | S |
 | SM-007 | ✅ Extrair helpers partilhados smokes | `scripts/lib/smoke-helpers.mjs`: assert, fetchJson, tempHome, startServer. | 3+ smokes usam helper. | SM-001 | P1 | M |
 | SM-008 | ✅ Reduzir duplicação bootstrap em smokes | Usar helper SM-007 nos cad*. | Menos copy-paste start/stop server. | SM-007 | P2 | M |
 
@@ -201,7 +201,7 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 | SM-012 | ✅ Consolidar displays (cad188+cad194) | Projetor + displays config num smoke. | Um script; build projector incluído. | SM-003 | P2 | M |
 | SM-013 | ✅ Consolidar backup/restore smokes | cad228, cad234, cad238 se sobrepostos. | Avaliar merge vs manter um. | SM-003 | P2 | L |
 | SM-014 | ✅ Manter `smoke-legacy-upgrade` isolado | Migração v0.0.8 — não misturar com fase2. | Script + npm; doc quando correr. | SM-005 | P1 | S |
-| SM-015 | Manter testes unitários em `tests/` | Mover lógica pesada de cad313 para imports de `tests/*.mjs`. | Smokes finos, testes grossos. | SM-010 | P1 | M |
+| SM-015 | ✅ Manter testes unitários em `tests/` | Mover lógica pesada de cad313 para imports de `tests/*.mjs`. | Smokes finos, testes grossos. | SM-010 | P1 | M |
 
 ### 3.4 Remoção / deprecação cad*
 
@@ -229,19 +229,19 @@ Objetivo: gate de release claro (3–5 scripts), smokes por ticket arquivados ou
 |----|--------|-----------|---------------------|------|---|------|
 | SM-031 | ✅ Actualizar `scripts/README.md` | Remover refs `car40-macos.yml`; listar só smokes vivos. | Doc = realidade CI. | SM-030 | P0 | S |
 | SM-032 | ✅ Actualizar `package.json` scripts | Remover entradas cad* mortas; manter aliases deprecated 1 versão se needed. | npm run smoke:release intacto. | SM-030 | P0 | S |
-| SM-033 | Adicionar `smoke:fase8` no job Windows release | Alinhar com Linux/macOS (INVENTARIO lacuna). | release.yml Windows corre fase8. | SM-005 | P2 | S |
-| SM-034 | Opcional: `smoke:legacy-upgrade` no CI PR | Só se runtime aceitável; senão manter manual pre-release. | Decisão documentada. | SM-014 | P3 | M |
-| SM-035 | Opcional: `smoke-win-installer` no CI | Integrar no job build-windows. | Installer validado automaticamente. | — | P3 | L |
+| SM-033 | ✅ Adicionar `smoke:fase8` no job Windows release | Alinhar com Linux/macOS (INVENTARIO lacuna). | release.yml Windows corre fase8. | SM-005 | P2 | S |
+| SM-034 | ✅ Opcional: `smoke:legacy-upgrade` no CI PR | Só se runtime aceitável; senão manter manual pre-release. | Decisão documentada. | SM-014 | P3 | M |
+| SM-035 | ✅ Opcional: `smoke-win-installer` no CI | Integrar no job build-windows. | Installer validado automaticamente. | — | P3 | L |
 | SM-036 | ✅ Documentar «quando correr smokes» | Dev diário: typecheck; pre-release: smoke:release + legacy + features. | README secção QA. | SM-031 | P1 | S |
 | SM-037 | ✅ CHANGELOG entrada limpeza smokes | Utilizadores/devs sabem scripts removidos. | Entrada alpha.x. | SM-030 | P1 | S |
-| SM-038 | Actualizar `INVENTARIO-FUNCOES.md` secção testes | Refletir suite consolidada. | Links correctos. | SM-031 | P2 | S |
+| SM-038 | ✅ Actualizar `INVENTARIO-FUNCOES.md` secção testes | Refletir suite consolidada. | Links correctos. | SM-031 | P2 | S |
 
 ### 3.6 Preparação Vitest (backlog smoke → testes)
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| SM-039 | Listar asserções cad* migráveis para Vitest | core/, shared/ funções puras. | Backlog Vitest. | SM-002 | P3 | M |
-| SM-040 | Manter runner Node nativo para integração | Smokes HTTP/WS continuam .mjs até Playwright. | Decisão INVENTARIO respeitada. | — | P2 | S |
+| SM-039 | ✅ Listar asserções cad* migráveis para Vitest | core/, shared/ funções puras. | Backlog Vitest. | SM-002 | P3 | M |
+| SM-040 | ✅ Manter runner Node nativo para integração | Smokes HTTP/WS continuam .mjs até Playwright. | Decisão INVENTARIO respeitada. | — | P2 | S |
 | SM-041 | ✅ Criar `npm run test:unit` placeholder | Corre tests/*.mjs seleccionados. | Script existe pre-Vitest. | SM-015 | P2 | S |
 | SM-042 | ✅ Fechar epic smokes — checklist | ≤8 scripts smoke + tests/; CI verde. | Contagem ficheiros scripts/smoke-*.mjs. | SM-030–041 | P0 | S |
 
@@ -258,9 +258,9 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 | ST-001 | ✅ Mover `projection-contrast` para `shared/` | Fonte única TS; projector + web importam `/shared/projection-contrast.js`. | Ficheiro duplicado web removido. | — | P0 | M |
 | ST-002 | ✅ Actualizar imports projector | `from '/shared/projection-contrast.js'`. | Build projector OK. | ST-001 | P0 | S |
 | ST-003 | ✅ Actualizar imports external-display | Idem após TS-016. | Contraste scrim OK em live/vocal. | ST-001, TS-016 | P0 | S |
-| ST-004 | Auditar outros duplicados web vs apps | grep lógica copiada (stripChords, wsUrl, etc.). | Lista ST-004 anexa ou issues. | TS-015 | P1 | M |
-| ST-005 | Extrair `stripChordsForProjection` para shared | Se duplicado em projector/live/operator. | Função única testável. | ST-004 | P2 | M |
-| ST-006 | Centralizar `wsUrl` helpers por perfil | Padrão `location.host` + path WS. | Menos copy-paste web apps. | ST-004 | P2 | M |
+| ST-004 | ✅ Auditar outros duplicados web vs apps | grep lógica copiada (stripChords, wsUrl, etc.). | Lista ST-004 anexa ou issues. | TS-015 | P1 | M |
+| ST-005 | ✅ Extrair `stripChordsForProjection` para shared | Se duplicado em projector/live/operator. | Função única testável. | ST-004 | P2 | M |
+| ST-006 | ✅ Centralizar `wsUrl` helpers por perfil | Padrão `location.host` + path WS. | Menos copy-paste web apps. | ST-004 | P2 | M |
 
 ### 4.2 Build e deploy
 
@@ -269,7 +269,7 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 | ST-007 | ✅ Criar `docs/BUILD.md` | Ordem builds, env vars (`LIVEPRAISE_HOME`, `APP_ROOT`), artefactos. | Referenciado no README. | TS-028 | P1 | M |
 | ST-008 | ✅ Diagrama arquitectura runtime | Electron + server + static mounts + WS. | Mermaid em docs/ARCHITECTURE.md. | — | P2 | M |
 | ST-009 | ✅ Unificar destino emits apps | Meta: `dist/apps/*` (projector, stage-return, operator); `dist/web/*` para portal/live/remote. | Documentado em ARCHITECTURE.md. | TS-007 | P1 | L |
-| ST-010 | Script `npm run clean` | Remove dist/, emits apps, caches. | Rebuild determinístico. | ST-009 | P2 | S |
+| ST-010 | ✅ Script `npm run clean` | Remove dist/, emits apps, caches. | Rebuild determinístico. | ST-009 | P2 | S |
 | ST-011 | ✅ Validar `copy-shared-assets.mjs` | CSS shared sempre em dist/shared após build. | projection-layout.css servido. | — | P1 | S |
 | ST-012 | ✅ Verificar ordem `build` no package.json | sync:version → server (inclui shared) → projector → stage-return → electron → operator → web. | Uma linha documentada. | TS-021 | P1 | S |
 
@@ -279,16 +279,16 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 |----|--------|-----------|---------------------|------|---|------|
 | ST-013 | ✅ Documentar mounts Express | Tabela path → pasta (`/shared`, `/projector`, `/live`, …). | docs/ARCHITECTURE.md | — | P1 | S |
 | ST-014 | ✅ Health check cobre todas superfícies | `server/health.ts` — web/live, portal, remote. | GET /health reporta activo. | — | P2 | S |
-| ST-015 | Revisar cache headers static | Projector vs operator vs shared — evitar stale em dev. | Comportamento documentado. | — | P3 | M |
+| ST-015 | ✅ Revisar cache headers static | Projector vs operator vs shared — evitar stale em dev. | Comportamento documentado. | — | P3 | M |
 
 ### 4.4 Operador Vue — padrões
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| ST-016 | Guia `docs/operator-patterns.md` | Composables vs components; `@shared` imports; i18n. | Novos painéis seguem guia. | — | P2 | M |
-| ST-017 | Padronizar imports `@shared` vs paths relativos | grep operador; corrigir outliers. | Consistência. | — | P2 | M |
-| ST-018 | Padronizar chamadas API via `useApi` | Evitar fetch disperso. | Auditoria routes. | — | P3 | M |
-| ST-019 | Revisar tipos duplicados operador vs shared | Ex.: preview-groups, projection types. | DRY. | TF-019 | P2 | M |
+| ST-016 | ✅ Guia `docs/operator-patterns.md` | Composables vs components; `@shared` imports; i18n. | Novos painéis seguem guia. | — | P2 | M |
+| ST-017 | ✅ Padronizar imports `@shared` vs paths relativos | grep operador; corrigir outliers. | Consistência. | — | P2 | M |
+| ST-018 | ✅ Padronizar chamadas API via `useApi` | Evitar fetch disperso. | Auditoria routes. | — | P3 | M |
+| ST-019 | ✅ Revisar tipos duplicados operador vs shared | Ex.: preview-groups, projection types. | DRY. | TF-019 | P2 | M |
 
 ### 4.5 WebSocket e live state
 
@@ -296,7 +296,7 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 |----|--------|-----------|---------------------|------|---|------|
 | ST-020 | ✅ Documentar fluxo WS operador ↔ hub ↔ outputs | `shared/types/live.ts` como contrato. | ARCHITECTURE.md secção WS. | ST-008 | P1 | M |
 | ST-021 | ✅ Verificar paridade eventos tipografia WS | Controller attachProjectionTypographyWs em todas saídas. | grep attachProjectionTypographyWs. | TF-015 | P1 | S |
-| ST-022 | Verificar paridade `display-debug-overlay` | Projector/live/external usam mesmo overlay debug. | Comportamento consistente. | — | P3 | S |
+| ST-022 | ✅ Verificar paridade `display-debug-overlay` | Projector/live/external usam mesmo overlay debug. | Comportamento consistente. | — | P3 | S |
 
 ### 4.6 CI/CD e documentação
 
@@ -305,18 +305,18 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 | ST-023 | ✅ Revisar `.github/workflows/*.yml` | Nomes, smokes, alinhamento README/INVENTARIO. | Sem referências mortas. | SM-031 | P1 | M |
 | ST-024 | ✅ Adicionar job typecheck CI | Ver TS-029. | ci.yml typecheck. | TS-029 | P1 | S |
 | ST-025 | ✅ Actualizar README estrutura repositório | web/ TS, dist/, smokes consolidados. | Árvore actualizada. | TS-045, SM-042 | P1 | S |
-| ST-026 | Actualizar CHANGELOG meta técnica | Epics TS, TF, SM, ST concluídos. | Entrada por release. | — | P2 | S |
+| ST-026 | ✅ Actualizar CHANGELOG meta técnica | Epics TS, TF, SM, ST concluídos. | Entrada por release. | — | P2 | S |
 
 ### 4.7 Qualidade e dívida conhecida
 
 | ID | Título | Descrição | Critério de aceite | Dep. | P | Esf. |
 |----|--------|-----------|---------------------|------|---|------|
-| ST-027 | Registar dívida «portal/remote i18n» | INVENTARIO — fora MVP; link doc. | Não perder no backlog. | — | P3 | S |
-| ST-028 | Registar dívida «Vitest/Playwright» | Secção backlog com deps SM-039. | Roadmap claro. | SM-039 | P3 | S |
-| ST-029 | Registar dívida «busca online louvores» | INVENTARIO secção 6. | — | — | P3 | S |
-| ST-030 | Registar dívida «editor temas visual» | INVENTARIO secção 7. | — | — | P3 | S |
-| ST-031 | Revisar pasta `v0.0.8/` no repo | Arquivo legado — manter ignorado ou remover do clone. | Política documentada. | — | P3 | S |
-| ST-032 | OpenAPI coverage script | `verify-openapi-coverage.mjs` — integrar CI opcional. | verify:openapi no PR? | — | P3 | S |
+| ST-027 | ✅ Registar dívida «portal/remote i18n» | INVENTARIO — fora MVP; link doc. | Não perder no backlog. | — | P3 | S |
+| ST-028 | ✅ Registar dívida «Vitest/Playwright» | Secção backlog com deps SM-039. | Roadmap claro. | SM-039 | P3 | S |
+| ST-029 | ✅ Registar dívida «busca online louvores» | INVENTARIO secção 6. | — | — | P3 | S |
+| ST-030 | ✅ Registar dívida «editor temas visual» | INVENTARIO secção 7. | — | — | P3 | S |
+| ST-031 | ✅ Revisar pasta `v0.0.8/` no repo | Arquivo legado — manter ignorado ou remover do clone. | Política documentada. | — | P3 | S |
+| ST-032 | ✅ OpenAPI coverage script | `verify-openapi-coverage.mjs` — integrar CI opcional. | verify:openapi no PR? | — | P3 | S |
 
 ### 4.8 Segurança e consistência core
 
@@ -324,7 +324,7 @@ Objetivo: menos duplicação, build previsível, fluxos documentados, lacunas CI
 |----|--------|-----------|---------------------|------|---|------|
 | ST-033 | ✅ Manter `tests/security/*` no gate | Incluir em SM-041 ou smoke:release. | remote-fetch tests passam. | SM-041 | P1 | S |
 | ST-034 | ✅ Revisar `core/` boundaries | server importa core; apps não importam server. | grep violations. | — | P2 | M |
-| ST-035 | Revisar paths `.js` em imports TS | NodeNext — consistente em server/electron/shared. | typecheck + runtime OK. | TS-026 | P2 | M |
+| ST-035 | ✅ Revisar paths `.js` em imports TS | NodeNext — consistente em server/electron/shared. | typecheck + runtime OK. | TS-026 | P2 | M |
 
 ### 4.9 Fecho estrutural
 
@@ -493,7 +493,52 @@ Após cada tarefa concluída, marcar `[x]` na secção «Concluídas» e **✅**
 - [x] **SM-012** — `scripts/lib/smoke-displays.mjs` + `npm run smoke:displays` (cad188 + cad194)
 - [x] **SM-013** — `scripts/lib/smoke-backup.mjs` + `npm run smoke:backup` (cad228 + cad234 + cad238)
 
-**Fila:** ST-004/026 → SM-003/004 → TF-025.
+**Fila:** Epic técnico (TS/TF/SM/ST) **fechado** — manter `INVENTARIO-FUNCOES.md` funcional; dívida futura em [`DIVIDA-TECNICA.md`](DIVIDA-TECNICA.md).
+
+### TF-023/026 + SM-006 + SM-035 (2026-06-17)
+
+- [x] **TF-023** — `docs/TF-023-composable-preview-test.md` (backlog Vitest)
+- [x] **TF-026** — `docs/TF-026-ADR-projection-content.md` (não implementar)
+- [x] **SM-006** — aliases `smoke:core:bootstrap|ws|video` em `package.json`
+- [x] **SM-035** — `smoke:win-installer:ci` + job Windows em `release.yml`
+
+### SM-040 (2026-06-17)
+
+- [x] **SM-040** — decisão em `scripts/README.md`: integração `.mjs` até Playwright
+
+### SM-038 + SM-033/034 + TF-027 (2026-06-17)
+
+- [x] **SM-038** — `INVENTARIO-FUNCOES.md` secção 3 actualizada (gate CI, smokes, links)
+- [x] **SM-033** — `release.yml` Windows: `smoke:fase8` alinhado com Linux/macOS
+- [x] **SM-034** — `docs/SM-034-legacy-upgrade-ci.md` (manual pré-release, não CI PR)
+- [x] **TF-027** — `STAGE_RETURN_OUTPUT_FLOOR_PX` exportado + doc `projection-textfill.md`
+
+### ST-015/018/019/022/035 + SM-039 (2026-06-17)
+
+- [x] **ST-015** — cache `no-store` em `/projector` HTML + `/shared/*.js`; tabela em `ARCHITECTURE.md`
+- [x] **ST-018** — auditoria fetch: só `useApi` + excepções multipart documentadas
+- [x] **ST-019** — `preview-groups` é tipo operador (UI); shared já expõe `ClientRole`/`ExternalDisplayProfile`
+- [x] **ST-022** — 4 superfícies importam `shared/display-debug-overlay.ts` + `attachDisplayDebugOverlayListener()`
+- [x] **ST-035** — `docs/ST-035-imports-js.md`
+- [x] **SM-039** — `docs/SM-039-vitest-backlog.md`
+
+### ST-016/017 + SM-015 + ST-027–032 (2026-06-17)
+
+- [x] **ST-016** — `docs/operator-patterns.md`
+- [x] **ST-017** — auditoria: operador 100% `@shared` (sem `/shared/` nem paths relativos a `shared/`)
+- [x] **SM-015** — `docs/SM-015-unit-tests-split.md`; textfill smoke fino + `tests/projection-textfill-*`
+- [x] **ST-027–032** — `docs/DIVIDA-TECNICA.md`; `verify:openapi` no job CI typecheck
+
+### ST-004/005/006 + ST-010/026 + SM-003/004 + TF-025 (2026-06-17)
+
+- [x] **ST-004** — `docs/ST-004-duplicados-web.md`
+- [x] **ST-005** — `shared/projection-chords.ts` (live, external-display, operador)
+- [x] **ST-006** — `shared/ws-live-url.ts` → `wsLiveUrl()` em 5 superfícies
+- [x] **ST-010** — `npm run clean` (`scripts/clean.mjs`)
+- [x] **ST-026** — CHANGELOG [Unreleased] epics técnicos
+- [x] **SM-003** — `docs/SM-003-smoke-consolidacao.md`
+- [x] **SM-004** — `docs/SM-004-tests-orphans.md`
+- [x] **TF-025** — `smoke:release` inclui `smoke:textfill`
 
 ### TF-019/020/021 (2026-06-17)
 

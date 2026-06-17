@@ -130,21 +130,41 @@ export async function createLivepraiseApp(
     res.json(buildHealthReport(Boolean(liveHub)));
   });
 
+  const projectorRoot = path.join(appRoot, 'dist/apps/projector');
+  app.get(['/projector', '/projector/'], (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.sendFile(path.join(projectorRoot, 'index.html'));
+  });
   app.use(
     '/projector',
     (req, res, next) => {
       res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
       next();
     },
-    express.static(path.join(appRoot, 'dist/apps/projector'), {
-      index: 'index.html',
+    express.static(projectorRoot, {
+      index: false,
+      setHeaders(res, filePath) {
+        if (filePath.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'no-store');
+        }
+      },
     }),
   );
 
   app.get('/stage-return', (_req, res) => res.redirect(302, '/stage/'));
   app.get('/stage-return/', (_req, res) => res.redirect(302, '/stage/'));
 
-  app.use('/shared', express.static(path.join(appRoot, 'dist', 'shared')));
+  app.use(
+    '/shared',
+    express.static(path.join(appRoot, 'dist', 'shared'), {
+      setHeaders(res, filePath) {
+        if (filePath.endsWith('.js') || filePath.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'no-store');
+        }
+      },
+    }),
+  );
 
   const externalDisplayRoot = path.join(appRoot, 'dist/web/external-display');
 

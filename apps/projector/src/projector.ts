@@ -18,6 +18,7 @@ import {
   createProjectionTypographyController,
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
+import { wsLiveUrl } from '/shared/ws-live-url.js';
 
 attachDisplayDebugOverlayListener();
 
@@ -52,8 +53,7 @@ interface WsJoinedMessage {
 type WsServerMessage = WsLiveBroadcastMessage | WsJoinedMessage | { type: string };
 
 function wsUrl(): string {
-  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${protocol}//${location.host}/ws/live`;
+  return wsLiveUrl();
 }
 
 function byId<T extends HTMLElement>(id: string): T {

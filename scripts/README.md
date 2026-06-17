@@ -2,9 +2,11 @@
 
 Smokes de release — validação manual ou em CI **antes de publicar**, não no desenvolvimento diário.
 
-Gate de release: `npm run smoke:release` = `smoke:bootstrap` → `test:video-pipeline` → `smoke:fase8`.
+Gate de release: `npm run smoke:release` = `smoke:bootstrap` → `test:video-pipeline` → `smoke:textfill` → `smoke:fase8`.
 
 Desenvolvimento diário: `npm run typecheck` e `npm run dev`.
+
+**SM-040:** smokes de integração HTTP/WS permanecem em `.mjs` com Node nativo até adoptar Playwright; testes algorítmicos em `tests/*.test.mjs`. Vitest futuro cobre `shared/`/`core/` — ver [`docs/SM-039-vitest-backlog.md`](../docs/SM-039-vitest-backlog.md).
 
 Requisito: Node ≥ 22.12 (`engines` na raiz).
 
@@ -13,9 +15,12 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 | npm | Ficheiro | Corre no CI? | O que valida |
 |-----|----------|--------------|--------------|
 | `smoke:bootstrap` / `smoke:fase2` | `smoke-fase2.mjs` | ✅ `ci.yml` | Bootstrap BD, CRUD música, persistência |
+| `smoke:core:bootstrap` | *(alias)* | — | = `smoke:bootstrap` (SM-006) |
 | `smoke:fase8` | `smoke-fase8.mjs` | ✅ `ci.yml` | Instalação limpa, health, WebSocket, latência |
+| `smoke:core:ws` | *(alias)* | — | = `smoke:fase8` (SM-006) |
 | `test:video-pipeline` / `smoke:car40` | `smoke-car40.mjs` | ✅ `ci.yml` | Pipeline ffmpeg / vídeo |
-| `smoke:release` | *(encadeamento)* | Manual / local | Os três acima |
+| `smoke:core:video` | *(alias)* | — | = `test:video-pipeline` (SM-006) |
+| `smoke:release` | *(encadeamento)* | Manual / local | Os três acima + textfill |
 
 ## Smokes de feature (manual — SM-001, SM-002)
 
@@ -33,7 +38,9 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 | `smoke:displays` | `smoke-displays.mjs` | ❌ | Sim | footerAlert + fila/media (SM-012) |
 | `smoke:backup` | `smoke-backup.mjs` | ❌ | Sim | import-url + fila + backup (SM-013) |
 | `smoke:features` | `smoke-features.mjs` | ❌ | Sim | Entrypoint único (SM-009) |
-| `smoke-win-installer` | `smoke-win-installer.mjs` | ❌ | Manual Windows | Instalador NSIS |
+| `smoke-win-installer` | `smoke-win-installer.mjs` | ❌ | Manual Windows — build + instalar + arranque |
+| `smoke:win-installer` | idem | ❌ | Alias npm |
+| `smoke:win-installer:ci` | idem `--skip-build` | ✅ `release.yml` Windows | Instala artefacto já buildado (SM-035) |
 
 **Nota:** scripts `smoke:cad*` removidos em SM-030 — ver CHANGELOG [Unreleased].
 
@@ -52,7 +59,7 @@ Scripts individuais (`smoke:locales`, `smoke:audit`, …) mantidos como aliases 
 |----------|----------------|
 | Job `typecheck` (PR) | `check:js-in-src`, `lint`, `test:unit`, `typecheck` |
 | Job `smoke` (PR) | `test:video-pipeline`, `smoke:bootstrap`, `smoke:fase8` |
-| `.github/workflows/release.yml` | `smoke:bootstrap`, `smoke:fase8` (Linux/macOS); Windows parcial |
+| `.github/workflows/release.yml` | `smoke:bootstrap`, `smoke:fase8` (Win/Linux/macOS); `smoke:win-installer:ci` (Win pós-build) |
 
 ## Outros scripts úteis
 

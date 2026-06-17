@@ -348,7 +348,7 @@ function spanFitsAtFontPx(
 }
 const STAGE_RETURN_PROXIMO_MAX_SCALE = 0.72;
 /** Piso em saídas reais quando o perfil min não cabe (mobile / muito texto). */
-const STAGE_RETURN_OUTPUT_FLOOR_PX = 10;
+export const STAGE_RETURN_OUTPUT_FLOOR_PX = 10;
 
 type TextfillMode = 'preview' | 'output';
 

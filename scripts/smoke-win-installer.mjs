@@ -187,9 +187,16 @@ async function launchInstalledAndVerify() {
 }
 
 async function main() {
+  const skipBuild = process.argv.includes('--skip-build');
+
   stopRunningApp();
   uninstallCurrentVersion();
-  run('npm run dist:win');
+  if (skipBuild) {
+    latestInstallerPath();
+    console.log('smoke:win-installer: --skip-build (instalador já em release-builds/)');
+  } else {
+    run('npm run dist:win');
+  }
 
   const installer = latestInstallerPath();
   run(`powershell -NoProfile -Command "Start-Process -FilePath '${installer}' -ArgumentList '/S' -Wait"`);

@@ -69,6 +69,7 @@ npm run typecheck      # verificação TS sem emit
 npm run lint           # ESLint (TS-039; CI bloqueia em errors)
 npm run test:unit      # unitários em tests/ (SM-041)
 npm run verify:depcheck # dependências (TS-042)
+npm run clean          # ST-010 — remove dist/
 npm run dev            # browser dev com maps + Electron
 npm run dev:server     # servidor + operador (sem Electron)
 ```

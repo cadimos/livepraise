@@ -31,7 +31,8 @@ projector / external-display / live     ← saídas via controller
 | `refreshOutputTextfill(el, min, max, enabled, opts?)` | Async; saída real |
 | `refreshOutputTextfillAll(root, min, max, enabled, opts?)` | Async; múltiplos `.texto` |
 | `waitForProjectionTypographyLayout(opts?)` | Aguarda `@font-face` antes de medir |
-| `PREVIEW_TEXTFILL_MIN_PX` | Constante 8 — piso na prévia |
+| `PREVIEW_TEXTFILL_MIN_PX` | Constante 8 — piso na prévia (tiles operador) |
+| `STAGE_RETURN_OUTPUT_FLOOR_PX` | Constante 10 — piso em saída real no retorno de palco (`.retorno-musica` / `.retorno-biblia`) e em `refreshOutputTextfillAll` |
 
 ### `ProjectionTextfillOptions` (principais)
 
@@ -90,7 +91,7 @@ Lógica **duplicada** entre `PreviewOutputTile.vue` / `ProjectionTypographyPrevi
 | `@font-face` inject | `ensureFontFaceStyle` no controller | `fontFaceCss` computed + `<style>` no tile |
 | `diagnosticSurface` | `operator-preview:${label}` implícito | Passado explicitamente ✓ |
 
-**Conclusão TF-005:** funcionalidade equivalente, mas **dois caminhos de integração**. Tarefas TF-006–TF-012 unificam via composable `useProjectionTypographyPreview`.
+**Conclusão TF-005:** funcionalidade equivalente, mas **dois caminhos de integração**. Tarefas TF-006–TF-012 unificam via composable `useProjectionTypographyPreview`. TF-026 ADR: não criar `<ProjectionContent>` — ver [`TF-026-ADR-projection-content.md`](TF-026-ADR-projection-content.md).
 
 ## Diagnóstico (TF-021)
 
