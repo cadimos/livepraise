@@ -37,8 +37,8 @@ function onNewBlankDrop(event: DragEvent): void {
       :class="
         prefs.activeTabId === tab.id
           ? tab.missing
-            ? 'border-amber-500/70 bg-amber-950/30 text-lp-text shadow-sm'
-            : 'border-lp-primary/60 bg-lp-surface text-lp-text shadow-sm'
+            ? 'border-amber-500/70 bg-amber-950/30 text-lp-text shadow-xs'
+            : 'border-lp-primary/60 bg-lp-surface text-lp-text shadow-xs'
           : tab.missing
             ? 'border-amber-600/40 bg-amber-950/20 text-amber-100/90 hover:bg-amber-950/30'
             : 'border-transparent bg-lp-background/60 text-lp-muted hover:bg-lp-surface/50'

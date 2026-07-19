@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import type { Writable } from 'node:stream';
+import { ZipArchive } from 'archiver';
 import { getAppRoot, getLivepraiseHome } from '../config/paths.js';
 import { getMainDb } from '../db/connection.js';
 import {
@@ -20,22 +20,7 @@ import {
   type BackupManifest,
 } from './types.js';
 
-interface BackupArchiver {
-  pipe<T extends NodeJS.WritableStream>(destination: T): T;
-  append(source: string | Buffer, data: { name: string }): void;
-  file(filepath: string, data: { name: string }): void;
-  directory(dirpath: string, destpath: string): void;
-  finalize(): void;
-  pointer(): number;
-  on(event: 'error', listener: (err: Error) => void): BackupArchiver;
-  on(event: 'warning', listener: (err: unknown) => void): BackupArchiver;
-  on(event: 'end', listener: () => void): BackupArchiver;
-}
-
-const require = createRequire(import.meta.url);
-const archiverMod = require('archiver') as {
-  create: (format: string, options?: { zlib?: { level?: number } }) => BackupArchiver;
-};
+type BackupArchiver = ZipArchive;
 
 function readAppVersion(): string {
   const pkgPath = path.join(getAppRoot(), 'package.json');
@@ -131,7 +116,7 @@ async function runArchive(
     fs.createWriteStream(options.outputPath!);
 
   return new Promise((resolve, reject) => {
-    const archive = archiverMod.create('zip', { zlib: { level: 6 } });
+    const archive = new ZipArchive({ zlib: { level: 6 } });
 
     output.on('error', (err: Error) => reject(mapIoError(err)));
     archive.on('error', (err: Error) => reject(mapIoError(err)));

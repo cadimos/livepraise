@@ -10,10 +10,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "baseUrl": ".",
     "paths": {
-      "@shared/*": ["shared/*"],
-      "@core/*": ["core/*"]
+      "@shared/*": ["./shared/*"],
+      "@core/*": ["./core/*"]
     }
   },
   "include": [
@@ -23,8 +22,7 @@
     "core/**/*.ts",
     "server/**/*.ts",
     "shared/**/*.ts",
-    "tailwind.config.ts",
-    "postcss.config.ts"
+    "vite.config.ts"
   ],
   "exclude": ["node_modules", "dist", "v0.0.8"]
 }

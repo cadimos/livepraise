@@ -51,7 +51,9 @@ export function runNpm(args, options = {}) {
  * @param {import('node:child_process').SpawnSyncOptions} [options]
  */
 export function runTsc(args, options = {}) {
-  const tscJs = require.resolve('typescript/lib/tsc.js');
+  // TS 7 não exporta `lib/tsc.js` via package.exports — resolver via package.json.
+  const pkgJson = require.resolve('typescript/package.json');
+  const tscJs = path.join(path.dirname(pkgJson), 'lib', 'tsc.js');
   return spawnSync(process.execPath, [tscJs, ...args], {
     stdio: 'inherit',
     ...options,

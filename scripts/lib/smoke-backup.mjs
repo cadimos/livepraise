@@ -601,12 +601,11 @@ export async function runBackupRestoreSmoke({ pass, assert, skip, appRoot }) {
       'future',
     );
     fake.close();
-    const { createRequire } = await import('node:module');
-    const archiver = createRequire(import.meta.url)('archiver');
+    const { ZipArchive } = await import('archiver');
     const newerZip = path.join(testRoot, 'newer.zip');
     await new Promise((resolve, reject) => {
       const out = fs.createWriteStream(newerZip);
-      const archive = archiver('zip', { zlib: { level: 6 } });
+      const archive = new ZipArchive({ zlib: { level: 6 } });
       archive.pipe(out);
       archive.file(fakeDb, { name: 'groups/database/dsw.bd' });
       archive.append(

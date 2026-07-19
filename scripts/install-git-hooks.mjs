@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * TS-040 — instala hook pre-commit opt-in (lint + typecheck).
+ * TS-040 — instala hook pre-commit opt-in (typecheck).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,5 +22,5 @@ fs.copyFileSync(source, target);
 fs.chmodSync(target, 0o755);
 
 console.log('install-git-hooks: pre-commit instalado em .git/hooks/pre-commit');
-console.log('  → corre npm run lint && npm run typecheck antes de cada commit');
+console.log('  → corre npm run typecheck antes de cada commit');
 console.log('  → remover: rm .git/hooks/pre-commit');
