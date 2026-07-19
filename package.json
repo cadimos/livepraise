@@ -72,6 +72,7 @@
     "smoke:backup": "npm run build:server && node scripts/smoke-backup.mjs",
     "smoke:win-installer": "node scripts/smoke-win-installer.mjs",
     "smoke:win-installer:ci": "node scripts/smoke-win-installer.mjs --skip-build",
+    "verify:sourcemaps": "node scripts/verify-sourcemaps.mjs",
     "verify:build": "node scripts/verify-fresh-build.mjs",
     "verify:depcheck": "depcheck --ignores=autoprefixer,postcss,tailwindcss,axe-core",
     "install:git-hooks": "node scripts/install-git-hooks.mjs",

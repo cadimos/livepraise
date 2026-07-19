@@ -4,23 +4,15 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 
 import { assert, pass, resolveAppRoot } from './lib/smoke-helpers.mjs';
+import { assertSpawnOk, runNpm } from './lib/run-command.mjs';
 
 const appRoot = resolveAppRoot(import.meta.url);
 const MAP_SAMPLE = path.join(appRoot, 'dist/apps/projector/projector.js.map');
 
 function npmRun(script) {
-  const result = spawnSync('npm', ['run', script], {
-    cwd: appRoot,
-    stdio: 'inherit',
-    env: process.env,
-  });
-  if (result.status !== 0) {
-    throw new Error(`${script} falhou`);
-  }
+  assertSpawnOk(runNpm(['run', script], { cwd: appRoot }), script);
 }
 
 console.log('verify-sourcemaps (TS-038)');

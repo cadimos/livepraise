@@ -3,7 +3,7 @@
  * Instala o binário do Electron para a plataforma actual (dev e CI).
  * O install.js embutido em electron@42 usa require('@electron/get'), mas @electron/get@5 é ESM-only.
  */
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -131,11 +131,17 @@ function isInstalled(version, platformPath) {
 }
 
 async function extractElectronZip(zipPath, distDir, platformPath) {
+  // Limpar destino: extract-zip no Windows pode hangar e deixar dist parcial.
+  fs.rmSync(distDir, { recursive: true, force: true });
   fs.mkdirSync(distDir, { recursive: true });
 
-  if (process.platform === 'linux' && commandExists('unzip')) {
+  // Preferir tar (Windows 10+/macOS/Linux): fiável e evita hang do extract-zip.
+  if (tryExtractWithTar(zipPath, distDir)) {
+    /* ok */
+  } else if (process.platform !== 'win32' && commandExists('unzip')) {
     extractWithUnzip(zipPath, distDir);
   } else {
+    console.info('install-electron: a usar extract-zip (fallback)…');
     const extract = require('extract-zip');
     await extract(zipPath, { dir: distDir });
   }
@@ -143,8 +149,8 @@ async function extractElectronZip(zipPath, distDir, platformPath) {
   const binaryPath = path.join(distDir, platformPath);
   if (fs.existsSync(binaryPath)) return;
 
-  if (commandExists('unzip')) {
-    console.warn('install-electron: extract-zip incompleto; a usar unzip…');
+  if (process.platform !== 'win32' && commandExists('unzip')) {
+    console.warn('install-electron: extracção incompleta; a usar unzip…');
     extractWithUnzip(zipPath, distDir);
   }
 
@@ -153,15 +159,33 @@ async function extractElectronZip(zipPath, distDir, platformPath) {
   }
 }
 
+/** @returns {boolean} */
+function tryExtractWithTar(zipPath, distDir) {
+  try {
+    execFileSync('tar', ['-xf', zipPath, '-C', distDir], { stdio: 'inherit' });
+    return true;
+  } catch (err) {
+    console.warn(
+      'install-electron: tar falhou —',
+      err instanceof Error ? err.message : err,
+    );
+    return false;
+  }
+}
+
 function extractWithUnzip(zipPath, distDir) {
   fs.rmSync(distDir, { recursive: true, force: true });
   fs.mkdirSync(distDir, { recursive: true });
-  execSync(`unzip -oq ${shellQuote(zipPath)} -d ${shellQuote(distDir)}`, { stdio: 'inherit' });
+  execFileSync('unzip', ['-oq', zipPath, '-d', distDir], { stdio: 'inherit' });
 }
 
 function commandExists(command) {
   try {
-    execSync(`command -v ${shellQuote(command)}`, { stdio: 'ignore' });
+    if (process.platform === 'win32') {
+      execFileSync('where', [command], { stdio: 'ignore' });
+    } else {
+      execSync(`command -v ${shellQuote(command)}`, { stdio: 'ignore', shell: true });
+    }
     return true;
   } catch {
     return false;
