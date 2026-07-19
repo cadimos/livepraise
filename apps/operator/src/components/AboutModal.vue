@@ -19,9 +19,28 @@ type LivepraiseBridge = {
 
 const bridge = (window as Window & { livepraise?: LivepraiseBridge }).livepraise;
 
+type CreditItem = {
+  name: string;
+  description: string;
+  url: string;
+};
+
 const stackItems = computed(() => {
   const items = tm('about.stackItems');
   return Array.isArray(items) ? items : [];
+});
+
+const creditItems = computed((): CreditItem[] => {
+  const items = tm('about.creditsItems');
+  if (!Array.isArray(items)) return [];
+  return items.filter(
+    (item): item is CreditItem =>
+      !!item &&
+      typeof item === 'object' &&
+      typeof (item as CreditItem).name === 'string' &&
+      typeof (item as CreditItem).description === 'string' &&
+      typeof (item as CreditItem).url === 'string',
+  );
 });
 
 const runtime = computed(() => ({
@@ -137,6 +156,31 @@ onUnmounted(unbindEsc);
                 electron: runtime.electron,
               })
             }}
+          </p>
+        </section>
+
+        <section>
+          <h3 class="mb-1 font-semibold">
+            {{ t('about.creditsTitle') }}
+          </h3>
+          <ul class="list-disc space-y-1 pl-5 text-lp-muted">
+            <li
+              v-for="(item, index) in creditItems"
+              :key="index"
+            >
+              <a
+                :href="item.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-lp-primary underline-offset-2 hover:underline"
+              >
+                {{ item.name }}
+              </a>
+              — {{ item.description }}
+            </li>
+          </ul>
+          <p class="mt-2 text-xs text-lp-muted">
+            {{ t('about.creditsPublishers') }}
           </p>
         </section>
 

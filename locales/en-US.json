@@ -248,16 +248,16 @@
       "hideDetail": "Hide detail",
       "displayDebugOverlay": "Debug overlay on monitors",
       "displayDebugOverlayHint": "When active, shows the last received action in the footer of projection monitors and network-connected devices (e.g. song change at 5:08:38 PM).",
-      "textfillDiagnostics": "Textfill diagnostics (preview/projector)",
-      "textfillDiagnosticsHint": "Records font-size and layout box measurements. Reproduce the issue (project 2–3 verses), export the file, and send it to support.",
-      "textfillDiagnosticsEnabled": "Enable textfill logging",
-      "textfillDiagnosticsPath": "Server file",
-      "textfillDiagnosticsCount": "{count} record(s)",
-      "textfillDiagnosticsEmpty": "No records yet. Project worship lyrics with logging enabled.",
-      "textfillDiagnosticsExport": "Export JSONL",
-      "textfillDiagnosticsClear": "Clear diagnostics",
-      "textfillDiagnosticsConfirmClear": "Clear all textfill diagnostic records?",
-      "textfillDiagnosticsEntry": "{surface} · {phase} · {font}px (overflow H {overflowH}) · box {boxW}×{boxH}"
+      "textfillDiagnostics": "Diagnóstico de textfill (prévia/projetor)",
+      "textfillDiagnosticsHint": "Regista medições de tamanho de fonte e caixas de layout. Reproduza o problema (projecte 2–3 versos), exporte o ficheiro e envie à equipa de suporte.",
+      "textfillDiagnosticsEnabled": "Activar registo de textfill",
+      "textfillDiagnosticsPath": "Ficheiro no servidor",
+      "textfillDiagnosticsCount": "{count} registo(s)",
+      "textfillDiagnosticsEmpty": "Nenhum registo ainda. Projecte louvor com o registo activo.",
+      "textfillDiagnosticsExport": "Exportar JSONL",
+      "textfillDiagnosticsClear": "Limpar diagnóstico",
+      "textfillDiagnosticsConfirmClear": "Limpar todos os registos de textfill?",
+      "textfillDiagnosticsEntry": "{surface} · {phase} · {font}px (overflow H {overflowH}) · caixa {boxW}×{boxH}"
     },
     "shortcuts": {
       "title": "Keyboard shortcuts",
@@ -499,6 +499,25 @@
       "SQLite (local persistence)",
       "Tailwind CSS and vue-i18n"
     ],
+    "creditsTitle": "Credits and acknowledgements",
+    "creditsItems": [
+      {
+        "name": "FFmpeg",
+        "description": "video conversion and thumbnail generation",
+        "url": "https://ffmpeg.org/"
+      },
+      {
+        "name": "yt-dlp",
+        "description": "downloading videos from URLs",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      {
+        "name": "Daniel Amaral (biblias)",
+        "description": "Portuguese Bible packages in the OpenLP schema",
+        "url": "https://github.com/damarals/biblias"
+      }
+    ],
+    "creditsPublishers": "Bible translations belong to their respective publishers and are used according to the rights of each work.",
     "runtime": "Runtime for this installation: Node.js {node}, Chromium {chromium}, Electron {electron}.",
     "version": "Application version: {version}",
     "close": "Close"
@@ -607,7 +626,7 @@
   "displays": {
     "intro": "Set each monitor role: the operator uses the primary monitor; public projection and stage return show different content.",
     "primary": "primary",
-    "disconnected": "disconnected",
+    "disconnected": "desligado",
     "monitorsTitle": "Monitors",
     "none": "No monitor detected. Run Live Praise on this computer to list connected screens.",
     "save": "Save roles",
@@ -649,6 +668,13 @@
         "proporcional": "Proportional (fit without distortion)"
       },
       "livePreview": "Preview on projector while changing (before applying)",
+      "customPresetHint": "Para usar largura e altura em pixels (ex.: 800×600), escolha «Personalizado». Proporções como 16:9 ou 7:3 usam quase toda a largura do monitor.",
+      "effective": {
+        "fullScreen": "Será aplicado: ecrã completo do monitor.",
+        "customPixels": "Será aplicado no projetor: {size} px (faixas pretas se couber num monitor maior).",
+        "customInvalid": "Indique largura e altura válidas em pixels.",
+        "ratioPixels": "Será aplicado no projetor: {ratio} → {size} px (letterbox dentro do monitor)."
+      },
       "save": "Apply size",
       "saving": "Applying…",
       "saved": "Screen size saved and sent to projector.",
@@ -664,7 +690,8 @@
       "errors": {
         "save": "Error saving screen size",
         "socket": "Could not send to projector — check live connection.",
-        "disconnected": "This monitor is not connected — plug it in or pick the correct monitor in the list."
+        "disconnected": "Este monitor não está ligado — ligue-o ou escolha o monitor correcto na lista.",
+        "customDimensions": "Com «Personalizado», indique largura e altura em pixels (ex.: 800 e 600)."
       }
     },
     "errors": {
