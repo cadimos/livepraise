@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Livepraise API
-  version: 1.0.0-alpha.2
+  version: 1.0.0-alpha.3
   description: |
     API HTTP do servidor Livepraise (Electron + Express).
 
@@ -70,7 +70,7 @@ paths:
                   value:
                     status: ok
                     phase: release
-                    version: 1.0.0-alpha.2
+                    version: 1.0.0-alpha.3
                     websocket: /ws/live
                     modules:
                       - id: database
