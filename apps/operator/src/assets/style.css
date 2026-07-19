@@ -1,6 +1,29 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  --color-lp-primary: var(--lp-color-primary);
+  --color-lp-action-bar: var(--lp-color-action-bar);
+  --color-lp-background: var(--lp-color-background);
+  --color-lp-surface: var(--lp-color-surface);
+  --color-lp-text: var(--lp-color-text);
+  --color-lp-muted: var(--lp-color-muted);
+  --color-lp-accent: var(--lp-color-accent);
+  --color-lp-selection-list: var(--lp-selection-list-bg);
+  --color-lp-selection-list-text: var(--lp-selection-list-text);
+  --color-lp-selection-list-hover: var(--lp-selection-list-hover);
+  --color-lp-selection-list-ring: var(--lp-selection-list-ring);
+  --color-lp-selection-nav: var(--lp-selection-nav-bg);
+  --color-lp-selection-nav-text: var(--lp-selection-nav-text);
+  --color-lp-selection-nav-hover: var(--lp-selection-nav-hover);
+  --color-lp-selection-nav-chip-bg: var(--lp-selection-nav-chip-bg);
+  --color-lp-selection-nav-chip-border: var(--lp-selection-nav-chip-border);
+  --color-lp-selection-nav-chip-hover: var(--lp-selection-nav-chip-hover);
+  --color-lp-selection-active: var(--lp-selection-active-bg);
+  --color-lp-selection-active-text: var(--lp-selection-active-text);
+  --color-lp-selection-active-hover: var(--lp-selection-active-hover);
+  --color-lp-selection-active-ring: var(--lp-selection-active-ring);
+  --font-lp: var(--lp-font-family);
+}
 
 :root {
   --lp-color-primary: #38bdf8;

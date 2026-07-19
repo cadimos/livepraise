@@ -13,11 +13,6 @@
   "engines": {
     "node": ">=22.12.0"
   },
-  "overrides": {
-    "tailwindcss": {
-      "jiti": "1.21.7"
-    }
-  },
   "scripts": {
     "build:browser:dev": "node scripts/build-browser-dev.mjs",
     "dev": "npm run sync:version && npm run build:browser:dev && npm run build:electron && npm run build:operator && node scripts/dev-electron.mjs",
@@ -74,7 +69,7 @@
     "smoke:win-installer:ci": "node scripts/smoke-win-installer.mjs --skip-build",
     "verify:sourcemaps": "node scripts/verify-sourcemaps.mjs",
     "verify:build": "node scripts/verify-fresh-build.mjs",
-    "verify:depcheck": "depcheck --ignores=autoprefixer,postcss,tailwindcss,axe-core",
+    "verify:depcheck": "depcheck --ignores=axe-core,tailwindcss,@tailwindcss/vite",
     "install:git-hooks": "node scripts/install-git-hooks.mjs",
     "dist:win": "npm run build && node scripts/dist-win.mjs",
     "dist:linux": "npm run build && node scripts/dist-linux.mjs",
@@ -89,44 +84,43 @@
     "postinstall": "node scripts/install-yt-dlp.mjs && node scripts/install-ffmpeg.mjs && node scripts/install-electron.mjs"
   },
   "dependencies": {
-    "@lucide/vue": "^1.16.0",
+    "@lucide/vue": "^1.25.0",
     "archiver": "^7.0.1",
-    "compression": "^1.8.0",
-    "cors": "^2.8.5",
-    "electron-updater": "^6.8.3",
-    "express": "^5.1.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
+    "electron-updater": "^6.8.9",
+    "express": "^5.2.1",
     "ffmpeg-static": "^5.3.0",
-    "fuse.js": "^7.3.0",
-    "multer": "^2.1.1",
-    "ws": "^8.21.0",
-    "yauzl": "^3.3.1"
+    "fuse.js": "^7.5.0",
+    "multer": "^2.2.0",
+    "ws": "^8.21.1",
+    "yauzl": "^3.4.0"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@types/archiver": "^7.0.0",
-    "@types/compression": "^1.7.5",
-    "@types/cors": "^2.8.18",
-    "@types/express": "^5.0.2",
-    "@types/multer": "^2.1.0",
-    "@types/node": "^22.15.21",
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^22.20.1",
     "@types/ws": "^8.18.1",
     "@types/yauzl": "^2.10.3",
-    "@vitejs/plugin-vue": "^5.0.2",
-    "autoprefixer": "^10.4.21",
-    "axe-core": "^4.11.4",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "axe-core": "^4.12.1",
     "depcheck": "^1.4.7",
-    "electron": "42.2.0",
-    "electron-builder": "26.8.1",
-    "eslint": "^9.39.4",
+    "electron": "42.7.0",
+    "electron-builder": "26.15.3",
+    "eslint": "^9.39.5",
     "eslint-plugin-vue": "^10.9.2",
     "globals": "^16.5.0",
     "jsdom": "^26.1.0",
-    "postcss": "^8.5.4",
     "rcedit": "^5.0.2",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.61.1",
-    "vite": "^6.3.5",
-    "vue": "^3.4.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.64.0",
+    "vite": "^8.1.5",
+    "vue": "^3.5.40",
     "vue-eslint-parser": "^10.4.1",
     "vue-i18n": "^9.14.5"
   },
@@ -137,10 +131,9 @@
   "homepage": "https://github.com/cadimos/livepraise#readme",
   "depcheck": {
     "ignoreMatches": [
-      "autoprefixer",
-      "postcss",
+      "axe-core",
       "tailwindcss",
-      "axe-core"
+      "@tailwindcss/vite"
     ],
     "ignorePatterns": [
       "v0.0.8/**",

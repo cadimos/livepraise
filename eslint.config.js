@@ -55,8 +55,6 @@ export default tseslint.config(
       'shared/**/*.ts',
       'electron/**/*.ts',
       'web/**/*.ts',
-      'tailwind.config.ts',
-      'postcss.config.ts',
       'vite.config.ts',
     ],
   },

@@ -99,7 +99,7 @@ function reloadApp() {
 
 <template>
   <nav
-    class="flex flex-wrap items-center gap-0.5 border-b border-lp-action-bar/80 bg-lp-action-bar px-2 py-1 text-sm text-lp-text shadow-sm"
+    class="flex flex-wrap items-center gap-0.5 border-b border-lp-action-bar/80 bg-lp-action-bar px-2 py-1 text-sm text-lp-text shadow-xs"
     aria-label="Ações rápidas"
   >
     <button
