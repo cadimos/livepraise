@@ -1,5 +1,7 @@
 appId: com.cadimos.livepraise
 productName: Live Praise
+# Nome do .exe / pasta em %LOCALAPPDATA%\Programs (sem espaços — smoke e atalhos).
+executableName: LivePraise
 copyright: Copyright © Cadimos
 npmRebuild: false
 # Sem ASAR: binários nativos (ffmpeg-static, yt-dlp) e paths de ficheiro funcionam de forma fiável no Windows.
@@ -33,6 +35,7 @@ nsis:
   installerIcon: resources/icon/livepraise.ico
   uninstallerIcon: resources/icon/livepraise.ico
   installerHeaderIcon: resources/icon/livepraise.ico
+  shortcutName: Live Praise
 win:
   target:
     - target: nsis

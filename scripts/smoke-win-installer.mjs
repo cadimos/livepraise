@@ -16,8 +16,14 @@ if (process.platform !== 'win32') {
 delete process.env.ELECTRON_RUN_AS_NODE;
 
 const projectRoot = process.cwd();
-const installDir = path.join(os.homedir(), 'AppData', 'Local', 'Programs', 'livepraise');
-const appExe = path.join(installDir, 'LivePraise.exe');
+const localAppData =
+  process.env.LOCALAPPDATA ?? path.join(os.homedir(), 'AppData', 'Local');
+const programsRoot = path.join(localAppData, 'Programs');
+
+/** Pastas candidatas (histórico + executableName actual). */
+const INSTALL_DIR_CANDIDATES = ['LivePraise', 'livepraise', 'Live Praise'];
+const APP_EXE_CANDIDATES = ['LivePraise.exe', 'Live Praise.exe'];
+
 const releaseDir = path.join(projectRoot, 'release-builds');
 const bootLogPath = path.join(
   process.env.LOCALAPPDATA ?? os.homedir(),
@@ -30,10 +36,51 @@ function run(command) {
   execSync(command, { stdio: 'inherit', cwd: projectRoot, env: process.env });
 }
 
-function stopRunningApp() {
-  for (const image of ['LivePraise.exe']) {
+function listProgramsDirs() {
+  try {
+    return fs.readdirSync(programsRoot);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Resolve instalação após NSIS /S.
+ * Prefere LivePraise.exe (executableName); aceita layouts antigos com espaço.
+ */
+function resolveInstalledApp() {
+  for (const dirName of INSTALL_DIR_CANDIDATES) {
+    const installDir = path.join(programsRoot, dirName);
+    if (!fs.existsSync(installDir)) continue;
+    for (const exeName of APP_EXE_CANDIDATES) {
+      const appExe = path.join(installDir, exeName);
+      if (fs.existsSync(appExe)) {
+        return { installDir, appExe, exeName };
+      }
+    }
+    // Fallback: qualquer .exe que não seja o desinstalador.
     try {
-      execSync(`taskkill /F /IM ${image} /T`, { stdio: 'ignore' });
+      const exe = fs
+        .readdirSync(installDir)
+        .find((name) => /\.exe$/i.test(name) && !/^Uninstall/i.test(name));
+      if (exe) {
+        return {
+          installDir,
+          appExe: path.join(installDir, exe),
+          exeName: exe,
+        };
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return null;
+}
+
+function stopRunningApp() {
+  for (const image of APP_EXE_CANDIDATES) {
+    try {
+      execSync(`taskkill /F /IM "${image}" /T`, { stdio: 'ignore' });
     } catch {
       // não estava em execução
     }
@@ -41,21 +88,29 @@ function stopRunningApp() {
 }
 
 function uninstallCurrentVersion() {
-  if (!fs.existsSync(installDir)) return;
+  for (const dirName of INSTALL_DIR_CANDIDATES) {
+    const installDir = path.join(programsRoot, dirName);
+    if (!fs.existsSync(installDir)) continue;
 
-  const uninstallExe = fs
-    .readdirSync(installDir)
-    .find((file) => /^Uninstall.*\.exe$/i.test(file));
+    const uninstallExe = fs
+      .readdirSync(installDir)
+      .find((file) => /^Uninstall.*\.exe$/i.test(file));
 
-  if (uninstallExe) {
-    const uninstallPath = path.join(installDir, uninstallExe);
-    run(
-      `powershell -NoProfile -Command "Start-Process -FilePath '${uninstallPath}' -ArgumentList '/S' -Wait"`,
-    );
-  }
+    if (uninstallExe) {
+      const uninstallPath = path.join(installDir, uninstallExe);
+      run(
+        `powershell -NoProfile -Command "Start-Process -FilePath '${uninstallPath.replace(/'/g, "''")}' -ArgumentList '/S' -Wait"`,
+      );
+    }
 
-  if (fs.existsSync(installDir)) {
-    fs.rmSync(installDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 });
+    if (fs.existsSync(installDir)) {
+      fs.rmSync(installDir, {
+        recursive: true,
+        force: true,
+        maxRetries: 5,
+        retryDelay: 300,
+      });
+    }
   }
 }
 
@@ -87,10 +142,33 @@ function assertNoBootFailure(logText) {
   }
 }
 
-async function launchInstalledAndVerify() {
-  if (!fs.existsSync(appExe)) {
-    throw new Error(`Executável não encontrado: ${appExe}`);
+function describeInstallFailure() {
+  const dirs = listProgramsDirs();
+  const lines = [
+    `Executável Live Praise não encontrado sob ${programsRoot}.`,
+    `Pastas candidatas: ${INSTALL_DIR_CANDIDATES.join(', ')}.`,
+    `Conteúdo de Programs/: ${dirs.length ? dirs.join(', ') : '(vazio ou inacessível)'}`,
+  ];
+  for (const dirName of INSTALL_DIR_CANDIDATES) {
+    const installDir = path.join(programsRoot, dirName);
+    if (!fs.existsSync(installDir)) continue;
+    try {
+      lines.push(`  ${dirName}/ → ${fs.readdirSync(installDir).join(', ')}`);
+    } catch (err) {
+      lines.push(`  ${dirName}/ → (erro: ${err instanceof Error ? err.message : err})`);
+    }
   }
+  return lines.join('\n');
+}
+
+async function launchInstalledAndVerify() {
+  const installed = resolveInstalledApp();
+  if (!installed) {
+    throw new Error(describeInstallFailure());
+  }
+
+  const { installDir, appExe } = installed;
+  console.log(`smoke:win-installer: instalado em ${appExe}`);
 
   const resourcesDir = path.join(installDir, 'resources');
   const hasAsar = fs.existsSync(path.join(resourcesDir, 'app.asar'));
@@ -199,10 +277,20 @@ async function main() {
   }
 
   const installer = latestInstallerPath();
-  run(`powershell -NoProfile -Command "Start-Process -FilePath '${installer}' -ArgumentList '/S' -Wait"`);
+  const installerEscaped = installer.replace(/'/g, "''");
+  run(
+    `powershell -NoProfile -Command "Start-Process -FilePath '${installerEscaped}' -ArgumentList '/S' -Wait"`,
+  );
+
+  // NSIS /S pode demorar um instante a finalizar ficheiros no runner.
+  for (let i = 0; i < 20 && !resolveInstalledApp(); i += 1) {
+    await new Promise((r) => setTimeout(r, 500));
+  }
 
   await launchInstalledAndVerify();
-  console.log('\nsmoke:win-installer OK — app instalado, servidor CAD-194 respondeu, sem erros no boot log.');
+  console.log(
+    '\nsmoke:win-installer OK — app instalado, servidor CAD-194 respondeu, sem erros no boot log.',
+  );
 }
 
 main().catch((err) => {
