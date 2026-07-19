@@ -1,3 +1,7 @@
+import {
+  stripChordsForProjection,
+} from '@shared/projection-chords';
+
 function escapeHtml(text: string): string {
   return text
     .replace(/&/g, '&amp;')
@@ -10,14 +14,7 @@ function nl2br(text: string): string {
   return escapeHtml(text).replace(/\n/g, '<br />');
 }
 
-/** Remove linhas de cifra (CA-R24) para projeção pública. */
-export function stripChordsForProjection(text: string): string {
-  return text
-    .split('\n')
-    .filter((line) => !/^\s*[A-G][#b]?(\/|\s|$)/.test(line.trim()))
-    .join('\n')
-    .trim();
-}
+export { stripChordsForProjection };
 
 export function buildMusicHtml(verseText: string, footer: string): string {
   const body = nl2br(stripChordsForProjection(verseText));

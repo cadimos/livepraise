@@ -130,36 +130,49 @@ export async function createLivepraiseApp(
     res.json(buildHealthReport(Boolean(liveHub)));
   });
 
+  const projectorRoot = path.join(appRoot, 'dist/apps/projector');
+  app.get(['/projector', '/projector/'], (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.sendFile(path.join(projectorRoot, 'index.html'));
+  });
   app.use(
     '/projector',
     (req, res, next) => {
       res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
       next();
     },
-    express.static(path.join(appRoot, 'apps/projector'), {
-      index: 'index.html',
+    express.static(projectorRoot, {
+      index: false,
+      setHeaders(res, filePath) {
+        if (filePath.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'no-store');
+        }
+      },
     }),
   );
 
   app.get('/stage-return', (_req, res) => res.redirect(302, '/stage/'));
   app.get('/stage-return/', (_req, res) => res.redirect(302, '/stage/'));
 
-  app.use('/shared', express.static(path.join(appRoot, 'dist', 'shared')));
+  app.use(
+    '/shared',
+    express.static(path.join(appRoot, 'dist', 'shared'), {
+      setHeaders(res, filePath) {
+        if (filePath.endsWith('.js') || filePath.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'no-store');
+        }
+      },
+    }),
+  );
+
+  const externalDisplayRoot = path.join(appRoot, 'dist/web/external-display');
 
   const publicViewerRoutes = [
-    { mount: '/live', root: path.join(appRoot, 'web/live') },
-    {
-      mount: '/vocal',
-      root: path.join(appRoot, 'web/external-display'),
-    },
-    {
-      mount: '/stage',
-      root: path.join(appRoot, 'web/external-display'),
-    },
-    {
-      mount: '/player',
-      root: path.join(appRoot, 'web/external-display'),
-    },
+    { mount: '/live', root: path.join(appRoot, 'dist/web/live') },
+    { mount: '/vocal', root: externalDisplayRoot },
+    { mount: '/stage', root: externalDisplayRoot },
+    { mount: '/player', root: externalDisplayRoot },
   ] as const;
 
   for (const { mount, root } of publicViewerRoutes) {
@@ -208,14 +221,14 @@ export async function createLivepraiseApp(
 
   app.use(
     '/remote',
-    express.static(path.join(appRoot, 'web/remote'), {
+    express.static(path.join(appRoot, 'dist/web/remote'), {
       index: 'index.html',
     }),
   );
 
   app.use(
     '/',
-    express.static(path.join(appRoot, 'web/portal'), {
+    express.static(path.join(appRoot, 'dist/web/portal'), {
       index: 'index.html',
     }),
   );

@@ -91,37 +91,53 @@ onMounted(() => {
 
 <template>
   <div class="flex h-full flex-col gap-3">
-    <div v-if="error" class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200">
+    <div
+      v-if="error"
+      class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200"
+    >
       {{ error }}
     </div>
 
     <div class="lp-panel-field-row">
-      <label class="lp-panel-label" for="images-category">{{ t('images.category') }}</label>
+      <label
+        class="lp-panel-label"
+        for="images-category"
+      >{{ t('images.category') }}</label>
       <select
         id="images-category"
         :value="prefs.imageCategory"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
         @change="loadImages(($event.target as HTMLSelectElement).value)"
       >
-        <option v-for="cat in imageCategories" :key="cat" :value="cat">
+        <option
+          v-for="cat in imageCategories"
+          :key="cat"
+          :value="cat"
+        >
           {{ cat }}
         </option>
       </select>
     </div>
 
     <div class="lp-panel-field-row">
-      <label class="lp-panel-label" for="images-search">{{ t('common.search') }}</label>
+      <label
+        class="lp-panel-label"
+        for="images-search"
+      >{{ t('common.search') }}</label>
       <input
         id="images-search"
         v-model="searchQuery"
         type="search"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
         :placeholder="t('common.searchPlaceholder')"
-      />
+      >
     </div>
 
     <ul class="grid min-h-0 flex-1 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4">
-      <li v-for="img in filteredImages" :key="img">
+      <li
+        v-for="img in filteredImages"
+        :key="img"
+      >
         <MediaTileContextMenu
           :media-path="img"
           media-kind="imagens"
@@ -143,7 +159,11 @@ onMounted(() => {
               })
             "
           >
-            <img :src="mediaUrl(img)" alt="" class="h-full w-full object-cover" />
+            <img
+              :src="mediaUrl(img)"
+              alt=""
+              class="h-full w-full object-cover"
+            >
           </button>
         </MediaTileContextMenu>
       </li>

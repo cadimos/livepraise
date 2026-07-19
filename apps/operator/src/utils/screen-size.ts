@@ -1,4 +1,4 @@
-/** Presets de tamanho da tela de projeção (paridade v0.0.8 `conf_tela`). */
+/** Presets de tamanho da tela de projeção por monitor. */
 
 import type { DisplayScreenSize } from '@shared/types/live';
 import {
@@ -12,6 +12,7 @@ import {
   parseCustomScreenPixels,
   resolvePreviewAspectRatio,
   resolveProjectionStageSize,
+  fitAspectRatioInBox,
   SCREEN_CONTENT_FITS,
 } from '@shared/screen-layout';
 

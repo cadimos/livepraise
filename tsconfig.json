@@ -17,13 +17,14 @@
     }
   },
   "include": [
-    "apps/**/*.ts",
-    "apps/**/*.tsx",
-    "apps/**/*.vue",
+    "apps/operator/**/*.ts",
+    "apps/operator/**/*.tsx",
+    "apps/operator/**/*.vue",
     "core/**/*.ts",
     "server/**/*.ts",
     "shared/**/*.ts",
-    "web/**/*.ts"
+    "tailwind.config.ts",
+    "postcss.config.ts"
   ],
   "exclude": ["node_modules", "dist", "v0.0.8"]
 }

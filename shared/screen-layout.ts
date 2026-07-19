@@ -1,4 +1,4 @@
-/** Tamanho e posição da área de projeção (paridade v0.0.8 `conf_tela`). */
+/** Tamanho e posição da área de projeção por monitor. */
 
 export type ScreenPosition = 'centro' | 'topo' | 'personalizado';
 

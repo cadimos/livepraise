@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "/shared/display-debug-overlay.js": ["dist/shared/display-debug-overlay.d.ts"],
+      "/shared/endpoint-device-id.js": ["dist/shared/endpoint-device-id.d.ts"],
+      "/shared/footer-alert-overlay.js": ["dist/shared/footer-alert-overlay.d.ts"],
+      "/shared/projection-chords.js": ["dist/shared/projection-chords.d.ts"],
+      "/shared/projection-contrast.js": ["dist/shared/projection-contrast.d.ts"],
+      "/shared/ws-live-url.js": ["dist/shared/ws-live-url.d.ts"],
+      "/shared/projection-media-url.js": ["dist/shared/projection-media-url.d.ts"],
+      "/shared/projection-typography-runtime.js": ["dist/shared/projection-typography-runtime.d.ts"],
+      "/shared/projection-textfill.js": ["dist/shared/projection-textfill.d.ts"],
+      "/shared/projection-typography.js": ["dist/shared/projection-typography.d.ts"],
+      "/shared/projection-video-player.js": ["dist/shared/projection-video-player.d.ts"],
+      "/shared/screen-layout.js": ["dist/shared/screen-layout.d.ts"],
+      "/shared/service-timer-overlay.js": ["dist/shared/service-timer-overlay.d.ts"],
+      "/shared/viewer-status.js": ["dist/shared/viewer-status.d.ts"],
+      "/shared/youtube.js": ["dist/shared/youtube.d.ts"],
+      "@shared/types/live": ["dist/shared/types/live.d.ts"],
+      "@shared/auth-session": ["dist/shared/auth-session.d.ts"],
+      "@shared/types/auth-api": ["dist/shared/types/auth-api.d.ts"],
+      "@shared/types/remote-api": ["dist/shared/types/remote-api.d.ts"]
+    }
+  }
+}

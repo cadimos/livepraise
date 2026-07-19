@@ -4,37 +4,27 @@
  */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { pathToFileURL } from 'node:url';
 import ffmpegPath from 'ffmpeg-static';
+import {
+  assert,
+  cleanupSmokeHome,
+  configureSmokeEnv,
+  createSmokeHome,
+  fetchJson,
+  loadLivepraiseServer,
+  resolveAppRoot,
+} from './lib/smoke-helpers.mjs';
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const appRoot = path.resolve(scriptDir, '..');
-const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'livepraise-smoke-r40-'));
+const appRoot = resolveAppRoot(import.meta.url);
+const testHome = createSmokeHome('livepraise-smoke-r40-');
+configureSmokeEnv({ home: testHome, appRoot, port: '0' });
 
-process.env.LIVEPRAISE_HOME = testHome;
-process.env.LIVEPRAISE_APP_ROOT = appRoot;
-process.env.LIVEPRAISE_PORT = '0';
-
-const { startLivepraiseServer, stopLivepraiseServer } = await import(
-  '../dist/server/index.js'
-);
+const { startLivepraiseServer, stopLivepraiseServer } = await loadLivepraiseServer(appRoot);
 const { resetVideoPipelineForTests } = await import(
-  '../dist/server/services/videoPipeline.js'
+  pathToFileURL(path.join(appRoot, 'dist/server/services/videoPipeline.js')).href
 );
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-async function fetchJson(url, init) {
-  const res = await fetch(url, init);
-  if (!res.ok) {
-    throw new Error(`${init?.method ?? 'GET'} ${url} → ${res.status}`);
-  }
-  return res.json();
-}
 
 function runFfmpeg(args) {
   return new Promise((resolve, reject) => {
@@ -105,5 +95,5 @@ try {
   console.log('smoke CA-R40 OK');
   await stopLivepraiseServer();
 } finally {
-  fs.rmSync(testHome, { recursive: true, force: true });
+  cleanupSmokeHome(testHome);
 }

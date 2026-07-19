@@ -95,7 +95,10 @@ function openMonitors(): void {
 </script>
 
 <template>
-  <div ref="root" class="relative">
+  <div
+    ref="root"
+    class="relative"
+  >
     <button
       type="button"
       class="rounded px-0.5 underline decoration-dotted underline-offset-2 transition hover:text-lp-text"
@@ -156,7 +159,7 @@ function openMonitors(): void {
               v-model="drafts[device.deviceId].label"
               type="text"
               class="mt-0.5 w-full rounded border border-lp-surface bg-lp-background px-2 py-1 text-xs text-lp-text"
-            />
+            >
           </label>
 
           <label
@@ -166,7 +169,7 @@ function openMonitors(): void {
             <input
               v-model="drafts[device.deviceId].showChords"
               type="checkbox"
-            />
+            >
             <span>{{ t('displays.external.showChords') }}</span>
           </label>
 
@@ -184,11 +187,19 @@ function openMonitors(): void {
           </button>
         </li>
       </ul>
-      <p v-else class="mt-2 text-xs text-lp-muted">
+      <p
+        v-else
+        class="mt-2 text-xs text-lp-muted"
+      >
         {{ t('status.externalDevices.noneOnline') }}
       </p>
 
-      <p v-if="saveError" class="mt-2 text-xs text-red-400">{{ saveError }}</p>
+      <p
+        v-if="saveError"
+        class="mt-2 text-xs text-red-400"
+      >
+        {{ saveError }}
+      </p>
 
       <button
         type="button"

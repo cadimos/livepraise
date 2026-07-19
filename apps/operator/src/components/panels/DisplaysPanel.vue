@@ -12,10 +12,8 @@ import {
   buildAjustarTelaPayload,
   buildAjustarTelaPayloadForDevice,
   defaultScreenSize,
-  describeScreenLayoutSize,
   parseCustomScreenPixels,
   resolveProjectionStageSize,
-  fitAspectRatioInBox,
 } from '../../utils/screen-size';
 import { Settings } from '@lucide/vue';
 
@@ -459,7 +457,10 @@ watch(onlineDevices, () => {
       {{ t('displays.screenSize.perMonitorHint') }}
     </p>
 
-    <div v-if="error" class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200">
+    <div
+      v-if="error"
+      class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200"
+    >
       {{ error }}
     </div>
     <div
@@ -469,7 +470,10 @@ watch(onlineDevices, () => {
       {{ message }}
     </div>
 
-    <ul v-if="assignments.length" class="space-y-2">
+    <ul
+      v-if="assignments.length"
+      class="space-y-2"
+    >
       <li
         v-for="item in assignments"
         :key="item.displayId"
@@ -478,7 +482,10 @@ watch(onlineDevices, () => {
         <div class="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
           <span class="text-sm text-lp-text">
             {{ item.label }}
-            <span v-if="item.primary" class="ml-1 text-xs text-amber-400">{{ t('displays.primary') }}</span>
+            <span
+              v-if="item.primary"
+              class="ml-1 text-xs text-amber-400"
+            >{{ t('displays.primary') }}</span>
             <span
               v-if="!isConnectedDisplay(item)"
               class="ml-2 rounded bg-rose-900/50 px-1.5 py-0.5 text-xs text-rose-300"
@@ -496,13 +503,20 @@ watch(onlineDevices, () => {
               :aria-expanded="isExpandedDisplay(item.displayId)"
               @click.stop="toggleScreenConfig(item.displayId)"
             >
-              <Settings class="h-5 w-5" aria-hidden="true" />
+              <Settings
+                class="h-5 w-5"
+                aria-hidden="true"
+              />
             </button>
             <select
               v-model="item.role"
               class="lp-field min-w-[9rem] rounded-md px-2 py-1.5 text-sm"
             >
-              <option v-for="opt in roleOptions" :key="opt.value" :value="opt.value">
+              <option
+                v-for="opt in roleOptions"
+                :key="opt.value"
+                :value="opt.value"
+              >
                 {{ opt.label }}
               </option>
             </select>
@@ -524,7 +538,11 @@ watch(onlineDevices, () => {
                 class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
                 @change="onScreenPresetChange(item)"
               >
-                <option v-for="opt in presetOptions" :key="opt.value" :value="opt.value">
+                <option
+                  v-for="opt in presetOptions"
+                  :key="opt.value"
+                  :value="opt.value"
+                >
                   {{ opt.label }}
                 </option>
               </select>
@@ -542,7 +560,7 @@ watch(onlineDevices, () => {
                 :disabled="ensureScreenSize(item).preset !== 'personalizado'"
                 :placeholder="t('displays.screenSize.widthPlaceholder')"
                 @input="useCustomScreenDimensions(ensureScreenSize(item))"
-              />
+              >
             </label>
             <label class="flex flex-col gap-1 text-sm">
               <span class="text-lp-muted">{{ t('displays.screenSize.heightLabel') }}</span>
@@ -554,7 +572,7 @@ watch(onlineDevices, () => {
                 :disabled="ensureScreenSize(item).preset !== 'personalizado'"
                 :placeholder="t('displays.screenSize.heightPlaceholder')"
                 @input="useCustomScreenDimensions(ensureScreenSize(item))"
-              />
+              >
             </label>
             <p class="text-xs text-sky-300/90 sm:col-span-2">
               {{ effectiveScreenSizeLabel(ensureScreenSize(item), item.bounds) }}
@@ -565,7 +583,11 @@ watch(onlineDevices, () => {
                 v-model="ensureScreenSize(item).position"
                 class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
               >
-                <option v-for="opt in positionOptions" :key="opt.value" :value="opt.value">
+                <option
+                  v-for="opt in positionOptions"
+                  :key="opt.value"
+                  :value="opt.value"
+                >
                   {{ opt.label }}
                 </option>
               </select>
@@ -581,7 +603,7 @@ watch(onlineDevices, () => {
                 inputmode="numeric"
                 class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
                 :placeholder="t('displays.screenSize.offsetXPlaceholder')"
-              />
+              >
             </label>
             <label
               v-if="ensureScreenSize(item).position === 'personalizado'"
@@ -594,7 +616,7 @@ watch(onlineDevices, () => {
                 inputmode="numeric"
                 class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
                 :placeholder="t('displays.screenSize.offsetYPlaceholder')"
-              />
+              >
             </label>
             <label class="flex flex-col gap-1 text-sm sm:col-span-2">
               <span class="text-lp-muted">{{ t('displays.screenSize.contentFitLabel') }}</span>
@@ -602,14 +624,21 @@ watch(onlineDevices, () => {
                 v-model="ensureScreenSize(item).contentFit"
                 class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
               >
-                <option v-for="opt in contentFitOptions" :key="opt.value" :value="opt.value">
+                <option
+                  v-for="opt in contentFitOptions"
+                  :key="opt.value"
+                  :value="opt.value"
+                >
                   {{ opt.label }}
                 </option>
               </select>
               <span class="text-xs text-lp-muted">{{ t('displays.screenSize.contentFitHint') }}</span>
             </label>
             <label class="inline-flex items-center gap-2 text-sm sm:col-span-2">
-              <input v-model="ensureScreenSize(item).livePreview" type="checkbox" />
+              <input
+                v-model="ensureScreenSize(item).livePreview"
+                type="checkbox"
+              >
               <span>{{ t('displays.screenSize.livePreview') }}</span>
             </label>
           </div>
@@ -628,7 +657,10 @@ watch(onlineDevices, () => {
         </div>
       </li>
     </ul>
-    <p v-else class="text-sm text-lp-muted">
+    <p
+      v-else
+      class="text-sm text-lp-muted"
+    >
       {{ t('displays.none') }}
     </p>
 
@@ -642,10 +674,17 @@ watch(onlineDevices, () => {
     </button>
 
     <section class="mt-6 border-t border-lp-surface pt-4">
-      <h3 class="text-sm font-semibold text-lp-text">{{ t('displays.remoteProjection.title') }}</h3>
-      <p class="mt-1 text-sm text-lp-muted">{{ t('displays.remoteProjection.hint') }}</p>
+      <h3 class="text-sm font-semibold text-lp-text">
+        {{ t('displays.remoteProjection.title') }}
+      </h3>
+      <p class="mt-1 text-sm text-lp-muted">
+        {{ t('displays.remoteProjection.hint') }}
+      </p>
 
-      <ul v-if="projectionRemoteDrafts.length" class="mt-3 space-y-2">
+      <ul
+        v-if="projectionRemoteDrafts.length"
+        class="mt-3 space-y-2"
+      >
         <li
           v-for="item in projectionRemoteDrafts"
           :key="item.deviceId"
@@ -671,7 +710,10 @@ watch(onlineDevices, () => {
                 :aria-expanded="isExpandedRemoteDevice(item.deviceId)"
                 @click.stop="toggleRemoteScreenConfig(item.deviceId)"
               >
-                <Settings class="h-5 w-5" aria-hidden="true" />
+                <Settings
+                  class="h-5 w-5"
+                  aria-hidden="true"
+                />
               </button>
             </div>
           </div>
@@ -686,7 +728,7 @@ watch(onlineDevices, () => {
                 v-model="item.label"
                 type="text"
                 class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
-              />
+              >
             </label>
             <p class="mb-3 text-xs text-lp-muted">
               {{ t('displays.screenSize.monitorTitle', { label: remoteProjectorLabel(item) }) }}
@@ -699,7 +741,11 @@ watch(onlineDevices, () => {
                   class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
                   @change="onRemoteScreenPresetChange(item)"
                 >
-                  <option v-for="opt in presetOptions" :key="opt.value" :value="opt.value">
+                  <option
+                    v-for="opt in presetOptions"
+                    :key="opt.value"
+                    :value="opt.value"
+                  >
                     {{ opt.label }}
                   </option>
                 </select>
@@ -717,7 +763,7 @@ watch(onlineDevices, () => {
                   :disabled="ensureRemoteScreenSize(item).preset !== 'personalizado'"
                   :placeholder="t('displays.screenSize.widthPlaceholder')"
                   @input="useCustomScreenDimensions(ensureRemoteScreenSize(item))"
-                />
+                >
               </label>
               <label class="flex flex-col gap-1 text-sm">
                 <span class="text-lp-muted">{{ t('displays.screenSize.heightLabel') }}</span>
@@ -729,7 +775,7 @@ watch(onlineDevices, () => {
                   :disabled="ensureRemoteScreenSize(item).preset !== 'personalizado'"
                   :placeholder="t('displays.screenSize.heightPlaceholder')"
                   @input="useCustomScreenDimensions(ensureRemoteScreenSize(item))"
-                />
+                >
               </label>
               <p class="text-xs text-sky-300/90 sm:col-span-2">
                 {{ effectiveScreenSizeLabel(ensureRemoteScreenSize(item)) }}
@@ -740,7 +786,11 @@ watch(onlineDevices, () => {
                   v-model="ensureRemoteScreenSize(item).position"
                   class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
                 >
-                  <option v-for="opt in positionOptions" :key="opt.value" :value="opt.value">
+                  <option
+                    v-for="opt in positionOptions"
+                    :key="opt.value"
+                    :value="opt.value"
+                  >
                     {{ opt.label }}
                   </option>
                 </select>
@@ -756,7 +806,7 @@ watch(onlineDevices, () => {
                   inputmode="numeric"
                   class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
                   :placeholder="t('displays.screenSize.offsetXPlaceholder')"
-                />
+                >
               </label>
               <label
                 v-if="ensureRemoteScreenSize(item).position === 'personalizado'"
@@ -769,7 +819,7 @@ watch(onlineDevices, () => {
                   inputmode="numeric"
                   class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
                   :placeholder="t('displays.screenSize.offsetYPlaceholder')"
-                />
+                >
               </label>
               <label class="flex flex-col gap-1 text-sm sm:col-span-2">
                 <span class="text-lp-muted">{{ t('displays.screenSize.contentFitLabel') }}</span>
@@ -777,14 +827,21 @@ watch(onlineDevices, () => {
                   v-model="ensureRemoteScreenSize(item).contentFit"
                   class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
                 >
-                  <option v-for="opt in contentFitOptions" :key="opt.value" :value="opt.value">
+                  <option
+                    v-for="opt in contentFitOptions"
+                    :key="opt.value"
+                    :value="opt.value"
+                  >
                     {{ opt.label }}
                   </option>
                 </select>
                 <span class="text-xs text-lp-muted">{{ t('displays.screenSize.contentFitHint') }}</span>
               </label>
               <label class="inline-flex items-center gap-2 text-sm sm:col-span-2">
-                <input v-model="ensureRemoteScreenSize(item).livePreview" type="checkbox" />
+                <input
+                  v-model="ensureRemoteScreenSize(item).livePreview"
+                  type="checkbox"
+                >
                 <span>{{ t('displays.screenSize.livePreview') }}</span>
               </label>
             </div>
@@ -803,14 +860,26 @@ watch(onlineDevices, () => {
           </div>
         </li>
       </ul>
-      <p v-else class="mt-2 text-sm text-lp-muted">{{ t('displays.remoteProjection.none') }}</p>
+      <p
+        v-else
+        class="mt-2 text-sm text-lp-muted"
+      >
+        {{ t('displays.remoteProjection.none') }}
+      </p>
     </section>
 
     <section class="mt-6 border-t border-lp-surface pt-4">
-      <h3 class="text-sm font-semibold text-lp-text">{{ t('displays.external.title') }}</h3>
-      <p class="mt-1 text-sm text-lp-muted">{{ t('displays.external.hint') }}</p>
+      <h3 class="text-sm font-semibold text-lp-text">
+        {{ t('displays.external.title') }}
+      </h3>
+      <p class="mt-1 text-sm text-lp-muted">
+        {{ t('displays.external.hint') }}
+      </p>
 
-      <ul v-if="otherExternalDrafts.length" class="mt-3 space-y-2">
+      <ul
+        v-if="otherExternalDrafts.length"
+        class="mt-3 space-y-2"
+      >
         <li
           v-for="item in otherExternalDrafts"
           :key="item.deviceId"
@@ -835,13 +904,16 @@ watch(onlineDevices, () => {
                 v-model="item.label"
                 type="text"
                 class="lp-field w-full rounded-md px-2 py-1.5 text-sm"
-              />
+              >
             </label>
             <label
               v-if="chordsConfigurable(item.profile)"
               class="inline-flex items-center gap-2 text-sm sm:col-span-2"
             >
-              <input v-model="item.showChords" type="checkbox" />
+              <input
+                v-model="item.showChords"
+                type="checkbox"
+              >
               <span>{{ t('displays.external.showChords') }}</span>
             </label>
           </div>
@@ -859,7 +931,12 @@ watch(onlineDevices, () => {
           </button>
         </li>
       </ul>
-      <p v-else class="mt-2 text-sm text-lp-muted">{{ t('displays.external.none') }}</p>
+      <p
+        v-else
+        class="mt-2 text-sm text-lp-muted"
+      >
+        {{ t('displays.external.none') }}
+      </p>
     </section>
   </div>
 </template>

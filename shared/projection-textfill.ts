@@ -348,7 +348,7 @@ function spanFitsAtFontPx(
 }
 const STAGE_RETURN_PROXIMO_MAX_SCALE = 0.72;
 /** Piso em saídas reais quando o perfil min não cabe (mobile / muito texto). */
-const STAGE_RETURN_OUTPUT_FLOOR_PX = 10;
+export const STAGE_RETURN_OUTPUT_FLOOR_PX = 10;
 
 type TextfillMode = 'preview' | 'output';
 
@@ -1074,4 +1074,182 @@ export function applyOutputTextfillAll(
       fontStyle: options?.fontStyle,
     });
   }
+}
+
+/** ResizeObserver / window.resize — partilhado por todas as superfícies. */
+export const PROJECTION_TEXTFILL_RESIZE_DEBOUNCE_MS = 120;
+
+/**
+ * Debounce do `scheduleRefresh` só em prévias do operador.
+ * Saídas reais usam `requestAnimationFrame` (ver `createProjectionTextfill`).
+ */
+export const PROJECTION_TEXTFILL_PREVIEW_REFRESH_DEBOUNCE_MS = 32;
+
+/** @deprecated Use `PROJECTION_TEXTFILL_RESIZE_DEBOUNCE_MS`. */
+export const PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS = PROJECTION_TEXTFILL_RESIZE_DEBOUNCE_MS;
+/** @deprecated Use `PROJECTION_TEXTFILL_PREVIEW_REFRESH_DEBOUNCE_MS`. */
+export const PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS =
+  PROJECTION_TEXTFILL_PREVIEW_REFRESH_DEBOUNCE_MS;
+
+/**
+ * Parâmetros resolvidos em cada medição (estilo opções do jQuery TextFill).
+ */
+export interface ProjectionTextfillResolveParams extends ProjectionTextfillOptions {
+  minFontPx: number;
+  maxFontPx: number;
+  textfillEnabled: boolean;
+  /** Retorno de palco / vocal-stage: cada `.texto`. */
+  allTexto?: boolean;
+}
+
+export interface ProjectionTextfillHandle {
+  refresh: () => Promise<void>;
+  scheduleRefresh: () => void;
+  /** Observa root (+ extras) e `window.resize`. */
+  attach: (extraEls?: Array<HTMLElement | null | undefined>) => void;
+  disconnect: () => void;
+}
+
+export interface CreateProjectionTextfillOptions {
+  rootEl: HTMLElement;
+  mode: 'preview' | 'output';
+  /** Como `$().textfill({...})` — lido em cada refresh. */
+  resolve: () => ProjectionTextfillResolveParams;
+  /** Antes de medir (fontes, shadow, prepareContent). `false` aborta o fit. */
+  beforeRefresh?: () => void | boolean | Promise<void | boolean>;
+  /**
+   * Debounce de `scheduleRefresh`.
+   * `undefined` → preview: 32ms; output: rAF.
+   */
+  refreshDebounceMs?: number | null;
+  resizeDebounceMs?: number;
+}
+
+/**
+ * Binding estilo jQuery TextFill: um handle por root.
+ * Algoritmo + resize vivem neste módulo; tipografia/prefs ficam fora.
+ */
+export function createProjectionTextfill(
+  options: CreateProjectionTextfillOptions,
+): ProjectionTextfillHandle {
+  const {
+    rootEl,
+    mode,
+    resolve,
+    beforeRefresh,
+    resizeDebounceMs = PROJECTION_TEXTFILL_RESIZE_DEBOUNCE_MS,
+  } = options;
+
+  const refreshDebounceMs =
+    options.refreshDebounceMs === undefined
+      ? mode === 'preview'
+        ? PROJECTION_TEXTFILL_PREVIEW_REFRESH_DEBOUNCE_MS
+        : null
+      : options.refreshDebounceMs;
+
+  let refreshGeneration = 0;
+  let refreshInProgress = false;
+  let refreshScheduled = false;
+  let refreshDebounce: ReturnType<typeof setTimeout> | null = null;
+  let resizeDebounce: ReturnType<typeof setTimeout> | null = null;
+  let resizeObserver: ResizeObserver | null = null;
+  let onWindowResize: (() => void) | null = null;
+
+  async function refresh(): Promise<void> {
+    if (refreshInProgress) return;
+    refreshInProgress = true;
+    const generation = ++refreshGeneration;
+    try {
+      if (beforeRefresh) {
+        const cont = await beforeRefresh();
+        if (cont === false) return;
+      }
+      if (generation !== refreshGeneration) return;
+
+      const params = resolve();
+      const {
+        minFontPx,
+        maxFontPx,
+        textfillEnabled,
+        allTexto,
+        ...textfillOpts
+      } = params;
+
+      if (allTexto) {
+        await refreshOutputTextfillAll(
+          rootEl,
+          minFontPx,
+          maxFontPx,
+          textfillEnabled,
+          textfillOpts,
+        );
+        return;
+      }
+
+      const refreshFn = mode === 'preview' ? refreshPreviewTextfill : refreshOutputTextfill;
+      await refreshFn(rootEl, minFontPx, maxFontPx, textfillEnabled, textfillOpts);
+    } finally {
+      refreshInProgress = false;
+    }
+  }
+
+  function scheduleRefresh(): void {
+    if (refreshDebounceMs == null) {
+      if (refreshScheduled) return;
+      refreshScheduled = true;
+      requestAnimationFrame(() => {
+        refreshScheduled = false;
+        void refresh();
+      });
+      return;
+    }
+    if (refreshDebounce) clearTimeout(refreshDebounce);
+    refreshDebounce = setTimeout(() => {
+      refreshDebounce = null;
+      void refresh();
+    }, refreshDebounceMs);
+  }
+
+  function attach(extraEls: Array<HTMLElement | null | undefined> = []): void {
+    disconnectObservers();
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        if (resizeDebounce) clearTimeout(resizeDebounce);
+        resizeDebounce = setTimeout(() => {
+          scheduleRefresh();
+        }, resizeDebounceMs);
+      });
+      resizeObserver.observe(rootEl);
+      for (const el of extraEls) {
+        if (el) resizeObserver.observe(el);
+      }
+    }
+    onWindowResize = () => {
+      if (resizeDebounce) clearTimeout(resizeDebounce);
+      resizeDebounce = setTimeout(() => {
+        scheduleRefresh();
+      }, resizeDebounceMs);
+    };
+    window.addEventListener('resize', onWindowResize);
+  }
+
+  function disconnectObservers(): void {
+    if (resizeDebounce) clearTimeout(resizeDebounce);
+    resizeDebounce = null;
+    resizeObserver?.disconnect();
+    resizeObserver = null;
+    if (onWindowResize) {
+      window.removeEventListener('resize', onWindowResize);
+      onWindowResize = null;
+    }
+  }
+
+  function disconnect(): void {
+    if (refreshDebounce) clearTimeout(refreshDebounce);
+    refreshDebounce = null;
+    refreshGeneration += 1;
+    disconnectObservers();
+  }
+
+  return { refresh, scheduleRefresh, attach, disconnect };
 }

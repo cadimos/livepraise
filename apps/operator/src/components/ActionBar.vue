@@ -108,11 +108,14 @@ function reloadApp() {
       :class="frozen ? 'bg-white/20 ring-1 ring-white/40' : ''"
       :title="
         (frozen ? t('actions.unfreeze') : t('actions.freeze')) +
-        (comboLabel('freeze_toggle') !== '—' ? ` (${comboLabel('freeze_toggle')})` : '')
+          (comboLabel('freeze_toggle') !== '—' ? ` (${comboLabel('freeze_toggle')})` : '')
       "
       @click="toggleFrozen()"
     >
-      <Snowflake class="h-4 w-4 shrink-0" aria-hidden="true" />
+      <Snowflake
+        class="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      />
       {{ frozen ? t('actions.unfreeze') : t('actions.freeze') }}
     </button>
 
@@ -123,7 +126,10 @@ function reloadApp() {
       :aria-label="t('actions.clearScreen')"
       @click="clearScreen"
     >
-      <Presentation class="h-4 w-4 shrink-0" aria-hidden="true" />
+      <Presentation
+        class="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      />
       {{ t('actions.clearScreen') }}
     </button>
 
@@ -133,7 +139,10 @@ function reloadApp() {
       :title="t('actions.newSong')"
       @click="emit('openNewSong')"
     >
-      <Music class="h-4 w-4 shrink-0" aria-hidden="true" />
+      <Music
+        class="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      />
       {{ t('actions.newSong') }}
     </button>
 
@@ -143,7 +152,10 @@ function reloadApp() {
       :title="t('actions.notepad')"
       @click="emit('openNotepad')"
     >
-      <NotebookPen class="h-4 w-4 shrink-0" aria-hidden="true" />
+      <NotebookPen
+        class="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      />
       {{ t('actions.notepad') }}
     </button>
 
@@ -152,11 +164,14 @@ function reloadApp() {
       class="inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-medium transition hover:bg-white/15"
       :title="
         t('actions.reload') +
-        (comboLabel('reload_data') !== '—' ? ` (${comboLabel('reload_data')})` : '')
+          (comboLabel('reload_data') !== '—' ? ` (${comboLabel('reload_data')})` : '')
       "
       @click="reloadApp"
     >
-      <RotateCw class="h-4 w-4 shrink-0" aria-hidden="true" />
+      <RotateCw
+        class="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      />
       {{ t('actions.reload') }}
     </button>
 
@@ -167,7 +182,7 @@ function reloadApp() {
         accept="application/json,.json"
         class="hidden"
         @change="onImportPlaylistFile"
-      />
+      >
 
       <DropdownMenu :label="t('actions.tools')">
         <template #default="{ close }">
@@ -356,7 +371,10 @@ function reloadApp() {
               {{ t('actions.errorLog') }}
             </button>
           </li>
-          <li v-if="isAdmin" role="none">
+          <li
+            v-if="isAdmin"
+            role="none"
+          >
             <button
               type="button"
               role="menuitem"
@@ -388,7 +406,10 @@ function reloadApp() {
               <span class="text-lp-muted"> ({{ t('actions.helpAboutShortcut') }})</span>
             </button>
           </li>
-          <li role="separator" class="my-1 border-t border-lp-surface" />
+          <li
+            role="separator"
+            class="my-1 border-t border-lp-surface"
+          />
           <li role="none">
             <a
               role="menuitem"

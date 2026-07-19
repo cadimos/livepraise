@@ -28,7 +28,10 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick));
 </script>
 
 <template>
-  <div ref="root" class="relative">
+  <div
+    ref="root"
+    class="relative"
+  >
     <button
       type="button"
       class="inline-flex items-center gap-1 rounded-md px-2 py-1 font-medium transition hover:bg-white/15"
@@ -36,7 +39,10 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick));
       @click.stop="toggle"
     >
       {{ label }}
-      <ChevronDown class="h-4 w-4 opacity-80" aria-hidden="true" />
+      <ChevronDown
+        class="h-4 w-4 opacity-80"
+        aria-hidden="true"
+      />
     </button>
     <ul
       v-show="open"

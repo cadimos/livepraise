@@ -1,6 +1,6 @@
-/** Protocolo WebSocket ao vivo — operador ↔ projetor (paridade v0.0.8). */
+/** Protocolo WebSocket ao vivo — operador ↔ projetor e saídas externas. */
 
-/** Paridade v0.0.8 monitor/projetor (Fase 3). */
+/** Ações baseline de projeção (monitor público). */
 export const BASELINE_LIVE_ACTIONS = [
   'background',
   /** CA-R21: /live não recebe `background`; o hub envia isto para limpar vídeo/fundo. */
@@ -78,7 +78,7 @@ export interface ExternalDeviceInfo {
 
 export type DisplayRole = 'operator' | 'projection' | 'stage-return' | 'off';
 
-/** Tamanho da área de projeção por monitor (paridade v0.0.8 `conf_tela`). */
+/** Tamanho da área de projeção por monitor (`conf_tela` / prefs). */
 export interface DisplayScreenSize {
   preset: string;
   largura: string;

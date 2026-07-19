@@ -25,7 +25,9 @@ function onEnabledChange(event: Event) {
 
 <template>
   <div class="flex flex-col gap-4 text-sm">
-    <p class="text-lp-muted">{{ t('settings.bible.intro') }}</p>
+    <p class="text-lp-muted">
+      {{ t('settings.bible.intro') }}
+    </p>
 
     <label class="flex items-center gap-2">
       <input
@@ -33,11 +35,14 @@ function onEnabledChange(event: Event) {
         class="rounded border-lp-surface"
         :checked="prefs.bibleSearchHistoryEnabled"
         @change="onEnabledChange"
-      />
+      >
       <span class="font-medium text-lp-text">{{ t('settings.bible.searchHistoryEnabled') }}</span>
     </label>
 
-    <label class="flex flex-col gap-1.5" :class="{ 'opacity-50': !prefs.bibleSearchHistoryEnabled }">
+    <label
+      class="flex flex-col gap-1.5"
+      :class="{ 'opacity-50': !prefs.bibleSearchHistoryEnabled }"
+    >
       <span class="font-medium text-lp-text">{{ t('settings.bible.searchHistoryLimit') }}</span>
       <div class="flex items-center gap-3">
         <input
@@ -49,7 +54,7 @@ function onEnabledChange(event: Event) {
           :value="prefs.bibleSearchHistoryLimit"
           :disabled="!prefs.bibleSearchHistoryEnabled"
           @change="onLimitChange"
-        />
+        >
         <span class="text-lp-muted">{{ t('settings.bible.searchHistoryLimitUnit') }}</span>
       </div>
       <p class="text-xs text-lp-muted">{{ t('settings.bible.searchHistoryLimitHint') }}</p>

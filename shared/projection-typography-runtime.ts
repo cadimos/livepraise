@@ -1,7 +1,11 @@
+/**
+ * Tipografia de projeção (fonte, sombra, prefs, WS) — NÃO é o algoritmo textfill.
+ * O fit vive só em `projection-textfill.ts` (`createProjectionTextfill` / refresh*).
+ */
 import {
-  refreshOutputTextfill,
-  refreshOutputTextfillAll,
-  refreshPreviewTextfill,
+  createProjectionTextfill,
+  type ProjectionTextfillHandle,
+  type ProjectionTextfillResolveParams,
 } from './projection-textfill.js';
 import {
   applyProjectionTypographyStyles,
@@ -156,40 +160,125 @@ function applyShadowTargets(
   }
 }
 
-async function runTextfill(
-  rootEl: HTMLElement,
-  profile: ProjectionTypographyProfile,
-  mode: 'preview' | 'output',
-  textfillOptions: Record<string, unknown> | undefined,
-  cssFamily: string,
-  surfaceLabel: string,
-): Promise<void> {
-  const fitSlackPx = projectionTextShadowSlackPx(
-    profile.textShadowLayers,
-    profile.textShadowEnabled,
-  );
-  const fontOpts = {
-    fontFamily: cssFamily,
-    fontWeight: profile.fontWeight,
-    fontStyle: profile.fontStyle,
-    fitSlackPx,
-  };
-  if (textfillOptions?.allTexto === true) {
-    await refreshOutputTextfillAll(
-      rootEl,
-      profile.minFontPx,
-      profile.maxFontPx,
-      profile.textfillEnabled,
-      fontOpts,
-    );
-    return;
+export interface ProjectionTypographySession {
+  setPrefs(nextPrefs: ProjectionTypographyPrefs | null): Promise<void>;
+  init(initialPrefs: ProjectionTypographyPrefs | null): Promise<void>;
+  applyChrome(): void;
+  resolveTextfillParams(): ProjectionTextfillResolveParams;
+  disconnect(): void;
+  getProfileKey(): ProjectionTypographyProfileKey;
+  getCssFamily(): string;
+}
+
+export interface ProjectionTypographySessionOptions {
+  rootEl: HTMLElement;
+  role: string;
+  externalProfile?: string;
+  origin?: string;
+  shadowSelector?: string;
+  textfillOptions?: Record<string, unknown>;
+  diagnosticSurface?: string;
+  onProfileKey?: (profileKey: ProjectionTypographyProfileKey) => void;
+}
+
+/** Sessão só de tipografia (fonte/sombra/prefs) — o fit é `createProjectionTextfill`. */
+export function createProjectionTypographySession(
+  options: ProjectionTypographySessionOptions,
+): ProjectionTypographySession {
+  const {
+    rootEl,
+    role,
+    externalProfile,
+    origin = location.origin,
+    shadowSelector = '.titulo, .content > span, .rodape:not(:empty), .texto',
+    textfillOptions,
+    diagnosticSurface,
+    onProfileKey,
+  } = options;
+
+  let prefs = null as ProjectionTypographyPrefs | null;
+  let profileKey = resolveProfileKey(role, externalProfile);
+  let profile = normalizeProfile(null);
+  let manifest: FontsManifest | null = null;
+  let cssFamily = 'sans-serif';
+  const fontStyleEl = document.createElement('style');
+  fontStyleEl.dataset.projectionTypography = 'font-face';
+
+  function currentProfile(): ProjectionTypographyProfile {
+    if (!prefs) return profile;
+    return normalizeProfile(prefs[profileKey] ?? profile);
   }
-  const refreshFn = mode === 'preview' ? refreshPreviewTextfill : refreshOutputTextfill;
-  await refreshFn(rootEl, profile.minFontPx, profile.maxFontPx, profile.textfillEnabled, {
-    ...fontOpts,
-    ...textfillOptions,
-    diagnosticSurface: (textfillOptions?.diagnosticSurface as string | undefined) ?? surfaceLabel ?? mode,
-  });
+
+  function applyChrome(): void {
+    profile = currentProfile();
+    cssFamily = resolveCssFamily(profile, manifest);
+    const textShadowCss = resolveProjectionTextShadowCss(
+      profile.textShadowLayers,
+      profile.textShadowEnabled,
+      profile.textShadowCssAdvanced,
+    );
+    applyProjectionTypographyStyles(rootEl, {
+      fontFamily: cssFamily,
+      fontWeight: profile.fontWeight,
+      fontStyle: profile.fontStyle,
+      textShadowCss,
+    });
+    ensureFontFaceStyle(profile, origin, manifest, fontStyleEl);
+    applyShadowTargets(rootEl, profile, shadowSelector);
+  }
+
+  function resolveTextfillParams(): ProjectionTextfillResolveParams {
+    profile = currentProfile();
+    cssFamily = resolveCssFamily(profile, manifest);
+    const fitSlackPx = projectionTextShadowSlackPx(
+      profile.textShadowLayers,
+      profile.textShadowEnabled,
+    );
+    const extra = (textfillOptions ?? {}) as Record<string, unknown>;
+    return {
+      ...extra,
+      minFontPx: profile.minFontPx,
+      maxFontPx: profile.maxFontPx,
+      textfillEnabled: profile.textfillEnabled,
+      allTexto: extra.allTexto === true,
+      fontFamily: cssFamily,
+      fontWeight: profile.fontWeight,
+      fontStyle: profile.fontStyle,
+      fitSlackPx,
+      diagnosticSurface:
+        (extra.diagnosticSurface as string | undefined) ??
+        diagnosticSurface ??
+        profileKey,
+    };
+  }
+
+  async function setPrefs(nextPrefs: ProjectionTypographyPrefs | null): Promise<void> {
+    prefs = nextPrefs;
+    profileKey = resolveProfileKey(role, externalProfile);
+    profile = currentProfile();
+    onProfileKey?.(profileKey);
+    if (!manifest) manifest = await loadFontsManifest(origin);
+    applyChrome();
+  }
+
+  async function init(initialPrefs: ProjectionTypographyPrefs | null): Promise<void> {
+    manifest = await loadFontsManifest(origin);
+    await setPrefs(initialPrefs);
+  }
+
+  function disconnect(): void {
+    fontStyleEl.remove();
+  }
+
+  return {
+    setPrefs,
+    init,
+    applyChrome,
+    resolveTextfillParams,
+    disconnect,
+    getProfileKey: () => profileKey,
+    getCssFamily: () => cssFamily,
+  };
 }
 
 export interface ProjectionTypographyController {
@@ -199,147 +288,56 @@ export interface ProjectionTypographyController {
   scheduleRefresh(): void;
   disconnect(): void;
   getProfileKey(): ProjectionTypographyProfileKey;
+  /** Handle do motor textfill (para superfícies que preferem chamar o fit directo). */
+  textfill: ProjectionTextfillHandle;
+  typography: ProjectionTypographySession;
 }
 
-export interface ProjectionTypographyControllerOptions {
-  rootEl: HTMLElement;
-  role: string;
-  externalProfile?: string;
-  origin?: string;
+export interface ProjectionTypographyControllerOptions extends ProjectionTypographySessionOptions {
   mode?: 'preview' | 'output';
   prefs?: ProjectionTypographyPrefs | null;
-  shadowSelector?: string;
-  textfillOptions?: Record<string, unknown>;
-  diagnosticSurface?: string;
-  onProfileKey?: (profileKey: ProjectionTypographyProfileKey) => void;
 }
 
-/** Controlador partilhado para previews e saídas reais (CAD-313). */
+/**
+ * Conveniência: tipografia + `createProjectionTextfill` no mesmo objecto.
+ * Preferir nas superfícies: importar `createProjectionTextfill` + `createProjectionTypographySession`.
+ */
 export function createProjectionTypographyController(
   options: ProjectionTypographyControllerOptions,
 ): ProjectionTypographyController {
-  const {
-    rootEl,
-    role,
-    externalProfile,
-    origin = location.origin,
-    mode = 'output',
-    shadowSelector = '.titulo, .content > span, .rodape:not(:empty), .texto',
-    textfillOptions,
-    diagnosticSurface,
-    onProfileKey,
-  } = options;
-
-  let prefs = options.prefs ?? null;
-  let profileKey = resolveProfileKey(role, externalProfile);
-  let profile = normalizeProfile(prefs?.[profileKey]);
-  let manifest: FontsManifest | null = null;
-  const fontStyleEl = document.createElement('style');
-  fontStyleEl.dataset.projectionTypography = 'font-face';
-  let resizeObserver: ResizeObserver | null = null;
-  let refreshScheduled = false;
-  let refreshGeneration = 0;
-  let refreshInProgress = false;
-  let resizeDebounce: ReturnType<typeof setTimeout> | null = null;
-  let onWindowResize: (() => void) | null = null;
-
-  function currentProfile(): ProjectionTypographyProfile {
-    if (!prefs) return profile;
-    return normalizeProfile(prefs[profileKey] ?? profile);
-  }
-
-  function scheduleRefresh(): void {
-    if (refreshScheduled) return;
-    refreshScheduled = true;
-    requestAnimationFrame(() => {
-      refreshScheduled = false;
-      void refresh();
-    });
-  }
-
-  async function refresh(): Promise<void> {
-    if (refreshInProgress) return;
-    refreshInProgress = true;
-    const generation = ++refreshGeneration;
-    try {
-      profile = currentProfile();
-      const cssFamily = resolveCssFamily(profile, manifest);
-      const textShadowCss = resolveProjectionTextShadowCss(
-        profile.textShadowLayers,
-        profile.textShadowEnabled,
-        profile.textShadowCssAdvanced,
-      );
-      applyProjectionTypographyStyles(rootEl, {
-        fontFamily: cssFamily,
-        fontWeight: profile.fontWeight,
-        fontStyle: profile.fontStyle,
-        textShadowCss,
-      });
-      ensureFontFaceStyle(profile, origin, manifest, fontStyleEl);
-      applyShadowTargets(rootEl, profile, shadowSelector);
-      if (generation !== refreshGeneration) return;
-      await runTextfill(
-        rootEl,
-        profile,
-        mode,
-        textfillOptions,
-        cssFamily,
-        diagnosticSurface ?? profileKey,
-      );
-    } finally {
-      refreshInProgress = false;
-    }
-  }
+  const { mode = 'output', prefs: initialPrefs, ...sessionOpts } = options;
+  const typography = createProjectionTypographySession(sessionOpts);
+  const textfill = createProjectionTextfill({
+    rootEl: sessionOpts.rootEl,
+    mode,
+    resolve: () => typography.resolveTextfillParams(),
+    beforeRefresh: () => typography.applyChrome(),
+  });
 
   async function setPrefs(nextPrefs: ProjectionTypographyPrefs | null): Promise<void> {
-    prefs = nextPrefs;
-    profileKey = resolveProfileKey(role, externalProfile);
-    profile = currentProfile();
-    onProfileKey?.(profileKey);
-    if (!manifest) manifest = await loadFontsManifest(origin);
-    await refresh();
+    await typography.setPrefs(nextPrefs);
+    await textfill.refresh();
   }
 
-  async function init(initialPrefs: ProjectionTypographyPrefs | null): Promise<void> {
-    manifest = await loadFontsManifest(origin);
-    await setPrefs(initialPrefs);
-    if (typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(() => {
-        if (resizeDebounce) clearTimeout(resizeDebounce);
-        resizeDebounce = setTimeout(() => {
-          scheduleRefresh();
-        }, 150);
-      });
-      resizeObserver.observe(rootEl);
-      const stage = document.getElementById('stage');
-      if (stage) resizeObserver.observe(stage);
-    }
-    onWindowResize = () => {
-      if (resizeDebounce) clearTimeout(resizeDebounce);
-      resizeDebounce = setTimeout(() => {
-        scheduleRefresh();
-      }, 150);
-    };
-    window.addEventListener('resize', onWindowResize);
-  }
-
-  function disconnect(): void {
-    if (resizeDebounce) clearTimeout(resizeDebounce);
-    resizeObserver?.disconnect();
-    if (onWindowResize) {
-      window.removeEventListener('resize', onWindowResize);
-      onWindowResize = null;
-    }
-    fontStyleEl.remove();
+  async function init(prefs: ProjectionTypographyPrefs | null): Promise<void> {
+    await typography.init(prefs ?? initialPrefs ?? null);
+    const stage = document.getElementById('stage');
+    textfill.attach([stage]);
+    await textfill.refresh();
   }
 
   return {
     init,
     setPrefs,
-    refresh,
-    scheduleRefresh,
-    disconnect,
-    getProfileKey: () => profileKey,
+    refresh: () => textfill.refresh(),
+    scheduleRefresh: () => textfill.scheduleRefresh(),
+    disconnect: () => {
+      textfill.disconnect();
+      typography.disconnect();
+    },
+    getProfileKey: () => typography.getProfileKey(),
+    textfill,
+    typography,
   };
 }
 
@@ -372,8 +370,11 @@ export async function fetchProjectionTypographyPrefs(
 }
 
 export function attachProjectionTypographyWs(
-  controller: ProjectionTypographyController,
-  onMessage?: (message: { type?: string; projectionTypography?: ProjectionTypographyPrefs }) => void,
+  controller: { setPrefs: (prefs: ProjectionTypographyPrefs | null) => Promise<void> },
+  onMessage?: (message: {
+    type?: string;
+    projectionTypography?: ProjectionTypographyPrefs;
+  }) => void,
 ): (message: { type?: string; projectionTypography?: ProjectionTypographyPrefs }) => void {
   const previous = onMessage;
   return (message) => {

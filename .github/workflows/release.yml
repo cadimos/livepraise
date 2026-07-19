@@ -120,12 +120,19 @@ jobs:
 
       - run: npm run test:video-pipeline
       - run: npm run smoke:bootstrap
+      - name: Release smoke (socket + bootstrap limpo)
+        run: npm run smoke:fase8
+        timeout-minutes: 10
 
       - name: Build e anexar ao draft (Windows)
         run: npm run dist:win
         env:
           LIVEPRAISE_PUBLISH: '1'
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validar instalador Windows (SM-035)
+        run: npm run smoke:win-installer:ci
+        timeout-minutes: 15
 
       - name: Verificar artefactos Windows
         shell: pwsh

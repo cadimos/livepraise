@@ -1,5 +1,10 @@
 {
-  "ignoreMatches": ["autoprefixer", "postcss", "tailwindcss"],
+  "ignoreMatches": [
+    "autoprefixer",
+    "postcss",
+    "tailwindcss",
+    "axe-core"
+  ],
   "ignorePatterns": ["v0.0.8/**", "dist/**", "release-builds/**"],
   "skipMissing": ["node:sqlite", "@shared/types"]
 }

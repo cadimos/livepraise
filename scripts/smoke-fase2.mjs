@@ -3,33 +3,22 @@
  * Smoke Fase 2: bootstrap + CRUD música + restart simulado (CA-04, CA-05, CA-R04).
  */
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import {
+  assert,
+  cleanupSmokeHome,
+  configureSmokeEnv,
+  createSmokeHome,
+  fetchJson,
+  loadLivepraiseServer,
+  resolveAppRoot,
+} from './lib/smoke-helpers.mjs';
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const appRoot = path.resolve(scriptDir, '..');
-const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'livepraise-smoke-'));
+const appRoot = resolveAppRoot(import.meta.url);
+const testHome = createSmokeHome('livepraise-smoke-');
+configureSmokeEnv({ home: testHome, appRoot, port: '0' });
 
-process.env.LIVEPRAISE_HOME = testHome;
-process.env.LIVEPRAISE_APP_ROOT = appRoot;
-process.env.LIVEPRAISE_PORT = '0';
-
-const { startLivepraiseServer, stopLivepraiseServer } = await import(
-  '../dist/server/index.js'
-);
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-async function fetchJson(url, init) {
-  const res = await fetch(url, init);
-  if (!res.ok) {
-    throw new Error(`${init?.method ?? 'GET'} ${url} → ${res.status}`);
-  }
-  return res.json();
-}
+const { startLivepraiseServer, stopLivepraiseServer } = await loadLivepraiseServer(appRoot);
 
 try {
   const dbPath = path.join(testHome, 'livepraise', 'dsw.bd');
@@ -75,5 +64,5 @@ try {
   console.log('Smoke Fase 2 OK');
   await stopLivepraiseServer();
 } finally {
-  fs.rmSync(testHome, { recursive: true, force: true });
+  cleanupSmokeHome(testHome);
 }

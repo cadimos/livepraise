@@ -210,14 +210,19 @@ async function importMediaUrl(): Promise<void> {
       class="flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-lp-surface bg-lp-background shadow-xl"
     >
       <header class="flex items-center justify-between border-b border-lp-surface px-4 py-3">
-        <h2 class="text-sm font-semibold text-lp-text">{{ t('queueAdd.title') }}</h2>
+        <h2 class="text-sm font-semibold text-lp-text">
+          {{ t('queueAdd.title') }}
+        </h2>
         <button
           type="button"
           class="rounded px-2 py-1 text-lp-muted hover:bg-lp-surface hover:text-lp-text"
           :aria-label="t('queueAdd.cancel')"
           @click="close"
         >
-          <X class="h-4 w-4" aria-hidden="true" />
+          <X
+            class="h-4 w-4"
+            aria-hidden="true"
+          />
         </button>
       </header>
 
@@ -245,14 +250,19 @@ async function importMediaUrl(): Promise<void> {
         </p>
 
         <template v-if="step === 'menu'">
-          <p class="text-sm text-lp-muted">{{ t('queueAdd.intro') }}</p>
+          <p class="text-sm text-lp-muted">
+            {{ t('queueAdd.intro') }}
+          </p>
           <button
             type="button"
             class="flex w-full items-center gap-3 rounded-lg border border-lp-surface px-4 py-3 text-left text-sm text-lp-text hover:border-lp-primary/50 hover:bg-lp-surface/50"
             :disabled="busy"
             @click="step = 'local'"
           >
-            <FolderOpen class="h-5 w-5 shrink-0 text-lp-primary" aria-hidden="true" />
+            <FolderOpen
+              class="h-5 w-5 shrink-0 text-lp-primary"
+              aria-hidden="true"
+            />
             <span>{{ t('queueAdd.optionLocal') }}</span>
           </button>
           <button
@@ -261,7 +271,10 @@ async function importMediaUrl(): Promise<void> {
             :disabled="busy"
             @click="step = 'youtube'"
           >
-            <Link2 class="h-5 w-5 shrink-0 text-lp-primary" aria-hidden="true" />
+            <Link2
+              class="h-5 w-5 shrink-0 text-lp-primary"
+              aria-hidden="true"
+            />
             <span>{{ t('queueAdd.optionYoutube') }}</span>
           </button>
           <button
@@ -270,17 +283,25 @@ async function importMediaUrl(): Promise<void> {
             :disabled="busy"
             @click="step = 'mediaUrl'"
           >
-            <Globe class="h-5 w-5 shrink-0 text-lp-primary" aria-hidden="true" />
+            <Globe
+              class="h-5 w-5 shrink-0 text-lp-primary"
+              aria-hidden="true"
+            />
             <span>{{ t('queueAdd.optionMediaUrl') }}</span>
           </button>
         </template>
 
         <template v-else-if="step === 'local'">
-          <p class="text-sm text-lp-muted">{{ t('queueAdd.localHint') }}</p>
+          <p class="text-sm text-lp-muted">
+            {{ t('queueAdd.localHint') }}
+          </p>
           <label
             class="flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-lp-surface px-4 py-6 text-sm text-lp-muted hover:border-lp-primary/50"
           >
-            <Plus class="h-6 w-6 text-lp-primary" aria-hidden="true" />
+            <Plus
+              class="h-6 w-6 text-lp-primary"
+              aria-hidden="true"
+            />
             <span>{{ busy ? t('queueAdd.uploading') : t('queueAdd.pickFiles') }}</span>
             <input
               type="file"
@@ -289,7 +310,7 @@ async function importMediaUrl(): Promise<void> {
               multiple
               :disabled="busy"
               @change="onLocalFiles"
-            />
+            >
           </label>
           <button
             type="button"
@@ -301,7 +322,9 @@ async function importMediaUrl(): Promise<void> {
         </template>
 
         <template v-else-if="step === 'youtube'">
-          <p class="text-sm text-lp-muted">{{ t('queueAdd.youtubeHint') }}</p>
+          <p class="text-sm text-lp-muted">
+            {{ t('queueAdd.youtubeHint') }}
+          </p>
           <label class="block text-xs uppercase tracking-wider text-lp-muted">
             {{ t('queueAdd.youtubeUrl') }}
             <input
@@ -311,7 +334,7 @@ async function importMediaUrl(): Promise<void> {
               class="mt-1 w-full rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
               :placeholder="t('queueAdd.youtubePlaceholder')"
               :disabled="busy"
-            />
+            >
           </label>
           <div class="flex justify-end gap-2">
             <button
@@ -339,9 +362,15 @@ async function importMediaUrl(): Promise<void> {
               v-if="mediaUrlPreviewSrc"
               class="aspect-video max-h-40 w-full overflow-hidden rounded-lg border border-lp-surface bg-black"
             >
-              <img :src="mediaUrlPreviewSrc" :alt="previewAlt" class="h-full w-full object-contain" />
+              <img
+                :src="mediaUrlPreviewSrc"
+                :alt="previewAlt"
+                class="h-full w-full object-contain"
+              >
             </div>
-            <p class="text-sm text-lp-muted">{{ t('queueAdd.mediaUrlDoneHint') }}</p>
+            <p class="text-sm text-lp-muted">
+              {{ t('queueAdd.mediaUrlDoneHint') }}
+            </p>
             <div class="flex justify-end">
               <button
                 type="button"
@@ -353,7 +382,9 @@ async function importMediaUrl(): Promise<void> {
             </div>
           </template>
           <template v-else>
-            <p class="text-sm text-lp-muted">{{ t('queueAdd.mediaUrlHint') }}</p>
+            <p class="text-sm text-lp-muted">
+              {{ t('queueAdd.mediaUrlHint') }}
+            </p>
             <label class="block text-xs uppercase tracking-wider text-lp-muted">
               {{ t('queueAdd.mediaUrlLabel') }}
               <input
@@ -363,7 +394,7 @@ async function importMediaUrl(): Promise<void> {
                 class="mt-1 w-full rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
                 :placeholder="t('queueAdd.mediaUrlPlaceholder')"
                 :disabled="busy"
-              />
+              >
             </label>
             <div class="flex justify-end gap-2">
               <button
@@ -387,7 +418,10 @@ async function importMediaUrl(): Promise<void> {
         </template>
       </div>
 
-      <footer v-if="step === 'menu'" class="flex justify-end border-t border-lp-surface px-4 py-3">
+      <footer
+        v-if="step === 'menu'"
+        class="flex justify-end border-t border-lp-surface px-4 py-3"
+      >
         <button
           type="button"
           class="rounded-lg px-4 py-2 text-sm text-lp-muted hover:bg-lp-surface"

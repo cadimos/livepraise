@@ -1,32 +1,12 @@
 import { ref } from 'vue';
+import type { TextfillDiagnosticEntry } from '@core/textfill-diagnostics/types';
 import { fetchJson } from './useApi';
 import {
   isTextfillDiagnosticsEnabled,
   setTextfillDiagnosticsEnabled,
 } from '@shared/projection-textfill-diagnostics';
 
-export interface TextfillDiagnosticEntry {
-  id: string;
-  ts: string;
-  surface: string;
-  mode: 'preview' | 'output';
-  pass: number;
-  measurePhase?: string;
-  resultFontPx: number;
-  heightOverflow?: number;
-  spanOffsetH?: number;
-  maxH?: number;
-  rootConcealed?: boolean;
-  minFontPx: number;
-  maxFontPx: number;
-  textfillEnabled: boolean;
-  loBound: number;
-  hiBound: number;
-  box: { clientW: number; clientH: number; scrollW: number; scrollH: number };
-  root: { clientW: number; clientH: number };
-  stage?: { clientW: number; clientH: number; dataScreen?: string };
-  textSnippet: string;
-}
+export type { TextfillDiagnosticEntry };
 
 const enabled = ref(isTextfillDiagnosticsEnabled());
 const items = ref<TextfillDiagnosticEntry[]>([]);

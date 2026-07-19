@@ -17,7 +17,7 @@ export function normalizeBibleText(text: string): string {
     .trim();
 }
 
-/** Paridade com `buscaBiblia` (monitor.js v0.0.8): livro, capítulo e versículo opcionais. */
+/** Referência parcial: livro, capítulo e versículo opcionais. */
 export function parseBibleReference(raw: string): ParsedBibleReference | null {
   const texto = raw.trim();
   if (texto.length <= 1) return null;

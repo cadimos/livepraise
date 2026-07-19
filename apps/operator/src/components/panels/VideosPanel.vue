@@ -137,37 +137,53 @@ onUnmounted(() => {
 
 <template>
   <div class="flex h-full flex-col gap-3">
-    <div v-if="error" class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200">
+    <div
+      v-if="error"
+      class="rounded-lg border border-rose-500/40 bg-rose-950/40 px-3 py-2 text-sm text-rose-200"
+    >
       {{ error }}
     </div>
 
     <div class="lp-panel-field-row">
-      <label class="lp-panel-label" for="videos-category">{{ t('videos.category') }}</label>
+      <label
+        class="lp-panel-label"
+        for="videos-category"
+      >{{ t('videos.category') }}</label>
       <select
         id="videos-category"
         :value="prefs.videoCategory"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
         @change="loadVideos(($event.target as HTMLSelectElement).value)"
       >
-        <option v-for="cat in videoCategories" :key="cat" :value="cat">
+        <option
+          v-for="cat in videoCategories"
+          :key="cat"
+          :value="cat"
+        >
           {{ cat }}
         </option>
       </select>
     </div>
 
     <div class="lp-panel-field-row">
-      <label class="lp-panel-label" for="videos-search">{{ t('common.search') }}</label>
+      <label
+        class="lp-panel-label"
+        for="videos-search"
+      >{{ t('common.search') }}</label>
       <input
         id="videos-search"
         v-model="searchQuery"
         type="search"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text placeholder:text-lp-muted"
         :placeholder="t('common.searchPlaceholder')"
-      />
+      >
     </div>
 
     <ul class="grid min-h-0 flex-1 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4">
-      <li v-for="item in filteredVideos" :key="item.video">
+      <li
+        v-for="item in filteredVideos"
+        :key="item.video"
+      >
         <MediaTileContextMenu
           :media-path="item.video"
           media-kind="videos"
@@ -201,8 +217,11 @@ onUnmounted(() => {
               :src="mediaUrl(item.thumb)"
               alt=""
               class="h-full w-full object-cover"
-            />
-            <span v-else class="flex h-full items-center justify-center text-xs text-lp-muted">
+            >
+            <span
+              v-else
+              class="flex h-full items-center justify-center text-xs text-lp-muted"
+            >
               {{ t('videos.noThumb') }}
             </span>
             <span

@@ -23,19 +23,25 @@ Software desktop open-source (MIT) para projeção de louvores, passagens bíbli
 ```
 livepraise/
 ├── electron/          # Processo principal Electron (splash, monitores)
-├── server/            # HTTP + WebSocket
-├── core/              # Lógica de sistema (projeção, auth, temas, segurança)
+├── server/            # HTTP + WebSocket (TypeScript → dist/server/)
+├── core/              # Lógica de domínio (projeção, auth, temas, segurança)
 ├── apps/
-│   ├── operator/      # Vue 3 + Vite + Tailwind
-│   ├── projector/     # Projeção pública
-│   └── stage-return/  # Retorno de palco
-├── web/               # Portal, /live, /remote, ecrãs externos
+│   ├── operator/      # Vue 3 + Vite + Tailwind (fonte .ts/.vue)
+│   ├── projector/     # Projeção pública (fonte .ts → dist/apps/projector/)
+│   └── stage-return/  # Retorno de palco (fonte .ts → dist/apps/stage-return/)
+├── web/               # Portal, /live, /remote, ecrãs externos (fonte .ts → dist/web/*/)
+├── shared/            # Tipos e utilitários TS (emit → dist/shared/)
+├── scripts/           # Build, smokes, dist, helpers (*.mjs)
+├── tests/             # Testes unitários Node (`npm run test:unit`)
+├── docs/              # BUILD, ARCHITECTURE, planos, ADRs, checklists epic
+├── dist/              # Artefactos de build (gitignored — `npm run build`)
 ├── themes/            # Temas (theme.json + assets)
 ├── locales/           # Traduções
 ├── install/           # Payload da primeira instalação → ~/livepraise
-├── shared/            # Tipos e utilitários TS partilhados
 └── resources/         # Ícones e assets de build
 ```
+
+Documentação técnica: [`docs/BUILD.md`](docs/BUILD.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`docs/ST-038-EPIC-CHECKLIST.md`](docs/ST-038-EPIC-CHECKLIST.md), [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md).
 
 ## Requisitos
 
@@ -167,15 +173,44 @@ O Electron em `node_modules/electron/dist` é **por SO**. Após clonar ou copiar
 
 ## Desenvolvimento
 
+### Quickstart (clone limpo — TS-044)
+
+```bash
+git clone https://github.com/cadimos/livepraise.git
+cd livepraise
+npm ci                 # Node ≥ 22.12 (ver .nvmrc)
+npm run build          # server + electron + operator + web + apps browser
+npm run verify:sourcemaps # TS-038: maps em dev, ausentes em produção
+npm run verify:build   # opcional: build + smoke:surfaces (validação pós-clone)
+npm run dev            # Electron (browser com source maps — TS-038)
+```
+
+Ver [`docs/BUILD.md`](docs/BUILD.md) para ordem de build e aliases TypeScript.
+
 ```bash
 npm install
 npm run dev          # compila e abre o Electron (Linux/NTFS: --no-sandbox em dev)
 npm run dev:server   # só o servidor HTTP (porta 3000)
 npm run typecheck
+npm run lint             # ESLint (CI)
+npm run test:unit        # tests/*.mjs (requer build:server)
 npm run build        # server + electron + operator + projetor + stage-return
 ```
 
-Regressão entre versões (release / CI): [`scripts/README.md`](scripts/README.md) — `npm run smoke:release`.
+Regressão entre versões (release / CI): [`scripts/README.md`](scripts/README.md) — `npm run smoke:release`.  
+Smokes de feature: `npm run smoke:features` (auth, displays, backup, textfill, …).
+
+Hook git opt-in (lint + typecheck antes de commit): `npm run install:git-hooks` — ver [`docs/BUILD.md`](docs/BUILD.md#git-hooks-opt-in-ts-040).
+
+### Quando correr cada verificação (SM-036)
+
+| Momento | Comandos |
+|---------|----------|
+| **Dev diário** | `npm run typecheck`, `npm run lint` |
+| **Antes de PR** | `npm run test:unit`, `npm run smoke:release` (CI faz o mesmo núcleo) |
+| **Pré-release manual** | `npm run smoke:features` ou `--only=auth,displays,backup,textfill` |
+| **Migração v0.0.8** | `npm run smoke:legacy-upgrade` (isolado — não misturar com fase2) |
+| **Pós-clone / build** | `npm run verify:build`, `npm run verify:sourcemaps` |
 
 ## Instalação
 

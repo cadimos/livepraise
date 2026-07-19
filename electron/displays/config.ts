@@ -27,10 +27,6 @@ function mergedAssignmentsDiffer(
   return staleConnected;
 }
 
-function isPrimaryDisplay(display: Display): boolean {
-  return display.id === screen.getPrimaryDisplay().id;
-}
-
 function toConnected(display: Display): {
   id: number;
   label?: string | null;

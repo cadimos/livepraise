@@ -12,6 +12,17 @@ const MEDIA_URL_PATHS = [
 
 export type YoutubeImportJobPhase = 'downloading' | 'processing' | 'ready' | 'failed';
 
+function queueImportPhaseFromJob(
+  raw: unknown,
+  phase?: YoutubeImportJobPhase,
+): QueueItem['youtubeImportPhase'] {
+  const value = (typeof raw === 'string' ? raw : phase) as YoutubeImportJobPhase | undefined;
+  if (value === 'downloading' || value === 'processing' || value === 'failed') {
+    return value;
+  }
+  return undefined;
+}
+
 export interface YoutubeImportJobResponse {
   status: string;
   async?: boolean;
@@ -150,8 +161,7 @@ export function queueItemFromYoutubeJobResponse(
       typeof raw.previewVideoId === 'string' ? raw.previewVideoId : data.videoId,
     youtubeImportJobId:
       typeof raw.youtubeImportJobId === 'string' ? raw.youtubeImportJobId : data.jobId,
-    youtubeImportPhase:
-      (raw.youtubeImportPhase as QueueItem['youtubeImportPhase']) ?? data.phase ?? 'downloading',
+    youtubeImportPhase: queueImportPhaseFromJob(raw.youtubeImportPhase, data.phase),
     youtubeImportProgress:
       typeof raw.youtubeImportProgress === 'number'
         ? raw.youtubeImportProgress

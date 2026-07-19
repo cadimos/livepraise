@@ -3,14 +3,19 @@
  * Smoke Fase 8: instalação limpa + 6 ações socket + latência (CA-R02–R03, CA-R05, CA-R07).
  */
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import WebSocket from 'ws';
+import {
+  assert,
+  cleanupSmokeHome,
+  configureSmokeEnv,
+  createSmokeHome,
+  loadLivepraiseServer,
+  resolveAppRoot,
+} from './lib/smoke-helpers.mjs';
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-const appRoot = path.resolve(scriptDir, '..');
-const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'livepraise-smoke-f8-'));
+const appRoot = resolveAppRoot(import.meta.url);
+const testHome = createSmokeHome('livepraise-smoke-f8-');
 
 /** Seis ações core do protocolo live (subset da baseline Fase 3). */
 const SMOKE_SOCKET_ACTIONS = [
@@ -22,17 +27,9 @@ const SMOKE_SOCKET_ACTIONS = [
   { acao: 'removeConteudo', valor: '' },
 ];
 
-process.env.LIVEPRAISE_HOME = testHome;
-process.env.LIVEPRAISE_APP_ROOT = appRoot;
-process.env.LIVEPRAISE_PORT = '0';
+configureSmokeEnv({ home: testHome, appRoot, port: '0' });
 
-const { startLivepraiseServer, stopLivepraiseServer } = await import(
-  '../dist/server/index.js'
-);
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
+const { startLivepraiseServer, stopLivepraiseServer } = await loadLivepraiseServer(appRoot);
 
 function seedSmokeMedia(homeDir) {
   const imagePath = path.join(homeDir, 'livepraise', 'imagens', 'smoke-f8.jpg');
@@ -159,5 +156,5 @@ try {
   operator?.close();
   projector?.close();
   await stopLivepraiseServer().catch(() => {});
-  fs.rmSync(testHome, { recursive: true, force: true });
+  cleanupSmokeHome(testHome);
 }

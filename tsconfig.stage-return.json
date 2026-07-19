@@ -1,19 +1,12 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": ["./tsconfig.json", "./tsconfig.browser-paths.json"],
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": false,
-    "outDir": "apps/stage-return",
+    "outDir": "dist/apps/stage-return",
     "rootDir": "apps/stage-return/src",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "baseUrl": ".",
-    "paths": {
-      "/shared/display-debug-overlay.js": ["dist/shared/display-debug-overlay.d.ts"],
-      "/shared/service-timer-overlay.js": ["dist/shared/service-timer-overlay.d.ts"],
-      "/shared/footer-alert-overlay.js": ["dist/shared/footer-alert-overlay.d.ts"],
-      "/shared/projection-typography-runtime.js": ["dist/shared/projection-typography-runtime.d.ts"]
-    }
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
   },
   "include": ["apps/stage-return/src/**/*.ts"]
 }

@@ -283,7 +283,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="contents" @contextmenu="onContextMenu">
+  <div
+    class="contents"
+    @contextmenu="onContextMenu"
+  >
     <slot />
   </div>
 
@@ -346,7 +349,11 @@ onUnmounted(() => {
         {{ t('mediaContext.applyToQueue') }}
       </button>
     </li>
-    <li role="separator" class="my-1 border-t border-lp-surface" aria-hidden="true" />
+    <li
+      role="separator"
+      class="my-1 border-t border-lp-surface"
+      aria-hidden="true"
+    />
     <li>
       <button
         type="button"
@@ -375,31 +382,66 @@ onUnmounted(() => {
     @click.self="propertiesOpen = false"
   >
     <div class="w-full max-w-md rounded-xl border border-lp-surface bg-lp-background p-4 shadow-xl">
-      <h3 class="mb-3 text-sm font-semibold text-lp-text">{{ t('mediaContext.properties') }}</h3>
-      <p v-if="propertiesError" class="mb-2 text-sm text-rose-300">{{ propertiesError }}</p>
-      <dl v-else-if="properties" class="space-y-2 text-sm">
+      <h3 class="mb-3 text-sm font-semibold text-lp-text">
+        {{ t('mediaContext.properties') }}
+      </h3>
+      <p
+        v-if="propertiesError"
+        class="mb-2 text-sm text-rose-300"
+      >
+        {{ propertiesError }}
+      </p>
+      <dl
+        v-else-if="properties"
+        class="space-y-2 text-sm"
+      >
         <div class="flex justify-between gap-4">
-          <dt class="text-lp-muted">{{ t('mediaContext.fields.name') }}</dt>
-          <dd class="text-right text-lp-text">{{ properties.name }}</dd>
+          <dt class="text-lp-muted">
+            {{ t('mediaContext.fields.name') }}
+          </dt>
+          <dd class="text-right text-lp-text">
+            {{ properties.name }}
+          </dd>
         </div>
         <div class="flex justify-between gap-4">
-          <dt class="text-lp-muted">{{ t('mediaContext.fields.category') }}</dt>
-          <dd class="text-right text-lp-text">{{ properties.category }}</dd>
+          <dt class="text-lp-muted">
+            {{ t('mediaContext.fields.category') }}
+          </dt>
+          <dd class="text-right text-lp-text">
+            {{ properties.category }}
+          </dd>
         </div>
         <div class="flex justify-between gap-4">
-          <dt class="text-lp-muted">{{ t('mediaContext.fields.size') }}</dt>
-          <dd class="text-right text-lp-text">{{ properties.sizeLabel }}</dd>
+          <dt class="text-lp-muted">
+            {{ t('mediaContext.fields.size') }}
+          </dt>
+          <dd class="text-right text-lp-text">
+            {{ properties.sizeLabel }}
+          </dd>
         </div>
         <div class="flex justify-between gap-4">
-          <dt class="text-lp-muted">{{ t('mediaContext.fields.modified') }}</dt>
-          <dd class="text-right text-lp-text">{{ new Date(properties.modifiedAt).toLocaleString() }}</dd>
+          <dt class="text-lp-muted">
+            {{ t('mediaContext.fields.modified') }}
+          </dt>
+          <dd class="text-right text-lp-text">
+            {{ new Date(properties.modifiedAt).toLocaleString() }}
+          </dd>
         </div>
         <div class="flex justify-between gap-4">
-          <dt class="text-lp-muted">{{ t('mediaContext.fields.path') }}</dt>
-          <dd class="break-all text-right text-xs text-lp-text">{{ properties.path }}</dd>
+          <dt class="text-lp-muted">
+            {{ t('mediaContext.fields.path') }}
+          </dt>
+          <dd class="break-all text-right text-xs text-lp-text">
+            {{ properties.path }}
+          </dd>
         </div>
       </dl>
-      <p v-else class="text-sm text-lp-muted">{{ t('common.loading') }}</p>
+      <p
+        v-else
+        class="text-sm text-lp-muted"
+      >
+        {{ t('common.loading') }}
+      </p>
       <div class="mt-4 flex justify-end">
         <button
           type="button"
@@ -421,9 +463,18 @@ onUnmounted(() => {
     @click.self="replaceOpen = false"
   >
     <div class="w-full max-w-lg rounded-xl border border-lp-surface bg-lp-background p-4 shadow-xl">
-      <h3 class="mb-2 text-sm font-semibold text-lp-text">{{ t('mediaContext.replaceQuickTitle') }}</h3>
-      <p class="mb-3 text-xs text-lp-muted">{{ t('mediaContext.replaceQuickHint') }}</p>
-      <p v-if="replaceError" class="mb-2 text-sm text-rose-300">{{ replaceError }}</p>
+      <h3 class="mb-2 text-sm font-semibold text-lp-text">
+        {{ t('mediaContext.replaceQuickTitle') }}
+      </h3>
+      <p class="mb-3 text-xs text-lp-muted">
+        {{ t('mediaContext.replaceQuickHint') }}
+      </p>
+      <p
+        v-if="replaceError"
+        class="mb-2 text-sm text-rose-300"
+      >
+        {{ replaceError }}
+      </p>
       <div class="flex flex-wrap gap-2">
         <button
           v-for="slot in quickBackgrounds"
@@ -433,7 +484,11 @@ onUnmounted(() => {
           :disabled="replaceBusy || !slot.id"
           @click="confirmReplace(slot)"
         >
-          <img :src="quickBackgroundDisplayUrl(slot)" alt="" class="h-full w-full object-cover" />
+          <img
+            :src="quickBackgroundDisplayUrl(slot)"
+            alt=""
+            class="h-full w-full object-cover"
+          >
         </button>
       </div>
       <div class="mt-4 flex justify-end">
@@ -457,13 +512,26 @@ onUnmounted(() => {
     @click.self="categoryOpen = false"
   >
     <div class="w-full max-w-sm rounded-xl border border-lp-surface bg-lp-background p-4 shadow-xl">
-      <h3 class="mb-3 text-sm font-semibold text-lp-text">{{ t('mediaContext.changeCategory') }}</h3>
-      <p v-if="categoryError" class="mb-2 text-sm text-rose-300">{{ categoryError }}</p>
+      <h3 class="mb-3 text-sm font-semibold text-lp-text">
+        {{ t('mediaContext.changeCategory') }}
+      </h3>
+      <p
+        v-if="categoryError"
+        class="mb-2 text-sm text-rose-300"
+      >
+        {{ categoryError }}
+      </p>
       <select
         v-model="targetCategory"
         class="mb-4 w-full rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
       >
-        <option v-for="cat in otherCategories" :key="cat" :value="cat">{{ cat }}</option>
+        <option
+          v-for="cat in otherCategories"
+          :key="cat"
+          :value="cat"
+        >
+          {{ cat }}
+        </option>
       </select>
       <div class="flex justify-end gap-2">
         <button

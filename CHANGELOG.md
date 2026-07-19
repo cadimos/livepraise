@@ -8,6 +8,25 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 ### Adicionado
 
+- **TypeScript / build (TS-038)** — `npm run build:browser:dev` gera source maps para projector/web; `npm run verify:sourcemaps` valida dev vs produção; `npm run dev` usa browser dev.
+- **ESLint TypeScript (TS-039)** — `eslint.config.js`, `npm run lint` / `lint:fix`; job CI typecheck executa lint antes do typecheck.
+- **Smokes consolidados (SM-009/010/011/012/013/030/042)** — `smoke:features`, domínios auth/displays/backup/textfill; checklists TF-028 + SM-042.
+- **TS-041** — comentários «paridade v0.0.8» actualizados em fonte TS (legado mantido só em `legacy-upgrade.ts`).
+- **TS-040/042, SM-041, ST-025** — hook git opt-in, `verify:depcheck`, `test:unit`, README estrutura actualizado.
+- **ST-038** — epic estrutura fechado — [`ST-038-EPIC-CHECKLIST.md`](ST-038-EPIC-CHECKLIST.md); CI inclui `test:unit`.
+- **ST-004/005/006** — `shared/projection-chords.ts`, `shared/ws-live-url.ts`; duplicados web removidos.
+- **ST-010** — `npm run clean` remove `dist/` para rebuild determinístico.
+- **TF-025** — `smoke:release` inclui `smoke:textfill`.
+- **TS-046** — ESLint 0 warnings (`lint:fix` + cleanup imports).
+- **ST-016/017** — guia operador + imports `@shared` padronizados.
+- **ST-027–032** — dívida técnica em `docs/DIVIDA-TECNICA.md`; OpenAPI no CI.
+- **SM-006/035** — aliases `smoke:core:*`; validação instalador Windows no release CI.
+- **TF-023/026** — backlog Vitest composable + ADR «não implementar» `<ProjectionContent>`.
+
+### Removido
+
+- **Scripts `smoke:cad187` … `smoke:cad314`** — substituídos por `smoke:features`, `smoke:textfill`, `smoke:typography-qa`, `smoke:fase8`, `smoke:version`, etc. Ver [`scripts/README.md`](scripts/README.md).
+
 - **Diagnóstico de textfill** — registo JSONL de medições de fonte e layout (prévia e projetor) em `~/livepraise/textfill-diagnostics.jsonl`; UI em Configurações → Logs de erro; exportação JSONL para suporte.
 
 ### Corrigido

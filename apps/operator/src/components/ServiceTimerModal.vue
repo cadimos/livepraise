@@ -41,15 +41,21 @@ function onModeChange(key: string, mode: ServiceTimerMode): void {
 </script>
 
 <template>
-  <SettingsModal v-model:open="open" :title="t('serviceTimer.title')" wide>
-    <p class="mb-4 text-sm text-lp-muted">{{ t('serviceTimer.intro') }}</p>
+  <SettingsModal
+    v-model:open="open"
+    :title="t('serviceTimer.title')"
+    wide
+  >
+    <p class="mb-4 text-sm text-lp-muted">
+      {{ t('serviceTimer.intro') }}
+    </p>
 
     <label class="mb-4 flex items-center gap-2 text-sm">
       <input
         type="checkbox"
         :checked="state.active"
         @change="setActive(($event.target as HTMLInputElement).checked)"
-      />
+      >
       {{ t('serviceTimer.enable') }}
     </label>
 
@@ -60,13 +66,17 @@ function onModeChange(key: string, mode: ServiceTimerMode): void {
         <span class="text-xs font-medium uppercase text-lp-muted">{{
           t('serviceTimer.modes.counter')
         }}</span>
-        <p class="font-mono text-2xl tabular-nums">{{ previewCounter }}</p>
+        <p class="font-mono text-2xl tabular-nums">
+          {{ previewCounter }}
+        </p>
       </div>
       <div>
         <span class="text-xs font-medium uppercase text-lp-muted">{{
           t('serviceTimer.modes.timer')
         }}</span>
-        <p class="font-mono text-2xl tabular-nums">{{ previewTimer }}</p>
+        <p class="font-mono text-2xl tabular-nums">
+          {{ previewTimer }}
+        </p>
       </div>
     </div>
 
@@ -80,7 +90,7 @@ function onModeChange(key: string, mode: ServiceTimerMode): void {
           max="600"
           class="w-24 rounded border border-lp-surface bg-lp-background px-2 py-1"
           :disabled="!state.active"
-        />
+        >
       </label>
       <button
         type="button"
@@ -100,15 +110,30 @@ function onModeChange(key: string, mode: ServiceTimerMode): void {
       </button>
     </div>
 
-    <h3 class="mb-2 text-sm font-semibold">{{ t('serviceTimer.targetsTitle') }}</h3>
-    <p class="mb-3 text-xs text-lp-muted">{{ t('serviceTimer.targetsHint') }}</p>
+    <h3 class="mb-2 text-sm font-semibold">
+      {{ t('serviceTimer.targetsTitle') }}
+    </h3>
+    <p class="mb-3 text-xs text-lp-muted">
+      {{ t('serviceTimer.targetsHint') }}
+    </p>
 
-    <p v-if="loading" class="text-sm text-lp-muted">{{ t('serviceTimer.loading') }}</p>
-    <p v-else-if="!rows.length" class="text-sm text-lp-muted">
+    <p
+      v-if="loading"
+      class="text-sm text-lp-muted"
+    >
+      {{ t('serviceTimer.loading') }}
+    </p>
+    <p
+      v-else-if="!rows.length"
+      class="text-sm text-lp-muted"
+    >
       {{ t('serviceTimer.noTargets') }}
     </p>
 
-    <ul v-else class="space-y-2">
+    <ul
+      v-else
+      class="space-y-2"
+    >
       <li
         v-for="row in rows"
         :key="row.key"
@@ -124,7 +149,7 @@ function onModeChange(key: string, mode: ServiceTimerMode): void {
                 enabled: ($event.target as HTMLInputElement).checked,
               })
             "
-          />
+          >
           <span class="truncate font-medium">{{ row.label }}</span>
           <span class="text-xs text-lp-muted">({{ roleLabel(row.roleHint) }})</span>
         </label>
@@ -134,8 +159,12 @@ function onModeChange(key: string, mode: ServiceTimerMode): void {
           :disabled="!state.active || !row.enabled"
           @change="onModeChange(row.key, ($event.target as HTMLSelectElement).value as ServiceTimerMode)"
         >
-          <option value="counter">{{ t('serviceTimer.modes.counter') }}</option>
-          <option value="timer">{{ t('serviceTimer.modes.timer') }}</option>
+          <option value="counter">
+            {{ t('serviceTimer.modes.counter') }}
+          </option>
+          <option value="timer">
+            {{ t('serviceTimer.modes.timer') }}
+          </option>
         </select>
       </li>
     </ul>

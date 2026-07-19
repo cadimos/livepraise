@@ -186,7 +186,7 @@ export function buildHealthReport(liveHubAttached: boolean): HealthReport {
     {
       id: 'projector-ui',
       name: 'UI do projetor',
-      active: pathExists(path.join(appRoot, 'apps/projector')),
+      active: pathExists(path.join(appRoot, 'dist/apps/projector')),
       mount: '/projector',
     },
     {
@@ -198,25 +198,25 @@ export function buildHealthReport(liveHubAttached: boolean): HealthReport {
     {
       id: 'live-portal',
       name: 'Portal live',
-      active: pathExists(path.join(appRoot, 'web/live')),
+      active: pathExists(path.join(appRoot, 'dist/web/live')),
       mount: '/live',
     },
     {
       id: 'external-displays',
       name: 'Ecrãs externos (vocal/stage/player)',
-      active: pathExists(path.join(appRoot, 'web/external-display')),
+      active: pathExists(path.join(appRoot, 'dist/web/external-display')),
       mount: '/vocal, /stage, /player',
     },
     {
       id: 'remote-ui',
       name: 'Controlo remoto (web)',
-      active: pathExists(path.join(appRoot, 'web/remote')),
+      active: pathExists(path.join(appRoot, 'dist/web/remote')),
       mount: '/remote',
     },
     {
       id: 'portal',
       name: 'Portal web',
-      active: pathExists(path.join(appRoot, 'web/portal')),
+      active: pathExists(path.join(appRoot, 'dist/web/portal')),
       mount: '/',
     },
     {
