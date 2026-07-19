@@ -15,9 +15,10 @@ import { ensureEndpointDeviceId } from '/shared/endpoint-device-id.js';
 import { createServiceTimerOverlay } from '/shared/service-timer-overlay.js';
 import {
   attachProjectionTypographyWs,
-  createProjectionTypographyController,
+  createProjectionTypographySession,
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
+import { createProjectionTextfill } from '/shared/projection-textfill.js';
 import { wsLiveUrl } from '/shared/ws-live-url.js';
 
 attachDisplayDebugOverlayListener();
@@ -397,7 +398,7 @@ function applyAction(action: LiveAction): void {
     byId<HTMLDivElement>('stage'),
     content,
   );
-  typography.scheduleRefresh();
+  textfill.scheduleRefresh();
 }
 
 const projectionContrast = attachProjectionContrast({
@@ -408,12 +409,32 @@ const projectionContrast = attachProjectionContrast({
 });
 void projectionContrast;
 
-const typography = createProjectionTypographyController({
+const typography = createProjectionTypographySession({
   rootEl: byId<HTMLDivElement>('conteudo'),
   role: 'projector',
-  mode: 'output',
   diagnosticSurface: 'projector',
 });
+const textfill = createProjectionTextfill({
+  rootEl: byId<HTMLDivElement>('conteudo'),
+  mode: 'output',
+  resolve: () => typography.resolveTextfillParams(),
+  beforeRefresh: () => typography.applyChrome(),
+});
+
+async function initTypography(prefs: Awaited<ReturnType<typeof fetchProjectionTypographyPrefs>>) {
+  await typography.init(prefs);
+  textfill.attach([byId<HTMLDivElement>('stage')]);
+  await textfill.refresh();
+}
+
+const typographyBridge = {
+  setPrefs: async (
+    prefs: Awaited<ReturnType<typeof fetchProjectionTypographyPrefs>>,
+  ) => {
+    await typography.setPrefs(prefs);
+    await textfill.refresh();
+  },
+};
 
 function connect(): WebSocket {
   const socket = new WebSocket(wsUrl());
@@ -431,7 +452,7 @@ function connect(): WebSocket {
     socket.send(JSON.stringify(join));
   });
 
-  handleWsMessage = attachProjectionTypographyWs(typography, (message) => {
+  handleWsMessage = attachProjectionTypographyWs(typographyBridge, (message) => {
     if (message.type === 'live-action') {
       applyAction((message as WsLiveBroadcastMessage).action);
     }
@@ -470,6 +491,6 @@ window.addEventListener('load', () => {
   });
 });
 void registerRemoteDevice().then(() => applyStoredScreenSize());
-void fetchProjectionTypographyPrefs().then((prefs) => typography.init(prefs));
+void fetchProjectionTypographyPrefs().then((prefs) => initTypography(prefs));
 
 export {};

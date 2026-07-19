@@ -176,9 +176,10 @@ try {
       'apps/stage-return/src/stage-return.ts',
     ]) {
       const src = readSrc(file);
-      assert(src.includes('createProjectionTypographyController'), `CA-7 ${file}`);
+      assert(src.includes('createProjectionTextfill'), `CA-7 textfill ${file}`);
+      assert(src.includes('createProjectionTypographySession'), `CA-7 typography ${file}`);
     }
-    pass('CA-7', 'Roboto bundled + runtime em projetor/live/stage-return');
+    pass('CA-7', 'Roboto bundled + textfill + tipografia em projetor/live/stage-return');
   }
 
   // CA-8 — aviso fontes sistema (copy + UI)
@@ -196,10 +197,10 @@ try {
     const projector = readSrc('apps/projector/src/projector.ts');
     assert(projector.includes("case 'ajustarTela'"), 'CA-9 ajustarTela case');
     assert(
-      /case 'ajustarTela'[\s\S]*typography\.scheduleRefresh\(\)/.test(projector),
+      /case 'ajustarTela'[\s\S]*textfill\.scheduleRefresh\(\)/.test(projector),
       'CA-9 scheduleRefresh após ajustarTela',
     );
-    pass('CA-9', 'ajustarTela → typography.scheduleRefresh() no projetor');
+    pass('CA-9', 'ajustarTela → textfill.scheduleRefresh() no projetor');
   }
 
   // CA-10 — high-contrast presente; contraste de projeção intacto

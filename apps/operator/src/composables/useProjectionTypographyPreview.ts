@@ -9,7 +9,12 @@ import {
   type ComputedRef,
   type Ref,
 } from 'vue';
-import { refreshPreviewTextfill } from '@shared/projection-textfill';
+import {
+  createProjectionTextfill,
+  PROJECTION_TEXTFILL_PREVIEW_REFRESH_DEBOUNCE_MS,
+  PROJECTION_TEXTFILL_RESIZE_DEBOUNCE_MS,
+  type ProjectionTextfillHandle,
+} from '@shared/projection-textfill';
 import {
   applyProjectionTypographyStyles,
   bundledFontFileForProfile,
@@ -19,17 +24,13 @@ import {
   projectionTextShadowSlackPx,
   resolveProjectionTextShadowCss,
 } from '@shared/projection-text-shadow';
-import {
-  PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS,
-  PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS,
-} from '@shared/projection-typography-timing';
 import { apiBase } from './useApi';
 import { useProjectionFonts } from './useProjectionFonts';
 
-/** @deprecated Preferir `PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS`. */
-export const PREVIEW_REFRESH_DEBOUNCE_MS = PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS;
-/** @deprecated Preferir `PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS`. */
-export const PREVIEW_RESIZE_DEBOUNCE_MS = PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS;
+/** @deprecated Preferir exports em `@shared/projection-textfill`. */
+export const PREVIEW_REFRESH_DEBOUNCE_MS = PROJECTION_TEXTFILL_PREVIEW_REFRESH_DEBOUNCE_MS;
+/** @deprecated Preferir exports em `@shared/projection-textfill`. */
+export const PREVIEW_RESIZE_DEBOUNCE_MS = PROJECTION_TEXTFILL_RESIZE_DEBOUNCE_MS;
 
 export interface UseProjectionTypographyPreviewOptions {
   rootRef: Ref<HTMLElement | null>;
@@ -53,10 +54,7 @@ export function useProjectionTypographyPreview(
   const { bundledFamilyById, resolveCssFamily } = useProjectionFonts();
   const fontFaceStyleRef = ref<HTMLStyleElement | null>(null);
 
-  let refreshGeneration = 0;
-  let resizeDebounce: ReturnType<typeof setTimeout> | null = null;
-  let refreshDebounce: ReturnType<typeof setTimeout> | null = null;
-  let resizeObserver: ResizeObserver | null = null;
+  let textfill: ProjectionTextfillHandle | null = null;
   let lastLayoutSignature = '';
 
   const profile = computed(() => unref(options.profile));
@@ -100,10 +98,42 @@ export function useProjectionTypographyPreview(
     return unref(surface);
   });
 
+  function ensureTextfill(root: HTMLElement): ProjectionTextfillHandle {
+    if (textfill) return textfill;
+    textfill = createProjectionTextfill({
+      rootEl: root,
+      mode: 'preview',
+      refreshDebounceMs: PROJECTION_TEXTFILL_PREVIEW_REFRESH_DEBOUNCE_MS,
+      resizeDebounceMs: PROJECTION_TEXTFILL_RESIZE_DEBOUNCE_MS,
+      resolve: () => ({
+        minFontPx: profile.value.minFontPx,
+        maxFontPx: profile.value.maxFontPx,
+        textfillEnabled: profile.value.textfillEnabled,
+        fontFamily: cssFamily.value,
+        fontWeight: profile.value.fontWeight,
+        fontStyle: profile.value.fontStyle,
+        fitSlackPx: fitSlackPx.value,
+        diagnosticSurface: diagnosticLabel.value,
+      }),
+      beforeRefresh: async () => {
+        if (unref(options.disabled)) return false;
+        await nextTick();
+        if (options.prepareContent?.() === false) return false;
+        if (!root.querySelector('.content span, .content, .texto')) return false;
+        applyProjectionTypographyStyles(root, {
+          fontFamily: cssFamily.value,
+          fontWeight: profile.value.fontWeight,
+          fontStyle: profile.value.fontStyle,
+          textShadowCss: textShadowCss.value,
+        });
+      },
+    });
+    return textfill;
+  }
+
   async function runPreviewRefresh(remeasure = false): Promise<void> {
     if (unref(options.disabled)) return;
 
-    const generation = ++refreshGeneration;
     const layoutSig = options.layoutSignature ? unref(options.layoutSignature) : null;
     const layoutChanged = layoutSig !== null && layoutSig !== lastLayoutSignature;
     const needsTextfill = layoutSig === null || layoutChanged || remeasure;
@@ -116,68 +146,52 @@ export function useProjectionTypographyPreview(
     const root = options.rootRef.value;
     if (!root) return;
 
-    if (options.prepareContent?.() === false) return;
-
-    if (!root.querySelector('.content span, .content, .texto')) {
+    const handle = ensureTextfill(root);
+    if (!needsTextfill) {
+      applyProjectionTypographyStyles(root, {
+        fontFamily: cssFamily.value,
+        fontWeight: profile.value.fontWeight,
+        fontStyle: profile.value.fontStyle,
+        textShadowCss: textShadowCss.value,
+      });
+      if (options.previewReady) options.previewReady.value = true;
       return;
     }
 
-    applyProjectionTypographyStyles(root, {
-      fontFamily: cssFamily.value,
-      fontWeight: profile.value.fontWeight,
-      fontStyle: profile.value.fontStyle,
-      textShadowCss: textShadowCss.value,
-    });
+    await handle.refresh();
 
-    if (needsTextfill) {
-      await refreshPreviewTextfill(
-        root,
-        profile.value.minFontPx,
-        profile.value.maxFontPx,
-        profile.value.textfillEnabled,
-        {
-          fontFamily: cssFamily.value,
-          fontWeight: profile.value.fontWeight,
-          fontStyle: profile.value.fontStyle,
-          fitSlackPx: fitSlackPx.value,
-          diagnosticSurface: diagnosticLabel.value,
-        },
-      );
-      if (layoutSig !== null && layoutChanged) {
-        lastLayoutSignature = layoutSig;
-      }
+    if (layoutSig !== null && layoutChanged) {
+      lastLayoutSignature = layoutSig;
     }
-
-    if (generation !== refreshGeneration) return;
     if (options.previewReady) {
       options.previewReady.value = true;
     }
   }
 
   function schedulePreviewRefresh(remeasure = false): void {
-    if (refreshDebounce) clearTimeout(refreshDebounce);
-    refreshDebounce = setTimeout(() => {
+    const root = options.rootRef.value;
+    if (!root) {
       void runPreviewRefresh(remeasure);
-    }, PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS);
+      return;
+    }
+    const handle = ensureTextfill(root);
+    if (remeasure) {
+      handle.scheduleRefresh();
+      return;
+    }
+    void runPreviewRefresh(false);
   }
 
   function attachPreviewResizeObserver(): void {
+    const root = options.rootRef.value;
     const frame = options.frameRef.value;
-    if (!frame) return;
-    resizeObserver = new ResizeObserver(() => {
-      if (resizeDebounce) clearTimeout(resizeDebounce);
-      resizeDebounce = setTimeout(() => {
-        schedulePreviewRefresh(true);
-      }, PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS);
-    });
-    resizeObserver.observe(frame);
+    if (!root) return;
+    ensureTextfill(root).attach([frame]);
   }
 
   function detachPreviewResizeObserver(): void {
-    if (resizeDebounce) clearTimeout(resizeDebounce);
-    if (refreshDebounce) clearTimeout(refreshDebounce);
-    resizeObserver?.disconnect();
-    resizeObserver = null;
+    textfill?.disconnect();
+    textfill = null;
   }
 
   watch(fontFaceCss, (css) => {

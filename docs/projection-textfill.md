@@ -1,18 +1,40 @@
 # Textfill de projeção
 
 Motor de redimensionamento de texto para caber na área útil da projeção (substituto do jQuery TextFill).  
-Documento TF-001 … TF-004; auditoria de duplicação TF-005.
+Documento TF-001 … TF-004; auditoria de integração TF-005.
 
 ## Camadas
 
 ```text
-shared/projection-textfill.ts              ← motor (algoritmo)
-shared/projection-typography-timing.ts     ← debounces partilhados (resize / preview refresh)
-shared/projection-typography-runtime.ts    ← createProjectionTypographyController()
-shared/projection-typography.ts            ← perfis, prefs, estilos CSS
-apps/operator (Vue)                        ← useProjectionTypographyPreview (prévias)
-projector / external-display / live        ← saídas via controller
+shared/projection-textfill.ts              ← ÚNICO motor (algoritmo + createProjectionTextfill)
+shared/projection-typography.ts            ← perfis / prefs / estilos CSS
+shared/projection-typography-runtime.ts    ← tipografia (fonte, sombra, prefs, WS) — NÃO é textfill
+apps/operator (Vue)                        ← useProjectionTypographyPreview → createProjectionTextfill
+projector / live / external / stage-return ← chamam createProjectionTextfill + sessão tipografia
 ```
+
+## Modelo de uso (paridade jQuery TextFill)
+
+```ts
+import { createProjectionTextfill } from '/shared/projection-textfill.js';
+import { createProjectionTypographySession } from '/shared/projection-typography-runtime.js';
+
+const typography = createProjectionTypographySession({ rootEl, role: 'projector' });
+const textfill = createProjectionTextfill({
+  rootEl,
+  mode: 'output',
+  resolve: () => typography.resolveTextfillParams(),
+  beforeRefresh: () => typography.applyChrome(),
+});
+
+await typography.init(prefs);
+textfill.attach([stageEl]);
+await textfill.refresh();
+// após mudar o HTML:
+textfill.scheduleRefresh();
+```
+
+O fit **só** altera `font-size`; fonte/sombra vêm da sessão tipográfica (como CSS à parte do plugin jQuery).
 
 ## Modos
 
@@ -21,42 +43,30 @@ projector / external-display / live        ← saídas via controller
 | `preview` | `applyPreviewTextfill` / `refreshPreviewTextfill` | Tiles do operador; `minPx` pode ir a 8px |
 | `output` | `applyOutputTextfill` / `refreshOutputTextfill` | Projetor, live, ecrãs externos |
 | `output` (batch) | `refreshOutputTextfillAll` | Retorno de palco — cada `.texto` ou acoplado `.atual`/`.proximo` |
+| binding | `createProjectionTextfill` | Resize + scheduleRefresh no mesmo módulo |
 
 ## API pública do motor (TF-002)
 
 | Export | Descrição |
 |--------|-----------|
-| `applyPreviewTextfill(el, min, max, enabled, opts?)` | Síncrono; prévia |
-| `applyOutputTextfill(el, min, max, enabled, opts?)` | Síncrono; saída |
-| `refreshPreviewTextfill(el, min, max, enabled, opts?)` | Async; aguarda fontes/layout |
-| `refreshOutputTextfill(el, min, max, enabled, opts?)` | Async; saída real |
-| `refreshOutputTextfillAll(root, min, max, enabled, opts?)` | Async; múltiplos `.texto` |
-| `waitForProjectionTypographyLayout(opts?)` | Aguarda `@font-face` antes de medir |
-| `PREVIEW_TEXTFILL_MIN_PX` | Constante 8 — piso na prévia (tiles operador) |
-| `STAGE_RETURN_OUTPUT_FLOOR_PX` | Constante 10 — piso em saída real no retorno de palco (`.retorno-musica` / `.retorno-biblia`) e em `refreshOutputTextfillAll` |
-
-### `ProjectionTextfillOptions` (principais)
-
-| Opção | Descrição |
-|-------|-----------|
-| `spanSelector` | Selector do nó de texto (default `.content > span`) |
-| `allTexto` | Via runtime — retorno de palco |
-| `maxFontPxScale` | Escala para `.proximo` vs `.atual` |
-| `fitSlackPx` | Margem extra (sombra de texto) |
-| `suppressVisibilityToggle` | Evita flash em batch |
-| `diagnosticSurface` | Label nos logs JSONL |
-| `fontFamily`, `fontWeight`, `fontStyle` | Medição com fonte correcta |
+| `createProjectionTextfill(opts)` | Handle estilo plugin (`refresh` / `scheduleRefresh` / `attach` / `disconnect`) |
+| `applyPreviewTextfill` / `refreshPreviewTextfill` | Prévia |
+| `applyOutputTextfill` / `refreshOutputTextfill` | Saída |
+| `refreshOutputTextfillAll` / `applyOutputTextfillAll` | Retorno de palco |
+| `waitForProjectionTypographyLayout` | Aguarda `@font-face` antes de medir |
+| `PREVIEW_TEXTFILL_MIN_PX` | Constante 8 — piso na prévia |
+| `STAGE_RETURN_OUTPUT_FLOOR_PX` | Constante 10 — piso retorno de palco |
+| `PROJECTION_TEXTFILL_RESIZE_DEBOUNCE_MS` | 120 — resize |
+| `PROJECTION_TEXTFILL_PREVIEW_REFRESH_DEBOUNCE_MS` | 32 — schedule em prévia |
 
 ## Quando usar o quê (TF-003)
 
 | Contexto | Usar |
 |----------|------|
-| Projetor, live, external-display, stage (`/stage/`) | `createProjectionTypographyController()` |
+| Projetor, live, external-display, stage-return | `createProjectionTextfill` + `createProjectionTypographySession` |
+| Prévia operador | `useProjectionTypographyPreview()` (chama o motor) |
 | Testes unitários / smokes | Imports directos do motor |
-| Prévia operador | `useProjectionTypographyPreview()` composable |
-| Configurações → Tipografia | Idem composable |
-
-**Regra alvo:** produção usa sempre o **controller** ou composable Vue que o encapsula; o motor directo fica restrito a testes.
+| Conveniência (legado) | `createProjectionTypographyController` ainda existe e só compõe tipografia + textfill |
 
 ## Fluxo operador → projetor (TF-004)
 
@@ -65,32 +75,25 @@ sequenceDiagram
   participant Op as Operador Vue
   participant API as PUT /projection-typography
   participant WS as WebSocket hub
-  participant RT as projection-typography-runtime
+  participant Ty as typography session
   participant TF as projection-textfill
   participant DOM as #conteudo
 
   Op->>API: guardar prefs (min/max, textfill, fonte)
   API->>WS: broadcast typography-updated
-  WS->>RT: setPrefs()
-  RT->>TF: refreshOutputTextfill()
+  WS->>Ty: setPrefs() + applyChrome()
+  Ty->>TF: textfill.refresh()
   TF->>DOM: font-size inline final
 ```
 
-## Auditoria de duplicação — operador (TF-005)
+## Integração tipografia vs motor (TF-005)
 
-Lógica **equivalente** entre `useProjectionTypographyPreview` e `createProjectionTypographyController` (dois caminhos de integração mantidos de propósito — TF-026).
+| Responsabilidade | Ficheiro |
+|------------------|----------|
+| Algoritmo + resize binding | `shared/projection-textfill.ts` |
+| Fonte, sombra, prefs, WS | `shared/projection-typography-runtime.ts` |
+| Prévias Vue | `useProjectionTypographyPreview` → `createProjectionTextfill` |
 
-| Comportamento | Runtime (controller) | Operador (composable) |
-|---------------|----------------------|------------------------|
-| Motor de fit | `runTextfill` → `projection-textfill.ts` | `refreshPreviewTextfill` → mesmo motor |
-| Font / shadow / slack | partilhados em `@shared/projection-*` | Idem ✓ |
-| Debounce resize | `PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS` (120) | Idem ✓ (`shared/projection-typography-timing.ts`) |
-| Debounce refresh | `requestAnimationFrame` | `PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS` (32) |
-| WS sync prefs | `attachProjectionTypographyWs` | N/A (`usePreferences` local) |
-| `@font-face` | `ensureFontFaceStyle` | `fontFaceCss` + `<style>` no tile |
-
-**Onde alterar timings:** `shared/projection-typography-timing.ts`.  
-**Onde alterar o algoritmo:** `shared/projection-textfill.ts`.  
 TF-026 ADR: não criar `<ProjectionContent>` — ver [`TF-026-ADR-projection-content.md`](TF-026-ADR-projection-content.md).
 
 ## Diagnóstico (TF-021)
@@ -133,8 +136,8 @@ Integrados em `npm run smoke:textfill` e `npm run smoke:typography-qa` (SM-010/0
 
 | Superfície | Integração textfill | Estado |
 |------------|---------------------|--------|
-| Projetor | `createProjectionTypographyController` — sem import directo do motor | ✅ |
-| Live / external-display | Idem via `projection-typography-runtime` | ✅ |
-| Operador (prévia) | `useProjectionTypographyPreview` → `refreshPreviewTextfill` | ✅ |
-| Retorno palco (`/stage`) | `textfillOptions: { allTexto: true }` em external-display | ✅ |
+| Projetor | `createProjectionTextfill` + sessão tipografia | ✅ |
+| Live / external-display | Idem | ✅ |
+| Operador (prévia) | composable → `createProjectionTextfill` | ✅ |
+| Retorno palco (`/stage`) | `allTexto: true` via params do motor | ✅ |
 | `apps/stage-return/` (legado) | Compila mas **não** servido HTTP — Electron usa `/stage/` | ⚠️ ver ST-004 |

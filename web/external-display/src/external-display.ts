@@ -14,9 +14,10 @@ import { createServiceTimerOverlay } from '/shared/service-timer-overlay.js';
 import { clearViewerStatus, setViewerStatus } from '/shared/viewer-status.js';
 import {
   attachProjectionTypographyWs,
-  createProjectionTypographyController,
+  createProjectionTypographySession,
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
+import { createProjectionTextfill } from '/shared/projection-textfill.js';
 import type { ProjectionTypographyPrefs } from '/shared/projection-typography.js';
 import type {
   ExternalDisplayProfile,
@@ -65,14 +66,25 @@ document.body.dataset.profile = profile;
 
 const usesStageReturnLayout = profile === 'stage' || profile === 'vocal';
 
-const typography = createProjectionTypographyController({
+const typography = createProjectionTypographySession({
   rootEl: byId('conteudo'),
   role: 'external-display',
   externalProfile: profile,
-  mode: 'output',
   textfillOptions: usesStageReturnLayout ? { allTexto: true } : undefined,
   shadowSelector: usesStageReturnLayout ? '.texto-fill, .texto, .content' : '.content',
 });
+const textfill = createProjectionTextfill({
+  rootEl: byId('conteudo'),
+  mode: 'output',
+  resolve: () => typography.resolveTextfillParams(),
+  beforeRefresh: () => typography.applyChrome(),
+});
+const typographyBridge = {
+  setPrefs: async (prefs: ProjectionTypographyPrefs | null) => {
+    await typography.setPrefs(prefs);
+    await textfill.refresh();
+  },
+};
 
 const serviceTimerOverlay = createServiceTimerOverlay({
   kind: 'external',
@@ -204,7 +216,7 @@ function applyAction(action: LiveAction): void {
     `${action.acao} @ ${new Date().toLocaleTimeString()}`,
   );
   syncProjectionContentState(byId('stage'), content);
-  typography.scheduleRefresh();
+  textfill.scheduleRefresh();
   refreshViewerStatus();
 }
 
@@ -240,7 +252,7 @@ function connect(): void {
     }
   };
 
-  const handleWsMessage = attachProjectionTypographyWs(typography, (message) => {
+  const handleWsMessage = attachProjectionTypographyWs(typographyBridge, (message) => {
     handleLiveMessage(message as WsServerMessage);
   });
 
@@ -276,7 +288,9 @@ setViewerStatus(statusEl(), 'A ligar…');
 void registerDevice().catch((err) => {
   console.warn('Registo dispositivo:', err);
 });
-void fetchProjectionTypographyPrefs().then((prefs: ProjectionTypographyPrefs | null) =>
-  typography.init(prefs),
-);
+void fetchProjectionTypographyPrefs().then(async (prefs: ProjectionTypographyPrefs | null) => {
+  await typography.init(prefs);
+  textfill.attach([byId('stage')]);
+  await textfill.refresh();
+});
 connect();

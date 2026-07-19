@@ -8,9 +8,10 @@ import { clearViewerStatus, setViewerStatus } from '/shared/viewer-status.js';
 import { ensureEndpointDeviceId } from '/shared/endpoint-device-id.js';
 import {
   attachProjectionTypographyWs,
-  createProjectionTypographyController,
+  createProjectionTypographySession,
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
+import { createProjectionTextfill } from '/shared/projection-textfill.js';
 import type { ProjectionTypographyPrefs } from '/shared/projection-typography.js';
 import type {
   LiveAction,
@@ -55,12 +56,23 @@ function clearBackgroundMedia(): void {
 const deviceId = ensureDeviceId();
 document.body.dataset.profile = PROFILE;
 
-const typography = createProjectionTypographyController({
+const typography = createProjectionTypographySession({
   rootEl: byId('conteudo'),
   role: 'external-display',
   externalProfile: PROFILE,
-  mode: 'output',
 });
+const textfill = createProjectionTextfill({
+  rootEl: byId('conteudo'),
+  mode: 'output',
+  resolve: () => typography.resolveTextfillParams(),
+  beforeRefresh: () => typography.applyChrome(),
+});
+const typographyBridge = {
+  setPrefs: async (prefs: ProjectionTypographyPrefs | null) => {
+    await typography.setPrefs(prefs);
+    await textfill.refresh();
+  },
+};
 
 const statusEl = (): HTMLElement => byId('last-action');
 let wsConnected = false;
@@ -147,7 +159,7 @@ function applyAction(action: LiveAction): void {
     statusEl(),
     `${action.acao} @ ${new Date().toLocaleTimeString()}`,
   );
-  typography.scheduleRefresh();
+  textfill.scheduleRefresh();
   refreshViewerStatus();
 }
 
@@ -176,7 +188,7 @@ function connect(): void {
     }
   };
 
-  const handleWsMessage = attachProjectionTypographyWs(typography, (message) => {
+  const handleWsMessage = attachProjectionTypographyWs(typographyBridge, (message) => {
     handleLiveMessage(message as WsServerMessage);
   });
 
@@ -212,7 +224,9 @@ setViewerStatus(statusEl(), 'A ligar…');
 void registerDevice().catch((err) => {
   console.warn('Registo dispositivo:', err);
 });
-void fetchProjectionTypographyPrefs().then((prefs: ProjectionTypographyPrefs | null) =>
-  typography.init(prefs),
-);
+void fetchProjectionTypographyPrefs().then(async (prefs: ProjectionTypographyPrefs | null) => {
+  await typography.init(prefs);
+  textfill.attach();
+  await textfill.refresh();
+});
 connect();

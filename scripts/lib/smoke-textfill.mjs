@@ -43,18 +43,19 @@ export async function runTextfillIntegrationSmoke({ base, pass, assert }) {
   assert(putRes.ok, `PUT loopback status ${putRes.status}`);
   pass('TF-smoke-put', 'PUT persiste tipografia (loopback operador)');
 
-  const { applyPreviewTextfill, applyOutputTextfill } = await import(
+  const { applyPreviewTextfill, applyOutputTextfill, createProjectionTextfill } = await import(
     '../../dist/shared/projection-textfill.js'
   );
   assert(typeof applyPreviewTextfill === 'function', 'applyPreviewTextfill export');
   assert(typeof applyOutputTextfill === 'function', 'applyOutputTextfill export');
+  assert(typeof createProjectionTextfill === 'function', 'createProjectionTextfill export');
   pass('TF-smoke-exports', 'helpers textfill exportados');
 
-  const { createProjectionTypographyController } = await import(
+  const { createProjectionTypographySession } = await import(
     '../../dist/shared/projection-typography-runtime.js'
   );
-  assert(typeof createProjectionTypographyController === 'function', 'runtime controller');
-  pass('TF-smoke-controller', 'runtime controller disponível');
+  assert(typeof createProjectionTypographySession === 'function', 'typography session');
+  pass('TF-smoke-controller', 'sessão tipografia disponível');
 }
 
 /**

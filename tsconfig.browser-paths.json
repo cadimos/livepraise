@@ -10,6 +10,7 @@
       "/shared/ws-live-url.js": ["dist/shared/ws-live-url.d.ts"],
       "/shared/projection-media-url.js": ["dist/shared/projection-media-url.d.ts"],
       "/shared/projection-typography-runtime.js": ["dist/shared/projection-typography-runtime.d.ts"],
+      "/shared/projection-textfill.js": ["dist/shared/projection-textfill.d.ts"],
       "/shared/projection-typography.js": ["dist/shared/projection-typography.d.ts"],
       "/shared/projection-video-player.js": ["dist/shared/projection-video-player.d.ts"],
       "/shared/screen-layout.js": ["dist/shared/screen-layout.d.ts"],

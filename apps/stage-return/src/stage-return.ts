@@ -8,9 +8,10 @@ import { createFooterAlertOverlay } from '/shared/footer-alert-overlay.js';
 import { createServiceTimerOverlay } from '/shared/service-timer-overlay.js';
 import {
   attachProjectionTypographyWs,
-  createProjectionTypographyController,
+  createProjectionTypographySession,
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
+import { createProjectionTextfill } from '/shared/projection-textfill.js';
 import { wsLiveUrl } from '/shared/ws-live-url.js';
 
 attachDisplayDebugOverlayListener();
@@ -67,13 +68,26 @@ const footerAlertOverlay = createFooterAlertOverlay({
   id: LOCAL_DISPLAY_ID !== null ? String(LOCAL_DISPLAY_ID) : '',
 });
 
-const typography = createProjectionTypographyController({
+const typography = createProjectionTypographySession({
   rootEl: byId<HTMLElement>('conteudo'),
   role: 'stage-return',
-  mode: 'output',
   shadowSelector: '.texto',
   textfillOptions: { allTexto: true },
 });
+const textfill = createProjectionTextfill({
+  rootEl: byId<HTMLElement>('conteudo'),
+  mode: 'output',
+  resolve: () => typography.resolveTextfillParams(),
+  beforeRefresh: () => typography.applyChrome(),
+});
+const typographyBridge = {
+  setPrefs: async (
+    prefs: Awaited<ReturnType<typeof fetchProjectionTypographyPrefs>>,
+  ) => {
+    await typography.setPrefs(prefs);
+    await textfill.refresh();
+  },
+};
 
 function applyAction(action: LiveAction): void {
   const content = byId<HTMLElement>('conteudo');
@@ -105,7 +119,7 @@ function applyAction(action: LiveAction): void {
     badge,
     `${action.acao} @ ${new Date().toLocaleTimeString()}`,
   );
-  typography.scheduleRefresh();
+  textfill.scheduleRefresh();
 }
 
 function connect(): WebSocket {
@@ -118,7 +132,7 @@ function connect(): WebSocket {
     );
   });
 
-  handleWsMessage = attachProjectionTypographyWs(typography, (message) => {
+  handleWsMessage = attachProjectionTypographyWs(typographyBridge, (message) => {
     if (message.type === 'live-action') {
       applyAction((message as WsLiveBroadcastMessage).action);
     }
@@ -141,6 +155,10 @@ function connect(): WebSocket {
 }
 
 connect();
-void fetchProjectionTypographyPrefs().then((prefs) => typography.init(prefs));
+void fetchProjectionTypographyPrefs().then(async (prefs) => {
+  await typography.init(prefs);
+  textfill.attach();
+  await textfill.refresh();
+});
 
 export {};
