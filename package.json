@@ -13,6 +13,11 @@
   "engines": {
     "node": ">=24"
   },
+  "overrides": {
+    "depcheck": {
+      "js-yaml": "3.15.0"
+    }
+  },
   "scripts": {
     "build:browser:dev": "node scripts/build-browser-dev.mjs",
     "dev": "npm run sync:version && npm run build:browser:dev && npm run build:electron && npm run build:operator && node scripts/dev-electron.mjs",

@@ -1,2 +1,2 @@
 /** Gerado por `scripts/sync-app-version.mjs` — não editar manualmente. */
-export const APP_VERSION = '1.0.0-alpha.2' as const;
+export const APP_VERSION = '1.0.0-alpha.3' as const;
