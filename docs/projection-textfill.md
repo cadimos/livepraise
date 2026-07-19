@@ -6,11 +6,12 @@ Documento TF-001 … TF-004; auditoria de duplicação TF-005.
 ## Camadas
 
 ```text
-shared/projection-textfill.ts           ← motor (busca binária, preview vs output)
-shared/projection-typography-runtime.ts ← createProjectionTypographyController()
-shared/projection-typography.ts         ← perfis, prefs, estilos CSS
-apps/operator (Vue)                     ← prévias (caminho a unificar — ver TF-005)
-projector / external-display / live     ← saídas via controller
+shared/projection-textfill.ts              ← motor (algoritmo)
+shared/projection-typography-timing.ts     ← debounces partilhados (resize / preview refresh)
+shared/projection-typography-runtime.ts    ← createProjectionTypographyController()
+shared/projection-typography.ts            ← perfis, prefs, estilos CSS
+apps/operator (Vue)                        ← useProjectionTypographyPreview (prévias)
+projector / external-display / live        ← saídas via controller
 ```
 
 ## Modos
@@ -77,21 +78,20 @@ sequenceDiagram
 
 ## Auditoria de duplicação — operador (TF-005)
 
-Lógica **duplicada** entre `PreviewOutputTile.vue` / `ProjectionTypographyPreview.vue` e `createProjectionTypographyController`:
+Lógica **equivalente** entre `useProjectionTypographyPreview` e `createProjectionTypographyController` (dois caminhos de integração mantidos de propósito — TF-026).
 
-| Comportamento | Runtime (controller) | Operador (actual) |
-|---------------|----------------------|-------------------|
-| Aplicar font-family/weight/style | `applyProjectionTypographyStyles` | `applyProjectionTypographyStyles` ✓ mesmo |
-| Text shadow CSS | `resolveProjectionTextShadowCss` + slack | Idem via computed ✓ |
-| Textfill | `refreshPreviewTextfill` via `runTextfill` | `refreshPreviewTextfill` directo ✓ |
-| `fitSlackPx` | `projectionTextShadowSlackPx` | Idem ✓ |
-| Debounce resize | 120 ms + `ResizeObserver` | 32 ms refresh / 120 ms resize — **timings diferentes** |
-| Geração/cancel refresh | `refreshGeneration` | `refreshGeneration` ✓ padrão similar |
-| WS sync prefs | `attachProjectionTypographyWs` | N/A (lê `usePreferences` local) |
-| `@font-face` inject | `ensureFontFaceStyle` no controller | `fontFaceCss` computed + `<style>` no tile |
-| `diagnosticSurface` | `operator-preview:${label}` implícito | Passado explicitamente ✓ |
+| Comportamento | Runtime (controller) | Operador (composable) |
+|---------------|----------------------|------------------------|
+| Motor de fit | `runTextfill` → `projection-textfill.ts` | `refreshPreviewTextfill` → mesmo motor |
+| Font / shadow / slack | partilhados em `@shared/projection-*` | Idem ✓ |
+| Debounce resize | `PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS` (120) | Idem ✓ (`shared/projection-typography-timing.ts`) |
+| Debounce refresh | `requestAnimationFrame` | `PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS` (32) |
+| WS sync prefs | `attachProjectionTypographyWs` | N/A (`usePreferences` local) |
+| `@font-face` | `ensureFontFaceStyle` | `fontFaceCss` + `<style>` no tile |
 
-**Conclusão TF-005:** funcionalidade equivalente, mas **dois caminhos de integração**. Tarefas TF-006–TF-012 unificam via composable `useProjectionTypographyPreview`. TF-026 ADR: não criar `<ProjectionContent>` — ver [`TF-026-ADR-projection-content.md`](TF-026-ADR-projection-content.md).
+**Onde alterar timings:** `shared/projection-typography-timing.ts`.  
+**Onde alterar o algoritmo:** `shared/projection-textfill.ts`.  
+TF-026 ADR: não criar `<ProjectionContent>` — ver [`TF-026-ADR-projection-content.md`](TF-026-ADR-projection-content.md).
 
 ## Diagnóstico (TF-021)
 

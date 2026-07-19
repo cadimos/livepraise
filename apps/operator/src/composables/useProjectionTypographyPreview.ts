@@ -19,12 +19,17 @@ import {
   projectionTextShadowSlackPx,
   resolveProjectionTextShadowCss,
 } from '@shared/projection-text-shadow';
+import {
+  PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS,
+  PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS,
+} from '@shared/projection-typography-timing';
 import { apiBase } from './useApi';
 import { useProjectionFonts } from './useProjectionFonts';
 
-/** Paridade com `PreviewOutputTile` / runtime (CAD-313). */
-export const PREVIEW_REFRESH_DEBOUNCE_MS = 32;
-export const PREVIEW_RESIZE_DEBOUNCE_MS = 120;
+/** @deprecated Preferir `PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS`. */
+export const PREVIEW_REFRESH_DEBOUNCE_MS = PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS;
+/** @deprecated Preferir `PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS`. */
+export const PREVIEW_RESIZE_DEBOUNCE_MS = PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS;
 
 export interface UseProjectionTypographyPreviewOptions {
   rootRef: Ref<HTMLElement | null>;
@@ -153,7 +158,7 @@ export function useProjectionTypographyPreview(
     if (refreshDebounce) clearTimeout(refreshDebounce);
     refreshDebounce = setTimeout(() => {
       void runPreviewRefresh(remeasure);
-    }, PREVIEW_REFRESH_DEBOUNCE_MS);
+    }, PROJECTION_TYPOGRAPHY_PREVIEW_REFRESH_DEBOUNCE_MS);
   }
 
   function attachPreviewResizeObserver(): void {
@@ -163,7 +168,7 @@ export function useProjectionTypographyPreview(
       if (resizeDebounce) clearTimeout(resizeDebounce);
       resizeDebounce = setTimeout(() => {
         schedulePreviewRefresh(true);
-      }, PREVIEW_RESIZE_DEBOUNCE_MS);
+      }, PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS);
     });
     resizeObserver.observe(frame);
   }

@@ -11,6 +11,7 @@ import {
   type ProjectionTypographyProfileKey,
 } from './projection-typography.js';
 import { projectionTextShadowSlackPx, resolveProjectionTextShadowCss } from './projection-text-shadow.js';
+import { PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS } from './projection-typography-timing.js';
 
 interface FontsManifestFamily {
   id: string;
@@ -308,7 +309,7 @@ export function createProjectionTypographyController(
         if (resizeDebounce) clearTimeout(resizeDebounce);
         resizeDebounce = setTimeout(() => {
           scheduleRefresh();
-        }, 150);
+        }, PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS);
       });
       resizeObserver.observe(rootEl);
       const stage = document.getElementById('stage');
@@ -318,7 +319,7 @@ export function createProjectionTypographyController(
       if (resizeDebounce) clearTimeout(resizeDebounce);
       resizeDebounce = setTimeout(() => {
         scheduleRefresh();
-      }, 150);
+      }, PROJECTION_TYPOGRAPHY_RESIZE_DEBOUNCE_MS);
     };
     window.addEventListener('resize', onWindowResize);
   }
