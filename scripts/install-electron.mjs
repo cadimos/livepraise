@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Instala o binário do Electron para a plataforma actual (dev e CI).
- * O install.js embutido em electron@42 usa require('@electron/get'), mas @electron/get@5 é ESM-only.
+ * O install.js embutido no pacote electron usa require('@electron/get'), mas @electron/get@5 é ESM-only.
  */
 import { execFileSync, execSync } from 'node:child_process';
 import fs from 'node:fs';
