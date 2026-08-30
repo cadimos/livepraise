@@ -196,6 +196,29 @@ try {
     pass('Q-4', 'aba arrastada para o fim da barra');
   }
 
+  // Q-4b: o botão de fechar não inicia o arrasto da aba.
+  {
+    const started = await page.evaluate(`
+      (() => {
+        const close = ${tabAt(0)}.querySelector('[data-no-tab-drag]');
+        const dt = new DataTransfer();
+        const event = new DragEvent('dragstart', {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer: dt,
+        });
+        close.dispatchEvent(event);
+        return { cancelado: event.defaultPrevented, tipos: Array.from(dt.types) };
+      })()
+    `);
+    assert(started.cancelado === true, 'arrasto a partir do botão fechar deveria ser cancelado');
+    assert(
+      started.tipos.length === 0,
+      `botão fechar não deveria preencher o dataTransfer: ${started.tipos.join(',')}`,
+    );
+    pass('Q-4b', 'botão de fechar não inicia arrasto da aba');
+  }
+
   // Q-5: a nova ordem sobrevive ao reload (localStorage).
   {
     const before = await page.evaluate(TAB_ORDER);

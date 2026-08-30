@@ -155,6 +155,7 @@ function onTabKeydown(event: KeyboardEvent, tabId: string): void {
         type="button"
         class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded text-base leading-none text-lp-muted hover:bg-lp-surface hover:text-lp-text"
         :aria-label="t('tabs.close')"
+        data-no-tab-drag
         @click.stop="removeChromeTab(tab.id)"
       >
         <X
