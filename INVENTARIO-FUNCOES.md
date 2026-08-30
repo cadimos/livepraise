@@ -224,7 +224,7 @@ Melhorias de **regressão automática** — o fluxo principal já está validado
 
 | Comando | Onde corre | O que valida |
 |---------|------------|--------------|
-| `npm run test:unit` | CI PR | 9× `tests/**/*.test.mjs` (textfill, cifras, fila, temas, security, error-log) |
+| `npm run test:unit` | CI PR | 10× `tests/**/*.test.mjs` (textfill, cifras, fila, reordenação, temas, security, error-log) |
 | `npm run typecheck` | CI PR | Todas as superfícies TS |
 | `npm run verify:openapi` | CI PR | **70** operações HTTP na lista canónica vs `openapi.yaml` |
 | `npm run test:video-pipeline` | CI PR (`smoke` job) | Pipeline ffmpeg / vídeo |
@@ -244,6 +244,7 @@ Documentação: [`scripts/README.md`](scripts/README.md) · [`docs/SM-015-unit-t
 | `smoke:displays` | Displays + footer alert |
 | `smoke:backup` | Backup/restore + import URL |
 | `smoke:legacy-upgrade` | Migração v0.0.8 *(manual pré-release)* |
+| `smoke:queue-dnd` | Reordenação da fila e das abas por arrasto (requer Chrome; ignorado sem ele) |
 | `smoke:locales`, `smoke:audit`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version`, `smoke:queue-sync` | Ver `smoke:features -- --list` |
 
 Scripts `smoke:cad187` … `smoke:cad314` **removidos** (SM-030). Mapeamento: [`docs/SM-003-smoke-consolidacao.md`](docs/SM-003-smoke-consolidacao.md).
@@ -253,6 +254,7 @@ Scripts `smoke:cad187` … `smoke:cad314` **removidos** (SM-030). Mapeamento: [`
 - `tests/projection-textfill-*.test.mjs` — motor textfill (jsdom)
 - `tests/projection-chords.test.mjs` — filtro de cifras
 - `tests/operator-queue/store.test.mjs` — estado da fila partilhada
+- `tests/queue-reorder.test.mjs` — reordenação da fila e das abas (índice final vs. inserção)
 - `tests/security/remote-fetch*.test.mjs` — SSRF e content-type
 - `tests/themes/normalize.test.mjs` — normalização temas
 - `tests/error-log/redact-url.test.mjs` — redacção de URLs
