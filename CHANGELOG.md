@@ -104,6 +104,8 @@ Ainda adiado (ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md)):
 - Auditoria WCAG sistemática
 - Painel UI de logs de auditoria (API admin já existe desde alpha.2)
 - Teste de auto-update in-app entre alphas após Publish release
+- i18n em portal e remote (ST-027)
+- OpenAPI para backup, tipografia e textfill-diagnostics
 
 ---
 
@@ -389,7 +391,7 @@ Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md) — **entregue em alpha.2:*
 3. Editor visual de temas (color pickers).
 4. Telemetria opt-in de crashes (envio remoto).
 5. Acessibilidade WCAG sistemática.
-6. Smoke instalador Windows no CI; teste auto-update in-app por SO.
+6. Teste auto-update in-app por SO (o smoke do instalador Windows já corre no CI).
 7. Sincronização multi-estação (fora de escopo).
 
 ---

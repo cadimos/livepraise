@@ -1,12 +1,12 @@
 # Dívida técnica registada (ST-027–032)
 
-Itens **fora do escopo alpha.2** ou melhorias opcionais. Detalhe funcional em [`INVENTARIO-FUNCOES.md`](../INVENTARIO-FUNCOES.md).
+Itens **fora do escopo da linha alpha actual** ou melhorias opcionais. Detalhe funcional em [`INVENTARIO-FUNCOES.md`](../INVENTARIO-FUNCOES.md) (actualizado para `1.0.0-alpha.3`).
 
 ## ST-027 — i18n portal e remote
 
 | Item | Estado | Referência |
 |------|--------|------------|
-| Operador Vue | ✅ | `apps/operator/locales/`, `smoke:locales` |
+| Operador Vue | ✅ | `locales/*.json`, `smoke:locales` (`pt-BR`, `en-US`, `pt-PT`, `es-ES`) |
 | Portal `web/portal` | 📅 | HTML estático `lang="pt-BR"`; sem ficheiros de locale |
 | Remote `web/remote` | 📅 | Idem |
 
@@ -19,7 +19,7 @@ Itens **fora do escopo alpha.2** ou melhorias opcionais. Detalhe funcional em [`
 | `tests/*.test.mjs` + Node nativo | Vitest para `core/` + `shared/` |
 | Smokes em CI | Playwright para fluxos operador |
 
-Dependências de backlog: SM-039 (quando existir). Ver INVENTARIO secção **3**.
+Dependências de backlog: [`docs/SM-039-vitest-backlog.md`](SM-039-vitest-backlog.md). Nota: `shared/projection-chords.ts` já tem `tests/projection-chords.test.mjs`. Ver INVENTARIO secção **3**.
 
 ## ST-029 — Busca online de louvores
 
@@ -39,5 +39,6 @@ Temas bundled + `~/livepraise/themes/` manual. Editor UI (color pickers, `custom
 
 ## ST-032 — OpenAPI coverage no CI
 
-- Script: `npm run verify:openapi` (`scripts/verify-openapi-coverage.mjs`) — 67 endpoints alinhados com `openapi.yaml`.
-- **CI:** job `typecheck` executa `verify:openapi` em cada PR (não bloqueia release manual).
+- Script: `npm run verify:openapi` (`scripts/verify-openapi-coverage.mjs`) — **70** operações na lista canónica alinhadas com `openapi.yaml` (inclui `GET`/`PUT /api/operator-queue`).
+- **Fora da lista (existem no servidor):** backup/restore, projection-typography, textfill-diagnostics — ver INVENTARIO secção **16**.
+- **CI:** job `typecheck` executa `verify:openapi` em cada PR.
