@@ -4,7 +4,7 @@
 
 Software desktop open-source (MIT) para projeção de louvores, passagens bíblicas, imagens e vídeos em cultos — operador local com pré-visualização multi-saída, retorno de palco, ecrãs externos e controlo remoto.
 
-**Versão actual:** `1.0.0-alpha.2` — ver [`CHANGELOG.md`](CHANGELOG.md) para novidades e migração.
+**Versão actual:** `1.0.0-alpha.3` — ver [`CHANGELOG.md`](CHANGELOG.md) para novidades e migração.
 
 ## Funcionalidades
 
@@ -141,11 +141,11 @@ Requisitos para clonar o repositório, compilar e correr `npm run dev` / `npm ru
 
 **Software obrigatório:**
 
-- **Node.js** ≥ 22.12 (`engines` em `package.json`; `node:sqlite` built-in)
+- **Node.js** ≥ 24 (`engines` em `package.json`; `node:sqlite` built-in)
 - **npm** 10+
 - **Git**
 
-O `postinstall` descarrega automaticamente o binário **Electron 42**, **ffmpeg** e **yt-dlp** para o SO actual (`scripts/install-electron.mjs`, `install-ffmpeg.mjs`, `install-yt-dlp.mjs`). Use `nvm use` com o `.nvmrc` do repositório.
+O `postinstall` descarrega automaticamente o binário **Electron 44**, **ffmpeg** e **yt-dlp** para o SO actual (`scripts/install-electron.mjs`, `install-ffmpeg.mjs`, `install-yt-dlp.mjs`). Use `nvm use` com o `.nvmrc` do repositório.
 
 **Linux (desenvolvimento):**
 
@@ -178,7 +178,7 @@ O Electron em `node_modules/electron/dist` é **por SO**. Após clonar ou copiar
 ```bash
 git clone https://github.com/cadimos/livepraise.git
 cd livepraise
-npm ci                 # Node ≥ 22.12 (ver .nvmrc)
+npm ci                 # Node ≥ 24 (ver .nvmrc)
 npm run build          # server + electron + operator + web + apps browser
 npm run verify:sourcemaps # TS-038: maps em dev, ausentes em produção
 npm run verify:build   # opcional: build + smoke:surfaces (validação pós-clone)
