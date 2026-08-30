@@ -2,7 +2,7 @@ import {
   AUTH_TOKEN_KEY,
   AUTH_USER_KEY,
   type AuthUser,
-} from '@shared/auth-session';
+} from '/shared/auth-session.js';
 import type { AuthLoginResponse, AuthSessionResponse } from '@shared/types/auth-api';
 
 function saveSession(token: string, user: AuthUser): void {
@@ -39,21 +39,32 @@ function consumeReturnUrl(): string | null {
   }
 }
 
+function canOperate(user: AuthUser): boolean {
+  return user.role === 'operator' || user.role === 'admin';
+}
+
+function canRemote(user: AuthUser): boolean {
+  return user.role === 'remote' || user.role === 'admin';
+}
+
 function redirectAfterLogin(user: AuthUser): boolean {
   const returnTo = consumeReturnUrl();
   if (!returnTo) return false;
-  if (returnTo.startsWith('/operator') && user.role !== 'operator' && user.role !== 'admin') {
+  if (returnTo.startsWith('/operator') && !canOperate(user)) {
     return false;
   }
-  if (
-    returnTo.startsWith('/remote') &&
-    user.role !== 'remote' &&
-    user.role !== 'admin'
-  ) {
+  if (returnTo.startsWith('/remote') && !canRemote(user)) {
     return false;
   }
   location.replace(returnTo);
   return true;
+}
+
+/** Sem `?return=`, o login manda o utilizador direto para a superfície do seu perfil. */
+function defaultViewFor(user: AuthUser): string | null {
+  if (canOperate(user)) return '/operator/';
+  if (canRemote(user)) return '/remote/';
+  return null;
 }
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -62,17 +73,19 @@ function byId<T extends HTMLElement>(id: string): T {
   return el as T;
 }
 
-function showLoggedIn(user: AuthUser): void {
+function showLoggedIn(user: AuthUser, options: { justLoggedIn: boolean }): void {
   byId<HTMLElement>('login-section').hidden = true;
   byId<HTMLElement>('views-section').hidden = false;
   byId('session-user').textContent = `${user.username} (${user.role})`;
 
-  const remoteLink = byId<HTMLElement>('remote-link');
-  const operatorLink = byId<HTMLElement>('operator-link');
-  remoteLink.hidden = user.role !== 'remote' && user.role !== 'admin';
-  operatorLink.hidden = user.role !== 'operator' && user.role !== 'admin';
+  byId<HTMLElement>('remote-link').hidden = !canRemote(user);
+  byId<HTMLElement>('operator-link').hidden = !canOperate(user);
 
-  redirectAfterLogin(user);
+  if (redirectAfterLogin(user)) return;
+  if (!options.justLoggedIn) return;
+
+  const target = defaultViewFor(user);
+  if (target) location.replace(target);
 }
 
 async function verifyExistingSession(): Promise<void> {
@@ -88,7 +101,7 @@ async function verifyExistingSession(): Promise<void> {
   }
   const data = (await res.json()) as AuthSessionResponse;
   saveSession(session.token, data.user);
-  showLoggedIn(data.user);
+  showLoggedIn(data.user, { justLoggedIn: false });
 }
 
 byId<HTMLFormElement>('login-form').addEventListener('submit', async (event) => {
@@ -114,7 +127,7 @@ byId<HTMLFormElement>('login-form').addEventListener('submit', async (event) => 
 
   if (!data.token || !data.user) return;
   saveSession(data.token, data.user);
-  showLoggedIn(data.user);
+  showLoggedIn(data.user, { justLoggedIn: true });
 });
 
 byId('logout-btn').addEventListener('click', async () => {

@@ -2,7 +2,7 @@ import {
   AUTH_TOKEN_KEY,
   AUTH_USER_KEY,
   type AuthUser,
-} from '@shared/auth-session';
+} from '/shared/auth-session.js';
 import type { AuthSessionResponse } from '@shared/types/auth-api';
 import type {
   RemoteChromeTabResponse,
