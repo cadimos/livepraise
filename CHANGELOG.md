@@ -8,38 +8,105 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 ### Adicionado
 
-- **TypeScript / build (TS-038)** — `npm run build:browser:dev` gera source maps para projector/web; `npm run verify:sourcemaps` valida dev vs produção; `npm run dev` usa browser dev.
-- **ESLint TypeScript (TS-039)** — `eslint.config.js`, `npm run lint` / `lint:fix`; job CI typecheck executa lint antes do typecheck.
-- **Smokes consolidados (SM-009/010/011/012/013/030/042)** — `smoke:features`, domínios auth/displays/backup/textfill; checklists TF-028 + SM-042.
-- **TS-041** — comentários «paridade v0.0.8» actualizados em fonte TS (legado mantido só em `legacy-upgrade.ts`).
-- **TS-040/042, SM-041, ST-025** — hook git opt-in, `verify:depcheck`, `test:unit`, README estrutura actualizado.
-- **ST-038** — epic estrutura fechado — [`ST-038-EPIC-CHECKLIST.md`](ST-038-EPIC-CHECKLIST.md); CI inclui `test:unit`.
-- **ST-004/005/006** — `shared/projection-chords.ts`, `shared/ws-live-url.ts`; duplicados web removidos.
-- **ST-010** — `npm run clean` remove `dist/` para rebuild determinístico.
-- **TF-025** — `smoke:release` inclui `smoke:textfill`.
-- **TS-046** — ESLint 0 warnings (`lint:fix` + cleanup imports).
-- **ST-016/017** — guia operador + imports `@shared` padronizados.
-- **ST-027–032** — dívida técnica em `docs/DIVIDA-TECNICA.md`; OpenAPI no CI.
-- **SM-006/035** — aliases `smoke:core:*`; validação instalador Windows no release CI.
-- **TF-023/026** — backlog Vitest composable + ADR «não implementar» `<ProjectionContent>`.
-
-### Removido
-
-- **Scripts `smoke:cad187` … `smoke:cad314`** — substituídos por `smoke:features`, `smoke:textfill`, `smoke:typography-qa`, `smoke:fase8`, `smoke:version`, etc. Ver [`scripts/README.md`](scripts/README.md).
-
-- **Diagnóstico de textfill** — registo JSONL de medições de fonte e layout (prévia e projetor) em `~/livepraise/textfill-diagnostics.jsonl`; UI em Configurações → Logs de erro; exportação JSONL para suporte.
+### Alterado
 
 ### Corrigido
 
-- **Textfill projetor — texto cortado** — `#conteudo` impedia `font-size` inline no Electron; medição via probe off-screen com altura fixa (paridade `.content`) + `!important` no span real; não re-verificar overflow visual no span real quando o probe foi usado (evitava cair no mínimo 24px).
-- **Textfill pass 2** — segunda passagem de medição podia inflar `scrollHeight` e forçar fonte mínima (24px) após pass 1 válida (120px); mantém pass 1 quando pass 2 não cabe; limpa fonte entre passagens; sombra de texto só em nós de texto (não em `.content`).
-- **Textfill medição oculta** — `visibility:hidden` no root e `opacity:0` distorcem `scrollHeight`; medição oculta só o `span` (root visível); pass 3 `reconcile-visible` reinicia em `loBound` se o resultado não cabe visível; diagnóstico inclui `measurePhase`, `heightOverflow`, `spanOffsetH`.
-- **Textfill in-place** — medição no span real da projeção com `scrollHeight`/`scrollWidth` (paridade jquery-textfill); probe off-screen removido (font-size não aplicava no Electron).
-- **Shared TypeScript único** — `shared/*.ts` é a única fonte; JS gerado só em `dist/shared/`; `/shared` HTTP serve `dist/shared`; removidos `.js`/`.d.ts` duplicados e `sync-shared-modules`.
-- **Projetor visível** — `refreshOutputTextfill` restaura `visibility` do `#conteudo` após textfill (o projetor oculta antes de `innerHTML`).
-- **Prévia sem piscar** — removido `opacity-0` durante refresh; o probe dispensa ocultar o tile.
+---
+
+## [1.0.0-alpha.3] — 2026-08-30
+
+Terceira release alpha — qualidade de **textfill** no projetor, **fila partilhada** entre operadores, mais idiomas, runtime **Node 24** + **Electron 44**, e consolidação da estrutura TypeScript/smokes.
+
+### Resumo
+
+| | 1.0.0-alpha.2 | 1.0.0-alpha.3 |
+|---|---|---|
+| **Foco** | Estabilização + produto | Textfill, fila sincronizada, runtime |
+| **Node.js** | ≥ 22.5 | **≥ 24** (`engines` + CI) |
+| **Electron** | 42 | **44.0.0** |
+| **Idiomas** | `pt-BR`, `en-US` | + **`pt-PT`**, **`es-ES`** |
+| **Fila de culto** | Só no operador local | Sync **GET/PUT `/api/operator-queue`** + WS `operator-queue-sync` |
+| **Textfill** | Ocultar até ao tamanho final | Medição in-place, diagnóstico JSONL, menos corte de texto |
+| **Cifras** | Remoção por linha | Só linhas *inteiras* de acordes (não apaga letra em PT) |
+| **Prévia** | Tiles por destino | Aspect ratio alinhado ao ecrã de projeção |
+| **Sobre** | Versão | Créditos (contribuintes, fontes, editoras) |
 
 ---
+
+### Adicionado
+
+#### Culto e operador
+
+- **Fila partilhada** — estado persistido (`009_operator_queue_state.sql`); **GET/PUT `/api/operator-queue`** com revisão optimista (409 se outro operador gravou); broadcast WebSocket **`operator-queue-sync`**; UI no operador (`useOperatorQueueSync`); smoke **`npm run smoke:queue-sync`**.
+- **Diagnóstico de textfill** — medições de fonte/layout (prévia e projetor) em `~/livepraise/textfill-diagnostics.jsonl`; UI em Configurações → Logs de erro (activar, exportar JSONL, limpar); API `/api/system/textfill-diagnostics`; incluído no backup selectivo.
+- **Locales `pt-PT` e `es-ES`** — paridade de chaves com `pt-BR` / `en-US`; `npm run sync:locales` gera os ficheiros derivados; smoke **`smoke:locales`** actualizado.
+- **Créditos na janela Sobre** — contribuintes, fontes e editoras (i18n).
+- **Prévia com aspect ratio** da saída de projeção (`projectionPreviewAspect`) para o tile reflectir o ecrã real.
+
+#### Infraestrutura e qualidade
+
+- **TypeScript / build** — `npm run build:browser:dev` com source maps para projector/web; `npm run verify:sourcemaps`; `npm run dev` usa o build browser de desenvolvimento.
+- **Smokes consolidados** — `smoke:features`, `smoke:auth`, `smoke:displays`, `smoke:backup`, `smoke:textfill`, `smoke:typography-qa`; aliases `smoke:core:*`; `smoke:release` inclui textfill.
+- **`npm run test:unit`** no CI; hook git opt-in (`install:git-hooks`); `verify:depcheck`; `npm run clean` apaga `dist/`.
+- **Módulos partilhados** — `shared/projection-chords.ts`, `shared/ws-live-url.ts`; `shared/*.ts` é a fonte única (JS só em `dist/shared/`).
+- Bootstrap Windows: `git clone` + `npm i` + `npm run dev` sem passos extra; `extract-zip` no install Electron; smoke do instalador NSIS resolve o caminho real de instalação.
+- Documentação de dívida técnica (`docs/DIVIDA-TECNICA.md`); epic de estrutura [`ST-038-EPIC-CHECKLIST.md`](ST-038-EPIC-CHECKLIST.md).
+
+---
+
+### Alterado
+
+- **Node.js ≥ 24** e **Electron 44.0.0**; **electron-builder 26.15.3**; TypeScript 7; Tailwind CSS 4 via Vite (`@tailwindcss/vite`).
+- **Textfill** como superfície única estilo jQuery (`$.fn.textfill` / chamada directa); constantes de debounce de tipografia partilhadas entre prévia e saída.
+- Filtro de **cifras na projeção** — uma linha só é cifra se *todas* as palavras forem acordes (evita apagar versos como «E ao Teu falar»).
+- **Archiver 8** (backup) em ESM; dependências de segurança (`undici`, `form-data`, `tar`, `js-yaml` / depcheck).
+- Login do **portal**: formulário **POST**; extração mais segura de username/password na API de auth.
+- Layout do conteúdo do projetor em **ecrãs mais pequenos**.
+
+---
+
+### Corrigido
+
+- **Textfill — texto cortado no projetor** — `#conteudo` impedia `font-size` inline no Electron; medição no span real (`scrollHeight` / `scrollWidth`, paridade jquery-textfill); `!important` no tamanho aplicado; overflow visual não força o mínimo 24px após uma pass válida.
+- **Textfill pass 2** — segunda passagem podia inflar `scrollHeight` e cair em 24px depois de uma pass 1 válida; mantém pass 1 quando pass 2 não cabe; limpa fonte entre passagens; sombra só em nós de texto.
+- **Textfill medição oculta** — `visibility:hidden` no root e `opacity:0` distorciam `scrollHeight`; o root permanece visível; pass `reconcile-visible` se o resultado não cabe no ecrã.
+- **Projetor visível após refresh** — `refreshOutputTextfill` restaura `visibility` de `#conteudo`.
+- **Prévia sem piscar** — removido `opacity-0` durante o refresh de tipografia.
+- Smoke do **instalador Windows** (caminho NSIS real).
+
+---
+
+### Removido
+
+- Scripts **`smoke:cad187` … `smoke:cad314`** — substituídos por `smoke:features`, `smoke:textfill`, `smoke:typography-qa`, etc. Ver [`scripts/README.md`](scripts/README.md).
+- JS/`.d.ts` duplicados em `shared/` e `web/`; script `sync-shared-modules`.
+- Configuração **ESLint** introduzida a meio do ciclo e retirada por incompatibilidade com TypeScript 7 (o CI usa `typecheck`).
+- Relatório local `audit.json` de vulnerabilidades npm (não fazia parte do produto).
+
+---
+
+### Breaking / requisitos
+
+- **Node.js 24+** é obrigatório para desenvolvimento, CI e `engines` do `package.json` (antes 22.x).
+- Clientes que sincronizem a fila devem usar **`/api/operator-queue`** e o evento WS **`operator-queue-sync`**.
+
+---
+
+### Fora do escopo alpha.3
+
+Ainda adiado (ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md)):
+
+- Suite Vitest + Playwright além dos smokes / `test:unit`
+- Busca online de louvores
+- Editor visual de temas
+- Telemetria opt-in remota
+- Auditoria WCAG sistemática
+- Painel UI de logs de auditoria (API admin já existe desde alpha.2)
+- Teste de auto-update in-app entre alphas após Publish release
+
+---
+
 
 ## [1.0.0-alpha.2] — 2026-06-07
 
@@ -315,7 +382,7 @@ Reescrita completa com arquitetura modular (Electron 42 + TypeScript + Vue 3), p
 
 Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md) — **entregue em alpha.2:** auditoria, locales `en-US`, watcher de vídeos, export/import louvor, sync de versão, flash textfill, release unificado.
 
-**Ainda pendente (alpha.3+ ou opcional):**
+**Ainda pendente (pós-alpha.3 ou opcional):**
 
 1. Suite Vitest + Playwright além dos smokes.
 2. Busca online de louvores (nova fonte — decisão de produto).
@@ -346,5 +413,6 @@ Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md) — **entregue em alpha.2:*
 - **Contribuidores da linha anterior:** Kerolen Lucena, Sabrina Santos
 - **Licença:** MIT
 
+[1.0.0-alpha.3]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.3
 [1.0.0-alpha.2]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.2
 [1.0.0-alpha.1]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.1
