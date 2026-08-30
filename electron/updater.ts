@@ -7,8 +7,9 @@ export type UpdateStatus =
   | { kind: 'idle' }
   | { kind: 'checking' }
   | { kind: 'available'; version: string }
-  | { kind: 'downloading'; percent?: number }
+  | { kind: 'downloading'; version: string; percent?: number }
   | { kind: 'ready'; version: string }
+  | { kind: 'installing'; version: string }
   | { kind: 'error'; message: string; fallback: true };
 
 type AutoUpdaterModule = typeof import('electron-updater');
@@ -57,32 +58,53 @@ export async function setupAutoUpdater(): Promise<void> {
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
 
+  let pendingVersion = '';
+  let lastDownloadPercent = -1;
+  let lastDownloadEmitAt = 0;
+
   autoUpdater.on('checking-for-update', () => {
     broadcast({ kind: 'checking' });
   });
 
+  autoUpdater.on('update-not-available', () => {
+    broadcast({ kind: 'idle' });
+  });
+
   autoUpdater.on('update-available', (info) => {
-    const version = info.version ?? 'nova versão';
-    broadcast({ kind: 'available', version });
+    pendingVersion = info.version ?? 'nova versão';
+    lastDownloadPercent = -1;
+    broadcast({ kind: 'available', version: pendingVersion });
     notifyUser(
       'Live Praise',
-      `Atualização ${version} disponível — download em segundo plano.`,
+      `Atualização ${pendingVersion} disponível — download em segundo plano.`,
     );
   });
 
   autoUpdater.on('download-progress', (progress) => {
+    const percent = Math.min(100, Math.max(0, Math.round(progress.percent ?? 0)));
+    const now = Date.now();
+    if (
+      percent < 100 &&
+      percent === lastDownloadPercent &&
+      now - lastDownloadEmitAt < 250
+    ) {
+      return;
+    }
+    lastDownloadPercent = percent;
+    lastDownloadEmitAt = now;
     broadcast({
       kind: 'downloading',
-      percent: progress.percent,
+      version: pendingVersion || 'nova versão',
+      percent,
     });
   });
 
   autoUpdater.on('update-downloaded', (info) => {
-    const version = info.version ?? 'nova versão';
-    broadcast({ kind: 'ready', version });
+    pendingVersion = info.version ?? pendingVersion || 'nova versão';
+    broadcast({ kind: 'ready', version: pendingVersion });
     notifyUser(
       'Live Praise',
-      `Atualização ${version} pronta. Será aplicada ao encerrar o app, ou use "Instalar agora".`,
+      `Atualização ${pendingVersion} pronta. Será aplicada ao encerrar o app, ou use "Instalar agora".`,
     );
   });
 
@@ -98,6 +120,10 @@ export async function setupAutoUpdater(): Promise<void> {
 
   ipcMain.handle('livepraise:install-update', async () => {
     if (!autoUpdater) return { ok: false, reason: 'updater-not-active' };
+    broadcast({
+      kind: 'installing',
+      version: pendingVersion || 'nova versão',
+    });
     autoUpdater.quitAndInstall(false, true);
     return { ok: true };
   });

@@ -587,6 +587,16 @@
     }
   },
   "status": {
+    "update": {
+      "checking": "A procurar atualizações…",
+      "available": "Atualização {version} disponível — a descarregar em segundo plano.",
+      "downloading": "A descarregar atualização {version}… {percent}%",
+      "ready": "Atualização {version} pronta. Instale agora ou será aplicada ao encerrar a aplicação.",
+      "installing": "A instalar a atualização {version}… o Live Praise vai reiniciar.",
+      "error": "Não foi possível atualizar automaticamente: {message}",
+      "installNow": "Instalar agora",
+      "dismiss": "Dispensar"
+    },
     "version": "v{version}",
     "displays": "{total} monitor(es) · {projection} em projeção · {return} em retorno ({stageReturn} retorno palco)",
     "localIp": "IP local: {ip}",

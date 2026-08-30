@@ -12,6 +12,7 @@ import SettingsModal from './components/SettingsModal.vue';
 import MultiOutputPreviewColumn from './components/MultiOutputPreviewColumn.vue';
 import QuickBackgroundsStrip from './components/QuickBackgroundsStrip.vue';
 import { PREVIEW_COLUMN_WIDTH } from './constants/layout';
+import AppUpdateBanner from './components/AppUpdateBanner.vue';
 import StatusBar from './components/StatusBar.vue';
 import WorshipPanel from './components/panels/WorshipPanel.vue';
 import BiblePanel from './components/panels/BiblePanel.vue';
@@ -180,6 +181,7 @@ onUnmounted(() => {
     >
       {{ t('settings.backup.globalBanner') }}
     </div>
+    <AppUpdateBanner />
     <ActionBar
       @open-settings="openSettings"
       @open-new-song="openNewSong"

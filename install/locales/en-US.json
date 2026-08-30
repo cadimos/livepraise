@@ -571,6 +571,16 @@
     }
   },
   "status": {
+    "update": {
+      "checking": "Checking for updates…",
+      "available": "Update {version} available — downloading in the background.",
+      "downloading": "Downloading update {version}… {percent}%",
+      "ready": "Update {version} is ready. Install now or it will be applied when you quit the app.",
+      "installing": "Installing update {version}… Live Praise will restart.",
+      "error": "Could not update automatically: {message}",
+      "installNow": "Install now",
+      "dismiss": "Dismiss"
+    },
     "version": "v{version}",
     "displays": "{total} monitor(s) · {projection} projecting · {return} on return ({stageReturn} stage return)",
     "localIp": "Local IP: {ip}",
