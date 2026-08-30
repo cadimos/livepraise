@@ -46,6 +46,8 @@ export default {
   "Break — 5 min": "Descanso — 5 min",
   "Bible translations belong to their respective publishers and are used according to the rights of each work.": "Las traducciones bíblicas pertenecen a sus respectivas editoriales y se usan conforme a los derechos de cada obra.",
   "Cancel": "Cancelar",
+  "Development": "Desarrollo",
+  "Embedded fonts: Roboto, Source Sans 3, Lato, Open Sans, Noto Sans, Literata and Merriweather (licensed under Apache 2.0 / OFL 1.1).": "Fuentes incluidas: Roboto, Source Sans 3, Lato, Open Sans, Noto Sans, Literata y Merriweather (licenciadas bajo Apache 2.0 / OFL 1.1).",
   "Category": "Categoría",
   "Center (default)": "Centro (predeterminado)",
   "Center (original size)": "Centrar (tamaño original)",

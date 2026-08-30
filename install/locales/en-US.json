@@ -518,6 +518,9 @@
       }
     ],
     "creditsPublishers": "Bible translations belong to their respective publishers and are used according to the rights of each work.",
+    "creditsFonts": "Embedded fonts: Roboto, Source Sans 3, Lato, Open Sans, Noto Sans, Literata and Merriweather (licensed under Apache 2.0 / OFL 1.1).",
+    "authorTitle": "Development",
+    "authorBody": "Thiago de Lucena Sobrinho",
     "runtime": "Runtime for this installation: Node.js {node}, Chromium {chromium}, Electron {electron}.",
     "version": "Application version: {version}",
     "close": "Close"

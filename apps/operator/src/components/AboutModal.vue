@@ -126,6 +126,15 @@ onUnmounted(unbindEsc);
 
         <section>
           <h3 class="mb-1 font-semibold">
+            {{ t('about.authorTitle') }}
+          </h3>
+          <p class="text-lp-muted">
+            {{ t('about.authorBody') }}
+          </p>
+        </section>
+
+        <section>
+          <h3 class="mb-1 font-semibold">
             {{ t('about.licenseTitle') }}
           </h3>
           <p class="mb-1 text-lp-muted">
@@ -179,6 +188,9 @@ onUnmounted(unbindEsc);
               — {{ item.description }}
             </li>
           </ul>
+          <p class="mt-2 text-xs text-lp-muted">
+            {{ t('about.creditsFonts') }}
+          </p>
           <p class="mt-2 text-xs text-lp-muted">
             {{ t('about.creditsPublishers') }}
           </p>

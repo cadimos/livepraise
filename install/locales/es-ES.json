@@ -518,6 +518,9 @@
       }
     ],
     "creditsPublishers": "Las traducciones bíblicas pertenecen a sus respectivas editoriales y se usan conforme a los derechos de cada obra.",
+    "creditsFonts": "Fuentes incluidas: Roboto, Source Sans 3, Lato, Open Sans, Noto Sans, Literata y Merriweather (licenciadas bajo Apache 2.0 / OFL 1.1).",
+    "authorTitle": "Desarrollo",
+    "authorBody": "Thiago de Lucena Sobrinho",
     "runtime": "Entorno de ejecución de esta instalación: Node.js {node}, Chromium {chromium}, Electron {electron}.",
     "version": "Versión de la aplicación: {version}",
     "close": "Cerrar"

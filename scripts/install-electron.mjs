@@ -3,14 +3,13 @@
  * Instala o binário do Electron para a plataforma actual (dev e CI).
  * O install.js embutido no pacote electron usa require('@electron/get'), mas @electron/get@5 é ESM-only.
  */
-import { execFileSync, execSync } from 'node:child_process';
+import { execSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { createRequire } from 'node:module';
+import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
 
-const require = createRequire(import.meta.url);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const electronDir = path.join(root, 'node_modules', 'electron');
 
@@ -131,69 +130,152 @@ function isInstalled(version, platformPath) {
 }
 
 async function extractElectronZip(zipPath, distDir, platformPath) {
-  // Limpar destino: extract-zip no Windows pode hangar e deixar dist parcial.
-  fs.rmSync(distDir, { recursive: true, force: true });
-  fs.mkdirSync(distDir, { recursive: true });
-
-  // Preferir tar (Windows 10+/macOS/Linux): fiável e evita hang do extract-zip.
-  if (tryExtractWithTar(zipPath, distDir)) {
-    /* ok */
-  } else if (process.platform !== 'win32' && commandExists('unzip')) {
-    extractWithUnzip(zipPath, distDir);
-  } else {
-    console.info('install-electron: a usar extract-zip (fallback)…');
-    const extract = require('extract-zip');
-    await extract(zipPath, { dir: distDir });
-  }
-
   const binaryPath = path.join(distDir, platformPath);
-  if (fs.existsSync(binaryPath)) return;
+  const failures = [];
 
-  if (process.platform !== 'win32' && commandExists('unzip')) {
-    console.warn('install-electron: extracção incompleta; a usar unzip…');
-    extractWithUnzip(zipPath, distDir);
-  }
-
-  if (!fs.existsSync(binaryPath)) {
-    throw new Error(`binário do Electron não encontrado em ${binaryPath}`);
-  }
-}
-
-/** @returns {boolean} */
-function tryExtractWithTar(zipPath, distDir) {
-  try {
-    execFileSync('tar', ['-xf', zipPath, '-C', distDir], { stdio: 'inherit' });
-    return true;
-  } catch (err) {
-    console.warn(
-      'install-electron: tar falhou —',
-      err instanceof Error ? err.message : err,
-    );
-    return false;
-  }
-}
-
-function extractWithUnzip(zipPath, distDir) {
-  fs.rmSync(distDir, { recursive: true, force: true });
-  fs.mkdirSync(distDir, { recursive: true });
-  execFileSync('unzip', ['-oq', zipPath, '-d', distDir], { stdio: 'inherit' });
-}
-
-function commandExists(command) {
-  try {
-    if (process.platform === 'win32') {
-      execFileSync('where', [command], { stdio: 'ignore' });
-    } else {
-      execSync(`command -v ${shellQuote(command)}`, { stdio: 'ignore', shell: true });
+  for (const extractor of extractors()) {
+    resetDir(distDir);
+    try {
+      await extractor.run(zipPath, distDir);
+    } catch (err) {
+      failures.push(`${extractor.name} — ${err instanceof Error ? err.message : err}`);
+      continue;
     }
-    return true;
-  } catch {
-    return false;
+    if (fs.existsSync(binaryPath)) {
+      if (failures.length > 0) console.log(`install-electron: extraído com ${extractor.name}.`);
+      return;
+    }
+    failures.push(`${extractor.name} — extracção incompleta (${platformPath} ausente)`);
+  }
+
+  resetDir(distDir);
+  throw new Error(
+    ['nenhum extractor conseguiu abrir o zip do Electron:', ...failures].join('\n  - '),
+  );
+}
+
+/**
+ * Extractores por ordem de preferência. O último (yauzl) é puro Node e serve de
+ * garantia em ambientes sem tar/unzip utilizáveis.
+ */
+function* extractors() {
+  for (const tar of tarCommands()) {
+    yield {
+      name: `tar (${tar.label})`,
+      run: (zipPath, distDir) => runCommand(tar.command, [...tar.args, '-xf', zipPath, '-C', distDir]),
+    };
+  }
+
+  if (process.platform !== 'win32') {
+    yield {
+      name: 'unzip',
+      run: (zipPath, distDir) => runCommand('unzip', ['-oq', zipPath, '-d', distDir]),
+    };
+  }
+
+  yield { name: 'yauzl', run: extractWithYauzl };
+}
+
+function tarCommands() {
+  if (process.platform !== 'win32') {
+    return [{ label: 'sistema', command: 'tar', args: [] }];
+  }
+
+  const commands = [];
+  const bsdtar = path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'tar.exe');
+  if (fs.existsSync(bsdtar)) {
+    commands.push({ label: 'bsdtar do Windows', command: bsdtar, args: [] });
+  }
+  // O GNU tar do Git Bash/MSYS lê "C:\..." como host remoto ("Cannot connect to C:");
+  // --force-local trata o argumento como caminho local.
+  commands.push({ label: 'GNU tar --force-local', command: 'tar', args: ['--force-local'] });
+  commands.push({ label: 'sistema', command: 'tar', args: [] });
+  return commands;
+}
+
+function runCommand(command, args) {
+  const result = spawnSync(command, args, { encoding: 'utf8' });
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    const output = `${result.stderr || ''}${result.stdout || ''}`.trim();
+    throw new Error(output.split('\n').pop() || `terminou com código ${result.status}`);
   }
 }
 
-function shellQuote(value) {
-  return `'${String(value).replace(/'/g, `'\\''`)}'`;
+async function extractWithYauzl(zipPath, distDir) {
+  const { default: yauzl } = await import('yauzl');
+
+  const zip = await new Promise((resolve, reject) => {
+    yauzl.open(zipPath, { lazyEntries: true, autoClose: false }, (err, handle) =>
+      err ? reject(err) : resolve(handle),
+    );
+  });
+
+  try {
+    await new Promise((resolve, reject) => {
+      zip.on('error', reject);
+      zip.on('end', resolve);
+      zip.on('entry', (entry) => {
+        writeZipEntry(zip, entry, distDir).then(() => zip.readEntry(), reject);
+      });
+      zip.readEntry();
+    });
+  } finally {
+    zip.close();
+  }
+}
+
+async function writeZipEntry(zip, entry, distDir) {
+  const target = resolveInside(distDir, entry.fileName);
+
+  if (entry.fileName.endsWith('/')) {
+    await fs.promises.mkdir(target, { recursive: true });
+    return;
+  }
+
+  await fs.promises.mkdir(path.dirname(target), { recursive: true });
+
+  const mode = entry.externalFileAttributes >>> 16;
+  if ((mode & 0o170000) === 0o120000) {
+    const link = (await readZipEntry(zip, entry)).toString('utf8');
+    resolveInside(distDir, path.join(path.dirname(entry.fileName), link));
+    await fs.promises.symlink(link, target);
+    return;
+  }
+
+  await pipeline(await openZipEntry(zip, entry), fs.createWriteStream(target));
+
+  const permissions = mode & 0o777;
+  if (permissions && process.platform !== 'win32') {
+    await fs.promises.chmod(target, permissions);
+  }
+}
+
+function openZipEntry(zip, entry) {
+  return new Promise((resolve, reject) => {
+    zip.openReadStream(entry, (err, stream) => (err ? reject(err) : resolve(stream)));
+  });
+}
+
+async function readZipEntry(zip, entry) {
+  const chunks = [];
+  for await (const chunk of await openZipEntry(zip, entry)) chunks.push(chunk);
+  return Buffer.concat(chunks);
+}
+
+/** Barra travessia de caminhos e symlinks que apontem fora de `root`. */
+function resolveInside(root, entryPath) {
+  const base = path.resolve(root);
+  const target = path.resolve(base, entryPath);
+  if (target !== base && !target.startsWith(base + path.sep)) {
+    throw new Error(`entrada fora do destino: ${entryPath}`);
+  }
+  return target;
+}
+
+function resetDir(dir) {
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
 }
 
 function hasStaleDist(distDir, platformPath) {
