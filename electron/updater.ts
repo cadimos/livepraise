@@ -100,7 +100,7 @@ export async function setupAutoUpdater(): Promise<void> {
   });
 
   autoUpdater.on('update-downloaded', (info) => {
-    pendingVersion = info.version ?? pendingVersion || 'nova versão';
+    pendingVersion = info.version ?? (pendingVersion || 'nova versão');
     broadcast({ kind: 'ready', version: pendingVersion });
     notifyUser(
       'Live Praise',
