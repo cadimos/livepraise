@@ -275,6 +275,36 @@ function translateValue(value) {
     'À espera do estado desta saída…': 'Waiting for this output state…',
     'Projetor 2': 'Projector 2',
     'Retorno de palco': 'Stage return',
+    'Sincronização da fila': 'Queue synchronization',
+    'Compartilhe as abas e os itens da fila entre todos os operadores conectados. A aba e o item selecionados continuam independentes em cada computador.':
+      'Share queue tabs and items with every connected operator. The selected tab and item remain independent on each computer.',
+    'Fila compartilhada global': 'Global shared queue',
+    'Alterações na fila são enviadas automaticamente para todos os operadores.':
+      'Queue changes are automatically sent to all operators.',
+    'Cada operador mantém sua própria fila local.':
+      'Each operator keeps a separate local queue.',
+    'Habilitar': 'Enable',
+    'Desabilitar': 'Disable',
+    'Salvando…': 'Saving…',
+    'A fila deste computador substituirá a fila compartilhada para todos os operadores. Deseja continuar?':
+      "This computer's queue will replace the shared queue for every operator. Continue?",
+    'Conexão': 'Connection',
+    'Revisão': 'Revision',
+    'Última atualização': 'Last update',
+    'Atualizada por': 'Updated by',
+    'A procurar atualizações…': 'Checking for updates…',
+    'Atualização {version} disponível — a descarregar em segundo plano.':
+      'Update {version} available — downloading in the background.',
+    'A descarregar atualização {version}… {percent}%':
+      'Downloading update {version}… {percent}%',
+    'Atualização {version} pronta. Instale agora ou será aplicada ao encerrar o aplicativo.':
+      'Update {version} is ready. Install now or it will be applied when you quit the app.',
+    'A instalar a atualização {version}… o Live Praise vai reiniciar.':
+      'Installing update {version}… Live Praise will restart.',
+    'Não foi possível atualizar automaticamente: {message}':
+      'Could not update automatically: {message}',
+    'Instalar agora': 'Install now',
+    'Dispensar': 'Dismiss',
     'Playlist / fila de projeção': 'Playlist / projection queue',
     'Fila vazia — arraste itens dos painéis ou crie uma fila em branco (+)':
       'Empty queue — drag items from panels or create a blank queue (+)',
@@ -288,12 +318,16 @@ function translateValue(value) {
     'Arraste versos, Bíblia, imagens ou vídeos para esta fila — ou solte numa aba acima.':
       'Drag stanzas, Bible, images or videos to this queue — or drop on a tab above.',
     'Arrastar para a fila de projeção': 'Drag to projection queue',
+    'Arraste para reordenar a fila (ou Alt+← / Alt+→)':
+      'Drag to reorder the queue (or Alt+← / Alt+→)',
     'Música': 'Song',
     'Imagem': 'Image',
     'Vídeo': 'Video',
     'Em branco': 'Blank',
     'Remover da fila': 'Remove from queue',
     'Remover «{label}» da fila': 'Remove «{label}» from queue',
+    'Mover para a esquerda': 'Move left',
+    'Mover para a direita': 'Move right',
     'Online': 'Online',
     'A descarregar…': 'Downloading…',
     'Tentativa {attempt}/{max}…': 'Attempt {attempt}/{max}…',

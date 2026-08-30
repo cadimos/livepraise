@@ -334,6 +334,7 @@
     "blankLabel": "Cola {n}",
     "dropHint": "Arrastra estrofas, Biblia, imágenes o vídeos a esta cola — o suéltalos en una pestaña de arriba.",
     "dragHint": "Arrastrar a la cola de proyección",
+    "reorderHint": "Arrastra para reordenar la cola (o Alt+← / Alt+→)",
     "kindMusic": "Canción",
     "kindBible": "Biblia",
     "kindImage": "Imagen",
@@ -343,6 +344,8 @@
   "queueItem": {
     "removeFromQueue": "Quitar de la cola",
     "removeFromQueueAria": "Quitar «{label}» de la cola",
+    "moveLeft": "Mover a la izquierda",
+    "moveRight": "Mover a la derecha",
     "online": "Online",
     "youtubeDownloading": "Descargando…",
     "youtubeDownloadingAttempt": "Intento {attempt}/{max}…",

@@ -334,6 +334,7 @@
     "blankLabel": "Queue {n}",
     "dropHint": "Drag stanzas, Bible, images or videos to this queue — or drop on a tab above.",
     "dragHint": "Drag to projection queue",
+    "reorderHint": "Drag to reorder the queue (or Alt+← / Alt+→)",
     "kindMusic": "Song",
     "kindBible": "Bible",
     "kindImage": "Image",
@@ -343,6 +344,8 @@
   "queueItem": {
     "removeFromQueue": "Remove from queue",
     "removeFromQueueAria": "Remove «{label}» from queue",
+    "moveLeft": "Move left",
+    "moveRight": "Move right",
     "online": "Online",
     "youtubeDownloading": "Downloading…",
     "youtubeDownloadingAttempt": "Attempt {attempt}/{max}…",

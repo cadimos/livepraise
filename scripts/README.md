@@ -37,6 +37,7 @@ Requisito: Node ≥ 22.12 (`engines` na raiz).
 | `smoke:auth` | `smoke-auth.mjs` | ❌ | Sim | Auth/delivery + preview (SM-011) |
 | `smoke:displays` | `smoke-displays.mjs` | ❌ | Sim | footerAlert + fila/media (SM-012) |
 | `smoke:backup` | `smoke-backup.mjs` | ❌ | Sim | import-url + fila + backup (SM-013) |
+| `smoke:queue-dnd` | `smoke-queue-dnd.mjs` | ❌ | **Sim** | Reordenar fila e abas por arrasto — requer Chrome (`CHROME_PATH`); ignorado sem ele |
 | `smoke:features` | `smoke-features.mjs` | ❌ | Sim | Entrypoint único (SM-009) |
 | `smoke-win-installer` | `smoke-win-installer.mjs` | ❌ | Manual Windows — build + instalar + arranque |
 | `smoke:win-installer` | idem | ❌ | Alias npm |

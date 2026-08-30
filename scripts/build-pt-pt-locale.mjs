@@ -10,6 +10,22 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /** @type {Record<string, string>} */
 const OVERRIDES = {
+  'Compartilhe as abas e os itens da fila entre todos os operadores conectados. A aba e o item selecionados continuam independentes em cada computador.':
+    'Partilhe os separadores e itens da fila entre todos os operadores ligados. O separador e item selecionados continuam independentes em cada computador.',
+  'Fila compartilhada global': 'Fila partilhada global',
+  'Alterações na fila são enviadas automaticamente para todos os operadores.':
+    'As alterações à fila são enviadas automaticamente para todos os operadores.',
+  'Cada operador mantém sua própria fila local.':
+    'Cada operador mantém a sua própria fila local.',
+  'Habilitar': 'Ativar',
+  'Desabilitar': 'Desativar',
+  'Salvando…': 'A guardar…',
+  'A fila deste computador substituirá a fila compartilhada para todos os operadores. Deseja continuar?':
+    'A fila deste computador substituirá a fila partilhada para todos os operadores. Deseja continuar?',
+  'Conexão': 'Ligação',
+  // A regra genérica «aplicativo» → «aplicação» quebraria a concordância aqui.
+  'Atualização {version} pronta. Instale agora ou será aplicada ao encerrar o aplicativo.':
+    'Atualização {version} pronta. Instale agora ou será aplicada ao encerrar a aplicação.',
   'Conta activa': 'Conta ativa',
   'inactivo': 'inativo',
   'Utilizador actualizado.': 'Utilizador atualizado.',

@@ -1,11 +1,13 @@
 import { ref, watch } from 'vue';
 import {
   migrateTabVerses,
+  moveQueueItemToInsertIndex,
   newQueueItemId,
   reorderQueueItems,
   type LegacyChromeTabVerse,
   type QueueItem,
 } from '@shared/queue-items';
+import { moveListItemToInsertIndex } from '@shared/list-reorder';
 import {
   BIBLE_SEARCH_HISTORY_DEFAULT_LIMIT,
   clampBibleSearchHistoryLimit,
@@ -218,6 +220,12 @@ export function usePreferences() {
     return tab.items;
   }
 
+  /** Itens da aba, materializando abas legadas que só têm `verses`. */
+  function getTabItems(tabId: string): QueueItem[] | null {
+    const tab = prefs.value.chromeTabs.find((t) => t.id === tabId);
+    return tab ? tabItems(tab) : null;
+  }
+
   function addQueueItem(
     tabId: string,
     item: QueueItem | Omit<QueueItem, 'id'>,
@@ -244,6 +252,41 @@ export function usePreferences() {
     if (!tab) return;
     const items = tabItems(tab);
     tab.items = reorderQueueItems(items, fromIndex, toIndex);
+  }
+
+  /**
+   * Move um item para um índice de inserção dentro da mesma aba
+   * (`items.length` = fim da fila). Devolve `true` quando a ordem mudou.
+   */
+  function moveQueueItemToIndex(
+    tabId: string,
+    itemId: string,
+    insertIndex: number,
+  ): boolean {
+    const tab = prefs.value.chromeTabs.find((t) => t.id === tabId);
+    if (!tab) return false;
+    const items = tabItems(tab);
+    const fromIndex = items.findIndex((i) => i.id === itemId);
+    if (fromIndex < 0) return false;
+    const next = moveQueueItemToInsertIndex(items, fromIndex, insertIndex);
+    if (next === items) return false;
+    tab.items = next;
+    return true;
+  }
+
+  /** Desloca um item `delta` posições na aba (fallback de teclado/menu). */
+  function moveQueueItemBy(tabId: string, itemId: string, delta: number): boolean {
+    const tab = prefs.value.chromeTabs.find((t) => t.id === tabId);
+    if (!tab) return false;
+    const items = tabItems(tab);
+    const fromIndex = items.findIndex((i) => i.id === itemId);
+    if (fromIndex < 0) return false;
+    const toIndex = fromIndex + delta;
+    if (toIndex < 0 || toIndex >= items.length) return false;
+    const next = reorderQueueItems(items, fromIndex, toIndex);
+    if (next === items) return false;
+    tab.items = next;
+    return true;
   }
 
   function removeQueueItem(tabId: string, itemId: string): void {
@@ -287,6 +330,30 @@ export function usePreferences() {
         ? toItems.length
         : toIndex;
     toItems.splice(idx, 0, item);
+  }
+
+  /**
+   * Move uma aba para um índice de inserção (`chromeTabs.length` = fim).
+   * Devolve `true` quando a ordem mudou.
+   */
+  function moveChromeTabToIndex(tabId: string, insertIndex: number): boolean {
+    const tabs = prefs.value.chromeTabs;
+    const fromIndex = tabs.findIndex((t) => t.id === tabId);
+    if (fromIndex < 0) return false;
+    const next = moveListItemToInsertIndex(tabs, fromIndex, insertIndex);
+    if (next === tabs) return false;
+    prefs.value.chromeTabs = next;
+    return true;
+  }
+
+  /** Desloca uma aba `delta` posições (fallback de teclado). */
+  function moveChromeTabBy(tabId: string, delta: number): boolean {
+    const tabs = prefs.value.chromeTabs;
+    const fromIndex = tabs.findIndex((t) => t.id === tabId);
+    if (fromIndex < 0) return false;
+    const toIndex = fromIndex + delta;
+    if (toIndex < 0 || toIndex >= tabs.length) return false;
+    return moveChromeTabToIndex(tabId, toIndex > fromIndex ? toIndex + 1 : toIndex);
   }
 
   function updateChromeTab(id: string, patch: Partial<Omit<ChromeTab, 'id'>>): void {
@@ -452,10 +519,15 @@ export function usePreferences() {
     addChromeTab,
     addBlankChromeTab,
     addQueueItem,
+    getTabItems,
     removeQueueItem,
     updateQueueItem,
     reorderQueueItemsInTab,
+    moveQueueItemToIndex,
+    moveQueueItemBy,
     moveQueueItemInTab,
+    moveChromeTabToIndex,
+    moveChromeTabBy,
     updateChromeTab,
     removeChromeTab,
     removeChromeTabsForSong,
