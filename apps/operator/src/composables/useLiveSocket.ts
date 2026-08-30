@@ -4,6 +4,7 @@ import {
   readAuthToken,
 } from '@shared/auth-session';
 import type { LiveAction, LiveActionName, LiveState, WsDevicePresenceMessage } from '@shared/types/live';
+import type { OperatorQueueState } from '@shared/types/operator-queue';
 import { wsLiveUrl } from '@shared/ws-live-url';
 import { handleDevicePresence } from './useExternalDevices';
 import {
@@ -31,6 +32,7 @@ export type LiveSocketEvent = {
   kind?: 'videos';
   category?: string;
   path?: string;
+  operatorQueueState?: OperatorQueueState;
 };
 
 const socketEventListeners = new Set<(event: LiveSocketEvent) => void>();
@@ -130,6 +132,13 @@ function handleMessage(raw: string): void {
       kind: media.kind,
       category: media.category,
       path: media.path,
+    });
+  }
+
+  if (message.type === 'operator-queue-sync') {
+    notifySocketEvent({
+      type: 'operator-queue-sync',
+      operatorQueueState: (message as unknown as { state: OperatorQueueState }).state,
     });
   }
 }

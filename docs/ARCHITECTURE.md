@@ -47,6 +47,7 @@ flowchart TB
 | Path | Pasta / origem | Descrição |
 |------|----------------|-----------|
 | `/api/*` | Rotas em `server/routes/` | REST JSON |
+| `/api/operator-queue` | `operator_queue_state` (SQLite) | Configuração, revisão e snapshot da fila compartilhada |
 | `/shared` | `dist/shared/` | Módulos TS compilados (textfill, tipografia, overlays) |
 | `/projector` | `dist/apps/projector/` | Saída pública (monitor projeção) |
 | `/operator` | `dist/apps/operator/` | UI operador (Vue 3) |
@@ -67,6 +68,15 @@ flowchart TB
 - Papéis: `operator`, `projector`, `stage-return`, `external-display`, etc.
 
 Eventos de tipografia de projeção propagam preferências (`projection-typography`) para todas as saídas via `attachProjectionTypographyWs` em `shared/projection-typography-runtime.ts`.
+
+### Fila compartilhada de operadores
+
+- É opcional e global; por padrão cada operador conserva a fila no `localStorage`.
+- Ao habilitar em **Configurações → Sincronização da fila**, a fila do operador que ativou torna-se o snapshot autoritativo.
+- Alterações usam `PUT /api/operator-queue` com revisão otimista. Revisões antigas recebem `409` e o snapshot atual.
+- O hub transmite `operator-queue-sync` apenas para clientes com papel `operator`; projetores e remotos não recebem a fila.
+- Abas e itens são compartilhados. Aba ativa e item selecionado continuam locais em cada computador.
+- Desabilitar conserva o último snapshot no servidor, mas interrompe a sincronização.
 
 ## Cache de estáticos (ST-015)
 

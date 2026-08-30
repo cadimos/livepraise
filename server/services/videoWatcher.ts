@@ -75,6 +75,22 @@ function onWatchEvent(_eventType: string, filename: string | Buffer | null): voi
   scheduleHandle(filename.toString());
 }
 
+/**
+ * O ReadDirectoryChangesW reporta nomes longos, mas um watcher aberto num caminho
+ * curto 8.3 (ex.: C:\Users\RUNNER~1\…) mantém a forma curta. O libuv compara os
+ * prefixos e aborta o processo quando divergem — assert nativo, logo impossível de
+ * apanhar com try/catch. Em POSIX não se resolve, porque realpath também colapsa
+ * symlinks (/var → /private/var) e isso mudaria o comportamento.
+ */
+function toWatchablePath(dir: string): string {
+  if (process.platform !== 'win32') return dir;
+  try {
+    return fs.realpathSync.native(dir);
+  } catch {
+    return dir;
+  }
+}
+
 export function startVideoWatcher(hub: LiveWebSocketHub | null = null): void {
   stopVideoWatcher();
   notifyHub = hub;
@@ -86,7 +102,7 @@ export function startVideoWatcher(hub: LiveWebSocketHub | null = null): void {
   }
 
   try {
-    rootWatcher = fs.watch(videosRoot, { recursive: true }, onWatchEvent);
+    rootWatcher = fs.watch(toWatchablePath(videosRoot), { recursive: true }, onWatchEvent);
     rootWatcher.on('error', (err) => {
       console.warn('[video-watcher] erro no watcher:', err);
     });

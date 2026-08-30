@@ -29,6 +29,21 @@
       "fontScaleHint": "Escala tipográfica global do operador (100–125%).",
       "fontScaleValue": "{percent} por cento"
     },
+    "queueSync": {
+      "title": "Sincronização da fila",
+      "intro": "Compartilhe as abas e os itens da fila entre todos os operadores conectados. A aba e o item selecionados continuam independentes em cada computador.",
+      "toggle": "Fila compartilhada global",
+      "enabledHint": "Alterações na fila são enviadas automaticamente para todos os operadores.",
+      "disabledHint": "Cada operador mantém sua própria fila local.",
+      "enable": "Habilitar",
+      "disable": "Desabilitar",
+      "saving": "Salvando…",
+      "enableConfirm": "A fila deste computador substituirá a fila compartilhada para todos os operadores. Deseja continuar?",
+      "connection": "Conexão",
+      "revision": "Revisão",
+      "lastUpdate": "Última atualização",
+      "updatedBy": "Atualizada por"
+    },
     "projectionTypography": {
       "title": "Tipografia de projeção",
       "menuLabel": "Tipografia de projeção",
@@ -423,6 +438,7 @@
     "projectorScreen": "Tela projetor",
     "manageUsers": "Utilizadores",
     "worshipSettings": "Louvor e estofres",
+    "queueSync": "Sincronização da fila",
     "bibleSettings": "Bíblia e pesquisa",
     "appearance": "Tema e idioma",
     "projectionTypography": "Tipografia de projeção",

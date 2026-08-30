@@ -23,6 +23,7 @@ import {
   type ProjectionTypographyProfile,
   type ProjectionTypographyProfileKey,
 } from '@shared/projection-typography';
+import type { OperatorQueueTab } from '@shared/types/operator-queue';
 
 export type OperatorPanel = 'imagens' | 'videos' | 'louvor' | 'biblia';
 
@@ -313,6 +314,35 @@ export function usePreferences() {
     prefs.value.activeTabId = prefs.value.chromeTabs[0]?.id ?? null;
   }
 
+  function applySharedQueueTabs(tabs: OperatorQueueTab[]): void {
+    const localItems = new Map(
+      prefs.value.chromeTabs.flatMap((tab) =>
+        (tab.items ?? []).map((item) => [item.id, item] as const),
+      ),
+    );
+    const currentTabId = prefs.value.activeTabId;
+    prefs.value.chromeTabs = tabs.map((tab) => ({
+      ...tab,
+      items: tab.items.map((item) => {
+        const local = localItems.get(item.id);
+        return {
+          ...item,
+          active: local?.active || undefined,
+          youtubeImportJobId: local?.youtubeImportJobId,
+          youtubeImportPhase: local?.youtubeImportPhase,
+          youtubeImportProgress: local?.youtubeImportProgress,
+          youtubeImportAttempt: local?.youtubeImportAttempt,
+          youtubeImportMaxAttempts: local?.youtubeImportMaxAttempts,
+          youtubeImportError: local?.youtubeImportError,
+        };
+      }),
+    }));
+    prefs.value.activeTabId =
+      currentTabId && prefs.value.chromeTabs.some((tab) => tab.id === currentTabId)
+        ? currentTabId
+        : prefs.value.chromeTabs[0]?.id ?? null;
+  }
+
   function removeChromeTabsForSong(songId: number): void {
     const removed = prefs.value.chromeTabs.filter((t) => t.songId === songId);
     if (!removed.length) return;
@@ -430,6 +460,7 @@ export function usePreferences() {
     removeChromeTab,
     removeChromeTabsForSong,
     replaceChromeTabs,
+    applySharedQueueTabs,
     setActiveTab,
     setThemeId,
     setFontScalePercent,

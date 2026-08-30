@@ -1780,6 +1780,53 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /api/operator-queue:
+    get:
+      tags: [queue]
+      summary: Obter configuração e snapshot da fila compartilhada
+      operationId: getOperatorQueue
+      security:
+        - bearerAuth: []
+      description: Em localhost o token é opcional; acesso pela LAN exige operador ou administrador.
+      responses:
+        '200':
+          description: Estado global atual da fila
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperatorQueueResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [queue]
+      summary: Habilitar, desabilitar ou atualizar a fila compartilhada
+      operationId: updateOperatorQueue
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperatorQueueUpdate'
+      responses:
+        '200':
+          description: Estado atualizado e transmitido aos operadores
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperatorQueueResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Revisão desatualizada; inclui o estado autoritativo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperatorQueueResponse'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1859,6 +1906,72 @@ components:
         status:
           type: string
           example: Sucesso
+
+    OperatorQueueTab:
+      type: object
+      required: [id, label, items]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        songId:
+          type: integer
+        songName:
+          type: string
+        artist:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            required: [id, kind, label]
+            additionalProperties: true
+
+    OperatorQueueState:
+      type: object
+      required: [enabled, revision, tabs]
+      properties:
+        enabled:
+          type: boolean
+        revision:
+          type: integer
+          minimum: 0
+        tabs:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperatorQueueTab'
+        updatedAt:
+          type: [string, 'null']
+          format: date-time
+        updatedBy:
+          type: [string, 'null']
+
+    OperatorQueueResponse:
+      type: object
+      required: [status, state]
+      properties:
+        status:
+          type: string
+        error:
+          type: string
+        state:
+          $ref: '#/components/schemas/OperatorQueueState'
+
+    OperatorQueueUpdate:
+      type: object
+      required: [expectedRevision, enabled]
+      properties:
+        expectedRevision:
+          type: integer
+          minimum: 0
+        enabled:
+          type: boolean
+        tabs:
+          type: array
+          description: Obrigatório ao habilitar ou atualizar a fila.
+          items:
+            $ref: '#/components/schemas/OperatorQueueTab'
 
     HealthModuleStatus:
       type: object

@@ -29,6 +29,21 @@
       "fontScaleHint": "Escala tipográfica Global del operador (100–125%).",
       "fontScaleValue": "{percent} por ciento"
     },
+    "queueSync": {
+      "title": "Sincronización de la cola",
+      "intro": "Comparte las pestañas y los elementos de la cola entre todos los operadores conectados. La pestaña y el elemento seleccionados siguen siendo independientes en cada ordenador.",
+      "toggle": "Cola compartida global",
+      "enabledHint": "Los cambios de la cola se envían automáticamente a todos los operadores.",
+      "disabledHint": "Cada operador mantiene su propia cola local.",
+      "enable": "Activar",
+      "disable": "Desactivar",
+      "saving": "Guardando…",
+      "enableConfirm": "La cola de este ordenador sustituirá la cola compartida para todos los operadores. ¿Desea continuar?",
+      "connection": "Conexión",
+      "revision": "Revisión",
+      "lastUpdate": "Última actualización",
+      "updatedBy": "Actualizada por"
+    },
     "projectionTypography": {
       "title": "Tipografía de proyección",
       "menuLabel": "Tipografía de proyección",
@@ -423,6 +438,7 @@
     "projectorScreen": "Pantalla del proyector",
     "manageUsers": "Usuarios",
     "worshipSettings": "Adoración y estrofas",
+    "queueSync": "Sincronización de la cola",
     "bibleSettings": "Biblia y búsqueda",
     "appearance": "Tema e idioma",
     "projectionTypography": "Tipografía de proyección",

@@ -1,5 +1,7 @@
 /** Protocolo WebSocket ao vivo — operador ↔ projetor e saídas externas. */
 
+import type { OperatorQueueSyncMessage } from './operator-queue.js';
+
 /** Ações baseline de projeção (monitor público). */
 export const BASELINE_LIVE_ACTIONS = [
   'background',
@@ -237,4 +239,5 @@ export type WsServerMessage =
   | WsDevicePresenceMessage
   | WsProjectionTypographySyncMessage
   | WsMediaUpdatedMessage
-  | WsDisplaysConfigUpdatedMessage;
+  | WsDisplaysConfigUpdatedMessage
+  | OperatorQueueSyncMessage;
