@@ -472,7 +472,9 @@ onUnmounted(() => {
               ? 'border-lp-primary bg-lp-primary/20 text-lp-text shadow-[0_3px_0_0_var(--lp-color-primary)]'
               : 'border-lp-surface bg-lp-surface text-lp-muted hover:border-lp-primary/40 hover:text-lp-text',
             dropInsertIndex === index ? 'playlist-verse-tile--drop-before' : '',
-            dropInsertIndex === index + 1 ? 'playlist-verse-tile--drop-after' : '',
+            index === activeItems.length - 1 && dropInsertIndex === activeItems.length
+              ? 'playlist-verse-tile--drop-after'
+              : '',
           ]"
           :aria-pressed="item.active"
           :aria-label="item.label"

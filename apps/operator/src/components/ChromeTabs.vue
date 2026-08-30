@@ -123,7 +123,10 @@ function onTabKeydown(event: KeyboardEvent, tabId: string): void {
             ? 'border-amber-600/40 bg-amber-950/20 text-amber-100/90 hover:bg-amber-950/30'
             : 'border-transparent bg-lp-background/60 text-lp-muted hover:bg-lp-surface/50',
         dropInsertIndex === index ? 'playlist-tab--drop-before' : '',
-        dropInsertIndex === index + 1 ? 'playlist-tab--drop-after' : '',
+        index === prefs.chromeTabs.length - 1
+          && dropInsertIndex === prefs.chromeTabs.length
+          ? 'playlist-tab--drop-after'
+          : '',
       ]"
       @dragstart="onTabDragStart($event, tab.id)"
       @dragend="onDragEnd"
