@@ -8,6 +8,8 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 ### Adicionado
 
+- **Auto-update no operador** — faixa no topo com progresso de download, estado de instalação e botão Instalar agora (`AppUpdateBanner`).
+
 ### Alterado
 
 ### Corrigido
@@ -103,7 +105,6 @@ Ainda adiado (ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md)):
 - Telemetria opt-in remota
 - Auditoria WCAG sistemática
 - Painel UI de logs de auditoria (API admin já existe desde alpha.2)
-- Teste de auto-update in-app entre alphas após Publish release
 - i18n em portal e remote (ST-027)
 - OpenAPI para backup, tipografia e textfill-diagnostics
 
@@ -194,8 +195,8 @@ Adiado para versão futura (ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md)
 ### Pendente / opcional pós-alpha.2
 
 - Smoke **`smoke-win-installer`** no CI Windows (secção 10) — validação manual já feita.
-- Teste de **auto-update in-app** alpha.1 → alpha.2 após **Publish release** (secção 13).
 - Painel UI para logs de auditoria (API admin já existe).
+- ~~Teste de **auto-update in-app**~~ — concluído na alpha.3 (Windows; ver inventário §13).
 
 ---
 
@@ -391,8 +392,7 @@ Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md) — **entregue em alpha.2:*
 3. Editor visual de temas (color pickers).
 4. Telemetria opt-in de crashes (envio remoto).
 5. Acessibilidade WCAG sistemática.
-6. Teste auto-update in-app por SO (o smoke do instalador Windows já corre no CI).
-7. Sincronização multi-estação (fora de escopo).
+6. Sincronização multi-estação (fora de escopo).
 
 ---
 

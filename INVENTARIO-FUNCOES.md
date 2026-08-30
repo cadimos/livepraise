@@ -29,7 +29,7 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). Se
 | 10 | Smoke instalador Windows | ✅ | `smoke:win-installer` / `:ci` no job Windows de `release.yml` (SM-035) |
 | 11 | Import/export repertório | ✅ | `GET/POST /musica/export\|import` |
 | 12 | Acessibilidade WCAG | 📅 | Tema alto contraste; `axe-core` **sem** `npm run a11y` |
-| 13 | Auto-update validado | 🟡 | Código em `electron/updater.ts`; **falta teste in-app** após Publish |
+| 13 | Auto-update validado | ✅ | In-app **Windows** (alpha.2 → alpha.3); faixa de progresso + Instalar agora |
 | 14 | Flash textfill | ✅ | Alpha.2 + medição in-place / diagnóstico na alpha.3 |
 | 15 | Fila partilhada | ✅ | **GET/PUT `/api/operator-queue`** + WS `operator-queue-sync` |
 | 16 | Diagnóstico textfill | ✅ | JSONL + UI Logs; **rotas ainda fora do OpenAPI** |
@@ -43,7 +43,6 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). Se
 | **7** | Editor visual de temas | Produto |
 | **8** | Telemetria remota opt-in | Produto |
 | **12** | Auditoria WCAG + `a11y` | Qualidade |
-| **13** | Teste auto-update Win/Linux/macOS | Validação |
 | **1 (UI)** | Painel de logs de auditoria no operador | Opcional |
 | **4 (web)** | i18n em `web/portal` e `web/remote` | Dívida ST-027 |
 | **OpenAPI** | Backup, tipografia, textfill-diagnostics (existem no servidor, fora da lista canónica) | Documentação |
@@ -59,6 +58,7 @@ Sincronização **multi-estação completa** (várias máquinas como um único c
 | Textfill (corte, medição in-place, cifras só em linhas de acordes) | `npm run smoke:textfill` · `tests/projection-chords.test.mjs` |
 | Diagnóstico textfill | UI Configurações → Logs · `~/livepraise/textfill-diagnostics.jsonl` |
 | Smoke instalador Windows no CI | `release.yml` → `smoke:win-installer:ci` |
+| Auto-update in-app (Windows) | Teste manual alpha.2 → alpha.3 + faixa `AppUpdateBanner` |
 | Runtime | Node ≥ 24, Electron 44 |
 
 ### Entregue em **alpha.2** ✅
@@ -582,42 +582,35 @@ Auditoria sistemática + correcções — não confundir com «já tem tema alto
 
 ---
 
-## 13. Auto-update validado por SO 🟡
+## 13. Auto-update validado por SO ✅ *(concluído em alpha.3 — Windows)*
 
-### Explicação (em português claro)
+### Explicação
 
-**O auto-update já está implementado no código** (`electron-updater`, `latest*.yml`, notificações). Isto **não** é «falta implementar updater».
+O auto-update está em `electron/updater.ts` (`electron-updater`, `latest*.yml`). O item era **validar o fluxo in-app** (não só instalar do zero).
 
-O item refere-se a **validar o fluxo completo de actualização** — cenário diferente de «instalar a app pela primeira vez» (que tu já testaste na secção 2):
+| Cenário | Estado |
+|---------|--------|
+| Instalar alpha.3 numa máquina limpa | ✅ NSIS |
+| Actualizar **alpha.2 → alpha.3 dentro da app** (Windows) | ✅ Detectou actualização, download em segundo plano |
+| Progresso e instalação na UI do operador | ✅ Faixa `AppUpdateBanner` (percentagem + **Instalar agora**) |
+| Linux / macOS in-app | Não testado nesta ronda — código partilhado; opcional |
 
-| Cenário | Testaste? | O quê |
-|---------|-----------|--------|
-| Instalar **alpha.3** numa máquina limpa | ✅ (instalador NSIS local / draft) | NSIS / AppImage / DMG |
-| **Actualizar** de alpha.2 → alpha.3 **dentro da app** (updater) | ❓ Pendente | App antiga abre → detecta release **publicada** → descarrega → reinicia |
+Draft no GitHub **não** alimenta o updater; só release **publicada**.
 
-Enquanto a release estiver em **draft**, o updater **não entrega** aos utilizadores — só após **Publish release** no GitHub.
+### Implementado
 
-### Já existe
+- `electron-updater` + provider GitHub; `latest*.yml` no job Windows.
+- Eventos IPC `livepraise:update-status` (checking, available, downloading com %, ready, installing, error, idle se não houver update).
+- UI: `apps/operator/src/components/AppUpdateBanner.vue` + `useAppUpdater.ts`.
+- Notificações do SO mantêm-se como complemento.
 
-- `electron-updater` + provider GitHub (`electron-builder.yml`).
-- Windows gera `latest*.yml`; CI verifica presença no job Windows.
-- README descreve comportamento (draft vs publicado, fallback manual).
+### Tarefas
 
-### O que realmente falta
-
-1. **Publicar** a release (sair do draft) — senão o updater não activa para utilizadores reais.
-2. **Teste manual por SO** (checklist curto):
-   - [ ] Windows: instalar versão **anterior publicada** → abrir app → confirmar download/instalação silenciosa ou notificação de fallback.
-   - [ ] Linux: idem com AppImage ou `.deb` (conforme canal usado).
-   - [ ] macOS: idem com DMG + versão anterior.
-3. (Opcional) Script que valida `latest.yml` + hashes nos artefactos do release.
-
-**Não falta:** reescrever `electron-updater` — já está ligado em `electron/updater.ts`.
-
-### Tarefas *(backlog)*
-
-- [ ] Checklist de teste manual Win/Linux/macOS na secção 2 ou README.
-- [ ] (Opcional) Smoke headless que valida `latest.yml` e hashes no artefacto.
+- [x] Publicar release e confirmar que o updater oferece a versão nova (Windows).
+- [x] Teste in-app: versão anterior → download → (faixa de progresso / instalar agora ou ao encerrar).
+- [x] Mostrar progresso de download e estado de instalação no operador.
+- [ ] (Opcional) Repetir o teste em Linux e macOS.
+- [ ] (Opcional) Smoke headless de `latest.yml` + hashes.
 
 ---
 
