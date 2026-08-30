@@ -1,6 +1,18 @@
 /** Itens da fila de projeção (chrome tabs) e payload de drag-and-drop (CAD-189). */
 
+import { moveListItem, moveListItemToInsertIndex } from './list-reorder.js';
+
 export const QUEUE_DRAG_MIME = 'application/x-livepraise-queue-drag';
+
+/**
+ * Marcador presente apenas quando o arrasto reordena um item já na fila. Em
+ * `dragover` o payload não é legível (modo protegido do DataTransfer), mas a lista
+ * de tipos é — é por aqui que o destino distingue reordenar de adicionar.
+ */
+export const QUEUE_REORDER_MIME = 'application/x-livepraise-queue-reorder';
+
+/** Reordenação das abas da playlist; distinto do MIME dos itens da fila. */
+export const TAB_DRAG_MIME = 'application/x-livepraise-tab-drag';
 
 export type QueueItemKind = 'music' | 'bible' | 'image' | 'video' | 'blank';
 
@@ -196,16 +208,40 @@ export function parseQueueDragPayload(raw: string | null): QueueDragPayload | nu
   }
 }
 
+/** Move um item para o índice final `toIndex` (posição após a remoção). */
 export function reorderQueueItems(
   items: QueueItem[],
   fromIndex: number,
   toIndex: number,
 ): QueueItem[] {
-  if (fromIndex === toIndex) return items;
-  if (fromIndex < 0 || fromIndex >= items.length) return items;
-  if (toIndex < 0 || toIndex >= items.length) return items;
-  const next = [...items];
-  const [moved] = next.splice(fromIndex, 1);
-  next.splice(toIndex, 0, moved!);
-  return next;
+  return moveListItem(items, fromIndex, toIndex);
+}
+
+/** Move um item para um índice de inserção (`items.length` = fim da fila). */
+export function moveQueueItemToInsertIndex(
+  items: QueueItem[],
+  fromIndex: number,
+  insertIndex: number,
+): QueueItem[] {
+  return moveListItemToInsertIndex(items, fromIndex, insertIndex);
+}
+
+export interface TabDragPayload {
+  tabId: string;
+}
+
+export function serializeTabDragPayload(payload: TabDragPayload): string {
+  return JSON.stringify(payload);
+}
+
+export function parseTabDragPayload(raw: string | null): TabDragPayload | null {
+  if (!raw) return null;
+  try {
+    const data = JSON.parse(raw) as TabDragPayload;
+    if (!data || typeof data !== 'object') return null;
+    if (typeof data.tabId !== 'string' || !data.tabId) return null;
+    return data;
+  } catch {
+    return null;
+  }
 }

@@ -288,12 +288,16 @@ function translateValue(value) {
     'Arraste versos, Bíblia, imagens ou vídeos para esta fila — ou solte numa aba acima.':
       'Drag stanzas, Bible, images or videos to this queue — or drop on a tab above.',
     'Arrastar para a fila de projeção': 'Drag to projection queue',
+    'Arraste para reordenar a fila (ou Alt+← / Alt+→)':
+      'Drag to reorder the queue (or Alt+← / Alt+→)',
     'Música': 'Song',
     'Imagem': 'Image',
     'Vídeo': 'Video',
     'Em branco': 'Blank',
     'Remover da fila': 'Remove from queue',
     'Remover «{label}» da fila': 'Remove «{label}» from queue',
+    'Mover para a esquerda': 'Move left',
+    'Mover para a direita': 'Move right',
     'Online': 'Online',
     'A descarregar…': 'Downloading…',
     'Tentativa {attempt}/{max}…': 'Attempt {attempt}/{max}…',

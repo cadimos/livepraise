@@ -29,6 +29,21 @@
       "fontScaleHint": "Escala tipográfica Global del operador (100–125%).",
       "fontScaleValue": "{percent} por ciento"
     },
+    "queueSync": {
+      "title": "Sincronização da fila",
+      "intro": "Compartilhe as abas e os itens da fila entre todos os operadores conectados. A aba e o item selecionados continuam independentes em cada computador.",
+      "toggle": "Fila compartilhada global",
+      "enabledHint": "Alterações na fila são enviadas automaticamente para todos os operadores.",
+      "disabledHint": "Cada operador mantém sua própria fila local.",
+      "enable": "Habilitar",
+      "disable": "Desabilitar",
+      "saving": "Salvando…",
+      "enableConfirm": "A fila deste computador substituirá a fila compartilhada para todos os operadores. Deseja continuar?",
+      "connection": "Conexão",
+      "revision": "Revisão",
+      "lastUpdate": "Última atualização",
+      "updatedBy": "Atualizada por"
+    },
     "projectionTypography": {
       "title": "Tipografía de proyección",
       "menuLabel": "Tipografía de proyección",
@@ -319,6 +334,7 @@
     "blankLabel": "Cola {n}",
     "dropHint": "Arrastra estrofas, Biblia, imágenes o vídeos a esta cola — o suéltalos en una pestaña de arriba.",
     "dragHint": "Arrastrar a la cola de proyección",
+    "reorderHint": "Arrastra para reordenar la cola (o Alt+← / Alt+→)",
     "kindMusic": "Canción",
     "kindBible": "Biblia",
     "kindImage": "Imagen",
@@ -328,6 +344,8 @@
   "queueItem": {
     "removeFromQueue": "Quitar de la cola",
     "removeFromQueueAria": "Quitar «{label}» de la cola",
+    "moveLeft": "Mover a la izquierda",
+    "moveRight": "Mover a la derecha",
     "online": "Online",
     "youtubeDownloading": "Descargando…",
     "youtubeDownloadingAttempt": "Intento {attempt}/{max}…",
@@ -423,6 +441,7 @@
     "projectorScreen": "Pantalla del proyector",
     "manageUsers": "Usuarios",
     "worshipSettings": "Adoración y estrofas",
+    "queueSync": "Sincronização da fila",
     "bibleSettings": "Biblia y búsqueda",
     "appearance": "Tema e idioma",
     "projectionTypography": "Tipografía de proyección",
@@ -572,14 +591,14 @@
   },
   "status": {
     "update": {
-      "checking": "Buscando actualizaciones…",
-      "available": "Actualización {version} disponible: descarga en segundo plano.",
-      "downloading": "Descargando actualización {version}… {percent}%",
-      "ready": "La actualización {version} está lista. Instálala ahora o se aplicará al cerrar la aplicación.",
-      "installing": "Instalando la actualización {version}… Live Praise se reiniciará.",
-      "error": "No se pudo actualizar automáticamente: {message}",
-      "installNow": "Instalar ahora",
-      "dismiss": "Descartar"
+      "checking": "A procurar atualizações…",
+      "available": "Atualização {version} disponível — a descarregar em segundo plano.",
+      "downloading": "A descarregar atualização {version}… {percent}%",
+      "ready": "Atualização {version} pronta. Instale agora ou será aplicada ao encerrar o aplicativo.",
+      "installing": "A instalar a atualização {version}… o Live Praise vai reiniciar.",
+      "error": "Não foi possível atualizar automaticamente: {message}",
+      "installNow": "Instalar agora",
+      "dismiss": "Dispensar"
     },
     "version": "v{version}",
     "displays": "{total} monitor(es) · {projection} proyectando · {return} en retorno ({stageReturn} retorno de escenario)",

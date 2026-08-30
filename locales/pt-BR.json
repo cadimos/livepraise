@@ -334,6 +334,7 @@
     "blankLabel": "Fila {n}",
     "dropHint": "Arraste versos, Bíblia, imagens ou vídeos para esta fila — ou solte numa aba acima.",
     "dragHint": "Arrastar para a fila de projeção",
+    "reorderHint": "Arraste para reordenar a fila (ou Alt+← / Alt+→)",
     "kindMusic": "Música",
     "kindBible": "Bíblia",
     "kindImage": "Imagem",
@@ -343,6 +344,8 @@
   "queueItem": {
     "removeFromQueue": "Remover da fila",
     "removeFromQueueAria": "Remover «{label}» da fila",
+    "moveLeft": "Mover para a esquerda",
+    "moveRight": "Mover para a direita",
     "online": "Online",
     "youtubeDownloading": "A descarregar…",
     "youtubeDownloadingAttempt": "Tentativa {attempt}/{max}…",

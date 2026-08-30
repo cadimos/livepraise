@@ -29,6 +29,21 @@
       "fontScaleHint": "Global operator typography scale (100–125%).",
       "fontScaleValue": "{percent} percent"
     },
+    "queueSync": {
+      "title": "Sincronização da fila",
+      "intro": "Compartilhe as abas e os itens da fila entre todos os operadores conectados. A aba e o item selecionados continuam independentes em cada computador.",
+      "toggle": "Fila compartilhada global",
+      "enabledHint": "Alterações na fila são enviadas automaticamente para todos os operadores.",
+      "disabledHint": "Cada operador mantém sua própria fila local.",
+      "enable": "Habilitar",
+      "disable": "Desabilitar",
+      "saving": "Salvando…",
+      "enableConfirm": "A fila deste computador substituirá a fila compartilhada para todos os operadores. Deseja continuar?",
+      "connection": "Conexão",
+      "revision": "Revisão",
+      "lastUpdate": "Última atualização",
+      "updatedBy": "Atualizada por"
+    },
     "projectionTypography": {
       "title": "Projection typography",
       "menuLabel": "Projection typography",
@@ -319,6 +334,7 @@
     "blankLabel": "Queue {n}",
     "dropHint": "Drag stanzas, Bible, images or videos to this queue — or drop on a tab above.",
     "dragHint": "Drag to projection queue",
+    "reorderHint": "Drag to reorder the queue (or Alt+← / Alt+→)",
     "kindMusic": "Song",
     "kindBible": "Bible",
     "kindImage": "Image",
@@ -328,6 +344,8 @@
   "queueItem": {
     "removeFromQueue": "Remove from queue",
     "removeFromQueueAria": "Remove «{label}» from queue",
+    "moveLeft": "Move left",
+    "moveRight": "Move right",
     "online": "Online",
     "youtubeDownloading": "Downloading…",
     "youtubeDownloadingAttempt": "Attempt {attempt}/{max}…",
@@ -423,6 +441,7 @@
     "projectorScreen": "Projector screen",
     "manageUsers": "Users",
     "worshipSettings": "Worship and stanzas",
+    "queueSync": "Sincronização da fila",
     "bibleSettings": "Bible and search",
     "appearance": "Theme and language",
     "projectionTypography": "Projection typography",
@@ -572,14 +591,14 @@
   },
   "status": {
     "update": {
-      "checking": "Checking for updates…",
-      "available": "Update {version} available — downloading in the background.",
-      "downloading": "Downloading update {version}… {percent}%",
-      "ready": "Update {version} is ready. Install now or it will be applied when you quit the app.",
-      "installing": "Installing update {version}… Live Praise will restart.",
-      "error": "Could not update automatically: {message}",
-      "installNow": "Install now",
-      "dismiss": "Dismiss"
+      "checking": "A procurar atualizações…",
+      "available": "Atualização {version} disponível — a descarregar em segundo plano.",
+      "downloading": "A descarregar atualização {version}… {percent}%",
+      "ready": "Atualização {version} pronta. Instale agora ou será aplicada ao encerrar o aplicativo.",
+      "installing": "A instalar a atualização {version}… o Live Praise vai reiniciar.",
+      "error": "Não foi possível atualizar automaticamente: {message}",
+      "installNow": "Instalar agora",
+      "dismiss": "Dispensar"
     },
     "version": "v{version}",
     "displays": "{total} monitor(s) · {projection} projecting · {return} on return ({stageReturn} stage return)",

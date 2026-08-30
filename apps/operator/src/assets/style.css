@@ -154,6 +154,48 @@ textarea::placeholder {
   overflow: hidden;
 }
 
+/* Barra que marca onde o item arrastado será inserido */
+.playlist-verse-tile--drop-before::before,
+.playlist-verse-tile--drop-after::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--lp-color-primary);
+  pointer-events: none;
+}
+
+.playlist-verse-tile--drop-before::before {
+  left: -0.3125rem;
+}
+
+.playlist-verse-tile--drop-after::after {
+  right: -0.3125rem;
+}
+
+/* Idem para as abas da playlist (reordenar músicas) */
+.playlist-tab--drop-before::before,
+.playlist-tab--drop-after::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--lp-color-primary);
+  pointer-events: none;
+}
+
+.playlist-tab--drop-before::before {
+  left: -0.1875rem;
+}
+
+.playlist-tab--drop-after::after {
+  right: -0.1875rem;
+}
+
 .playlist-verses-track::-webkit-scrollbar {
   height: 10px;
 }

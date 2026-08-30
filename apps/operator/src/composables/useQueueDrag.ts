@@ -1,6 +1,7 @@
 import {
   parseQueueDragPayload,
   QUEUE_DRAG_MIME,
+  QUEUE_REORDER_MIME,
   queueItemFromPayload,
   serializeQueueDragPayload,
   type QueueDragPayload,
@@ -14,46 +15,56 @@ function readQueueDragPayload(dataTransfer: DataTransfer | null): QueueDragPaylo
   return parseQueueDragPayload(raw || null);
 }
 
+/**
+ * Durante `dragover` o DataTransfer está em modo protegido e `getData()` devolve
+ * sempre string vazia — só a lista de tipos é legível. A intenção do arrasto viaja
+ * por isso num tipo MIME marcador em vez do payload.
+ */
+function hasType(dataTransfer: DataTransfer, type: string): boolean {
+  return Array.prototype.includes.call(dataTransfer.types, type) as boolean;
+}
+
 export function useQueueDrag() {
   const {
-    prefs,
     setActiveTab,
     addQueueItem,
+    getTabItems,
     moveQueueItemInTab,
-    reorderQueueItemsInTab,
+    moveQueueItemToIndex,
   } = usePreferences();
 
   function onDragStart(event: DragEvent, payload: QueueDragPayload): void {
     const dt = event.dataTransfer;
     if (!dt) return;
     dt.setData(QUEUE_DRAG_MIME, serializeQueueDragPayload(payload));
-    dt.effectAllowed = payload.sourceItemId ? 'move' : 'copy';
+    if (payload.sourceItemId) dt.setData(QUEUE_REORDER_MIME, payload.sourceItemId);
+    // `copyMove` cobre ambos os efeitos, pelo que qualquer `dropEffect` que o
+    // destino escolha é compatível e o evento `drop` chega a disparar.
+    dt.effectAllowed = 'copyMove';
   }
 
   function onDragOver(event: DragEvent): void {
-    event.preventDefault();
     const dt = event.dataTransfer;
-    if (!dt) return;
-    const payload = readQueueDragPayload(dt);
-    dt.dropEffect = payload?.sourceItemId ? 'move' : 'copy';
+    if (!dt || !hasType(dt, QUEUE_DRAG_MIME)) return;
+    event.preventDefault();
+    dt.dropEffect = hasType(dt, QUEUE_REORDER_MIME) ? 'move' : 'copy';
   }
 
   function handleDropOnTab(event: DragEvent, tabId: string): void {
+    const dt = event.dataTransfer;
+    if (dt && !hasType(dt, QUEUE_DRAG_MIME)) return;
     event.preventDefault();
     event.stopPropagation();
-    const payload = readQueueDragPayload(event.dataTransfer);
+    const payload = readQueueDragPayload(dt);
     if (!payload) return;
 
     setActiveTab(tabId);
 
     if (payload.sourceItemId && payload.sourceTabId) {
-      const tab = prefs.value.chromeTabs.find((t) => t.id === tabId);
-      if (!tab?.items) return;
       if (payload.sourceTabId === tabId) {
-        const fromIndex = tab.items.findIndex((i) => i.id === payload.sourceItemId);
-        if (fromIndex >= 0 && fromIndex !== tab.items.length - 1) {
-          reorderQueueItemsInTab(tabId, fromIndex, tab.items.length - 1);
-        }
+        const items = getTabItems(tabId);
+        if (!items) return;
+        moveQueueItemToIndex(tabId, payload.sourceItemId, items.length);
       } else {
         moveQueueItemInTab(payload.sourceTabId, payload.sourceItemId, tabId);
       }
@@ -63,40 +74,36 @@ export function useQueueDrag() {
     addQueueItem(tabId, queueItemFromPayload(payload));
   }
 
+  /** `insertIndex` é a posição *antes* do item nesse índice (`length` = fim da fila). */
   function handleDropOnQueueStrip(
     event: DragEvent,
     tabId: string,
-    dropIndex: number,
+    insertIndex: number,
   ): void {
+    const dt = event.dataTransfer;
+    if (dt && !hasType(dt, QUEUE_DRAG_MIME)) return;
     event.preventDefault();
     event.stopPropagation();
-    const payload = readQueueDragPayload(event.dataTransfer);
+    const payload = readQueueDragPayload(dt);
     if (!payload) return;
 
     setActiveTab(tabId);
 
     if (payload.sourceItemId && payload.sourceTabId) {
-      const tab = prefs.value.chromeTabs.find((t) => t.id === tabId);
-      if (!tab?.items) return;
       if (payload.sourceTabId === tabId) {
-        const fromIndex = tab.items.findIndex((i) => i.id === payload.sourceItemId);
-        if (fromIndex < 0) return;
-        const clamped = Math.max(0, Math.min(dropIndex, tab.items.length - 1));
-        if (fromIndex !== clamped) {
-          reorderQueueItemsInTab(tabId, fromIndex, clamped);
-        }
+        moveQueueItemToIndex(tabId, payload.sourceItemId, insertIndex);
       } else {
         moveQueueItemInTab(
           payload.sourceTabId,
           payload.sourceItemId,
           tabId,
-          dropIndex,
+          insertIndex,
         );
       }
       return;
     }
 
-    addQueueItem(tabId, queueItemFromPayload(payload), dropIndex);
+    addQueueItem(tabId, queueItemFromPayload(payload), insertIndex);
   }
 
   function onQueueItemDragStart(
