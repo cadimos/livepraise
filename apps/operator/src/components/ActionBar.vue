@@ -19,6 +19,7 @@ export type SettingsPanel =
   | 'users'
   | 'appearance'
   | 'projectionTypography'
+  | 'queueSync'
   | 'worship'
   | 'bible'
   | 'approvals'
@@ -254,6 +255,19 @@ function reloadApp() {
 
       <DropdownMenu :label="t('actions.settings')">
         <template #default="{ close }">
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
+              class="block w-full px-4 py-2 text-left hover:bg-lp-surface/80"
+              @click="
+                emit('openSettings', 'queueSync');
+                close();
+              "
+            >
+              {{ t('actions.queueSync') }}
+            </button>
+          </li>
           <li role="none">
             <button
               type="button"

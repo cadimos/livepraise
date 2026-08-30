@@ -19,7 +19,8 @@
 
       <section id="login-section">
         <h2>Operador (browser)</h2>
-        <form id="login-form">
+        <!-- method=post: se o módulo JS falhar, o fallback nativo nunca põe credenciais na URL. -->
+        <form id="login-form" method="post">
           <label>
             Usuário
             <input id="username" name="username" autocomplete="username" required />

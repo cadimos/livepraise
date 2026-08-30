@@ -29,8 +29,9 @@ export function createAuthRouter(): Router {
       return;
     }
 
-    const username = String(req.body.username ?? '').trim();
-    const password = String(req.body.password ?? '');
+    const body = (req.body ?? {}) as { username?: unknown; password?: unknown };
+    const username = String(body.username ?? '').trim();
+    const password = String(body.password ?? '');
     if (!username || !password) {
       jsonError(res, 400, 'Usuário e senha obrigatórios');
       return;

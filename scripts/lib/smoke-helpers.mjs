@@ -13,7 +13,15 @@ export function resolveAppRoot(fromImportMetaUrl) {
 
 /** Diretório temporário isolado para `LIVEPRAISE_HOME`. */
 export function createSmokeHome(prefix = 'livepraise-smoke-') {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  // Nos runners Windows, os.tmpdir() é C:\Users\RUNNER~1\… (curto 8.3), forma que
+  // faz o libuv abortar em fs.watch. Guardar já o caminho longo.
+  if (process.platform !== 'win32') return home;
+  try {
+    return fs.realpathSync.native(home);
+  } catch {
+    return home;
+  }
 }
 
 export function configureSmokeEnv({ home, appRoot, port = '0' }) {

@@ -29,6 +29,21 @@
       "fontScaleHint": "Global operator typography scale (100–125%).",
       "fontScaleValue": "{percent} percent"
     },
+    "queueSync": {
+      "title": "Queue synchronization",
+      "intro": "Share queue tabs and items with every connected operator. The selected tab and item remain independent on each computer.",
+      "toggle": "Global shared queue",
+      "enabledHint": "Queue changes are automatically sent to all operators.",
+      "disabledHint": "Each operator keeps a separate local queue.",
+      "enable": "Enable",
+      "disable": "Disable",
+      "saving": "Saving…",
+      "enableConfirm": "This computer's queue will replace the shared queue for every operator. Continue?",
+      "connection": "Connection",
+      "revision": "Revision",
+      "lastUpdate": "Last update",
+      "updatedBy": "Updated by"
+    },
     "projectionTypography": {
       "title": "Projection typography",
       "menuLabel": "Projection typography",
@@ -423,6 +438,7 @@
     "projectorScreen": "Projector screen",
     "manageUsers": "Users",
     "worshipSettings": "Worship and stanzas",
+    "queueSync": "Queue synchronization",
     "bibleSettings": "Bible and search",
     "appearance": "Theme and language",
     "projectionTypography": "Projection typography",

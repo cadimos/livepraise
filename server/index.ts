@@ -35,6 +35,7 @@ import { startVideoWatcher, stopVideoWatcher } from './services/videoWatcher.js'
 import { backupModeGuard } from './middleware/backup-mode.js';
 import { createFontsRouter } from './routes/fonts.js';
 import { createProjectionTypographyRouter } from './routes/projection-typography.js';
+import { createOperatorQueueRouter } from './routes/operator-queue.js';
 import { createSystemRouter, errorLogMiddleware, registerProcessErrorHandlers } from './routes/system.js';
 import { buildHealthReport } from './health.js';
 import {
@@ -118,6 +119,7 @@ export async function createLivepraiseApp(
   app.use('/api/users', createUsersRouter());
   app.use('/api/system', createSystemRouter());
   app.use('/api/projection-typography', createProjectionTypographyRouter(liveHub));
+  app.use('/api/operator-queue', createOperatorQueueRouter(liveHub));
   if (liveHub) {
     app.use('/api/remote', createRemoteRouter(liveHub));
   }

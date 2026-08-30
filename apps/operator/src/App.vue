@@ -27,6 +27,7 @@ import WorshipSettingsPanel from './components/panels/WorshipSettingsPanel.vue';
 import BibleSettingsPanel from './components/panels/BibleSettingsPanel.vue';
 import BackupRestorePanel from './components/panels/BackupRestorePanel.vue';
 import ProjectionTypographyPanel from './components/panels/ProjectionTypographyPanel.vue';
+import QueueSyncPanel from './components/panels/QueueSyncPanel.vue';
 import { useBackupRestore } from './composables/useBackupRestore';
 import ServiceTimerModal from './components/ServiceTimerModal.vue';
 import FooterAlertModal from './components/FooterAlertModal.vue';
@@ -34,6 +35,7 @@ import { usePreferences, type OperatorPanel } from './composables/usePreferences
 import { useFooterAlert } from './composables/useFooterAlert';
 import { connectLiveSocket, useLiveSocket } from './composables/useLiveSocket';
 import { startProjectionTypographySync } from './composables/useProjectionTypographySync';
+import { startOperatorQueueSync } from './composables/useOperatorQueueSync';
 import { useShortcuts } from './composables/useShortcuts';
 import { useLocale } from './composables/useLocale';
 
@@ -103,6 +105,8 @@ const settingsTitle = computed(() => {
       return t('settings.appearance.title');
     case 'projectionTypography':
       return t('settings.projectionTypography.title');
+    case 'queueSync':
+      return t('settings.queueSync.title');
     case 'worship':
       return t('settings.worship.title');
     case 'bible':
@@ -156,6 +160,7 @@ function onQuickBackground(url: string) {
 
 onMounted(() => {
   connectLiveSocket();
+  startOperatorQueueSync();
   startProjectionTypographySync();
   void refreshLocales();
   window.addEventListener('keydown', onGlobalKeydown);
@@ -267,6 +272,7 @@ onUnmounted(() => {
       <BibleSettingsPanel v-else-if="settingsPanel === 'bible'" />
       <AppearancePanel v-else-if="settingsPanel === 'appearance'" />
       <ProjectionTypographyPanel v-else-if="settingsPanel === 'projectionTypography'" />
+      <QueueSyncPanel v-else-if="settingsPanel === 'queueSync'" />
       <ApprovalsPanel v-else-if="settingsPanel === 'approvals'" />
       <ErrorLogPanel v-else-if="settingsPanel === 'errorLog'" />
       <BackupRestorePanel v-else-if="settingsPanel === 'backupRestore'" />

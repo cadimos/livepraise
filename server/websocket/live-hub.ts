@@ -34,6 +34,7 @@ import {
   loadProjectionTypographyPrefs,
 } from '../../core/projection-typography/persistence.js';
 import type { ProjectionTypographyPrefs } from '../../shared/projection-typography.js';
+import type { OperatorQueueState } from '../../shared/types/operator-queue.js';
 
 export const LIVE_WS_PATH = '/ws/live';
 
@@ -58,6 +59,7 @@ export interface LiveWebSocketHub {
     category: string;
     path: string;
   }): void;
+  broadcastOperatorQueue(state: OperatorQueueState): void;
   applyOperatorAction(action: LiveAction, from: string): void;
   close(): Promise<void>;
 }
@@ -144,6 +146,18 @@ export function attachLiveWebSocket(
     for (const [socket, meta] of clients) {
       if (socket.readyState !== WebSocket.OPEN) continue;
       if (meta.role !== 'operator' && meta.role !== 'remote-operator') continue;
+      send(socket, message);
+    }
+  }
+
+  function broadcastOperatorQueue(state: OperatorQueueState): void {
+    const message: WsServerMessage = {
+      type: 'operator-queue-sync',
+      state,
+      ts: Date.now(),
+    };
+    for (const [socket, meta] of clients) {
+      if (socket.readyState !== WebSocket.OPEN || meta.role !== 'operator') continue;
       send(socket, message);
     }
   }
@@ -404,6 +418,7 @@ export function attachLiveWebSocket(
     broadcast: (message) => emitAll(message),
     broadcastProjectionTypography,
     broadcastMediaUpdated,
+    broadcastOperatorQueue,
     applyOperatorAction,
     close: () =>
       new Promise((resolve, reject) => {

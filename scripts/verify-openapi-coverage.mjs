@@ -13,7 +13,8 @@ const specText = fs.readFileSync(specPath, 'utf8');
 function parseOpenApiPaths(text) {
   const paths = {};
   let current = null;
-  for (const line of text.split('\n')) {
+  for (const rawLine of text.split('\n')) {
+    const line = rawLine.replace(/\r$/, '');
     const pathMatch = line.match(/^  (\/\S+):$/);
     if (pathMatch) {
       current = pathMatch[1];
@@ -101,6 +102,8 @@ const IMPLEMENTED = [
   ['POST', '/api/queue/import-url'],
   ['POST', '/video/importar/url'],
   ['POST', '/imagem/importar/url'],
+  ['GET', '/api/operator-queue'],
+  ['PUT', '/api/operator-queue'],
 ];
 
 function documented(method, route) {

@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "paths": {
+      "/shared/auth-session.js": ["./dist/shared/auth-session.d.ts"],
       "/shared/display-debug-overlay.js": ["./dist/shared/display-debug-overlay.d.ts"],
       "/shared/endpoint-device-id.js": ["./dist/shared/endpoint-device-id.d.ts"],
       "/shared/footer-alert-overlay.js": ["./dist/shared/footer-alert-overlay.d.ts"],
