@@ -439,6 +439,17 @@ function translateValue(value) {
       'Node.js, Express 5 and WebSocket (ws) on the server',
     'SQLite (persistência local)': 'SQLite (local persistence)',
     'Tailwind CSS e vue-i18n': 'Tailwind CSS and vue-i18n',
+    'Créditos e agradecimentos': 'Credits and acknowledgements',
+    'conversão de vídeo e geração de miniaturas': 'video conversion and thumbnail generation',
+    'descarregamento de vídeos a partir de URLs': 'downloading videos from URLs',
+    'pacotes de Bíblias em português no esquema OpenLP':
+      'Portuguese Bible packages in the OpenLP schema',
+    'As traduções bíblicas pertencem às respectivas editoras e são usadas conforme os direitos de cada obra.':
+      'Bible translations belong to their respective publishers and are used according to the rights of each work.',
+    'Fontes embutidas: Roboto, Source Sans 3, Lato, Open Sans, Noto Sans, Literata e Merriweather (licenciadas sob Apache 2.0 / OFL 1.1).':
+      'Embedded fonts: Roboto, Source Sans 3, Lato, Open Sans, Noto Sans, Literata and Merriweather (licensed under Apache 2.0 / OFL 1.1).',
+    'Desenvolvimento': 'Development',
+    'Thiago de Lucena Sobrinho': 'Thiago de Lucena Sobrinho',
     'Runtime desta instalação: Node.js {node}, Chromium {chromium}, Electron {electron}.':
       'Runtime for this installation: Node.js {node}, Chromium {chromium}, Electron {electron}.',
     'Versão do aplicativo: {version}': 'Application version: {version}',

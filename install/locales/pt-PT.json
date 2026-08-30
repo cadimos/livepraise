@@ -247,7 +247,17 @@
       "showDetail": "Ver detalhe",
       "hideDetail": "Ocultar detalhe",
       "displayDebugOverlay": "Overlay de debug nos monitores",
-      "displayDebugOverlayHint": "Quando ativo, mostra no rodapé dos monitores de projeção e dos dispositivos ligados pela rede a última ação recebida (ex.: mudança de música às 17:08:38)."
+      "displayDebugOverlayHint": "Quando ativo, mostra no rodapé dos monitores de projeção e dos dispositivos ligados pela rede a última ação recebida (ex.: mudança de música às 17:08:38).",
+      "textfillDiagnostics": "Diagnóstico de textfill (prévia/projetor)",
+      "textfillDiagnosticsHint": "Regista medições de tamanho de fonte e caixas de layout. Reproduza o problema (projecte 2–3 versos), exporte o ficheiro e envie à equipa de suporte.",
+      "textfillDiagnosticsEnabled": "Ativar registo de textfill",
+      "textfillDiagnosticsPath": "Ficheiro no servidor",
+      "textfillDiagnosticsCount": "{count} registo(s)",
+      "textfillDiagnosticsEmpty": "Nenhum registo ainda. Projecte louvor com o registo ativo.",
+      "textfillDiagnosticsExport": "Exportar JSONL",
+      "textfillDiagnosticsClear": "Limpar diagnóstico",
+      "textfillDiagnosticsConfirmClear": "Limpar todos os registos de textfill?",
+      "textfillDiagnosticsEntry": "{surface} · {phase} · {font}px (overflow H {overflowH}) · caixa {boxW}×{boxH}"
     },
     "shortcuts": {
       "title": "Atalhos de teclado",
@@ -489,6 +499,28 @@
       "SQLite (persistência local)",
       "Tailwind CSS e vue-i18n"
     ],
+    "creditsTitle": "Créditos e agradecimentos",
+    "creditsItems": [
+      {
+        "name": "FFmpeg",
+        "description": "conversão de vídeo e geração de miniaturas",
+        "url": "https://ffmpeg.org/"
+      },
+      {
+        "name": "yt-dlp",
+        "description": "descarregamento de vídeos a partir de URLs",
+        "url": "https://github.com/yt-dlp/yt-dlp"
+      },
+      {
+        "name": "Daniel Amaral (biblias)",
+        "description": "pacotes de Bíblias em português no esquema OpenLP",
+        "url": "https://github.com/damarals/biblias"
+      }
+    ],
+    "creditsPublishers": "As traduções bíblicas pertencem às respectivas editoras e são usadas conforme os direitos de cada obra.",
+    "creditsFonts": "Fontes embutidas: Roboto, Source Sans 3, Lato, Open Sans, Noto Sans, Literata e Merriweather (licenciadas sob Apache 2.0 / OFL 1.1).",
+    "authorTitle": "Desenvolvimento",
+    "authorBody": "Thiago de Lucena Sobrinho",
     "runtime": "Runtime desta instalação: Node.js {node}, Chromium {chromium}, Electron {electron}.",
     "version": "Versão da aplicação: {version}",
     "close": "Fechar"
@@ -597,6 +629,7 @@
   "displays": {
     "intro": "Defina o papel de cada monitor: o operador usa o monitor principal; a projeção pública e o retorno de palco mostram conteúdos diferentes.",
     "primary": "principal",
+    "disconnected": "desligado",
     "monitorsTitle": "Monitores",
     "none": "Nenhum monitor detectado. Execute o Live Praise neste computador para listar os ecrãs ligados.",
     "save": "Guardar papéis",
@@ -638,6 +671,13 @@
         "proporcional": "Proporcional (ajustar sem distorcer)"
       },
       "livePreview": "Pré-visualizar no projetor enquanto altera (antes de aplicar)",
+      "customPresetHint": "Para usar largura e altura em pixels (ex.: 800×600), escolha «Personalizado». Proporções como 16:9 ou 7:3 usam quase toda a largura do monitor.",
+      "effective": {
+        "fullScreen": "Será aplicado: ecrã completo do monitor.",
+        "customPixels": "Será aplicado no projetor: {size} px (faixas pretas se couber num monitor maior).",
+        "customInvalid": "Indique largura e altura válidas em pixels.",
+        "ratioPixels": "Será aplicado no projetor: {ratio} → {size} px (letterbox dentro do monitor)."
+      },
       "save": "Aplicar tamanho",
       "saving": "A aplicar…",
       "saved": "Tamanho do ecrã guardado e enviado ao projetor.",
@@ -652,7 +692,9 @@
       },
       "errors": {
         "save": "Erro ao guardar tamanho do ecrã",
-        "socket": "Não foi possível enviar ao projetor — verifique a ligação ao vivo."
+        "socket": "Não foi possível enviar ao projetor — verifique a ligação ao vivo.",
+        "disconnected": "Este monitor não está ligado — ligue-o ou escolha o monitor correcto na lista.",
+        "customDimensions": "Com «Personalizado», indique largura e altura em pixels (ex.: 800 e 600)."
       }
     },
     "errors": {
