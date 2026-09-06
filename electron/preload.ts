@@ -4,8 +4,9 @@ export type UpdateStatus =
   | { kind: 'idle' }
   | { kind: 'checking' }
   | { kind: 'available'; version: string }
-  | { kind: 'downloading'; percent?: number }
+  | { kind: 'downloading'; version: string; percent?: number }
   | { kind: 'ready'; version: string }
+  | { kind: 'installing'; version: string }
   | { kind: 'error'; message: string; fallback: true };
 
 contextBridge.exposeInMainWorld('livepraise', {

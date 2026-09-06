@@ -334,6 +334,7 @@
     "blankLabel": "Fila {n}",
     "dropHint": "Arraste versos, Bíblia, imagens ou vídeos para esta fila — ou solte numa aba acima.",
     "dragHint": "Arrastar para a fila de projeção",
+    "reorderHint": "Arraste para reordenar a fila (ou Alt+← / Alt+→)",
     "kindMusic": "Música",
     "kindBible": "Bíblia",
     "kindImage": "Imagem",
@@ -343,6 +344,8 @@
   "queueItem": {
     "removeFromQueue": "Remover da fila",
     "removeFromQueueAria": "Remover «{label}» da fila",
+    "moveLeft": "Mover para a esquerda",
+    "moveRight": "Mover para a direita",
     "online": "Online",
     "youtubeDownloading": "A descarregar…",
     "youtubeDownloadingAttempt": "Tentativa {attempt}/{max}…",
@@ -587,6 +590,16 @@
     }
   },
   "status": {
+    "update": {
+      "checking": "A procurar atualizações…",
+      "available": "Atualização {version} disponível — a descarregar em segundo plano.",
+      "downloading": "A descarregar atualização {version}… {percent}%",
+      "ready": "Atualização {version} pronta. Instale agora ou será aplicada ao encerrar a aplicação.",
+      "installing": "A instalar a atualização {version}… o Live Praise vai reiniciar.",
+      "error": "Não foi possível atualizar automaticamente: {message}",
+      "installNow": "Instalar agora",
+      "dismiss": "Dispensar"
+    },
     "version": "v{version}",
     "displays": "{total} monitor(es) · {projection} em projeção · {return} em retorno ({stageReturn} retorno palco)",
     "localIp": "IP local: {ip}",

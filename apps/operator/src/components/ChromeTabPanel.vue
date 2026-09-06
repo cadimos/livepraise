@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Plus } from '@lucide/vue';
 import { migrateTabVerses, isYoutubeOnlinePlayback, queueItemTileRelativePath, youtubeQueueVideoId, type QueueItem } from '@shared/queue-items';
+import { insertIndexFromPointer } from '@shared/list-reorder';
 import { usePreferences } from '../composables/usePreferences';
 import QueueAddMediaModal from './QueueAddMediaModal.vue';
 import { useQueueDrag } from '../composables/useQueueDrag';
@@ -32,9 +33,16 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
-const { prefs, addQueueItem, removeQueueItem, updateQueueItem } = usePreferences();
+const {
+  prefs,
+  addQueueItem,
+  removeQueueItem,
+  updateQueueItem,
+  moveQueueItemBy,
+} = usePreferences();
 const addModalOpen = ref(false);
-const dragOverIndex = ref<number | null>(null);
+/** Posição de inserção sinalizada durante o arrasto (`length` = fim da fila). */
+const dropInsertIndex = ref<number | null>(null);
 
 const queueMenuOpen = ref(false);
 const queueMenuX = ref(0);
@@ -90,9 +98,7 @@ const activeItems = computed(() => {
 });
 
 function clearActiveFlags(): void {
-  const tab = activeTab.value;
-  if (!tab) return;
-  for (const item of tab.items) {
+  for (const item of activeItems.value) {
     item.active = false;
   }
 }
@@ -101,7 +107,7 @@ function projectItem(item: QueueItem, index: number): void {
   const tab = activeTab.value;
   if (!tab) return;
   const footer = musicProjectionFooter(item, tab);
-  const nextMusic = nextMusicTextInTab(tab.items, index);
+  const nextMusic = nextMusicTextInTab(activeItems.value, index);
   projectQueueItem(
     sendAction,
     item,
@@ -126,6 +132,20 @@ function onItemKeydown(event: KeyboardEvent, item: QueueItem, index: number): vo
   onItemClick(item, index);
 }
 
+/** Alt+←/→ desloca o item projetado; alternativa ao arrasto. */
+function onReorderKeydown(event: KeyboardEvent): boolean {
+  if (!event.altKey || event.ctrlKey || event.shiftKey) return false;
+  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return false;
+  const tab = activeTab.value;
+  if (!tab) return false;
+  const current = activeItems.value.find((item) => item.active);
+  if (!current) return false;
+  const delta = event.key === 'ArrowRight' ? 1 : -1;
+  event.preventDefault();
+  moveQueueItemBy(tab.id, current.id, delta);
+  return true;
+}
+
 function onKeydown(event: KeyboardEvent): void {
   if (!activeItems.value.length) return;
   const target = event.target as HTMLElement | null;
@@ -133,7 +153,10 @@ function onKeydown(event: KeyboardEvent): void {
 
   const prev = matchesShortcut(event, 'stanza_prev');
   const next = matchesShortcut(event, 'stanza_next');
-  if (!prev && !next) return;
+  if (!prev && !next) {
+    onReorderKeydown(event);
+    return;
+  }
 
   const currentIdx = activeItems.value.findIndex((v) => v.active);
   let nextIdx = currentIdx < 0 ? 0 : currentIdx;
@@ -267,20 +290,52 @@ function onMenuYoutubeDownloadLocal(): void {
   void onYoutubeDownloadLocal(item);
 }
 
-function onStripDragOver(event: DragEvent, index: number): void {
-  onDragOver(event);
-  dragOverIndex.value = index;
+/** Metade esquerda do tile insere antes dele, metade direita insere depois. */
+function tileInsertIndex(event: DragEvent, index: number): number {
+  const tile = event.currentTarget as HTMLElement | null;
+  if (!tile) return index;
+  const rect = tile.getBoundingClientRect();
+  return insertIndexFromPointer(index, event.clientX, rect.left, rect.width);
 }
 
-function onStripDrop(event: DragEvent, index: number): void {
+function onTileDragOver(event: DragEvent, index: number): void {
+  onDragOver(event);
+  if (!event.defaultPrevented) return;
+  // Sem isto o handler da secção sobrepõe-se e o alvo passa a ser sempre o fim.
+  event.stopPropagation();
+  dropInsertIndex.value = tileInsertIndex(event, index);
+}
+
+function onTileDrop(event: DragEvent, index: number): void {
   const tab = activeTab.value;
   if (!tab) return;
-  handleDropOnQueueStrip(event, tab.id, index);
-  dragOverIndex.value = null;
+  const insertIndex = tileInsertIndex(event, index);
+  handleDropOnQueueStrip(event, tab.id, insertIndex);
+  dropInsertIndex.value = null;
 }
 
-function onStripDragLeave(): void {
-  dragOverIndex.value = null;
+function onTrackDragOver(event: DragEvent): void {
+  onDragOver(event);
+  if (!event.defaultPrevented) return;
+  dropInsertIndex.value = activeItems.value.length;
+}
+
+function onTrackDrop(event: DragEvent): void {
+  const tab = activeTab.value;
+  if (!tab) return;
+  handleDropOnQueueStrip(event, tab.id, activeItems.value.length);
+  dropInsertIndex.value = null;
+}
+
+function onDragEnd(): void {
+  dropInsertIndex.value = null;
+}
+
+function onTrackDragLeave(event: DragEvent): void {
+  const track = event.currentTarget as HTMLElement | null;
+  const next = event.relatedTarget as Node | null;
+  if (track && next && track.contains(next)) return;
+  dropInsertIndex.value = null;
 }
 
 function closeQueueMenu(): void {
@@ -320,6 +375,25 @@ function onRemoveFromQueue(): void {
   removeQueueItem(tabId, itemId);
 }
 
+const queueMenuIndex = computed(() => {
+  const itemId = queueMenuItemId.value;
+  if (!itemId) return -1;
+  return activeItems.value.findIndex((item) => item.id === itemId);
+});
+
+const queueMenuCanMoveLeft = computed(() => queueMenuIndex.value > 0);
+const queueMenuCanMoveRight = computed(
+  () => queueMenuIndex.value >= 0 && queueMenuIndex.value < activeItems.value.length - 1,
+);
+
+function onMoveQueueItem(delta: number): void {
+  const tabId = queueMenuTabId.value;
+  const itemId = queueMenuItemId.value;
+  closeQueueMenu();
+  if (!tabId || !itemId) return;
+  moveQueueItemBy(tabId, itemId, delta);
+}
+
 function onQueueDocumentClick(): void {
   closeQueueMenu();
 }
@@ -330,12 +404,16 @@ function onQueueDocumentKeydown(event: KeyboardEvent): void {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeydown);
+  // Arrastos iniciados noutros painéis (ou cancelados com Esc) não passam pelos
+  // tiles, pelo que o indicador precisa de ser limpo a partir da janela.
+  window.addEventListener('dragend', onDragEnd);
   document.addEventListener('click', onQueueDocumentClick);
   document.addEventListener('keydown', onQueueDocumentKeydown);
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown);
+  window.removeEventListener('dragend', onDragEnd);
   document.removeEventListener('click', onQueueDocumentClick);
   document.removeEventListener('keydown', onQueueDocumentKeydown);
 });
@@ -345,8 +423,8 @@ onUnmounted(() => {
   <section
     v-if="activeTab"
     class="shrink-0 border-t border-lp-surface bg-lp-background/80"
-    @dragover="onDragOver"
-    @drop="handleDropOnQueueStrip($event, activeTab.id, activeItems.length)"
+    @dragover="onTrackDragOver"
+    @drop="onTrackDrop"
   >
     <div class="px-3 pb-2 pt-1">
       <p
@@ -364,6 +442,7 @@ onUnmounted(() => {
       </p>
       <ul
         class="playlist-verses-track flex flex-nowrap items-stretch gap-2 overflow-x-auto overflow-y-hidden pb-4"
+        @dragleave="onTrackDragLeave"
       >
         <li
           v-if="isBlankQueue"
@@ -388,22 +467,24 @@ onUnmounted(() => {
           tabindex="0"
           draggable="true"
           class="playlist-verse-tile relative w-[10rem] shrink-0 cursor-grab rounded-md border-2 text-sm transition active:cursor-grabbing"
-          :class="
+          :class="[
             item.active
               ? 'border-lp-primary bg-lp-primary/20 text-lp-text shadow-[0_3px_0_0_var(--lp-color-primary)]'
-              : dragOverIndex === index
-                ? 'border-lp-primary/70 bg-lp-primary/10 text-lp-text'
-                : 'border-lp-surface bg-lp-surface text-lp-muted hover:border-lp-primary/40 hover:text-lp-text'
-          "
+              : 'border-lp-surface bg-lp-surface text-lp-muted hover:border-lp-primary/40 hover:text-lp-text',
+            dropInsertIndex === index ? 'playlist-verse-tile--drop-before' : '',
+            index === activeItems.length - 1 && dropInsertIndex === activeItems.length
+              ? 'playlist-verse-tile--drop-after'
+              : '',
+          ]"
           :aria-pressed="item.active"
           :aria-label="item.label"
           @click="onItemClick(item, index)"
           @contextmenu.prevent="onQueueItemContextMenu($event, activeTab.id, item)"
           @keydown="onItemKeydown($event, item, index)"
           @dragstart="onQueueItemDragStart($event, activeTab.id, item)"
-          @dragover.prevent="onStripDragOver($event, index)"
-          @dragleave="onStripDragLeave"
-          @drop.stop="onStripDrop($event, index)"
+          @dragover="onTileDragOver($event, index)"
+          @dragend="onDragEnd"
+          @drop.stop="onTileDrop($event, index)"
         >
           <span
             class="absolute right-1 top-1 rounded bg-lp-background/80 px-1 text-[10px] uppercase tracking-wide text-lp-muted"
@@ -476,6 +557,26 @@ onUnmounted(() => {
       role="menu"
       @click.stop
     >
+      <li v-if="queueMenuCanMoveLeft">
+        <button
+          type="button"
+          class="w-full px-3 py-2 text-left hover:bg-lp-surface"
+          role="menuitem"
+          @click="onMoveQueueItem(-1)"
+        >
+          {{ t('queueItem.moveLeft') }}
+        </button>
+      </li>
+      <li v-if="queueMenuCanMoveRight">
+        <button
+          type="button"
+          class="w-full px-3 py-2 text-left hover:bg-lp-surface"
+          role="menuitem"
+          @click="onMoveQueueItem(1)"
+        >
+          {{ t('queueItem.moveRight') }}
+        </button>
+      </li>
       <li v-if="queueMenuYoutubeDownloadLocal">
         <button
           type="button"

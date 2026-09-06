@@ -8,9 +8,19 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 ### Adicionado
 
+- **Auto-update no operador** — faixa no topo com progresso de download, estado de instalação e botão Instalar agora (`AppUpdateBanner`).
+- **Reordenar músicas na fila** — as abas da playlist passam a ser arrastáveis, com barra a marcar a posição de inserção.
+- **Alternativas ao arrasto** — `Alt+←` / `Alt+→` deslocam o item projetado (ou a aba focada); menu de contexto do item ganha "Mover para a esquerda/direita".
+- **Smoke `npm run smoke:queue-dnd`** — arrastos HTML5 reais via Chrome DevTools Protocol; ignorado quando não há Chrome disponível.
+
 ### Alterado
 
+- **Posição de largada na fila** — o destino passa a ser derivado do lado do cursor sobre o item alvo (metade esquerda insere antes, direita insere depois) em vez de substituir o índice do alvo.
+
 ### Corrigido
+
+- **Reordenar itens da fila por arrasto** — o evento `drop` nunca disparava. O `dragstart` definia `effectAllowed = 'move'`, mas o `dragover` tentava ler o payload com `getData()` — que devolve string vazia no modo protegido do DataTransfer — e caía no fallback `dropEffect = 'copy'`; sendo os dois efeitos incompatíveis, o navegador cancelava o arrasto. A intenção viaja agora num tipo MIME marcador e `effectAllowed` passa a `'copyMove'`.
+- **Largar itens em abas legadas** — abas ainda com `verses` (antes da migração para `items`) recusavam o drop em silêncio.
 
 ---
 
@@ -103,7 +113,8 @@ Ainda adiado (ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md)):
 - Telemetria opt-in remota
 - Auditoria WCAG sistemática
 - Painel UI de logs de auditoria (API admin já existe desde alpha.2)
-- Teste de auto-update in-app entre alphas após Publish release
+- i18n em portal e remote (ST-027)
+- OpenAPI para backup, tipografia e textfill-diagnostics
 
 ---
 
@@ -192,8 +203,8 @@ Adiado para versão futura (ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md)
 ### Pendente / opcional pós-alpha.2
 
 - Smoke **`smoke-win-installer`** no CI Windows (secção 10) — validação manual já feita.
-- Teste de **auto-update in-app** alpha.1 → alpha.2 após **Publish release** (secção 13).
 - Painel UI para logs de auditoria (API admin já existe).
+- ~~Teste de **auto-update in-app**~~ — concluído na alpha.3 (Windows; ver inventário §13).
 
 ---
 
@@ -389,8 +400,7 @@ Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md) — **entregue em alpha.2:*
 3. Editor visual de temas (color pickers).
 4. Telemetria opt-in de crashes (envio remoto).
 5. Acessibilidade WCAG sistemática.
-6. Smoke instalador Windows no CI; teste auto-update in-app por SO.
-7. Sincronização multi-estação (fora de escopo).
+6. Sincronização multi-estação (fora de escopo).
 
 ---
 

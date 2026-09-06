@@ -29,6 +29,21 @@
       "fontScaleHint": "Global operator typography scale (100–125%).",
       "fontScaleValue": "{percent} percent"
     },
+    "queueSync": {
+      "title": "Queue synchronization",
+      "intro": "Share queue tabs and items with every connected operator. The selected tab and item remain independent on each computer.",
+      "toggle": "Global shared queue",
+      "enabledHint": "Queue changes are automatically sent to all operators.",
+      "disabledHint": "Each operator keeps a separate local queue.",
+      "enable": "Enable",
+      "disable": "Disable",
+      "saving": "Saving…",
+      "enableConfirm": "This computer's queue will replace the shared queue for every operator. Continue?",
+      "connection": "Connection",
+      "revision": "Revision",
+      "lastUpdate": "Last update",
+      "updatedBy": "Updated by"
+    },
     "projectionTypography": {
       "title": "Projection typography",
       "menuLabel": "Projection typography",
@@ -319,6 +334,7 @@
     "blankLabel": "Queue {n}",
     "dropHint": "Drag stanzas, Bible, images or videos to this queue — or drop on a tab above.",
     "dragHint": "Drag to projection queue",
+    "reorderHint": "Drag to reorder the queue (or Alt+← / Alt+→)",
     "kindMusic": "Song",
     "kindBible": "Bible",
     "kindImage": "Image",
@@ -328,6 +344,8 @@
   "queueItem": {
     "removeFromQueue": "Remove from queue",
     "removeFromQueueAria": "Remove «{label}» from queue",
+    "moveLeft": "Move left",
+    "moveRight": "Move right",
     "online": "Online",
     "youtubeDownloading": "Downloading…",
     "youtubeDownloadingAttempt": "Attempt {attempt}/{max}…",
@@ -423,6 +441,7 @@
     "projectorScreen": "Projector screen",
     "manageUsers": "Users",
     "worshipSettings": "Worship and stanzas",
+    "queueSync": "Queue synchronization",
     "bibleSettings": "Bible and search",
     "appearance": "Theme and language",
     "projectionTypography": "Projection typography",
@@ -571,6 +590,16 @@
     }
   },
   "status": {
+    "update": {
+      "checking": "Checking for updates…",
+      "available": "Update {version} available — downloading in the background.",
+      "downloading": "Downloading update {version}… {percent}%",
+      "ready": "Update {version} is ready. Install now or it will be applied when you quit the app.",
+      "installing": "Installing update {version}… Live Praise will restart.",
+      "error": "Could not update automatically: {message}",
+      "installNow": "Install now",
+      "dismiss": "Dismiss"
+    },
     "version": "v{version}",
     "displays": "{total} monitor(s) · {projection} projecting · {return} on return ({stageReturn} stage return)",
     "localIp": "Local IP: {ip}",

@@ -1,36 +1,65 @@
 # Inventário pendente — Live Praise
 
-**Versão analisada:** `1.0.0-alpha.2`  
-**Última actualização:** 2026-06-17 (suite consolidada — SM-038)  
+**Versão analisada:** `1.0.0-alpha.3`  
+**Última actualização:** 2026-08-30 (cruzamento com código, CI e [`CHANGELOG.md`](CHANGELOG.md))  
 **Repositório:** `electron/`, `server/`, `core/`, `apps/`, `web/`, `shared/`
 
-**TypeScript (meta técnica — 2026-06):** Migração documentada em [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md). Estado: fonte `.ts`/`.vue` em todas as superfícies; emit em `dist/`; CI PR: `lint`, `test:unit`, `typecheck`, `verify:openapi`, smokes núcleo. Smokes `smoke:cad*` removidos — ver [`scripts/README.md`](scripts/README.md) e [`docs/SM-003-smoke-consolidacao.md`](docs/SM-003-smoke-consolidacao.md).
+**TypeScript:** fonte `.ts`/`.vue` em todas as superfícies; emit em `dist/`; CI PR: `test:unit`, `typecheck`, `verify:openapi`, smokes núcleo. ESLint foi retirado (TypeScript 7). Smokes `smoke:cad*` removidos — [`scripts/README.md`](scripts/README.md). Plano técnico histórico: [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md) (tarefas marcadas feitas).
 
-Backlog do que **ainda não está implementado** (ou está só parcialmente). Itens **✅** da alpha.2 estão concluídos — secções mantidas como registo histórico e referência de smokes.
+Backlog do que **ainda não está implementado** (ou está só parcialmente). Secções ✅ são registo histórico e referência de smokes.
 
-**Legenda:** ✅ implementado · 🟡 parcial · ❌ pendente · 🎯 **escopo confirmado alpha.2** · 📅 **versão futura** (não alpha.2)
+**Legenda:** ✅ implementado · 🟡 parcial / falta validar · ❌ pendente · 📅 **versão futura**
 
 ---
 
 ## Resumo executivo
 
-| # | Item | Estado | Notas (alpha.2) |
+| # | Item | Estado | Notas (alpha.3) |
 |---|------|--------|-----------------|
 | 0 | Migração v0.0.8 → 1.x | ✅ | `legacy-upgrade.ts` + `smoke:legacy-upgrade` |
-| 1 | Auditoria e retenção | ✅ | `audit_logs`, purge diário, `GET /api/audit/logs`, `smoke:audit` |
-| 2 | Release GitHub | ✅ | Validado manualmente alpha.2 — draft unificado, instaladores Win/Linux/macOS OK |
-| 3 | Testes automatizados | 📅 | Smokes consolidados + `test:unit` no CI; Vitest/Playwright futuro — [`docs/DIVIDA-TECNICA.md`](docs/DIVIDA-TECNICA.md) |
-| 4 | Locales adicionais | ✅ | `en-US`, `pt-PT`, `es-ES`; `pt-BR` default; `npm run sync:locales` |
-| 5 | Watcher de vídeos | ✅ | `videoWatcher.ts` + WS `media-updated` → `VideosPanel`; `smoke:video-watcher` |
-| 6 | Busca online de louvores | 📅 | **Fora do escopo alpha.2** — Fuse.js local; busca online numa versão futura |
-| 7 | Editor visual de temas | 📅 | **Fora do escopo alpha.2** — leitura/sync OK; editor UI numa versão futura |
-| 8 | Telemetria opt-in | 📅 | **Fora do escopo alpha.2** — log local existe; envio remoto opt-in no futuro |
-| 9 | Versão única no build | ✅ | `bump-version` + `sync:version`; `package.json` → preload, UI, OpenAPI |
-| 10 | Smoke instalador Windows | 🟡 | **Automação CI** — tu já testaste à mão; falta script no workflow (opcional) |
-| 11 | Import/export repertório | ✅ | `GET/POST /musica/export|import`, Backup e restauração, `smoke:musica-export` |
-| 12 | Acessibilidade WCAG | 📅 | **Fora do escopo alpha.2** — parcial hoje; auditoria WCAG numa versão futura |
-| 13 | Auto-update validado | 🟡 | **Código ✅**; falta testar *update* de versão antiga→nova por SO (não só instalador) |
-| 14 | Flash textfill ao trocar verso | ✅ | Root oculto durante textfill; sem flash ao trocar versos |
+| 1 | Auditoria e retenção | ✅ | API `GET /api/audit/logs`; **sem painel UI** (opcional) |
+| 2 | Release GitHub | ✅ | Draft unificado; `smoke:fase8` nos 3 SO; `smoke:win-installer:ci` no Windows |
+| 3 | Testes automatizados | 📅 | `test:unit` (9 ficheiros) + smokes; **Vitest/Playwright não** |
+| 4 | Locales | ✅ | Operador: `pt-BR` (default), `en-US`, `pt-PT`, `es-ES`; portal/remote **não** i18n |
+| 5 | Watcher de vídeos | ✅ | `videoWatcher.ts` + WS `media-updated` |
+| 6 | Busca online de louvores | 📅 | Só Fuse.js local |
+| 7 | Editor visual de temas | 📅 | Temas bundled + `theme.json` manual |
+| 8 | Telemetria opt-in | 📅 | Só log local `/api/system/error-log` |
+| 9 | Versão única no build | ✅ | `bump-version` + `shared/app-version.ts` (`1.0.0-alpha.3`) |
+| 10 | Smoke instalador Windows | ✅ | `smoke:win-installer` / `:ci` no job Windows de `release.yml` (SM-035) |
+| 11 | Import/export repertório | ✅ | `GET/POST /musica/export\|import` |
+| 12 | Acessibilidade WCAG | 📅 | Tema alto contraste; `axe-core` **sem** `npm run a11y` |
+| 13 | Auto-update validado | ✅ | In-app **Windows** (alpha.2 → alpha.3); faixa de progresso + Instalar agora |
+| 14 | Flash textfill | ✅ | Alpha.2 + medição in-place / diagnóstico na alpha.3 |
+| 15 | Fila partilhada | ✅ | **GET/PUT `/api/operator-queue`** + WS `operator-queue-sync` |
+| 16 | Diagnóstico textfill | ✅ | JSONL + UI Logs; **rotas ainda fora do OpenAPI** |
+
+### Ainda pendente *(pós-alpha.3)*
+
+| # | Item | Tipo |
+|---|------|------|
+| **3** | Vitest + Playwright | Qualidade |
+| **6** | Busca online de louvores | Produto |
+| **7** | Editor visual de temas | Produto |
+| **8** | Telemetria remota opt-in | Produto |
+| **12** | Auditoria WCAG + `a11y` | Qualidade |
+| **1 (UI)** | Painel de logs de auditoria no operador | Opcional |
+| **4 (web)** | i18n em `web/portal` e `web/remote` | Dívida ST-027 |
+| **OpenAPI** | Backup, tipografia, textfill-diagnostics (existem no servidor, fora da lista canónica) | Documentação |
+
+Sincronização **multi-estação completa** (várias máquinas como um único culto, além da fila partilhada) continua **fora de escopo**.
+
+### Entregue em **alpha.3** ✅
+
+| Item | Verificação |
+|------|-------------|
+| Fila partilhada entre operadores | `npm run smoke:queue-sync` · `tests/operator-queue/store.test.mjs` |
+| Locales `pt-PT` / `es-ES` | `npm run smoke:locales` · `npm run sync:locales` |
+| Textfill (corte, medição in-place, cifras só em linhas de acordes) | `npm run smoke:textfill` · `tests/projection-chords.test.mjs` |
+| Diagnóstico textfill | UI Configurações → Logs · `~/livepraise/textfill-diagnostics.jsonl` |
+| Smoke instalador Windows no CI | `release.yml` → `smoke:win-installer:ci` |
+| Auto-update in-app (Windows) | Teste manual alpha.2 → alpha.3 + faixa `AppUpdateBanner` |
+| Runtime | Node ≥ 24, Electron 44 |
 
 ### Entregue em **alpha.2** ✅
 
@@ -44,22 +73,6 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). It
 | 9 | Versão única no build | `npm run bump-version` · `npm run smoke:version` |
 | 11 | Import/export repertório | `npm run smoke:musica-export` |
 | 14 | Flash textfill ao trocar verso | `tests/projection-textfill-visibility.test.mjs` · `npm run smoke:textfill` |
-
-### Fora do escopo **alpha.2** *(confirmado — versão futura)*
-
-| # | Item | Notas |
-|---|------|--------|
-| **3** | **Testes automatizados (Vitest + Playwright)** | Smokes + testes Node em `tests/` mantêm-se como gate; suite formal fica para release posterior |
-| **6** | **Busca online de louvores** | Pesquisa local Fuse.js mantém-se; API online (TeraIDC ou alternativa) numa versão futura |
-| **7** | **Editor visual de temas** | Temas bundled + sync OK; color pickers / `custom.json` numa versão futura |
-| **8** | **Telemetria opt-in de crashes** | Log local de erros mantém-se; envio anónimo opt-in (Sentry/DSN) numa versão futura |
-| **12** | **Acessibilidade WCAG** | Tema alto contraste mantém-se; auditoria sistemática + script `a11y` numa versão futura |
-
-### Candidatos naturais para **alpha.2** (ainda a confirmar)
-
-Itens 🟡 com lacuna pequena:
-
-1. ~~**Secção 10** — integrar `smoke-win-installer` no job Windows~~ ✅ SM-035 (`smoke:win-installer:ci` em `release.yml`).
 
 ---
 
@@ -155,13 +168,13 @@ Comandos locais `npm run dist:*` inalterados; documentação em [`README.md`](RE
 | Linux Flatpak / Snap | `dist:flatpak` / `dist:snap` | Opcional; **não** no workflow CI |
 | Todos (local) | `npm run dist:all` | Win + Linux (+ DMG no Mac se disponível) |
 
-**Smokes no CI de release (parcial):**
+**Smokes no CI de release *(alpha.3)*:**
 
 | Job | Smokes actuais |
 |-----|----------------|
-| Windows | `test:video-pipeline`, `smoke:bootstrap` |
-| Linux / macOS | + `smoke:fase8` |
-| Nenhum job | `smoke:release` completo, `smoke:legacy-upgrade`, `smoke-win-installer` |
+| Windows | `test:video-pipeline`, `smoke:bootstrap`, `smoke:fase8`, **`smoke:win-installer:ci`** após `dist:win` |
+| Linux / macOS | `smoke:fase8` (+ pipeline/bootstrap conforme o job) |
+| Manual pré-release | `smoke:release` completo, `smoke:legacy-upgrade` |
 
 **Publicação:** draft gerado pelo CI → validação manual ✅ → **Publish release** no GitHub quando quiser tornar pública (auto-update só activo após publish).
 
@@ -173,8 +186,8 @@ Melhorias de **regressão automática** — o fluxo principal já está validado
 
 | Lacuna | Situação actual | Prioridade |
 |--------|-----------------|------------|
-| **`smoke-win-installer` no CI** | Script existe; validação manual OK; **não** corre no job Windows | Média (secção 10) |
-| **`smoke:fase8` no Windows** | Só Linux/macOS no release workflow | Baixa |
+| **`smoke-win-installer` no CI** | ✅ `smoke:win-installer:ci` no job Windows | — |
+| **`smoke:fase8` no Windows** | ✅ Nos três jobs de release | — |
 | **`smoke:release` / `legacy-upgrade` no CI release** | Gate README não corre no pipeline de release | Baixa |
 | **Snap / Flatpak no CI** | Build manual opcional | Baixa |
 | **Assinatura de código** | Instaladores funcionam; avisos de publisher | Pós-beta |
@@ -182,8 +195,8 @@ Melhorias de **regressão automática** — o fluxo principal já está validado
 
 #### Tarefas opcionais
 
-- [ ] Integrar `smoke-win-installer` no job `build-windows` (secção 10).
-- [ ] Alinhar smokes Windows com Linux/macOS (`smoke:fase8`).
+- [x] Integrar `smoke-win-installer` no job `build-windows` (secção 10).
+- [x] Alinhar smokes Windows com Linux/macOS (`smoke:fase8`).
 - [ ] (Opcional) `smoke:legacy-upgrade` no CI de PR ou release.
 - [ ] Actualizar [`scripts/README.md`](scripts/README.md) / README — remover referências «CA-R40».
 - [ ] Snap / Flatpak no CI ou só documentação de build manual.
@@ -203,18 +216,17 @@ Melhorias de **regressão automática** — o fluxo principal já está validado
 
 ---
 
-## 3. Testes automatizados (além de smokes) 📅 *(versão futura — não alpha.2)*
+## 3. Testes automatizados (além de smokes) 📅 *(versão futura)*
 
-> **Decisão alpha.2:** não implementar Vitest nem Playwright nesta versão. A suite actual (`ci.yml` + `smoke:release`) é o gate de qualidade até release dedicada a testes formais.
+> **Decisão (mantida na alpha.3):** não adoptar Vitest nem Playwright. O gate é `ci.yml` + `smoke:release`. ESLint **não** faz parte do CI (removido por incompatibilidade com TypeScript 7).
 
 ### Gate actual (consolidado — SM-038)
 
 | Comando | Onde corre | O que valida |
 |---------|------------|--------------|
-| `npm run lint` | CI PR (`typecheck` job) | ESLint TypeScript — 0 warnings |
-| `npm run test:unit` | CI PR | 7× `tests/**/*.test.mjs` (textfill, temas, security) |
+| `npm run test:unit` | CI PR | 10× `tests/**/*.test.mjs` (textfill, cifras, fila, reordenação, temas, security, error-log) |
 | `npm run typecheck` | CI PR | Todas as superfícies TS |
-| `npm run verify:openapi` | CI PR | 67 endpoints vs `openapi.yaml` |
+| `npm run verify:openapi` | CI PR | **70** operações HTTP na lista canónica vs `openapi.yaml` |
 | `npm run test:video-pipeline` | CI PR (`smoke` job) | Pipeline ffmpeg / vídeo |
 | `npm run smoke:bootstrap` | CI PR + release | Bootstrap BD, CRUD, persistência |
 | `npm run smoke:fase8` | CI PR + release (Win/Linux/macOS) | WS, health, instalação limpa |
@@ -232,15 +244,20 @@ Documentação: [`scripts/README.md`](scripts/README.md) · [`docs/SM-015-unit-t
 | `smoke:displays` | Displays + footer alert |
 | `smoke:backup` | Backup/restore + import URL |
 | `smoke:legacy-upgrade` | Migração v0.0.8 *(manual pré-release)* |
-| `smoke:locales`, `smoke:audit`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version` | Ver `smoke:features -- --list` |
+| `smoke:queue-dnd` | Reordenação da fila e das abas por arrasto (requer Chrome; ignorado sem ele) |
+| `smoke:locales`, `smoke:audit`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version`, `smoke:queue-sync` | Ver `smoke:features -- --list` |
 
 Scripts `smoke:cad187` … `smoke:cad314` **removidos** (SM-030). Mapeamento: [`docs/SM-003-smoke-consolidacao.md`](docs/SM-003-smoke-consolidacao.md).
 
 ### Já existe (unitários Node)
 
 - `tests/projection-textfill-*.test.mjs` — motor textfill (jsdom)
+- `tests/projection-chords.test.mjs` — filtro de cifras
+- `tests/operator-queue/store.test.mjs` — estado da fila partilhada
+- `tests/queue-reorder.test.mjs` — reordenação da fila e das abas (índice final vs. inserção)
 - `tests/security/remote-fetch*.test.mjs` — SSRF e content-type
 - `tests/themes/normalize.test.mjs` — normalização temas
+- `tests/error-log/redact-url.test.mjs` — redacção de URLs
 - Runner: `scripts/run-unit-tests.mjs` via `npm run test:unit` (SM-041)
 
 ### O que falta *(planeado — versão futura)*
@@ -257,7 +274,7 @@ Suite **Vitest** para `core/` e `shared/` e **Playwright** para fluxos críticos
 
 ---
 
-## 4. Locales adicionais ✅ *(concluído em alpha.2)*
+## 4. Locales adicionais ✅ *(concluído — operador; web pública pendente)*
 
 ### Regra de produto
 
@@ -277,18 +294,18 @@ Suite **Vitest** para `core/` e `shared/` e **Playwright** para fluxos críticos
 
 ### Como deve funcionar
 
-1. Operador abre Configurações → Idioma e vê **pt-BR** (predefinido) mais locales instalados (ex.: **English (en-US)**).
+1. Operador abre Configurações → Idioma e vê **Português (Brasil)** (predefinido) mais **English**, **Português (Portugal)** e **Español**.
 2. Ao escolher outro idioma, o operador carrega `/locales/{code}.json` e persiste a preferência; **reinício** mantém a escolha.
 3. Chaves em falta num locale secundário caem no **fallback `pt-BR`** (vue-i18n).
 4. Portal/web views podem continuar `lang="pt-BR"` no HTML estático nesta versão; tradução do portal fica fora do MVP se não houver ficheiros em `web/`.
 
-### Implementado *(alpha.2)*
+### Implementado *(alpha.2 + alpha.3)*
 
-- `locales/en-US.json` + `install/locales/en-US.json` — 543 chaves em paridade com `pt-BR`.
-- `scripts/build-en-us-locale.mjs` — regenera `en-US` a partir de `pt-BR` (mapa de traduções).
+- `locales/en-US.json`, `pt-PT.json`, `es-ES.json` + cópias em `install/locales/`.
+- `npm run sync:locales` — `build-en-us-locale.mjs`, `build-pt-pt-locale.mjs`, `build-es-es-locale.mjs`.
 - Rótulos `locales.meta.*` + `useLocaleLabel()` em `AppearancePanel.vue` e `StatusBar.vue`.
 - `locales/README.md` — processo para idiomas futuros.
-- Smoke `npm run smoke:locales` (`scripts/smoke-locales-i18n.mjs`).
+- Smoke `npm run smoke:locales` — paridade de chaves `pt-BR` vs `en-US` / `pt-PT` / `es-ES`; `default === 'pt-BR'`.
 - **`pt-BR` inalterado** como default (`i18n.ts`, `usePreferences.ts`, `GET /locales`).
 
 ### Tarefas *(alpha.2)*
@@ -304,11 +321,11 @@ Suite **Vitest** para `core/` e `shared/` e **Playwright** para fluxos críticos
 
 **Processo para idiomas futuros** — ver [`locales/README.md`](locales/README.md).
 
-**Fora do MVP alpha.2 (opcional):**
+**Fora do MVP (ainda pendente):**
 
-- [ ] Traduções do portal (`web/`) e vistas externas.
-- [ ] `es` ou outros idiomas além de `en-US`.
-- [ ] Script `node scripts/verify-locale-keys.mjs` reutilizável em CI.
+- [ ] Traduções do portal (`web/portal`) e controlo remoto (`web/remote`) — HTML `lang="pt-BR"` estático; dívida **ST-027**.
+- [x] `es-ES` e `pt-PT` no operador (alpha.3).
+- [x] Paridade de chaves verificada em `smoke:locales` (substitui um script `verify-locale-keys` isolado).
 
 ---
 
@@ -354,9 +371,9 @@ Copiar vídeo para `~/livepraise/videos/{categoria}/` **com painel já aberto** 
 
 ---
 
-## 6. Busca online de louvores 📅 *(versão futura — não alpha.2)*
+## 6. Busca online de louvores 📅 *(versão futura)*
 
-> **Decisão alpha.2:** não implementar busca online nesta versão. O painel Louvor mantém **pesquisa local** (Fuse.js) como hoje.
+> **Decisão (mantida):** não implementar busca online. O painel Louvor mantém **pesquisa local** (Fuse.js).
 
 ### Estado actual
 
@@ -376,9 +393,9 @@ Pesquisa opcional online devolve título, autor, letra; operador importa com um 
 
 ---
 
-## 7. Editor visual de temas 📅 *(versão futura — não alpha.2)*
+## 7. Editor visual de temas 📅 *(versão futura)*
 
-> **Decisão alpha.2:** não implementar editor visual nesta versão. Operador continua a escolher temas bundled (`default`, `high-contrast`) ou editar `theme.json` manualmente em `~/livepraise/themes/`.
+> **Decisão (mantida):** não implementar editor visual. Operador escolhe temas bundled (`default`, `high-contrast`) ou edita `theme.json` em `~/livepraise/themes/`.
 
 ### Já existe
 
@@ -402,9 +419,9 @@ Edição visual em Configurações → Aparência (color pickers, preview, grava
 
 ---
 
-## 8. Telemetria opt-in de crashes 📅 *(versão futura — não alpha.2)*
+## 8. Telemetria opt-in de crashes 📅 *(versão futura)*
 
-> **Decisão alpha.2:** não implementar envio remoto nesta versão. O **log de erros local** (`/api/system/error-log`) mantém-se como hoje.
+> **Decisão (mantida):** não implementar envio remoto. O **log de erros local** (`/api/system/error-log`) mantém-se.
 
 ### Já existe
 
@@ -433,7 +450,7 @@ Envio **opt-in** e anónimo para endpoint configurável (Sentry/DSN). Desligado 
 
 Hoje, cada release exige editar a versão **manualmente em vários sítios** (`package.json`, `preload.ts`, barra de estado, modal Sobre, exemplo OpenAPI). Isto **não é um bug** — funciona — mas é trabalho repetitivo e risco de um sítio ficar desactualizado.
 
-**Problema que resolve:** um único `npm run bump-version 1.0.0-alpha.3` propagaria o número para todos os ficheiros.
+**Problema que resolve:** um único `npm run bump-version 1.0.0-alpha.4` (ou a versão seguinte) propaga o número para todos os ficheiros.
 
 **Não é:** corrigir versão errada na app (desde que edites todos os ficheiros no bump, está coerente).
 
@@ -466,31 +483,28 @@ Hoje, cada release exige editar a versão **manualmente em vários sítios** (`p
 
 ---
 
-## 10. Smoke do instalador Windows no CI 🟡
+## 10. Smoke do instalador Windows no CI ✅ *(concluído em alpha.3 — SM-035)*
 
-### Explicação (em português claro)
+### Explicação
 
 Existem **dois níveis** de teste do instalador Windows:
 
 | Nível | O quê | Estado |
 |-------|--------|--------|
-| **A. Manual** | Descarregar `.exe`, instalar, abrir app | ✅ **Tu já validaste** (secção 2) |
-| **B. Automático no CI** | Script `smoke-win-installer.mjs` corre sozinho no GitHub Actions após cada build | ❌ Ainda não ligado |
+| **A. Manual** | Descarregar `.exe`, instalar, abrir app | ✅ Validado (secção 2) |
+| **B. Automático no CI** | `scripts/smoke-win-installer.mjs --skip-build` após `dist:win` | ✅ `npm run smoke:win-installer:ci` em `release.yml` |
 
-O script **B** repete o que fizeste à mão (desinstalar → instalar NSIS → verificar arranque). Serve para **regressões futuras** — se alguém quebrar o instalador, o CI falha antes de publicar.
+### Implementado
 
-**Não é obrigatório para alpha.2** se o teste manual já passou; é hardening do pipeline.
+- `npm run smoke:win-installer` (build + instalar) e `npm run smoke:win-installer:ci` (artefacto já em `release-builds/`).
+- Job `build-windows` corre o smoke CI após anexar o NSIS ao draft.
+- Documentado em [`scripts/README.md`](scripts/README.md).
 
-### Já existe
+### Tarefas
 
-- Script **`scripts/smoke-win-installer.mjs`**: desinstalar → build → instalar NSIS → boot + CAD-194.
-- Job Windows em `release.yml` verifica tamanho do `.exe` e presença de `ffmpeg.exe` no unpacked — **não** executa ciclo de instalação.
-
-### O que falta *(automação opcional)*
-
-- [ ] Entrada **`npm run smoke:win-installer`** em `package.json`.
-- [ ] Passo no job `build-windows` após `dist:win`.
-- [ ] Documentar em [`scripts/README.md`](scripts/README.md).
+- [x] Entrada **`npm run smoke:win-installer`** em `package.json`.
+- [x] Passo no job `build-windows` após `dist:win`.
+- [x] Documentar em [`scripts/README.md`](scripts/README.md).
 
 ---
 
@@ -534,9 +548,9 @@ Isto serve **migrar ambiente inteiro**, não exportar só louvores para partilha
 
 ---
 
-## 12. Acessibilidade (WCAG) no operador 📅 *(versão futura — não alpha.2)*
+## 12. Acessibilidade (WCAG) no operador 📅 *(versão futura)*
 
-> **Decisão alpha.2:** não implementar auditoria WCAG nesta versão. Mantêm-se tema **alto contraste** e melhorias pontuais já existentes.
+> **Decisão (mantida):** não fazer auditoria WCAG nesta linha alpha. Mantêm-se tema **alto contraste** e `aria-*` pontuais. Painel **Atalhos** existe in-app (`ShortcutsPanel.vue`); falta página no README.
 
 ### Explicação (em português claro)
 
@@ -570,42 +584,35 @@ Auditoria sistemática + correcções — não confundir com «já tem tema alto
 
 ---
 
-## 13. Auto-update validado por SO 🟡
+## 13. Auto-update validado por SO ✅ *(concluído em alpha.3 — Windows)*
 
-### Explicação (em português claro)
+### Explicação
 
-**O auto-update já está implementado no código** (`electron-updater`, `latest*.yml`, notificações). Isto **não** é «falta implementar updater».
+O auto-update está em `electron/updater.ts` (`electron-updater`, `latest*.yml`). O item era **validar o fluxo in-app** (não só instalar do zero).
 
-O item refere-se a **validar o fluxo completo de actualização** — cenário diferente de «instalar a app pela primeira vez» (que tu já testaste na secção 2):
+| Cenário | Estado |
+|---------|--------|
+| Instalar alpha.3 numa máquina limpa | ✅ NSIS |
+| Actualizar **alpha.2 → alpha.3 dentro da app** (Windows) | ✅ Detectou actualização, download em segundo plano |
+| Progresso e instalação na UI do operador | ✅ Faixa `AppUpdateBanner` (percentagem + **Instalar agora**) |
+| Linux / macOS in-app | Não testado nesta ronda — código partilhado; opcional |
 
-| Cenário | Testaste? | O quê |
-|---------|-----------|--------|
-| Instalar **alpha.2** numa máquina limpa | ✅ (secção 2) | NSIS / AppImage / DMG funciona |
-| **Actualizar** de alpha.1 → alpha.2 **dentro da app** (updater) | ❓ Pendente | App antiga abre → detecta release **publicada** → descarrega → reinicia na nova versão |
+Draft no GitHub **não** alimenta o updater; só release **publicada**.
 
-Enquanto a release estiver em **draft**, o updater **não entrega** aos utilizadores — só após **Publish release** no GitHub.
+### Implementado
 
-### Já existe
+- `electron-updater` + provider GitHub; `latest*.yml` no job Windows.
+- Eventos IPC `livepraise:update-status` (checking, available, downloading com %, ready, installing, error, idle se não houver update).
+- UI: `apps/operator/src/components/AppUpdateBanner.vue` + `useAppUpdater.ts`.
+- Notificações do SO mantêm-se como complemento.
 
-- `electron-updater` + provider GitHub (`electron-builder.yml`).
-- Windows gera `latest*.yml`; CI verifica presença no job Windows.
-- README descreve comportamento (draft vs publicado, fallback manual).
+### Tarefas
 
-### O que realmente falta
-
-1. **Publicar** a release (sair do draft) — senão o updater não activa para utilizadores reais.
-2. **Teste manual por SO** (checklist curto):
-   - [ ] Windows: instalar versão **anterior publicada** → abrir app → confirmar download/instalação silenciosa ou notificação de fallback.
-   - [ ] Linux: idem com AppImage ou `.deb` (conforme canal usado).
-   - [ ] macOS: idem com DMG + versão anterior.
-3. (Opcional) Script que valida `latest.yml` + hashes nos artefactos do release.
-
-**Não falta:** reescrever `electron-updater` — já está ligado em `electron/updater.ts`.
-
-### Tarefas *(backlog)*
-
-- [ ] Checklist de teste manual Win/Linux/macOS na secção 2 ou README.
-- [ ] (Opcional) Smoke headless que valida `latest.yml` e hashes no artefacto.
+- [x] Publicar release e confirmar que o updater oferece a versão nova (Windows).
+- [x] Teste in-app: versão anterior → download → (faixa de progresso / instalar agora ou ao encerrar).
+- [x] Mostrar progresso de download e estado de instalação no operador.
+- [ ] (Opcional) Repetir o teste em Linux e macOS.
+- [ ] (Opcional) Smoke headless de `latest.yml` + hashes.
 
 ---
 
@@ -655,13 +662,52 @@ Ao **projectar o verso seguinte** (ou anterior) em louvor ou Bíblia, a tela **p
 
 **Critério de sucesso:** operador avança versos durante culto simulado — audiência **não vê** redimensionamento intermédio; apenas o texto final estável.
 
+### Follow-up alpha.3 *(medição e cifras)*
+
+- Medição **in-place** no span real (`scrollHeight` / `scrollWidth`); deixa de inflar para 24px após uma pass válida.
+- Diagnóstico JSONL — secção **16**.
+- Cifras: só linhas em que **todas** as palavras são acordes (`shared/projection-chords.ts` + `tests/projection-chords.test.mjs`).
+
+---
+
+## 15. Fila partilhada entre operadores ✅ *(concluído em alpha.3)*
+
+### O que faz
+
+Vários operadores na mesma LAN podem **ligar a sincronização da fila** (abas estilo Chrome). O estado vive na BD (`009_operator_queue_state.sql`), com revisão optimista: `PUT` com `expectedRevision` devolve **409** se outro operador gravou entretanto.
+
+### Implementado
+
+- `GET` / `PUT` **`/api/operator-queue`** (`server/routes/operator-queue.ts`).
+- Broadcast WebSocket **`operator-queue-sync`**.
+- UI: `useOperatorQueueSync.ts`.
+- OpenAPI: operações na spec.
+- `npm run smoke:queue-sync` · `tests/operator-queue/store.test.mjs`.
+
+Isto **não** é sincronização multi-estação completa (preferências, mídia, utilizadores em vários PCs).
+
+---
+
+## 16. Diagnóstico de textfill ✅ *(concluído em alpha.3; OpenAPI parcial)*
+
+### Implementado
+
+- Ficheiro `~/livepraise/textfill-diagnostics.jsonl`.
+- API `/api/system/textfill-diagnostics` (GET/POST/DELETE + `/meta`).
+- UI em Configurações → Logs de erro (activar, exportar, limpar).
+- Inclusão no backup selectivo.
+
+### Ainda pendente *(documentação)*
+
+- [ ] Incluir estas rotas (e, se fizer sentido, backup/tipografia) em `openapi.yaml` + `scripts/verify-openapi-coverage.mjs`. Hoje o gate conta **70** operações e **não** lista diagnóstico, backup nem `projection-typography`.
+
 ---
 
 ## Metodologia
 
 1. Varredura de `server/`, `apps/`, `web/`, `core/`, `shared/`, `.github/workflows/` e scripts `smoke-*.mjs`.
-2. Confronto com o estado actual do repositório (2026-06-07, pós-implementação alpha.2).
-3. `node scripts/verify-openapi-coverage.mjs` — **67** endpoints HTTP alinhados.
-4. Smokes alpha.2: `smoke:audit`, `smoke:locales`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version`, `smoke:legacy-upgrade`.
+2. Confronto com o repositório em **2026-08-30** (`package.json` = `1.0.0-alpha.3`).
+3. Lista canónica OpenAPI: **70** operações em `scripts/verify-openapi-coverage.mjs` (backup, tipografia e textfill-diagnostics **fora** desta lista).
+4. Smokes: `smoke:audit`, `smoke:locales`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version`, `smoke:legacy-upgrade`, `smoke:queue-sync`, `smoke:win-installer:ci`.
 
 ---

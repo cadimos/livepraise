@@ -10,7 +10,7 @@ Candidatos a migrar de `tests/*.test.mjs` (Node + jsdom manual) para **Vitest** 
 
 | Módulo | Funções / comportamento | Teste actual |
 |--------|-------------------------|--------------|
-| `shared/projection-chords.ts` | `stripChordsForProjection`, `stripChordsFromHtml` | cobertura indirecta em smokes |
+| `shared/projection-chords.ts` | `stripChordsForProjection`, `stripChordsFromHtml` | `tests/projection-chords.test.mjs` |
 | `shared/projection-text-shadow.ts` | `isValidAdvancedTextShadowCss`, `projectionTextShadowSlackPx` | smoke tipografia |
 | `shared/bible-navigation.ts` | `computeNextVerseIndex` | — |
 | `shared/bible-reference.ts` | parsing referências | — |
