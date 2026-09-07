@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Plus } from '@lucide/vue';
-import { migrateTabVerses, isYoutubeOnlinePlayback, queueItemTileRelativePath, youtubeQueueVideoId, type QueueItem } from '@shared/queue-items';
+import { Pencil, Plus } from '@lucide/vue';
+import {
+  migrateTabVerses,
+  isYoutubeOnlinePlayback,
+  queueItemTileRelativePath,
+  summarizeLabel,
+  youtubeQueueVideoId,
+  type QueueItem,
+} from '@shared/queue-items';
 import { insertIndexFromPointer } from '@shared/list-reorder';
 import { usePreferences } from '../composables/usePreferences';
 import QueueAddMediaModal from './QueueAddMediaModal.vue';
@@ -51,6 +58,9 @@ const queueMenuTabId = ref<string | null>(null);
 const queueMenuItemId = ref<string | null>(null);
 const queueMenuItem = ref<QueueItem | null>(null);
 const queueMenuItemLabel = ref('');
+const editingTabId = ref<string | null>(null);
+const editingItemId = ref<string | null>(null);
+const editingVerseText = ref('');
 const { sendAction } = useLiveSocket();
 const { matches: matchesShortcut } = useShortcuts();
 const { onDragOver, handleDropOnQueueStrip, onQueueItemDragStart } = useQueueDrag();
@@ -130,6 +140,31 @@ function onItemKeydown(event: KeyboardEvent, item: QueueItem, index: number): vo
   if (event.key !== 'Enter' && event.key !== ' ') return;
   event.preventDefault();
   onItemClick(item, index);
+}
+
+function startEditingVerse(tabId: string, item: QueueItem): void {
+  if (item.kind !== 'music') return;
+  editingTabId.value = tabId;
+  editingItemId.value = item.id;
+  editingVerseText.value = item.text ?? '';
+}
+
+function closeVerseEditor(): void {
+  editingTabId.value = null;
+  editingItemId.value = null;
+  editingVerseText.value = '';
+}
+
+function saveEditedVerse(): void {
+  const tabId = editingTabId.value;
+  const itemId = editingItemId.value;
+  const text = editingVerseText.value.trim();
+  if (!tabId || !itemId || !text) return;
+  updateQueueItem(tabId, itemId, {
+    text,
+    label: summarizeLabel(text),
+  });
+  closeVerseEditor();
 }
 
 /** Alt+←/→ desloca o item projetado; alternativa ao arrasto. */
@@ -375,6 +410,14 @@ function onRemoveFromQueue(): void {
   removeQueueItem(tabId, itemId);
 }
 
+function onMenuEditVerse(): void {
+  const item = queueMenuItem.value;
+  const tabId = queueMenuTabId.value;
+  closeQueueMenu();
+  if (!item || !tabId) return;
+  startEditingVerse(tabId, item);
+}
+
 const queueMenuIndex = computed(() => {
   const itemId = queueMenuItemId.value;
   if (!itemId) return -1;
@@ -399,7 +442,9 @@ function onQueueDocumentClick(): void {
 }
 
 function onQueueDocumentKeydown(event: KeyboardEvent): void {
-  if (event.key === 'Escape') closeQueueMenu();
+  if (event.key !== 'Escape') return;
+  closeQueueMenu();
+  closeVerseEditor();
 }
 
 onMounted(() => {
@@ -486,6 +531,22 @@ onUnmounted(() => {
           @dragend="onDragEnd"
           @drop.stop="onTileDrop($event, index)"
         >
+          <button
+            v-if="item.kind === 'music'"
+            type="button"
+            class="absolute left-1 top-1 z-10 rounded bg-lp-background/80 p-1 text-lp-muted transition hover:bg-lp-primary/30 hover:text-lp-text"
+            :title="t('queueItem.editVerse')"
+            :aria-label="t('queueItem.editVerseAria', { label: item.label })"
+            draggable="false"
+            @click.stop="startEditingVerse(activeTab.id, item)"
+            @pointerdown.stop
+            @keydown.stop
+          >
+            <Pencil
+              class="h-3.5 w-3.5"
+              aria-hidden="true"
+            />
+          </button>
           <span
             class="absolute right-1 top-1 rounded bg-lp-background/80 px-1 text-[10px] uppercase tracking-wide text-lp-muted"
             :class="isYoutubeOnlinePlayback(item) ? 'text-sky-300' : ''"
@@ -557,6 +618,16 @@ onUnmounted(() => {
       role="menu"
       @click.stop
     >
+      <li v-if="queueMenuItem?.kind === 'music'">
+        <button
+          type="button"
+          class="w-full px-3 py-2 text-left hover:bg-lp-surface"
+          role="menuitem"
+          @click="onMenuEditVerse"
+        >
+          {{ t('queueItem.editVerse') }}
+        </button>
+      </li>
       <li v-if="queueMenuCanMoveLeft">
         <button
           type="button"
@@ -619,5 +690,48 @@ onUnmounted(() => {
         </button>
       </li>
     </ul>
+    <div
+      v-if="editingItemId"
+      class="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4"
+      role="presentation"
+      @click.self="closeVerseEditor"
+    >
+      <form
+        class="w-full max-w-2xl rounded-xl border border-lp-surface bg-lp-background p-5 shadow-2xl"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="t('queueItem.editVerse')"
+        @submit.prevent="saveEditedVerse"
+      >
+        <h2 class="mb-1 text-lg font-semibold text-lp-text">
+          {{ t('queueItem.editVerse') }}
+        </h2>
+        <p class="mb-4 text-sm text-lp-muted">
+          {{ t('queueItem.editVerseHint') }}
+        </p>
+        <textarea
+          v-model="editingVerseText"
+          class="min-h-56 w-full resize-y rounded-lg border border-lp-surface bg-lp-surface/40 p-3 font-mono text-sm text-lp-text outline-none focus:border-lp-primary"
+          :aria-label="t('queueItem.verseText')"
+          autofocus
+        />
+        <div class="mt-4 flex justify-end gap-2">
+          <button
+            type="button"
+            class="rounded-lg border border-lp-surface px-4 py-2 text-sm text-lp-muted hover:bg-lp-surface"
+            @click="closeVerseEditor"
+          >
+            {{ t('queueItem.cancelEdit') }}
+          </button>
+          <button
+            type="submit"
+            class="rounded-lg bg-lp-primary px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="!editingVerseText.trim()"
+          >
+            {{ t('queueItem.saveEdit') }}
+          </button>
+        </div>
+      </form>
+    </div>
   </section>
 </template>

@@ -45,8 +45,7 @@ async function loadImageCategories() {
     imageCategories.value = data.imagens ?? [];
     if (!prefs.value.imageCategory && imageCategories.value[0]) {
       setImageCategory(imageCategories.value[0]);
-    }
-    if (prefs.value.imageCategory) {
+    } else if (prefs.value.imageCategory) {
       await loadImages(prefs.value.imageCategory);
     }
   } catch (e) {
@@ -60,7 +59,6 @@ function reloadCurrentCategory(): void {
 }
 
 async function loadImages(category: string) {
-  setImageCategory(category);
   try {
     const data = await fetchJson<{ status: string; imagens: string[] }>(
       `/imagem/categoria/${encodeURIComponent(category)}`,
@@ -107,7 +105,7 @@ onMounted(() => {
         id="images-category"
         :value="prefs.imageCategory"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
-        @change="loadImages(($event.target as HTMLSelectElement).value)"
+        @change="setImageCategory(($event.target as HTMLSelectElement).value)"
       >
         <option
           v-for="cat in imageCategories"

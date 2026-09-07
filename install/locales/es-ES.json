@@ -344,6 +344,12 @@
   "queueItem": {
     "removeFromQueue": "Quitar de la cola",
     "removeFromQueueAria": "Quitar «{label}» de la cola",
+    "editVerse": "Editar verso",
+    "editVerseAria": "Editar el verso «{label}»",
+    "editVerseHint": "Este cambio se aplica solo a este elemento de la playlist y no modificará la canción guardada.",
+    "verseText": "Texto del verso",
+    "cancelEdit": "Cancelar",
+    "saveEdit": "Guardar",
     "moveLeft": "Mover a la izquierda",
     "moveRight": "Mover a la derecha",
     "online": "Online",

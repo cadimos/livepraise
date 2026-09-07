@@ -106,8 +106,7 @@ async function loadCategories() {
     categories.value = data.items ?? [];
     if (!prefs.value.musicCategoryId && categories.value[0]) {
       setMusicCategory(String(categories.value[0].id));
-    }
-    if (prefs.value.musicCategoryId) {
+    } else if (prefs.value.musicCategoryId) {
       await loadSongs(prefs.value.musicCategoryId);
     }
   } catch (e) {
@@ -118,7 +117,6 @@ async function loadCategories() {
 }
 
 async function loadSongs(catId: string) {
-  setMusicCategory(catId);
   selectedSong.value = null;
   selectedVerseId.value = null;
   verses.value = [];
@@ -265,7 +263,7 @@ onUnmounted(() => {
         id="worship-category"
         :value="prefs.musicCategoryId"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
-        @change="loadSongs(($event.target as HTMLSelectElement).value)"
+        @change="setMusicCategory(($event.target as HTMLSelectElement).value)"
       >
         <option
           v-for="cat in categories"

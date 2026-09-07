@@ -212,23 +212,25 @@ onUnmounted(() => {
         </nav>
 
         <div class="min-h-0 flex-1 overflow-y-auto p-3">
-          <ImagesPanel
-            v-if="prefs.activePanel === 'imagens'"
-            @preview-bg="onPreviewBg"
-          />
-          <VideosPanel
-            v-else-if="prefs.activePanel === 'videos'"
-            @preview-bg="onPreviewBg"
-          />
-          <WorshipPanel
-            v-else-if="prefs.activePanel === 'louvor'"
-            @preview="onPreview"
-            @edit-song="openEditSong"
-          />
-          <BiblePanel
-            v-else
-            @preview="onPreview"
-          />
+          <KeepAlive>
+            <ImagesPanel
+              v-if="prefs.activePanel === 'imagens'"
+              @preview-bg="onPreviewBg"
+            />
+            <VideosPanel
+              v-else-if="prefs.activePanel === 'videos'"
+              @preview-bg="onPreviewBg"
+            />
+            <WorshipPanel
+              v-else-if="prefs.activePanel === 'louvor'"
+              @preview="onPreview"
+              @edit-song="openEditSong"
+            />
+            <BiblePanel
+              v-else
+              @preview="onPreview"
+            />
+          </KeepAlive>
         </div>
       </section>
 

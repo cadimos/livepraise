@@ -77,8 +77,7 @@ async function loadVideoCategories() {
     videoCategories.value = data.videos ?? [];
     if (!prefs.value.videoCategory && videoCategories.value[0]) {
       setVideoCategory(videoCategories.value[0]);
-    }
-    if (prefs.value.videoCategory) {
+    } else if (prefs.value.videoCategory) {
       await loadVideos(prefs.value.videoCategory);
     }
   } catch (e) {
@@ -92,7 +91,6 @@ function reloadCurrentCategory(): void {
 }
 
 async function loadVideos(category: string) {
-  setVideoCategory(category);
   try {
     const data = await fetchJson<{ status: string; videos: VideoItem[] }>(
       `/video/categoria/${encodeURIComponent(category)}`,
@@ -153,7 +151,7 @@ onUnmounted(() => {
         id="videos-category"
         :value="prefs.videoCategory"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
-        @change="loadVideos(($event.target as HTMLSelectElement).value)"
+        @change="setVideoCategory(($event.target as HTMLSelectElement).value)"
       >
         <option
           v-for="cat in videoCategories"

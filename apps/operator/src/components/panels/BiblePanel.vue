@@ -96,8 +96,7 @@ async function loadBibles() {
     bibles.value = data.biblias ?? [];
     if (!prefs.value.bibleFile && bibles.value[0]) {
       setBibleFile(bibles.value[0].arquivo);
-    }
-    if (prefs.value.bibleFile) {
+    } else if (prefs.value.bibleFile) {
       await loadBooks(prefs.value.bibleFile);
     }
   } catch (e) {
@@ -106,7 +105,6 @@ async function loadBibles() {
 }
 
 async function loadBooks(file: string) {
-  setBibleFile(file);
   selectedBook.value = null;
   selectedChapter.value = null;
   selectedVerse.value = null;
@@ -325,7 +323,7 @@ onUnmounted(() => {
         id="bible-translation"
         :value="prefs.bibleFile"
         class="rounded-lg border border-lp-surface bg-lp-background px-3 py-2 text-sm text-lp-text"
-        @change="loadBooks(($event.target as HTMLSelectElement).value)"
+        @change="setBibleFile(($event.target as HTMLSelectElement).value)"
       >
         <option
           v-for="b in bibles"
