@@ -6,7 +6,20 @@
   },
   "splash": {
     "loading": "Iniciando…",
-    "monitorsDetected": "{count} monitor(es) detectado(s)"
+    "ready": "Abriendo el operador…",
+    "monitorsDetected": "{count} monitor(es) detectado(s)",
+    "steps": {
+      "images": "Cargando imágenes…",
+      "videos": "Cargando vídeos…",
+      "songs": "Cargando alabanzas…",
+      "bibles": "Cargando versiones de la Biblia…",
+      "books": "Cargando libros de la Biblia…",
+      "queue": "Preparando la cola de proyección…",
+      "themes": "Cargando temas…",
+      "network": "Iniciando el acceso en red…",
+      "settings": "Aplicando ajustes…",
+      "monitors": "Configurando monitores…"
+    }
   },
   "connection": {
     "connected": "WebSocket conectado",
@@ -348,6 +361,10 @@
     "editVerseAria": "Editar el verso «{label}»",
     "editVerseHint": "Este cambio se aplica solo a este elemento de la playlist y no modificará la canción guardada.",
     "verseText": "Texto del verso",
+    "editBibleVerse": "Editar versículo bíblico",
+    "editBibleVerseAria": "Editar el versículo bíblico «{label}»",
+    "editBibleVerseHint": "Este cambio se aplica solo a este elemento de la playlist y no modificará el texto de la Biblia.",
+    "bibleVerseText": "Texto del versículo bíblico",
     "cancelEdit": "Cancelar",
     "saveEdit": "Guardar",
     "moveLeft": "Mover a la izquierda",

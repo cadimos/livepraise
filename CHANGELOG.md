@@ -8,21 +8,71 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 
 ### Adicionado
 
-- **Auto-update no operador** — faixa no topo com progresso de download, estado de instalação e botão Instalar agora (`AppUpdateBanner`).
-- **Reordenar músicas na fila** — as abas da playlist passam a ser arrastáveis, com barra a marcar a posição de inserção.
-- **Alternativas ao arrasto** — `Alt+←` / `Alt+→` deslocam o item projetado (ou a aba focada); menu de contexto do item ganha "Mover para a esquerda/direita".
-- **Smoke `npm run smoke:queue-dnd`** — arrastos HTML5 reais via Chrome DevTools Protocol; ignorado quando não há Chrome disponível.
-
 ### Alterado
-
-- **Posição de largada na fila** — o destino passa a ser derivado do lado do cursor sobre o item alvo (metade esquerda insere antes, direita insere depois) em vez de substituir o índice do alvo.
 
 ### Corrigido
 
-- **Reordenar itens da fila por arrasto** — o evento `drop` nunca disparava. O `dragstart` definia `effectAllowed = 'move'`, mas o `dragover` tentava ler o payload com `getData()` — que devolve string vazia no modo protegido do DataTransfer — e caía no fallback `dropEffect = 'copy'`; sendo os dois efeitos incompatíveis, o navegador cancelava o arrasto. A intenção viaja agora num tipo MIME marcador e `effectAllowed` passa a `'copyMove'`.
+---
+
+## [1.0.0-alpha.4] — 2026-09-07
+
+Quarta release alpha — operador de culto: **fila arrastável**, edição local de textos, atalhos de mídia no ambiente de trabalho, splash com progresso e **auto-update visível** no operador.
+
+### Resumo
+
+| | 1.0.0-alpha.3 | 1.0.0-alpha.4 |
+|---|---|---|
+| **Foco** | Textfill, fila sincronizada, runtime | UX da fila e arranque |
+| **Fila** | Sync entre operadores | Reordenar por arrasto / atalho / menu; drop fiável |
+| **Textos na fila** | Só o repertório / Bíblia | Edição local (não grava no catálogo) |
+| **Arranque** | Splash estático | Barra e frases de progresso |
+| **Mídia** | Pastas em `~/livepraise/` | Atalhos no ambiente de trabalho |
+| **Auto-update** | Notificação do SO | Faixa no operador (progresso + Instalar agora) |
+| **Projeção** | Textfill a cada clique | Deduplicação — mesmo verso não re-renderiza |
+
+---
+
+### Adicionado
+
+- **Edição local de textos na playlist** — versos de músicas e versículos bíblicos podem ser ajustados na fila sem modificar o repertório nem os ficheiros da Bíblia.
+- **Reordenar músicas na fila** — as abas da playlist passam a ser arrastáveis, com barra a marcar a posição de inserção.
+- **Alternativas ao arrasto** — `Alt+←` / `Alt+→` deslocam o item projetado (ou a aba focada); menu de contexto do item ganha «Mover para a esquerda/direita».
+- **Smoke `npm run smoke:queue-dnd`** — arrastos HTML5 reais via Chrome DevTools Protocol; ignorado quando não há Chrome disponível.
+- **Atalhos de mídia na área de trabalho** — o instalador Windows (e o primeiro arranque noutros SO) cria atalhos para `~/livepraise/imagens` e `~/livepraise/videos`.
+- **Splash com progresso** — barra e frases de carregamento (imagens, vídeos, louvores, Bíblia, fila, monitores).
+- **Auto-update no operador** — faixa no topo com progresso de download, estado de instalação e botão Instalar agora (`AppUpdateBanner`).
+
+---
+
+### Alterado
+
+- **Posição de largada na fila** — o destino deriva do lado do cursor sobre o item alvo (metade esquerda insere antes, direita insere depois).
+- **Deduplicação da projeção** — cada saída compara a hash e o conteúdo já renderizado; clicar novamente no mesmo verso não substitui o DOM nem executa o textfill outra vez.
+
+---
+
+### Corrigido
+
+- **Reordenar itens da fila por arrasto** — o `drop` nunca disparava: `dragstart` usava `effectAllowed = 'move'` e o `dragover` lia `getData()` (vazio no modo protegido), caindo em `dropEffect = 'copy'`. A intenção viaja num tipo MIME marcador e `effectAllowed` passa a `'copyMove'`.
 - **Largar itens em abas legadas** — abas ainda com `verses` (antes da migração para `items`) recusavam o drop em silêncio.
 
 ---
+
+### Fora do escopo alpha.4
+
+Ainda adiado (ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md)):
+
+- Suite Vitest + Playwright além dos smokes / `test:unit`
+- Busca online de louvores
+- Editor visual de temas
+- Telemetria opt-in remota
+- Auditoria WCAG sistemática (`npm run a11y`)
+- Painel UI de logs de auditoria (API admin já existe desde alpha.2)
+- i18n em portal e remote (ST-027)
+- OpenAPI para backup, tipografia e textfill-diagnostics
+
+---
+
 
 ## [1.0.0-alpha.3] — 2026-08-30
 
@@ -393,7 +443,7 @@ Reescrita completa com arquitetura modular (Electron 42 + TypeScript + Vue 3), p
 
 Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md) — **entregue em alpha.2:** auditoria, locales `en-US`, watcher de vídeos, export/import louvor, sync de versão, flash textfill, release unificado.
 
-**Ainda pendente (pós-alpha.3 ou opcional):**
+**Ainda pendente (pós-alpha.4 ou opcional):**
 
 1. Suite Vitest + Playwright além dos smokes.
 2. Busca online de louvores (nova fonte — decisão de produto).
@@ -423,6 +473,7 @@ Ver [`INVENTARIO-FUNCOES.md`](INVENTARIO-FUNCOES.md) — **entregue em alpha.2:*
 - **Contribuidores da linha anterior:** Kerolen Lucena, Sabrina Santos
 - **Licença:** MIT
 
+[1.0.0-alpha.4]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.4
 [1.0.0-alpha.3]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.3
 [1.0.0-alpha.2]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.2
 [1.0.0-alpha.1]: https://github.com/cadimos/livepraise/releases/tag/v1.0.0-alpha.1

@@ -50,8 +50,21 @@ const OVERRIDES = {
     'Quando ativo, mostra no rodapé dos monitores de projeção e dos dispositivos ligados pela rede a última ação recebida (ex.: mudança de música às 17:08:38).',
   'Limpar tela': 'Limpar ecrã',
   'Salvar': 'Guardar',
+  'Abrindo o operador…': 'A abrir o operador…',
+  'Carregando imagens…': 'A carregar imagens…',
+  'Carregando vídeos…': 'A carregar vídeos…',
+  'Carregando louvores…': 'A carregar louvores…',
+  'Carregando versões da Bíblia…': 'A carregar versões da Bíblia…',
+  'Carregando livros da Bíblia…': 'A carregar livros da Bíblia…',
+  'Preparando a fila de projeção…': 'A preparar a fila de projeção…',
+  'Carregando temas…': 'A carregar temas…',
+  'Acesso na rede iniciando…': 'A iniciar o acesso na rede…',
+  'Aplicando configurações…': 'A aplicar configurações…',
+  'Configurando monitores…': 'A configurar monitores…',
   'A alteração será aplicada somente a este item da playlist e não modificará a música salva.':
     'A alteração será aplicada apenas a este item da playlist e não modificará a música guardada.',
+  'A alteração será aplicada somente a este item da playlist e não modificará o texto da Bíblia.':
+    'A alteração será aplicada apenas a este item da playlist e não modificará o texto da Bíblia.',
   'Tela projetor': 'Ecrã do projetor',
   'Activar ferramenta': 'Ativar ferramenta',
   'Nenhum monitor de projeção ou retorno configurado. Defina papéis em Configurações → Tela projetor.':

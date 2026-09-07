@@ -38,23 +38,43 @@
       .tagline {
         color: #94a3b8;
         font-size: 0.9rem;
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
       }
 
-      .loader {
-        width: 40px;
-        height: 40px;
-        border: 3px solid #334155;
-        border-top-color: #38bdf8;
-        border-radius: 50%;
-        margin: 0 auto 1rem;
-        animation: spin 0.9s linear infinite;
+      .progress {
+        position: relative;
+        width: 100%;
+        height: 8px;
+        margin: 0 auto 0.85rem;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #1e293b;
+        box-shadow: inset 0 0 0 1px #334155;
+      }
+
+      .progress-bar {
+        height: 100%;
+        width: 8%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+        transition: width 0.55s ease;
+      }
+
+      .progress-bar.is-ready {
+        width: 100%;
       }
 
       .status {
-        font-size: 0.8rem;
-        color: #64748b;
+        min-height: 1.25rem;
+        margin-bottom: 0.35rem;
+        font-size: 0.88rem;
+        color: #cbd5e1;
+      }
+
+      .version {
         margin-bottom: 1rem;
+        font-size: 0.72rem;
+        color: #64748b;
       }
 
       .monitors {
@@ -82,45 +102,203 @@
         text-transform: capitalize;
         white-space: nowrap;
       }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
     </style>
   </head>
   <body>
     <div class="splash">
       <div class="logo">Live Praise</div>
-      <p class="tagline">Software de projeção para igrejas</p>
-      <div class="loader" aria-hidden="true"></div>
-      <p class="status" id="status">A iniciar…</p>
+      <p class="tagline" id="tagline">Software de projeção para igrejas</p>
+      <div
+        class="progress"
+        id="progress"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="8"
+        aria-labelledby="status"
+      >
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <p class="status" id="status" aria-live="polite">Carregando imagens…</p>
+      <p class="version" id="version"></p>
       <ul class="monitors" id="monitors" hidden></ul>
     </div>
     <script>
-      const status = document.getElementById('status');
-      const list = document.getElementById('monitors');
-
-      const roleLabels = {
-        operator: 'Operador',
-        projection: 'Projeção',
-        'stage-return': 'Retorno de palco',
-        off: 'Desligado',
+      const COPY = {
+        'pt-BR': {
+          tagline: 'Software de projeção para igrejas',
+          ready: 'Abrindo o operador…',
+          monitors: '{count} monitor(es) detectado(s)',
+          roles: {
+            operator: 'Operador',
+            projection: 'Projeção',
+            'stage-return': 'Retorno de palco',
+            off: 'Desligado',
+          },
+          steps: [
+            'Carregando imagens…',
+            'Carregando vídeos…',
+            'Carregando louvores…',
+            'Carregando versões da Bíblia…',
+            'Carregando livros da Bíblia…',
+            'Carregando temas…',
+            'Preparando a fila de projeção…',
+            'Acesso na rede iniciando…',
+            'Aplicando configurações…',
+            'Configurando monitores…',
+          ],
+        },
+        'pt-PT': {
+          tagline: 'Software de projeção para igrejas',
+          ready: 'A abrir o operador…',
+          monitors: '{count} monitor(es) detetado(s)',
+          roles: {
+            operator: 'Operador',
+            projection: 'Projeção',
+            'stage-return': 'Retorno de palco',
+            off: 'Desligado',
+          },
+          steps: [
+            'A carregar imagens…',
+            'A carregar vídeos…',
+            'A carregar louvores…',
+            'A carregar versões da Bíblia…',
+            'A carregar livros da Bíblia…',
+            'A carregar temas…',
+            'A preparar a fila de projeção…',
+            'A iniciar o acesso na rede…',
+            'A aplicar configurações…',
+            'A configurar monitores…',
+          ],
+        },
+        'en-US': {
+          tagline: 'Church projection software',
+          ready: 'Opening the operator…',
+          monitors: '{count} monitor(s) detected',
+          roles: {
+            operator: 'Operator',
+            projection: 'Projection',
+            'stage-return': 'Stage return',
+            off: 'Off',
+          },
+          steps: [
+            'Loading images…',
+            'Loading videos…',
+            'Loading songs…',
+            'Loading Bible translations…',
+            'Loading Bible books…',
+            'Loading themes…',
+            'Preparing the projection queue…',
+            'Starting network access…',
+            'Applying settings…',
+            'Configuring monitors…',
+          ],
+        },
+        'es-ES': {
+          tagline: 'Software de proyección para iglesias',
+          ready: 'Abriendo el operador…',
+          monitors: '{count} monitor(es) detectado(s)',
+          roles: {
+            operator: 'Operador',
+            projection: 'Proyección',
+            'stage-return': 'Retorno de escenario',
+            off: 'Apagado',
+          },
+          steps: [
+            'Cargando imágenes…',
+            'Cargando vídeos…',
+            'Cargando alabanzas…',
+            'Cargando versiones de la Biblia…',
+            'Cargando libros de la Biblia…',
+            'Cargando temas…',
+            'Preparando la cola de proyección…',
+            'Iniciando el acceso en red…',
+            'Aplicando ajustes…',
+            'Configurando monitores…',
+          ],
+        },
       };
 
+      function resolveLocale() {
+        const nav = (navigator.language || 'pt-BR').toLowerCase();
+        if (nav.startsWith('es')) return 'es-ES';
+        if (nav.startsWith('en')) return 'en-US';
+        if (nav === 'pt-pt' || nav.startsWith('pt-pt')) return 'pt-PT';
+        return 'pt-BR';
+      }
+
+      const locale = resolveLocale();
+      const copy = COPY[locale] ?? COPY['pt-BR'];
+      document.documentElement.lang = locale;
+
+      const status = document.getElementById('status');
+      const tagline = document.getElementById('tagline');
+      const version = document.getElementById('version');
+      const list = document.getElementById('monitors');
+      const progress = document.getElementById('progress');
+      const bar = document.getElementById('progress-bar');
+      const steps = copy.steps;
+      const STEP_MS = 1400;
+      const MAX_WAIT_PERCENT = 94;
+
+      tagline.textContent = copy.tagline;
+      let stepIndex = 0;
+      let ready = false;
+      let ticker = 0;
+
+      function setProgress(percent) {
+        const value = Math.max(6, Math.min(100, Math.round(percent)));
+        bar.style.width = `${value}%`;
+        progress.setAttribute('aria-valuenow', String(value));
+      }
+
+      function progressForTick(tick) {
+        if (tick < steps.length) {
+          return 8 + (tick / Math.max(1, steps.length - 1)) * 72;
+        }
+        return Math.min(MAX_WAIT_PERCENT, 80 + (tick - steps.length + 1) * 1.4);
+      }
+
+      function showStep(tick) {
+        if (ready) return;
+        const message = steps[Math.min(tick, steps.length - 1)];
+        status.textContent = message;
+        setProgress(progressForTick(tick));
+      }
+
+      function markReady() {
+        if (ready) return;
+        ready = true;
+        status.textContent = copy.ready;
+        bar.classList.add('is-ready');
+        setProgress(100);
+      }
+
+      showStep(0);
+      const timer = setInterval(() => {
+        if (ready) {
+          clearInterval(timer);
+          return;
+        }
+        ticker += 1;
+        showStep(ticker);
+      }, STEP_MS);
+
       if (window.livepraise) {
-        status.textContent = `Live Praise v${window.livepraise.version}`;
+        version.textContent = `Live Praise v${window.livepraise.version}`;
         window.livepraise.onDisplays((displays) => {
           list.hidden = false;
           list.innerHTML = '';
           for (const d of displays) {
             const li = document.createElement('li');
-            li.innerHTML = `<span>${d.label}${d.primary ? ' ★' : ''}</span><span class="role">${roleLabels[d.role] ?? d.role}</span>`;
+            const role = copy.roles[d.role] ?? d.role;
+            li.innerHTML = `<span>${d.label}${d.primary ? ' ★' : ''}</span><span class="role">${role}</span>`;
             list.appendChild(li);
           }
-          status.textContent = `${displays.length} monitor(es) detectado(s)`;
         });
+        if (typeof window.livepraise.onSplashReady === 'function') {
+          window.livepraise.onSplashReady(markReady);
+        }
       }
     </script>
   </body>

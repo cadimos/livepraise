@@ -6,7 +6,20 @@
   },
   "splash": {
     "loading": "Starting…",
-    "monitorsDetected": "{count} monitor(s) detected"
+    "ready": "Opening the operator…",
+    "monitorsDetected": "{count} monitor(s) detected",
+    "steps": {
+      "images": "Loading images…",
+      "videos": "Loading videos…",
+      "songs": "Loading songs…",
+      "bibles": "Loading Bible translations…",
+      "books": "Loading Bible books…",
+      "queue": "Preparing the projection queue…",
+      "themes": "Loading themes…",
+      "network": "Starting network access…",
+      "settings": "Applying settings…",
+      "monitors": "Configuring monitors…"
+    }
   },
   "connection": {
     "connected": "WebSocket connected",
@@ -348,6 +361,10 @@
     "editVerseAria": "Edit verse «{label}»",
     "editVerseHint": "This change applies only to this playlist item and will not modify the saved song.",
     "verseText": "Verse text",
+    "editBibleVerse": "Edit Bible verse",
+    "editBibleVerseAria": "Edit Bible verse «{label}»",
+    "editBibleVerseHint": "This change applies only to this playlist item and will not modify the Bible text.",
+    "bibleVerseText": "Bible verse text",
     "cancelEdit": "Cancel",
     "saveEdit": "Save",
     "moveLeft": "Move left",

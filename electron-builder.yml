@@ -36,6 +36,8 @@ nsis:
   uninstallerIcon: resources/icon/livepraise.ico
   installerHeaderIcon: resources/icon/livepraise.ico
   shortcutName: Live Praise
+  include: installer.nsh
+
 win:
   target:
     - target: nsis

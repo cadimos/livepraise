@@ -1,7 +1,7 @@
 # Inventário pendente — Live Praise
 
-**Versão analisada:** `1.0.0-alpha.3`  
-**Última actualização:** 2026-08-30 (cruzamento com código, CI e [`CHANGELOG.md`](CHANGELOG.md))  
+**Versão analisada:** `1.0.0-alpha.4`  
+**Última actualização:** 2026-09-07 (cruzamento com código, CI e [`CHANGELOG.md`](CHANGELOG.md))  
 **Repositório:** `electron/`, `server/`, `core/`, `apps/`, `web/`, `shared/`
 
 **TypeScript:** fonte `.ts`/`.vue` em todas as superfícies; emit em `dist/`; CI PR: `test:unit`, `typecheck`, `verify:openapi`, smokes núcleo. ESLint foi retirado (TypeScript 7). Smokes `smoke:cad*` removidos — [`scripts/README.md`](scripts/README.md). Plano técnico histórico: [`docs/PLANO-TAREFAS-TECNICAS.md`](docs/PLANO-TAREFAS-TECNICAS.md) (tarefas marcadas feitas).
@@ -14,40 +14,51 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). Se
 
 ## Resumo executivo
 
-| # | Item | Estado | Notas (alpha.3) |
+| # | Item | Estado | Notas (alpha.4) |
 |---|------|--------|-----------------|
 | 0 | Migração v0.0.8 → 1.x | ✅ | `legacy-upgrade.ts` + `smoke:legacy-upgrade` |
 | 1 | Auditoria e retenção | ✅ | API `GET /api/audit/logs`; **sem painel UI** (opcional) |
 | 2 | Release GitHub | ✅ | Draft unificado; `smoke:fase8` nos 3 SO; `smoke:win-installer:ci` no Windows |
-| 3 | Testes automatizados | 📅 | `test:unit` (9 ficheiros) + smokes; **Vitest/Playwright não** |
+| 3 | Testes automatizados | ✅ | `test:unit` (12 ficheiros) + smokes no CI; **Vitest/Playwright** ficam como dívida |
 | 4 | Locales | ✅ | Operador: `pt-BR` (default), `en-US`, `pt-PT`, `es-ES`; portal/remote **não** i18n |
 | 5 | Watcher de vídeos | ✅ | `videoWatcher.ts` + WS `media-updated` |
 | 6 | Busca online de louvores | 📅 | Só Fuse.js local |
 | 7 | Editor visual de temas | 📅 | Temas bundled + `theme.json` manual |
 | 8 | Telemetria opt-in | 📅 | Só log local `/api/system/error-log` |
-| 9 | Versão única no build | ✅ | `bump-version` + `shared/app-version.ts` (`1.0.0-alpha.3`) |
+| 9 | Versão única no build | ✅ | `bump-version` + `shared/app-version.ts` (`1.0.0-alpha.4`) |
 | 10 | Smoke instalador Windows | ✅ | `smoke:win-installer` / `:ci` no job Windows de `release.yml` (SM-035) |
 | 11 | Import/export repertório | ✅ | `GET/POST /musica/export\|import` |
-| 12 | Acessibilidade WCAG | 📅 | Tema alto contraste; `axe-core` **sem** `npm run a11y` |
+| 12 | Acessibilidade WCAG | ✅ | Tema **alto contraste** + `aria-*` pontuais; auditoria `axe-core` **sem** `npm run a11y` (dívida) |
 | 13 | Auto-update validado | ✅ | In-app **Windows** (alpha.2 → alpha.3); faixa de progresso + Instalar agora |
 | 14 | Flash textfill | ✅ | Alpha.2 + medição in-place / diagnóstico na alpha.3 |
 | 15 | Fila partilhada | ✅ | **GET/PUT `/api/operator-queue`** + WS `operator-queue-sync` |
 | 16 | Diagnóstico textfill | ✅ | JSONL + UI Logs; **rotas ainda fora do OpenAPI** |
 
-### Ainda pendente *(pós-alpha.3)*
+### Ainda pendente *(pós-alpha.4)*
 
 | # | Item | Tipo |
 |---|------|------|
-| **3** | Vitest + Playwright | Qualidade |
+| **3 (Vitest)** | Vitest + Playwright | Qualidade |
 | **6** | Busca online de louvores | Produto |
 | **7** | Editor visual de temas | Produto |
 | **8** | Telemetria remota opt-in | Produto |
-| **12** | Auditoria WCAG + `a11y` | Qualidade |
+| **12 (auditoria)** | Auditoria WCAG + script `a11y` | Qualidade |
 | **1 (UI)** | Painel de logs de auditoria no operador | Opcional |
 | **4 (web)** | i18n em `web/portal` e `web/remote` | Dívida ST-027 |
 | **OpenAPI** | Backup, tipografia, textfill-diagnostics (existem no servidor, fora da lista canónica) | Documentação |
 
 Sincronização **multi-estação completa** (várias máquinas como um único culto, além da fila partilhada) continua **fora de escopo**.
+
+### Entregue em **alpha.4** ✅
+
+| Item | Verificação |
+|------|-------------|
+| Reordenar fila (arrasto, `Alt+←`/`Alt+→`, menu) | `npm run smoke:queue-dnd` |
+| Edição local de textos na playlist | UI da fila (não grava repertório/Bíblia) |
+| Atalhos de mídia no ambiente de trabalho | Primeiro arranque / instalador Windows |
+| Splash com progresso | Arranque Electron |
+| Auto-update visível no operador | `AppUpdateBanner` (progresso + Instalar agora) |
+| Deduplicação da projeção | Mesmo verso não re-executa textfill |
 
 ### Entregue em **alpha.3** ✅
 
@@ -60,6 +71,8 @@ Sincronização **multi-estação completa** (várias máquinas como um único c
 | Smoke instalador Windows no CI | `release.yml` → `smoke:win-installer:ci` |
 | Auto-update in-app (Windows) | Teste manual alpha.2 → alpha.3 + faixa `AppUpdateBanner` |
 | Runtime | Node ≥ 24, Electron 44 |
+| Tema alto contraste | `themes/high-contrast/` · selector no operador |
+| `test:unit` no CI | `scripts/run-unit-tests.mjs` |
 
 ### Entregue em **alpha.2** ✅
 
@@ -156,7 +169,7 @@ Confirmado operacional no GitHub:
 
 CI de PR separado: **[`.github/workflows/ci.yml`](.github/workflows/ci.yml)** (smokes leves, sem instaladores).
 
-Comandos locais `npm run dist:*` inalterados; documentação em [`README.md`](README.md) / [`scripts/README.md`](scripts/README.md) *(algumas referências ainda mencionam «CA-R40» — nomenclatura legada)*.
+Comandos locais `npm run dist:*` inalterados; documentação em [`README.md`](README.md) / [`scripts/README.md`](scripts/README.md). [`scripts/README.md`](scripts/README.md) já não usa «CA-R40»; restam menções pontuais em [`README.md`](README.md) e `scripts/dist-all.mjs`.
 
 | Plataforma | Comando | Artefacto no draft |
 |------------|---------|-------------------|
@@ -198,7 +211,8 @@ Melhorias de **regressão automática** — o fluxo principal já está validado
 - [x] Integrar `smoke-win-installer` no job `build-windows` (secção 10).
 - [x] Alinhar smokes Windows com Linux/macOS (`smoke:fase8`).
 - [ ] (Opcional) `smoke:legacy-upgrade` no CI de PR ou release.
-- [ ] Actualizar [`scripts/README.md`](scripts/README.md) / README — remover referências «CA-R40».
+- [x] Remover «CA-R40» de [`scripts/README.md`](scripts/README.md).
+- [ ] (Residual) README e `scripts/dist-all.mjs` — última menção «CA-R40» (workflow macOS).
 - [ ] Snap / Flatpak no CI ou só documentação de build manual.
 - [ ] Assinatura de código (certificados Windows + Apple).
 - [ ] SHA256 automático nas notas do release.
@@ -216,17 +230,19 @@ Melhorias de **regressão automática** — o fluxo principal já está validado
 
 ---
 
-## 3. Testes automatizados (além de smokes) 📅 *(versão futura)*
+## 3. Testes automatizados (além de smokes) ✅ *(gate actual; Vitest/Playwright — versão futura)*
 
-> **Decisão (mantida na alpha.3):** não adoptar Vitest nem Playwright. O gate é `ci.yml` + `smoke:release`. ESLint **não** faz parte do CI (removido por incompatibilidade com TypeScript 7).
+> **Entregue:** `npm run test:unit` (12× `tests/**/*.test.mjs`) no CI de PR, juntamente com `typecheck`, `verify:openapi` e smokes. ESLint **não** faz parte do CI (removido por incompatibilidade com TypeScript 7).
+>
+> **Dívida (versão futura):** não adoptar Vitest nem Playwright nesta linha. Backlog: [`docs/SM-039-vitest-backlog.md`](docs/SM-039-vitest-backlog.md).
 
 ### Gate actual (consolidado — SM-038)
 
 | Comando | Onde corre | O que valida |
 |---------|------------|--------------|
-| `npm run test:unit` | CI PR | 10× `tests/**/*.test.mjs` (textfill, cifras, fila, reordenação, temas, security, error-log) |
+| `npm run test:unit` | CI PR | 12× `tests/**/*.test.mjs` (textfill, cifras, fila, reordenação, temas, security, error-log, atalhos de mídia, dedupe de projeção) |
 | `npm run typecheck` | CI PR | Todas as superfícies TS |
-| `npm run verify:openapi` | CI PR | **70** operações HTTP na lista canónica vs `openapi.yaml` |
+| `npm run verify:openapi` | CI PR | **69** operações HTTP na lista canónica vs `openapi.yaml` |
 | `npm run test:video-pipeline` | CI PR (`smoke` job) | Pipeline ffmpeg / vídeo |
 | `npm run smoke:bootstrap` | CI PR + release | Bootstrap BD, CRUD, persistência |
 | `npm run smoke:fase8` | CI PR + release (Win/Linux/macOS) | WS, health, instalação limpa |
@@ -258,13 +274,15 @@ Scripts `smoke:cad187` … `smoke:cad314` **removidos** (SM-030). Mapeamento: [`
 - `tests/security/remote-fetch*.test.mjs` — SSRF e content-type
 - `tests/themes/normalize.test.mjs` — normalização temas
 - `tests/error-log/redact-url.test.mjs` — redacção de URLs
+- `tests/desktop-media-shortcuts.test.mjs` — atalhos de pastas de mídia
+- `tests/projection-content-dedupe.test.mjs` — fingerprint / skip de textfill duplicado
 - Runner: `scripts/run-unit-tests.mjs` via `npm run test:unit` (SM-041)
 
 ### O que falta *(planeado — versão futura)*
 
 Suite **Vitest** para `core/` e `shared/` e **Playwright** para fluxos críticos do operador. Backlog: [`docs/SM-039-vitest-backlog.md`](docs/SM-039-vitest-backlog.md) · [`docs/DIVIDA-TECNICA.md`](docs/DIVIDA-TECNICA.md) ST-028.
 
-### Tarefas *(backlog — não alpha.2)*
+### Tarefas *(backlog — **3 (Vitest)**)*
 
 - [ ] Adicionar Vitest + config mínima.
 - [ ] Testes unitários: `bible-reference`, `queue-items`, `sanitize` projection, `sessions.purge`.
@@ -450,7 +468,7 @@ Envio **opt-in** e anónimo para endpoint configurável (Sentry/DSN). Desligado 
 
 Hoje, cada release exige editar a versão **manualmente em vários sítios** (`package.json`, `preload.ts`, barra de estado, modal Sobre, exemplo OpenAPI). Isto **não é um bug** — funciona — mas é trabalho repetitivo e risco de um sítio ficar desactualizado.
 
-**Problema que resolve:** um único `npm run bump-version 1.0.0-alpha.4` (ou a versão seguinte) propaga o número para todos os ficheiros.
+**Problema que resolve:** um único `npm run bump-version 1.0.0-alpha.5` (ou a versão seguinte) propaga o número para todos os ficheiros.
 
 **Não é:** corrigir versão errada na app (desde que edites todos os ficheiros no bump, está coerente).
 
@@ -548,23 +566,23 @@ Isto serve **migrar ambiente inteiro**, não exportar só louvores para partilha
 
 ---
 
-## 12. Acessibilidade (WCAG) no operador 📅 *(versão futura)*
+## 12. Acessibilidade (WCAG) no operador ✅ *(tema alto contraste — entrega desta linha)*
 
-> **Decisão (mantida):** não fazer auditoria WCAG nesta linha alpha. Mantêm-se tema **alto contraste** e `aria-*` pontuais. Painel **Atalhos** existe in-app (`ShortcutsPanel.vue`); falta página no README.
+> **Entregue:** tema **alto contraste** (`high-contrast`) e `aria-*` pontuais. Painel **Atalhos** existe in-app (`ShortcutsPanel.vue`).
+>
+> **Dívida (versão futura):** não há auditoria WCAG automática nesta linha alpha (`axe-core` está no `package.json` mas **não** há `npm run a11y`). Atalhos estão documentados **in-app** (`ShortcutsPanel.vue`); falta página equivalente no README.
 
 ### Explicação (em português claro)
 
-**Não está implementado como programa de acessibilidade** — existem apenas **peças isoladas**:
+O item de produto **está concluído**: o operador escolhe o tema bundled `high-contrast` (`themes/high-contrast/theme.json`, `BUNDLED_THEME_IDS` em `core/themes/normalize.ts`). Isso **não** equivale a conformidade WCAG verificada.
 
 | Peça | Estado |
 |------|--------|
 | Tema **alto contraste** (`high-contrast`) | ✅ Utilizável hoje |
 | Alguns atributos **`aria-*`** (ex. slider de fonte) | ✅ Pontual |
 | Biblioteca **`axe-core`** no `package.json` | 🟡 Instalada, **nunca corre** (sem `npm run a11y`) |
-| Auditoria WCAG (contraste, teclado, labels em fila/login) | ❌ Não feita |
+| Auditoria WCAG (contraste, teclado, labels em fila/login) | ❌ Não feita — ver **12 (auditoria)** no resumo pendente |
 | Correcções sistemáticas antes de beta | ❌ Não feitas |
-
-Ou seja: há **suporte básico**, mas **não** cumpre WCAG de forma verificada.
 
 ### Já existe
 
@@ -574,13 +592,15 @@ Ou seja: há **suporte básico**, mas **não** cumpre WCAG de forma verificada.
 
 ### O que falta *(planeado — versão futura)*
 
-Auditoria sistemática + correcções — não confundir com «já tem tema alto contraste».
+Auditoria sistemática + correcções (`npm run a11y:operator`). Não reabre o tema alto contraste.
 
 ### Tarefas *(backlog — versão futura)*
 
+- [x] Tema bundled `high-contrast` seleccionável no operador.
+- [x] Help in-app de atalhos (`ShortcutsPanel.vue` em Configurações).
 - [ ] Script `npm run a11y:operator` (axe + jsdom ou Playwright).
 - [ ] Corrigir issues críticos em fila, login e painéis de projeção.
-- [ ] Documentar atalhos de teclado no README ou help in-app.
+- [ ] (Opcional) Página de atalhos no README (o painel in-app já cobre o critério).
 
 ---
 
@@ -699,15 +719,15 @@ Isto **não** é sincronização multi-estação completa (preferências, mídia
 
 ### Ainda pendente *(documentação)*
 
-- [ ] Incluir estas rotas (e, se fizer sentido, backup/tipografia) em `openapi.yaml` + `scripts/verify-openapi-coverage.mjs`. Hoje o gate conta **70** operações e **não** lista diagnóstico, backup nem `projection-typography`.
+- [ ] Incluir estas rotas (e, se fizer sentido, backup/tipografia) em `openapi.yaml` + `scripts/verify-openapi-coverage.mjs`. Hoje o gate conta **69** operações e **não** lista diagnóstico, backup nem `projection-typography`.
 
 ---
 
 ## Metodologia
 
 1. Varredura de `server/`, `apps/`, `web/`, `core/`, `shared/`, `.github/workflows/` e scripts `smoke-*.mjs`.
-2. Confronto com o repositório em **2026-08-30** (`package.json` = `1.0.0-alpha.3`).
-3. Lista canónica OpenAPI: **70** operações em `scripts/verify-openapi-coverage.mjs` (backup, tipografia e textfill-diagnostics **fora** desta lista).
-4. Smokes: `smoke:audit`, `smoke:locales`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version`, `smoke:legacy-upgrade`, `smoke:queue-sync`, `smoke:win-installer:ci`.
+2. Confronto com o repositório em **2026-09-07** (`package.json` = `1.0.0-alpha.4`).
+3. Lista canónica OpenAPI: **69** operações em `scripts/verify-openapi-coverage.mjs` (backup, tipografia e textfill-diagnostics **fora** desta lista).
+4. Smokes: `smoke:audit`, `smoke:locales`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version`, `smoke:legacy-upgrade`, `smoke:queue-sync`, `smoke:queue-dnd`, `smoke:win-installer:ci`.
 
 ---

@@ -12,6 +12,7 @@ import {
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
 import { createProjectionTextfill } from '/shared/projection-textfill.js';
+import { createProjectionContentDeduper } from '/shared/projection-content-dedupe.js';
 import type { ProjectionTypographyPrefs } from '/shared/projection-typography.js';
 import type {
   LiveAction,
@@ -73,6 +74,7 @@ const typographyBridge = {
     await textfill.refresh();
   },
 };
+const contentDeduper = createProjectionContentDeduper();
 
 const statusEl = (): HTMLElement => byId('last-action');
 let wsConnected = false;
@@ -123,19 +125,27 @@ function applyAction(action: LiveAction): void {
       void playProjectionVideo(player);
       break;
     }
-    case 'texto':
-      content.textContent = decodeURIComponent(action.valor);
+    case 'texto': {
+      const text = decodeURIComponent(action.valor);
+      if (!contentDeduper.shouldApply(text)) return;
+      content.textContent = text;
       break;
+    }
     case 'viewMusica':
-    case 'viewBiblia':
+    case 'viewBiblia': {
+      const rendered = stripChordsFromHtml(action.valor);
+      if (!contentDeduper.shouldApply(rendered)) return;
       content.style.visibility = 'hidden';
-      content.innerHTML = stripChordsFromHtml(action.valor);
+      content.innerHTML = rendered;
       break;
+    }
     case 'removeConteudo':
+      if (!contentDeduper.shouldApply('')) return;
       content.innerHTML = '';
       hasProjectionContent = false;
       break;
     case 'atualizar':
+      contentDeduper.reset();
       location.reload();
       break;
     case 'ajustarTela':

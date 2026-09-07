@@ -4,11 +4,11 @@
 
 Software desktop open-source (MIT) para projeção de louvores, passagens bíblicas, imagens e vídeos em cultos — operador local com pré-visualização multi-saída, retorno de palco, ecrãs externos e controlo remoto.
 
-**Versão actual:** `1.0.0-alpha.3` — ver [`CHANGELOG.md`](CHANGELOG.md) para novidades e migração.
+**Versão actual:** `1.0.0-alpha.4` — ver [`CHANGELOG.md`](CHANGELOG.md) para novidades e migração.
 
 ## Funcionalidades
 
-- Fila de projeção com abas (louvor, Bíblia, imagens, vídeos, slides em branco) e drag-and-drop.
+- Fila de projeção com abas (louvor, Bíblia, imagens, vídeos, slides em branco); drag-and-drop, atalhos e edição local de textos na fila.
 - Multi-monitor: operador, projetor, retorno de palco; papéis configuráveis por ecrã.
 - Pré-visualização por destino de saída (projetor, retorno, live, vocal, stage, player).
 - Tipografia de projeção configurável por perfil (fonte, textfill, sombra).
@@ -16,7 +16,8 @@ Software desktop open-source (MIT) para projeção de louvores, passagens bíbli
 - Importação para fila: ficheiro local, YouTube e URL HTTP(S).
 - Autenticação local, utilizadores com papéis, controlo remoto web e fila de aprovações.
 - Backup e restore selectivo do ambiente (`~/livepraise`).
-- Auto-update via GitHub Releases em builds empacotados.
+- Auto-update via GitHub Releases em builds empacotados, com progresso no operador.
+- Atalhos no ambiente de trabalho para as pastas de imagens e vídeos (`~/livepraise/`).
 
 ## Estrutura do repositório
 
@@ -224,6 +225,7 @@ Em builds empacotados, o Live Praise verifica actualizações no GitHub ao inici
 2. Execute o instalador (duplo clique). Se o Windows SmartScreen avisar, escolha **Mais informações** → **Executar mesmo assim** (builds sem assinatura de código).
 3. Siga o assistente (pasta de instalação, atalho no menu Iniciar).
 4. Abra **Live Praise** pelo menu Iniciar ou pelo atalho no ambiente de trabalho.
+   O instalador também cria atalhos **Live Praise - Imagens** e **Live Praise - Videos** na área de trabalho, apontando para `~/livepraise/imagens` e `~/livepraise/videos`. Use-os para adicionar pastas e ficheiros de mídia sem procurar o caminho no Explorador.
 
 Desinstalação: **Definições → Aplicações → Live Praise → Desinstalar**, ou **Adicionar ou remover programas**.
 
@@ -246,6 +248,8 @@ Desinstalação: mova **Live Praise** de **Aplicações** para o Lixo.
 chmod +x "Live Praise-<versão>.AppImage"
 ./"Live Praise-<versão>.AppImage"
 ```
+
+Na primeira execução, se existir uma pasta Área de trabalho, o Live Praise cria atalhos para as pastas de imagens e vídeos (`~/livepraise/imagens` e `~/livepraise/videos`).
 
 3. (Opcional) Integrar no menu de aplicações com [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) ou movendo o ficheiro para `~/Applications` / `~/.local/bin`.
 

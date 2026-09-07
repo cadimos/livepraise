@@ -10,7 +10,7 @@ export type UpdateStatus =
   | { kind: 'error'; message: string; fallback: true };
 
 contextBridge.exposeInMainWorld('livepraise', {
-  version: '1.0.0-alpha.3',
+  version: '1.0.0-alpha.4',
   runtime: {
     node: process.versions.node,
     chrome: process.versions.chrome,
@@ -19,6 +19,11 @@ contextBridge.exposeInMainWorld('livepraise', {
   onDisplays(callback: (displays: unknown) => void) {
     ipcRenderer.on('livepraise:displays', (_event, payload) => {
       callback(payload);
+    });
+  },
+  onSplashReady(callback: () => void) {
+    ipcRenderer.on('livepraise:splash-ready', () => {
+      callback();
     });
   },
   getDisplaysConfig: () => ipcRenderer.invoke('livepraise:get-displays-config'),

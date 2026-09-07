@@ -33,6 +33,7 @@ export function applyLiveActionToPreviewFrame(
     case 'viewBiblia':
     case 'viewMusicaRetorno':
     case 'viewBibliaRetorno':
+      if (frame.contentHtml === action.valor) return frame;
       return {
         ...frame,
         contentHtml: action.valor,
@@ -44,12 +45,15 @@ export function applyLiveActionToPreviewFrame(
       } catch {
         text = action.valor;
       }
+      const contentHtml = `<div class="content"><span>${text}</span></div>`;
+      if (frame.contentHtml === contentHtml) return frame;
       return {
         ...frame,
-        contentHtml: `<div class="content"><span>${text}</span></div>`,
+        contentHtml,
       };
     }
     case 'removeConteudo':
+      if (!frame.contentHtml) return frame;
       return { ...frame, contentHtml: '' };
     case 'background':
       return {
