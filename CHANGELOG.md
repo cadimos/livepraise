@@ -12,6 +12,7 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 - **Reordenar músicas na fila** — as abas da playlist passam a ser arrastáveis, com barra a marcar a posição de inserção.
 - **Alternativas ao arrasto** — `Alt+←` / `Alt+→` deslocam o item projetado (ou a aba focada); menu de contexto do item ganha "Mover para a esquerda/direita".
 - **Smoke `npm run smoke:queue-dnd`** — arrastos HTML5 reais via Chrome DevTools Protocol; ignorado quando não há Chrome disponível.
+- **Atalhos de mídia na área de trabalho** — o instalador Windows (e o primeiro arranque noutros SO) cria atalhos para `~/livepraise/imagens` e `~/livepraise/videos`, para incluir pastas e ficheiros sem navegar até à pasta de dados.
 
 ### Alterado
 

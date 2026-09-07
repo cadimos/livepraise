@@ -224,6 +224,7 @@ Em builds empacotados, o Live Praise verifica actualizações no GitHub ao inici
 2. Execute o instalador (duplo clique). Se o Windows SmartScreen avisar, escolha **Mais informações** → **Executar mesmo assim** (builds sem assinatura de código).
 3. Siga o assistente (pasta de instalação, atalho no menu Iniciar).
 4. Abra **Live Praise** pelo menu Iniciar ou pelo atalho no ambiente de trabalho.
+   O instalador também cria atalhos **Live Praise - Imagens** e **Live Praise - Videos** na área de trabalho, apontando para `~/livepraise/imagens` e `~/livepraise/videos`. Use-os para adicionar pastas e ficheiros de mídia sem procurar o caminho no Explorador.
 
 Desinstalação: **Definições → Aplicações → Live Praise → Desinstalar**, ou **Adicionar ou remover programas**.
 
@@ -246,6 +247,8 @@ Desinstalação: mova **Live Praise** de **Aplicações** para o Lixo.
 chmod +x "Live Praise-<versão>.AppImage"
 ./"Live Praise-<versão>.AppImage"
 ```
+
+Na primeira execução, se existir uma pasta Área de trabalho, o Live Praise cria atalhos para as pastas de imagens e vídeos (`~/livepraise/imagens` e `~/livepraise/videos`).
 
 3. (Opcional) Integrar no menu de aplicações com [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) ou movendo o ficheiro para `~/Applications` / `~/.local/bin`.
 
