@@ -344,6 +344,12 @@
   "queueItem": {
     "removeFromQueue": "Remove from queue",
     "removeFromQueueAria": "Remove «{label}» from queue",
+    "editVerse": "Edit verse",
+    "editVerseAria": "Edit verse «{label}»",
+    "editVerseHint": "This change applies only to this playlist item and will not modify the saved song.",
+    "verseText": "Verse text",
+    "cancelEdit": "Cancel",
+    "saveEdit": "Save",
     "moveLeft": "Move left",
     "moveRight": "Move right",
     "online": "Online",

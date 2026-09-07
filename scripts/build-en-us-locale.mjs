@@ -11,6 +11,7 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PT = path.join(ROOT, 'locales/pt-BR.json');
 const EN = path.join(ROOT, 'locales/en-US.json');
 const INSTALL = path.join(ROOT, 'install/locales/en-US.json');
+const INSTALL_PT = path.join(ROOT, 'install/locales/pt-BR.json');
 
 /** @param {unknown} value */
 function translateValue(value) {
@@ -326,6 +327,11 @@ function translateValue(value) {
     'Em branco': 'Blank',
     'Remover da fila': 'Remove from queue',
     'Remover «{label}» da fila': 'Remove «{label}» from queue',
+    'Editar verso': 'Edit verse',
+    'Editar o verso «{label}»': 'Edit verse «{label}»',
+    'A alteração será aplicada somente a este item da playlist e não modificará a música salva.':
+      'This change applies only to this playlist item and will not modify the saved song.',
+    'Texto do verso': 'Verse text',
     'Mover para a esquerda': 'Move left',
     'Mover para a direita': 'Move right',
     'Online': 'Online',
@@ -682,4 +688,5 @@ en.locales = {
 
 fs.writeFileSync(EN, `${JSON.stringify(en, null, 2)}\n`);
 fs.writeFileSync(INSTALL, `${JSON.stringify(en, null, 2)}\n`);
+fs.writeFileSync(INSTALL_PT, `${JSON.stringify(pt, null, 2)}\n`);
 console.log('build-en-us-locale: OK');
