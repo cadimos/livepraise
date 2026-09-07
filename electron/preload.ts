@@ -21,6 +21,11 @@ contextBridge.exposeInMainWorld('livepraise', {
       callback(payload);
     });
   },
+  onSplashReady(callback: () => void) {
+    ipcRenderer.on('livepraise:splash-ready', () => {
+      callback();
+    });
+  },
   getDisplaysConfig: () => ipcRenderer.invoke('livepraise:get-displays-config'),
   onUpdateStatus(callback: (status: UpdateStatus) => void) {
     ipcRenderer.on('livepraise:update-status', (_event, status: UpdateStatus) => {

@@ -88,7 +88,7 @@ function createSplashWindow(): BrowserWindow {
     x,
     y,
     width: Math.min(520, width),
-    height: Math.min(420, height),
+    height: Math.min(460, height),
     center: true,
     frame: false,
     resizable: false,
@@ -147,6 +147,8 @@ app.whenReady().then(async () => {
 
   try {
     await waitForServer();
+    splashWindow?.webContents.send('livepraise:splash-ready');
+    await new Promise((resolve) => setTimeout(resolve, 280));
     await launchWorkspace();
   } catch (err) {
     console.error('Falha ao iniciar Livepraise:', err);
@@ -163,6 +165,8 @@ app.whenReady().then(async () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       splashWindow = createSplashWindow();
       await waitForServer();
+      splashWindow?.webContents.send('livepraise:splash-ready');
+      await new Promise((resolve) => setTimeout(resolve, 280));
       await launchWorkspace();
     }
   });

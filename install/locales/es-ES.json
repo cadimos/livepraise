@@ -6,7 +6,20 @@
   },
   "splash": {
     "loading": "Iniciando…",
-    "monitorsDetected": "{count} monitor(es) detectado(s)"
+    "ready": "Abriendo el operador…",
+    "monitorsDetected": "{count} monitor(es) detectado(s)",
+    "steps": {
+      "images": "Cargando imágenes…",
+      "videos": "Cargando vídeos…",
+      "songs": "Cargando alabanzas…",
+      "bibles": "Cargando versiones de la Biblia…",
+      "books": "Cargando libros de la Biblia…",
+      "queue": "Preparando la cola de proyección…",
+      "themes": "Cargando temas…",
+      "network": "Iniciando el acceso en red…",
+      "settings": "Aplicando ajustes…",
+      "monitors": "Configurando monitores…"
+    }
   },
   "connection": {
     "connected": "WebSocket conectado",
