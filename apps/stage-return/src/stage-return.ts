@@ -12,6 +12,7 @@ import {
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
 import { createProjectionTextfill } from '/shared/projection-textfill.js';
+import { createProjectionContentDeduper } from '/shared/projection-content-dedupe.js';
 import { wsLiveUrl } from '/shared/ws-live-url.js';
 
 attachDisplayDebugOverlayListener();
@@ -67,6 +68,7 @@ const footerAlertOverlay = createFooterAlertOverlay({
   kind: 'display',
   id: LOCAL_DISPLAY_ID !== null ? String(LOCAL_DISPLAY_ID) : '',
 });
+const contentDeduper = createProjectionContentDeduper();
 
 const typography = createProjectionTypographySession({
   rootEl: byId<HTMLElement>('conteudo'),
@@ -95,13 +97,16 @@ function applyAction(action: LiveAction): void {
   switch (action.acao) {
     case 'viewMusicaRetorno':
     case 'viewBibliaRetorno':
+      if (!contentDeduper.shouldApply(action.valor)) return;
       content.style.visibility = 'hidden';
       content.innerHTML = action.valor;
       break;
     case 'removeConteudo':
+      if (!contentDeduper.shouldApply('')) return;
       content.innerHTML = '';
       break;
     case 'atualizar':
+      contentDeduper.reset();
       location.reload();
       break;
     case 'serviceTimer':

@@ -17,6 +17,7 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 ### Alterado
 
 - **Posição de largada na fila** — o destino passa a ser derivado do lado do cursor sobre o item alvo (metade esquerda insere antes, direita insere depois) em vez de substituir o índice do alvo.
+- **Deduplicação da projeção** — cada saída compara a hash e o conteúdo já renderizado; clicar novamente no mesmo verso não substitui o DOM nem executa o textfill outra vez.
 
 ### Corrigido
 

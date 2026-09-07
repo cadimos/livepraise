@@ -19,6 +19,7 @@ import {
   fetchProjectionTypographyPrefs,
 } from '/shared/projection-typography-runtime.js';
 import { createProjectionTextfill } from '/shared/projection-textfill.js';
+import { createProjectionContentDeduper } from '/shared/projection-content-dedupe.js';
 import { wsLiveUrl } from '/shared/ws-live-url.js';
 
 attachDisplayDebugOverlayListener();
@@ -149,6 +150,7 @@ const footerAlertOverlay = createFooterAlertOverlay({
   kind: 'display',
   id: LOCAL_DISPLAY_ID !== null ? String(LOCAL_DISPLAY_ID) : (LOCAL_DEVICE_ID ?? ''),
 });
+const contentDeduper = createProjectionContentDeduper();
 
 function shouldApplyScreenLayout(valor: string): ReturnType<typeof parseAjustarTelaPayload> | null {
   const parsed = parseAjustarTelaPayload(valor);
@@ -355,20 +357,25 @@ function applyAction(action: LiveAction): void {
       break;
     }
     case 'texto': {
-      content.textContent = decodeURIComponent(action.valor);
+      const text = decodeURIComponent(action.valor);
+      if (!contentDeduper.shouldApply(text)) return;
+      content.textContent = text;
       break;
     }
     case 'viewMusica':
     case 'viewBiblia': {
+      if (!contentDeduper.shouldApply(action.valor)) return;
       content.style.visibility = 'hidden';
       content.innerHTML = action.valor;
       break;
     }
     case 'removeConteudo': {
+      if (!contentDeduper.shouldApply('')) return;
       content.innerHTML = '';
       break;
     }
     case 'atualizar': {
+      contentDeduper.reset();
       location.reload();
       break;
     }

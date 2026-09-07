@@ -9,6 +9,7 @@
       "/shared/projection-contrast.js": ["./dist/shared/projection-contrast.d.ts"],
       "/shared/ws-live-url.js": ["./dist/shared/ws-live-url.d.ts"],
       "/shared/projection-media-url.js": ["./dist/shared/projection-media-url.d.ts"],
+      "/shared/projection-content-dedupe.js": ["./dist/shared/projection-content-dedupe.d.ts"],
       "/shared/projection-typography-runtime.js": ["./dist/shared/projection-typography-runtime.d.ts"],
       "/shared/projection-textfill.js": ["./dist/shared/projection-textfill.d.ts"],
       "/shared/projection-typography.js": ["./dist/shared/projection-typography.d.ts"],
