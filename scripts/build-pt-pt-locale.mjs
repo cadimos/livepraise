@@ -52,6 +52,8 @@ const OVERRIDES = {
   'Salvar': 'Guardar',
   'A alteração será aplicada somente a este item da playlist e não modificará a música salva.':
     'A alteração será aplicada apenas a este item da playlist e não modificará a música guardada.',
+  'A alteração será aplicada somente a este item da playlist e não modificará o texto da Bíblia.':
+    'A alteração será aplicada apenas a este item da playlist e não modificará o texto da Bíblia.',
   'Tela projetor': 'Ecrã do projetor',
   'Activar ferramenta': 'Ativar ferramenta',
   'Nenhum monitor de projeção ou retorno configurado. Defina papéis em Configurações → Tela projetor.':

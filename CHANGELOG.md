@@ -9,6 +9,7 @@ O formato baseia-se em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0
 ### Adicionado
 
 - **Auto-update no operador** — faixa no topo com progresso de download, estado de instalação e botão Instalar agora (`AppUpdateBanner`).
+- **Edição local de textos na playlist** — versos de músicas e versículos bíblicos podem ser ajustados na fila sem modificar o repertório nem os ficheiros da Bíblia.
 - **Reordenar músicas na fila** — as abas da playlist passam a ser arrastáveis, com barra a marcar a posição de inserção.
 - **Alternativas ao arrasto** — `Alt+←` / `Alt+→` deslocam o item projetado (ou a aba focada); menu de contexto do item ganha "Mover para a esquerda/direita".
 - **Smoke `npm run smoke:queue-dnd`** — arrastos HTML5 reais via Chrome DevTools Protocol; ignorado quando não há Chrome disponível.

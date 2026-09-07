@@ -332,6 +332,11 @@ function translateValue(value) {
     'A alteração será aplicada somente a este item da playlist e não modificará a música salva.':
       'This change applies only to this playlist item and will not modify the saved song.',
     'Texto do verso': 'Verse text',
+    'Editar versículo': 'Edit Bible verse',
+    'Editar o versículo «{label}»': 'Edit Bible verse «{label}»',
+    'A alteração será aplicada somente a este item da playlist e não modificará o texto da Bíblia.':
+      'This change applies only to this playlist item and will not modify the Bible text.',
+    'Texto do versículo': 'Bible verse text',
     'Mover para a esquerda': 'Move left',
     'Mover para a direita': 'Move right',
     'Online': 'Online',

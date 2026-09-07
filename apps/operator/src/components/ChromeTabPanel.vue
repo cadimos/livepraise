@@ -60,6 +60,7 @@ const queueMenuItem = ref<QueueItem | null>(null);
 const queueMenuItemLabel = ref('');
 const editingTabId = ref<string | null>(null);
 const editingItemId = ref<string | null>(null);
+const editingItemKind = ref<'music' | 'bible' | null>(null);
 const editingVerseText = ref('');
 const { sendAction } = useLiveSocket();
 const { matches: matchesShortcut } = useShortcuts();
@@ -142,16 +143,54 @@ function onItemKeydown(event: KeyboardEvent, item: QueueItem, index: number): vo
   onItemClick(item, index);
 }
 
+function isEditableTextItem(item: QueueItem): boolean {
+  return item.kind === 'music' || item.kind === 'bible';
+}
+
+function editItemTitle(item: QueueItem): string {
+  return item.kind === 'bible'
+    ? t('queueItem.editBibleVerse')
+    : t('queueItem.editVerse');
+}
+
+function editItemAriaLabel(item: QueueItem): string {
+  const key =
+    item.kind === 'bible'
+      ? 'queueItem.editBibleVerseAria'
+      : 'queueItem.editVerseAria';
+  return t(key, { label: item.label });
+}
+
+const editorTitle = computed(() =>
+  editingItemKind.value === 'bible'
+    ? t('queueItem.editBibleVerse')
+    : t('queueItem.editVerse'),
+);
+
+const editorHint = computed(() =>
+  editingItemKind.value === 'bible'
+    ? t('queueItem.editBibleVerseHint')
+    : t('queueItem.editVerseHint'),
+);
+
+const editorTextLabel = computed(() =>
+  editingItemKind.value === 'bible'
+    ? t('queueItem.bibleVerseText')
+    : t('queueItem.verseText'),
+);
+
 function startEditingVerse(tabId: string, item: QueueItem): void {
-  if (item.kind !== 'music') return;
+  if (!isEditableTextItem(item)) return;
   editingTabId.value = tabId;
   editingItemId.value = item.id;
+  editingItemKind.value = item.kind;
   editingVerseText.value = item.text ?? '';
 }
 
 function closeVerseEditor(): void {
   editingTabId.value = null;
   editingItemId.value = null;
+  editingItemKind.value = null;
   editingVerseText.value = '';
 }
 
@@ -160,10 +199,13 @@ function saveEditedVerse(): void {
   const itemId = editingItemId.value;
   const text = editingVerseText.value.trim();
   if (!tabId || !itemId || !text) return;
-  updateQueueItem(tabId, itemId, {
-    text,
-    label: summarizeLabel(text),
-  });
+  updateQueueItem(
+    tabId,
+    itemId,
+    editingItemKind.value === 'music'
+      ? { text, label: summarizeLabel(text) }
+      : { text },
+  );
   closeVerseEditor();
 }
 
@@ -532,11 +574,11 @@ onUnmounted(() => {
           @drop.stop="onTileDrop($event, index)"
         >
           <button
-            v-if="item.kind === 'music'"
+            v-if="isEditableTextItem(item)"
             type="button"
             class="absolute left-1 top-1 z-10 rounded bg-lp-background/80 p-1 text-lp-muted transition hover:bg-lp-primary/30 hover:text-lp-text"
-            :title="t('queueItem.editVerse')"
-            :aria-label="t('queueItem.editVerseAria', { label: item.label })"
+            :title="editItemTitle(item)"
+            :aria-label="editItemAriaLabel(item)"
             draggable="false"
             @click.stop="startEditingVerse(activeTab.id, item)"
             @pointerdown.stop
@@ -618,14 +660,14 @@ onUnmounted(() => {
       role="menu"
       @click.stop
     >
-      <li v-if="queueMenuItem?.kind === 'music'">
+      <li v-if="queueMenuItem && isEditableTextItem(queueMenuItem)">
         <button
           type="button"
           class="w-full px-3 py-2 text-left hover:bg-lp-surface"
           role="menuitem"
           @click="onMenuEditVerse"
         >
-          {{ t('queueItem.editVerse') }}
+          {{ editItemTitle(queueMenuItem) }}
         </button>
       </li>
       <li v-if="queueMenuCanMoveLeft">
@@ -700,19 +742,19 @@ onUnmounted(() => {
         class="w-full max-w-2xl rounded-xl border border-lp-surface bg-lp-background p-5 shadow-2xl"
         role="dialog"
         aria-modal="true"
-        :aria-label="t('queueItem.editVerse')"
+        :aria-label="editorTitle"
         @submit.prevent="saveEditedVerse"
       >
         <h2 class="mb-1 text-lg font-semibold text-lp-text">
-          {{ t('queueItem.editVerse') }}
+          {{ editorTitle }}
         </h2>
         <p class="mb-4 text-sm text-lp-muted">
-          {{ t('queueItem.editVerseHint') }}
+          {{ editorHint }}
         </p>
         <textarea
           v-model="editingVerseText"
           class="min-h-56 w-full resize-y rounded-lg border border-lp-surface bg-lp-surface/40 p-3 font-mono text-sm text-lp-text outline-none focus:border-lp-primary"
-          :aria-label="t('queueItem.verseText')"
+          :aria-label="editorTextLabel"
           autofocus
         />
         <div class="mt-4 flex justify-end gap-2">
