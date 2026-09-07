@@ -1,6 +1,6 @@
 # Dívida técnica registada (ST-027–032)
 
-Itens **fora do escopo da linha alpha actual** ou melhorias opcionais. Detalhe funcional em [`INVENTARIO-FUNCOES.md`](../INVENTARIO-FUNCOES.md) (actualizado para `1.0.0-alpha.3`).
+Itens **fora do escopo da linha alpha actual** ou melhorias opcionais. Detalhe funcional em [`INVENTARIO-FUNCOES.md`](../INVENTARIO-FUNCOES.md) (actualizado para `1.0.0-alpha.4`).
 
 ## ST-027 — i18n portal e remote
 

@@ -2,7 +2,7 @@
 /**
  * Actualiza package.json (e lock) e propaga a versão para todos os consumidores.
  *
- * Uso: npm run bump-version -- 1.0.0-alpha.3
+ * Uso: npm run bump-version -- 1.0.0-alpha.4
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,7 +33,7 @@ function main() {
   const nextVersion = process.argv[2]?.trim();
   if (!nextVersion) {
     console.error('Uso: npm run bump-version -- <versão>');
-    console.error('Ex.: npm run bump-version -- 1.0.0-alpha.3');
+    console.error('Ex.: npm run bump-version -- 1.0.0-alpha.4');
     process.exit(1);
   }
   if (!VERSION_RE.test(nextVersion)) {

@@ -1,6 +1,6 @@
 # Inventário pendente — Live Praise
 
-**Versão analisada:** `1.0.0-alpha.3`  
+**Versão analisada:** `1.0.0-alpha.4`  
 **Última actualização:** 2026-09-07 (cruzamento com código, CI e [`CHANGELOG.md`](CHANGELOG.md))  
 **Repositório:** `electron/`, `server/`, `core/`, `apps/`, `web/`, `shared/`
 
@@ -14,7 +14,7 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). Se
 
 ## Resumo executivo
 
-| # | Item | Estado | Notas (alpha.3) |
+| # | Item | Estado | Notas (alpha.4) |
 |---|------|--------|-----------------|
 | 0 | Migração v0.0.8 → 1.x | ✅ | `legacy-upgrade.ts` + `smoke:legacy-upgrade` |
 | 1 | Auditoria e retenção | ✅ | API `GET /api/audit/logs`; **sem painel UI** (opcional) |
@@ -25,7 +25,7 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). Se
 | 6 | Busca online de louvores | 📅 | Só Fuse.js local |
 | 7 | Editor visual de temas | 📅 | Temas bundled + `theme.json` manual |
 | 8 | Telemetria opt-in | 📅 | Só log local `/api/system/error-log` |
-| 9 | Versão única no build | ✅ | `bump-version` + `shared/app-version.ts` (`1.0.0-alpha.3`) |
+| 9 | Versão única no build | ✅ | `bump-version` + `shared/app-version.ts` (`1.0.0-alpha.4`) |
 | 10 | Smoke instalador Windows | ✅ | `smoke:win-installer` / `:ci` no job Windows de `release.yml` (SM-035) |
 | 11 | Import/export repertório | ✅ | `GET/POST /musica/export\|import` |
 | 12 | Acessibilidade WCAG | ✅ | Tema **alto contraste** + `aria-*` pontuais; auditoria `axe-core` **sem** `npm run a11y` (dívida) |
@@ -34,7 +34,7 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). Se
 | 15 | Fila partilhada | ✅ | **GET/PUT `/api/operator-queue`** + WS `operator-queue-sync` |
 | 16 | Diagnóstico textfill | ✅ | JSONL + UI Logs; **rotas ainda fora do OpenAPI** |
 
-### Ainda pendente *(pós-alpha.3)*
+### Ainda pendente *(pós-alpha.4)*
 
 | # | Item | Tipo |
 |---|------|------|
@@ -48,6 +48,17 @@ Backlog do que **ainda não está implementado** (ou está só parcialmente). Se
 | **OpenAPI** | Backup, tipografia, textfill-diagnostics (existem no servidor, fora da lista canónica) | Documentação |
 
 Sincronização **multi-estação completa** (várias máquinas como um único culto, além da fila partilhada) continua **fora de escopo**.
+
+### Entregue em **alpha.4** ✅
+
+| Item | Verificação |
+|------|-------------|
+| Reordenar fila (arrasto, `Alt+←`/`Alt+→`, menu) | `npm run smoke:queue-dnd` |
+| Edição local de textos na playlist | UI da fila (não grava repertório/Bíblia) |
+| Atalhos de mídia no ambiente de trabalho | Primeiro arranque / instalador Windows |
+| Splash com progresso | Arranque Electron |
+| Auto-update visível no operador | `AppUpdateBanner` (progresso + Instalar agora) |
+| Deduplicação da projeção | Mesmo verso não re-executa textfill |
 
 ### Entregue em **alpha.3** ✅
 
@@ -457,7 +468,7 @@ Envio **opt-in** e anónimo para endpoint configurável (Sentry/DSN). Desligado 
 
 Hoje, cada release exige editar a versão **manualmente em vários sítios** (`package.json`, `preload.ts`, barra de estado, modal Sobre, exemplo OpenAPI). Isto **não é um bug** — funciona — mas é trabalho repetitivo e risco de um sítio ficar desactualizado.
 
-**Problema que resolve:** um único `npm run bump-version 1.0.0-alpha.4` (ou a versão seguinte) propaga o número para todos os ficheiros.
+**Problema que resolve:** um único `npm run bump-version 1.0.0-alpha.5` (ou a versão seguinte) propaga o número para todos os ficheiros.
 
 **Não é:** corrigir versão errada na app (desde que edites todos os ficheiros no bump, está coerente).
 
@@ -715,8 +726,8 @@ Isto **não** é sincronização multi-estação completa (preferências, mídia
 ## Metodologia
 
 1. Varredura de `server/`, `apps/`, `web/`, `core/`, `shared/`, `.github/workflows/` e scripts `smoke-*.mjs`.
-2. Confronto com o repositório em **2026-09-07** (`package.json` = `1.0.0-alpha.3`).
+2. Confronto com o repositório em **2026-09-07** (`package.json` = `1.0.0-alpha.4`).
 3. Lista canónica OpenAPI: **69** operações em `scripts/verify-openapi-coverage.mjs` (backup, tipografia e textfill-diagnostics **fora** desta lista).
-4. Smokes: `smoke:audit`, `smoke:locales`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version`, `smoke:legacy-upgrade`, `smoke:queue-sync`, `smoke:win-installer:ci`.
+4. Smokes: `smoke:audit`, `smoke:locales`, `smoke:video-watcher`, `smoke:musica-export`, `smoke:version`, `smoke:legacy-upgrade`, `smoke:queue-sync`, `smoke:queue-dnd`, `smoke:win-installer:ci`.
 
 ---

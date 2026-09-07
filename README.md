@@ -4,11 +4,11 @@
 
 Software desktop open-source (MIT) para projeção de louvores, passagens bíblicas, imagens e vídeos em cultos — operador local com pré-visualização multi-saída, retorno de palco, ecrãs externos e controlo remoto.
 
-**Versão actual:** `1.0.0-alpha.3` — ver [`CHANGELOG.md`](CHANGELOG.md) para novidades e migração.
+**Versão actual:** `1.0.0-alpha.4` — ver [`CHANGELOG.md`](CHANGELOG.md) para novidades e migração.
 
 ## Funcionalidades
 
-- Fila de projeção com abas (louvor, Bíblia, imagens, vídeos, slides em branco) e drag-and-drop.
+- Fila de projeção com abas (louvor, Bíblia, imagens, vídeos, slides em branco); drag-and-drop, atalhos e edição local de textos na fila.
 - Multi-monitor: operador, projetor, retorno de palco; papéis configuráveis por ecrã.
 - Pré-visualização por destino de saída (projetor, retorno, live, vocal, stage, player).
 - Tipografia de projeção configurável por perfil (fonte, textfill, sombra).
@@ -16,7 +16,8 @@ Software desktop open-source (MIT) para projeção de louvores, passagens bíbli
 - Importação para fila: ficheiro local, YouTube e URL HTTP(S).
 - Autenticação local, utilizadores com papéis, controlo remoto web e fila de aprovações.
 - Backup e restore selectivo do ambiente (`~/livepraise`).
-- Auto-update via GitHub Releases em builds empacotados.
+- Auto-update via GitHub Releases em builds empacotados, com progresso no operador.
+- Atalhos no ambiente de trabalho para as pastas de imagens e vídeos (`~/livepraise/`).
 
 ## Estrutura do repositório
 
